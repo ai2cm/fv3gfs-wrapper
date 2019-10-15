@@ -1,0 +1,12 @@
+include HISTORY.md
+include LICENSE
+include README.md
+include fv3.exe
+
+recursive-include tests *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+
+recursive-include docs *.rst conf.py Makefile make.bat *.jpg *.png *.gif
+recursive-include lib *
+recursive-include fv3gfs *
