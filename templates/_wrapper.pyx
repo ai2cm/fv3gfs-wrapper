@@ -17,6 +17,7 @@ cdef extern:
     void do_dynamics()
     void do_physics()
     void save_intermediate_restart_if_enabled_subroutine()
+    void initialize_time_subroutine(int *year, int *month, int *day, int *hour, int *minute, int *second)
     void get_centered_grid_dimensions(int *nx, int *ny, int *nz)
     void get_n_ghost_cells_subroutine(int *n_ghost)
     void get_u(REAL_t *u_out)
@@ -107,13 +108,33 @@ def get_array_from_dims(dim_name_list):
     return np.empty(shape_list, dtype=real_type)
 
 
+def set_time(time):
+    """Set model time to the given datetime.
+
+    Does not change end time of the model run, or reset the step count.
+
+    Args:
+        time (datetime): the target time
+    """
+    cdef int year, month, day, hour, minute, second
+    year = time.year
+    month = time.month
+    day = time.day
+    hour = time.hour
+    minute = time.minute
+    second = time.second
+    initialize_time_subroutine(&year, &month, &day, &hour, &minute, &second)
+
+
 def set_state(dict state):
     cdef REAL_t[:, :, ::1] input_value_3d
     cdef REAL_t[:, ::1] input_value_2d
     cdef REAL_t[::1] input_value_1d
     tracer_metadata = get_tracer_metadata()
     for name, data_array in state.items():
-        if len(data_array.shape) == 3:
+        if name == 'time':
+            set_time(state[name])
+        elif len(data_array.shape) == 3:
             set_3d_quantity(name, data_array.values, data_array.shape[0], tracer_metadata)
         elif len(data_array.shape) == 2:
             set_2d_quantity(name, data_array.values)
@@ -264,6 +285,16 @@ cpdef dict get_tracer_metadata():
     (the short name in Fortran) and 'units'.
     """
     cdef dict out_dict = {}
+    for i_tracer_minus_one, (tracer_name, tracer_long_name, tracer_units) in enumerate(get_tracer_metadata_list()):
+        out_dict[str(tracer_long_name).replace(' ', '_')] = {
+            'i_tracer': i_tracer_minus_one + 1,
+            'fortran_name': tracer_name,
+            'units': tracer_units
+        }
+    return out_dict
+
+cdef list get_tracer_metadata_list():
+    cdef list out_list = []
     cdef int n_prognostic_tracers, n_total_tracers, i_tracer
     # these lengths were chosen arbitrarily as "probably long enough"
     cdef char tracer_name[64]
@@ -273,12 +304,8 @@ cpdef dict get_tracer_metadata():
     get_tracer_count(&n_prognostic_tracers, &n_total_tracers)
     for i_tracer in range(1, n_total_tracers + 1):
         get_tracer_name(&i_tracer, &tracer_name[0], &tracer_long_name[0], &tracer_units[0])
-        out_dict[str(tracer_long_name).replace(' ', '_')] = {
-            'i_tracer': i_tracer,
-            'fortran_name': tracer_name,
-            'units': tracer_units
-        }
-    return out_dict
+        out_list.append((tracer_name, tracer_long_name, tracer_units))
+    return out_list
 
 
 def initialize():

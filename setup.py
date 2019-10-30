@@ -15,8 +15,10 @@ fv3gfs_build_path_environ_name = 'FV3GFS_BUILD_DIR'
 make_command = os.environ.get('MAKE', 'make')
 package_dir = os.path.dirname(os.path.abspath(__file__))
 
+
 class BuildDirectoryError(Exception):
     pass
+
 
 relative_wrapper_build_filenames = ['lib/coupler_lib.o', 'lib/physics_data.o', 'lib/dynamics_data.o', ]
 
@@ -32,7 +34,7 @@ library_link_args = [
     '-lmvec', '-lblas',
 ]
 
-requirements = ['xarray>=0.13.0']
+requirements = ['xarray>=0.13.0', 'netCDF4', 'numpy']
 
 setup_requirements = ['cython', 'numpy', 'jinja2']
 
