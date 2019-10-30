@@ -8,7 +8,7 @@ Welcome to FV3GFS's documentation!
    readme
    installation
    usage
-   modules
+   api
    history
 
 Indices and tables

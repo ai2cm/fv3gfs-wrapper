@@ -32,9 +32,9 @@ library_link_args = [
     '-lmvec', '-lblas',
 ]
 
-requirements = []
+requirements = ['xarray>=0.13.0']
 
-setup_requirements = ['cython', 'numpy']
+setup_requirements = ['cython', 'numpy', 'jinja2']
 
 test_requirements = []
 
@@ -71,7 +71,7 @@ ext_modules = [
     Extension(# module name:
         'fv3gfs._wrapper',
         # source file:
-        ['fv3gfs/_wrapper.pyx'],
+        ['lib/_wrapper.pyx'],
         include_dirs=[
             get_include(),
         ],
@@ -96,15 +96,15 @@ setup(
     install_requires=requirements,
     setup_requires=setup_requirements,
     tests_require=test_requirements,
-    name = 'fv3gfs',
+    name='fv3gfs',
     license="BSD license",
     long_description=readme + '\n\n' + history,
-    cmdclass = {'build_ext': build_ext},
-    packages=['fv3gfs', 'tests'],
+    cmdclass={'build_ext': build_ext},
+    packages=['fv3gfs'],
     # Needed if building with NumPy.
     # This includes the NumPy headers when compiling.
-    include_dirs = [get_include()],
-    ext_modules = cythonize(ext_modules),
+    include_dirs=[get_include()],
+    ext_modules=cythonize(ext_modules),
     url='https://github.com/VulcanClimateModeling/fv3gfs',
     version='0.1.0',
     zip_safe=False,

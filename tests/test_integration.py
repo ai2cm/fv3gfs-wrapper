@@ -3,6 +3,8 @@ import os
 import subprocess
 import shutil
 import hashlib
+from fv3config import get_default_config, write_run_directory
+import fv3config
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.abspath(os.path.join(base_dir, os.pardir))
@@ -36,17 +38,14 @@ class FV3GFSRunTests(unittest.TestCase):
         clear_workdir(work_dir)
         clear_workdir(fortran_work_dir)
 
-    def test_getters(self):
-        perform_python_run(os.path.join(base_dir, 'runs/test_getters.py'))
+    def test_fortran(self):
+        perform_fortran_run()  # test that the Fortran model runs without an error
 
-    def test_setters_after_init(self):
-        perform_python_run(os.path.join(base_dir, 'runs/test_setters_after_init.py'))
-
-    def test_setters_after_steps(self):
-        perform_python_run(os.path.join(base_dir, 'runs/test_setters_after_steps.py'))
+    # def test_restart(self):
+    #     perform_python_run(os.path.join(base_dir, 'integration_scripts/test_restart.py'))
 
     def test_default_run(self):
-        perform_python_run(os.path.join(base_dir, 'runs/default_run.py'))
+        perform_python_run()
         perform_fortran_run()
         failures = compare_paths(work_dir, fortran_work_dir, exclude_names=['logfile.000000.out'])
         self.assertFalse(failures)
@@ -81,7 +80,9 @@ def files_match_if_present(name1, name2):
 
 def prepare_workdir(work_dir):
     clear_workdir(work_dir)
-    shutil.copytree(input_dir, work_dir)
+    os.mkdir(work_dir)
+    config = get_default_config()
+    write_run_directory(config, work_dir)
 
 
 def clear_workdir(work_dir):
@@ -89,12 +90,16 @@ def clear_workdir(work_dir):
         shutil.rmtree(work_dir)
 
 
-def perform_python_run(filename, n_processes=6):
-    base_filename = os.path.basename(filename)
-    work_filename = os.path.join(work_dir, base_filename)
-    shutil.copy2(filename, work_filename)
+def perform_python_run(filename=None, n_processes=6):
+    if filename is None:
+        python_args = ["python3", "-m", "fv3gfs.run"]
+    else:
+        base_filename = os.path.basename(filename)
+        work_filename = os.path.join(work_dir, base_filename)
+        shutil.copy2(filename, work_filename)
+        python_args = ["python3", work_filename]
     subprocess.check_call(
-        ["mpirun", "-n", str(n_processes)] + mpi_flags + ["python3", base_filename],
+        ["mpirun", "-n", str(n_processes)] + mpi_flags + python_args,
         cwd=work_dir,
     )
 
