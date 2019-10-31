@@ -15,6 +15,7 @@ def fail(message):
     test_has_failed = True
     logging.error(f'FAIL: {message}')
 
+
 def test_has_failed():
     global _test_has_failed
     return _test_has_failed

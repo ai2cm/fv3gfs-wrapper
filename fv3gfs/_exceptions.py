@@ -1,3 +1,7 @@
 
-class InvalidQuantityError(Exception):
+class InvalidQuantityError(ValueError):
+    pass
+
+
+class AliasRegistrationError(Exception):
     pass
