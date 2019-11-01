@@ -61,7 +61,7 @@ class TracerMetadataTests(unittest.TestCase):
                 self.assertIsInstance(metadata['i_tracer'], int)
                 self.assertIsInstance(metadata['fortran_name'], str)
 
-    def test_all_traces_present(self):
+    def test_all_tracers_present(self):
         tracer_names = [
             'specific_humidity', 'cloud_water_mixing_ratio', 'rain_mixing_ratio', 'cloud_ice_mixing_ratio',
             'snow_mixing_ratio', 'graupel_mixing_ratio', 'ozone_mixing_ratio', 'cloud_amount'
