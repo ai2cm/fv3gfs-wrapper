@@ -161,6 +161,11 @@ contains
         nc = nc + 1
     end subroutine save_intermediate_restart_if_enabled_subroutine
 
+    subroutine save_intermediate_restart_subroutine() bind(c)
+        call atmos_model_restart(Atm, timestamp)
+        call coupler_res(timestamp)
+    end subroutine save_intermediate_restart_subroutine
+
     subroutine cleanup() bind(c, name='cleanup_subroutine')
 #ifdef AVEC_TIMERS
         call avec_timers_output

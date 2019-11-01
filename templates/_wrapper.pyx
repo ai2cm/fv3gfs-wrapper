@@ -17,6 +17,7 @@ cdef extern:
     void do_dynamics()
     void do_physics()
     void save_intermediate_restart_if_enabled_subroutine()
+    void save_intermediate_restart_subroutine()
     void initialize_time_subroutine(int *year, int *month, int *day, int *hour, int *minute, int *second)
     void get_centered_grid_dimensions(int *nx, int *ny, int *nz)
     void get_n_ghost_cells_subroutine(int *n_ghost)
@@ -330,6 +331,10 @@ def step_physics():
 
 def save_intermediate_restart_if_enabled():
     save_intermediate_restart_if_enabled_subroutine()
+
+
+def save_intermediate_restart():
+    save_intermediate_restart_subroutine()
 
 
 def cleanup():
