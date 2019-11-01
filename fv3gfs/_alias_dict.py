@@ -1,4 +1,5 @@
 from ._exceptions import AliasRegistrationError
+from ._fortran_info import dynamics_properties, physics_properties, get_tracer_metadata
 
 __all__ = ['register_alias', 'register_fortran_aliases', 'AliasDict']
 
@@ -27,7 +28,12 @@ def register_alias(**kwargs):
 def register_fortran_aliases():
     """Register all fortran variable names as aliases for long names.
     """
-    raise NotImplementedError()
+    aliases = {}
+    for properties in dynamics_properties + physics_properties:
+        aliases[properties['fortran_name']] = properties['name']
+    for name, properties in get_tracer_metadata().items():
+        aliases[properties['fortran_name']] = name
+    register_alias(**aliases)
 
 
 def reset_alias_dict_for_testing():
