@@ -117,6 +117,7 @@ class GetterTests(unittest.TestCase):
 
     def _get_names_helper(self, name_list):
         state = fv3gfs.get_state(names=name_list)
+        self.assertIsInstance(state, fv3gfs.AliasDict)
         for name, value in state.items():
             self.assertIsInstance(name, str)
             self.assertIsInstance(value, xr.DataArray)

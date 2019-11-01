@@ -6,6 +6,7 @@ import numpy as np
 import xarray as xr
 from mpi4py import MPI
 from ._exceptions import InvalidQuantityError
+from ._alias_dict import AliasDict
 
 ctypedef cnp.double_t REAL_t
 real_type = np.float64
@@ -176,7 +177,7 @@ def get_state(names=None):
     Arguments:
         names (list of str, optional): A list of names to get. Gets all names by default.
     """
-    cdef dict return_dict = {}
+    return_dict = AliasDict()
     cdef REAL_t[::1] array_1d
     cdef REAL_t[:, ::1] array_2d
     cdef REAL_t[:, :, ::1] array_3d
