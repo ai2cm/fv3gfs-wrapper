@@ -1,13 +1,13 @@
 import unittest
 import json
 import os
-import sys
 import shutil
 import xarray as xr
+import numpy as np
 import fv3config
 import fv3gfs
-import numpy as np
 from mpi4py import MPI
+from util import redirect_stdout
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -171,7 +171,9 @@ if __name__ == '__main__':
     original_path = os.getcwd()
     os.chdir(rundir)
     try:
-        fv3gfs.initialize()
+        with redirect_stdout(os.path.join(test_dir, f'logs/test_getters.rank{rank}.log')):
+            fv3gfs.initialize()
+            MPI.COMM_WORLD.barrier()
         if rank != 0:
             kwargs = {'verbosity': 0}
         else:

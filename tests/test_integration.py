@@ -4,7 +4,6 @@ import subprocess
 import shutil
 import hashlib
 from fv3config import get_default_config, write_run_directory
-import fv3config
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.abspath(os.path.join(base_dir, os.pardir))
@@ -39,10 +38,10 @@ class FV3GFSRunTests(unittest.TestCase):
         clear_workdir(fortran_work_dir)
 
     # def test_fortran(self):
-    #     perform_fortran_run()  # test that the Fortran model runs without an error
+    #     perform_fortran_run('test_fortran')  # test that the Fortran model runs without an error
 
     def test_restart_default_run(self):
-        perform_python_run(os.path.join(base_dir, 'integration_scripts/test_restart.py'))
+        perform_python_run('restart_default_run', os.path.join(base_dir, 'integration_scripts/test_restart.py'))
 
     def test_restart_without_physics(self):
         clear_workdir(work_dir)
@@ -50,13 +49,13 @@ class FV3GFSRunTests(unittest.TestCase):
         config = get_default_config()
         config['namelist']['atmos_model_nml']['dycore_only'] = True
         write_run_directory(config, work_dir)
-        perform_python_run(os.path.join(base_dir, 'integration_scripts/test_restart.py'))
+        perform_python_run('restart_without_physics', os.path.join(base_dir, 'integration_scripts/test_restart.py'))
 
-    # def test_default_run(self):
-    #     perform_python_run()
-    #     perform_fortran_run()
-    #     failures = compare_paths(work_dir, fortran_work_dir, exclude_names=['logfile.000000.out'])
-    #     self.assertFalse(failures)
+    def test_default_python_equals_fortran(self):
+        perform_python_run('python_for_test_default_python_equals_fortran')
+        perform_fortran_run('fortran_for_test_default_python_equals_fortran')
+        failures = compare_paths(work_dir, fortran_work_dir, exclude_names=['logfile.000000.out'])
+        self.assertFalse(failures)
 
 
 def compare_paths(path1, path2, exclude_names=None):
@@ -98,7 +97,7 @@ def clear_workdir(work_dir):
         shutil.rmtree(work_dir)
 
 
-def perform_python_run(filename=None, n_processes=6):
+def perform_python_run(run_name, filename=None, n_processes=6):
     if filename is None:
         python_args = ["python3", "-m", "fv3gfs.run"]
     else:
@@ -106,22 +105,24 @@ def perform_python_run(filename=None, n_processes=6):
         work_filename = os.path.join(work_dir, base_filename)
         shutil.copy2(filename, work_filename)
         python_args = ["python3", work_filename]
-    subprocess.check_call(
-        ["mpirun", "-n", str(n_processes)] + mpi_flags + python_args,
-        cwd=work_dir,
-    )
+    with open(os.path.join(base_dir, f'logs/{run_name}.log'), 'wb') as outfile:
+        subprocess.check_call(
+            ["mpirun", "-n", str(n_processes)] + mpi_flags + python_args,
+            cwd=work_dir, stdout=outfile
+        )
 
 
-def perform_fortran_run(n_processes=6):
+def perform_fortran_run(run_name, n_processes=6):
     filename = os.path.join(parent_dir, 'fv3.exe')
     base_filename = os.path.basename(filename)
     work_filename = os.path.join(fortran_work_dir, base_filename)
     shutil.copy2(filename, work_filename)
     print(f'Copied {filename} to {work_filename}')
-    subprocess.check_call(
-        ["mpirun", "-n", str(n_processes)] + mpi_flags + [work_filename],
-        cwd=fortran_work_dir,
-    )
+    with open(os.path.join(base_dir, f'logs/{run_name}.log'), 'wb') as outfile:
+        subprocess.check_call(
+            ["mpirun", "-n", str(n_processes)] + mpi_flags + [work_filename],
+            cwd=fortran_work_dir, stdout=outfile
+        )
 
 
 if __name__ == '__main__':

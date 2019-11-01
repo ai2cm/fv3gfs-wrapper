@@ -8,7 +8,7 @@ import numpy as np
 import fv3config
 import fv3gfs
 from mpi4py import MPI
-
+from util import redirect_stdout
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -37,16 +37,20 @@ class SetterTests(unittest.TestCase):
 
     def test_dynamics_names_present(self):
         """Test that some small subset of dynamics names are in the data dictionary"""
-        for name in ['eastward_wind', 'northward_wind', 'vertical_wind', 'surface_geopotential']:
+        for name in [
+                'eastward_wind', 'northward_wind', 'vertical_wind',
+                'surface_geopotential']:
             self.assertIn(name, self.dynamics_data.keys())
 
     def test_physics_names_present(self):
         """Test that some small subset of physics names are in the data dictionary"""
-        for name in ['land_sea_mask', 'surface_temperature', 'surface_roughness', 'air_temperature_at_2m']:
+        for name in [
+                'land_sea_mask', 'surface_temperature', 'surface_roughness',
+                'air_temperature_at_2m']:
             self.assertIn(name, self.physics_data.keys())
 
     def test_set_then_get_cloud_amount(self):
-        """Included because this caused a segfault at some point, as a diagnostic tracer."""
+        """Included because this is the last diagnostic tracer in memory"""
         self._set_names_helper(['cloud_amount'])
 
     def test_dynamics_names_one_at_a_time(self):
@@ -76,10 +80,18 @@ class SetterTests(unittest.TestCase):
         self._set_names_helper(self.tracer_data.keys())
 
     def test_set_then_get_all_names(self):
-        self._set_names_helper(list(self.dynamics_data.keys()) + list(self.physics_data.keys()) + list(self.tracer_data.keys()))
+        self._set_names_helper(
+            list(self.dynamics_data.keys()) +
+            list(self.physics_data.keys()) +
+            list(self.tracer_data.keys())
+        )
 
     def test_set_then_get_only_some_names(self):
-        all_name_list = list(self.dynamics_data.keys()) + list(self.physics_data.keys()) + list(self.tracer_data.keys())
+        all_name_list = (list(
+            self.dynamics_data.keys()) +
+            list(self.physics_data.keys()) +
+            list(self.tracer_data.keys())
+        )
         self._set_names_helper(all_name_list[::3])
 
     def _set_names_helper(self, name_list):
@@ -147,7 +159,9 @@ if __name__ == '__main__':
     original_path = os.getcwd()
     os.chdir(rundir)
     try:
-        fv3gfs.initialize()
+        with redirect_stdout(os.path.join(test_dir, f'logs/test_setters.rank{rank}.log')):
+            fv3gfs.initialize()
+            MPI.COMM_WORLD.barrier()
         if rank != 0:
             kwargs = {'verbosity': 0}
         else:
