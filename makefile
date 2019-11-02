@@ -1,10 +1,10 @@
 SHELL = /bin/sh
 
 ifndef FV3GFS_BUILD_DIR
-$(error FV3GFS_BUILD_DIR is not set)
-endif
-
+$(warning FV3GFS_BUILD_DIR is not set)
+else
 include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
+endif
 
 .PHONY: clean clean-test clean-pyc clean-build docs help
 .DEFAULT_GOAL := help
