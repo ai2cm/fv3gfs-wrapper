@@ -77,7 +77,8 @@ ext_modules = [
         include_dirs=[
             get_include(),
         ],
-        extra_link_args= wrapper_build_filenames + fortran_build_filenames + library_link_args
+        extra_link_args= wrapper_build_filenames + fortran_build_filenames + library_link_args,
+        depends=fortran_build_filenames + wrapper_build_filenames,
     )
 ]
 
