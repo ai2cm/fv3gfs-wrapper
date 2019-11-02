@@ -26,9 +26,6 @@ coupler_filename = 'coupler_res.nc'
 
 def fix_state_dimension_names(state):
     dim_lengths = _wrapper.get_dimension_lengths()
-    n_ghost = _wrapper.get_n_ghost_cells()
-    dim_lengths['nx'] -= 2 * n_ghost  # restart files don't have ghost cells
-    dim_lengths['ny'] -= 2 * n_ghost
     for name, data_array in state.items():
         if name != 'time':
             state[name] = fix_data_array_dimension_names(data_array, **dim_lengths)
