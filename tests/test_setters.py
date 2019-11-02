@@ -94,6 +94,12 @@ class SetterTests(unittest.TestCase):
         )
         self._set_names_helper(all_name_list[::3])
 
+    def test_set_non_existent_quantity(self):
+        with self.assertRaises(ValueError):
+            fv3gfs.set_state({
+                'non_quantity': xr.DataArray([0.], dims=['dim1'], attrs={'units': ''})
+            })
+
     def _set_names_helper(self, name_list):
         self._set_all_names_at_once_helper(name_list)
         self._set_names_one_at_a_time_helper(name_list)
@@ -108,27 +114,29 @@ class SetterTests(unittest.TestCase):
         new_state = fv3gfs.get_state(names=name_list)
         self._check_gotten_state(new_state, name_list)
         for name, new_data_array in new_state.items():
-            replace_data_array = replace_state[name]
-            self.assert_non_ghost_cells_equal(new_data_array, replace_data_array)
+            with self.subTest(name):
+                replace_data_array = replace_state[name]
+                self.assert_non_ghost_cells_equal(new_data_array, replace_data_array)
 
     def _set_names_one_at_a_time_helper(self, name_list):
         old_state = fv3gfs.get_state(names=name_list)
         self._check_gotten_state(old_state, name_list)
         for replace_name in name_list:
-            data_array = deepcopy(old_state[replace_name])
-            data_array.values[:] = np.random.uniform(size=data_array.shape)
-            replace_state = {
-                replace_name: data_array
-            }
-            fv3gfs.set_state(replace_state)
-            new_state = fv3gfs.get_state(names=name_list)
-            self._check_gotten_state(new_state, name_list)
-            for name, new_data_array in new_state.items():
-                if name == replace_name:
-                    self.assert_non_ghost_cells_equal(new_data_array, replace_state[name])
-                else:
-                    self.assert_non_ghost_cells_equal(new_data_array, old_state[name])
-            old_state = new_state
+            with self.subTest(replace_name):
+                data_array = deepcopy(old_state[replace_name])
+                data_array.values[:] = np.random.uniform(size=data_array.shape)
+                replace_state = {
+                    replace_name: data_array
+                }
+                fv3gfs.set_state(replace_state)
+                new_state = fv3gfs.get_state(names=name_list)
+                self._check_gotten_state(new_state, name_list)
+                for name, new_data_array in new_state.items():
+                    if name == replace_name:
+                        self.assert_non_ghost_cells_equal(new_data_array, replace_state[name])
+                    else:
+                        self.assert_non_ghost_cells_equal(new_data_array, old_state[name])
+                old_state = new_state
 
     def _check_gotten_state(self, state, name_list):
         for name, value in state.items():
@@ -159,7 +167,7 @@ if __name__ == '__main__':
     original_path = os.getcwd()
     os.chdir(rundir)
     try:
-        with redirect_stdout(os.path.join(test_dir, f'logs/test_setters.rank{rank}.log')):
+        with redirect_stdout(os.devnull):
             fv3gfs.initialize()
             MPI.COMM_WORLD.barrier()
         if rank != 0:
