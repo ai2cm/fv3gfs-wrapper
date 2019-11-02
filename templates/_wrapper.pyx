@@ -202,13 +202,13 @@ cdef int set_1d_quantity(name, REAL_t[::1] array) except -1:
     return 0
 
 
-def get_state(names=None):
+def get_state(names):
     """
     Returns a dictionary whose keys are quantity long names (with underscores instead of spaces)
     and values are DataArrays containing that quantity's data.
 
     Arguments:
-        names (list of str, optional): A list of names to get. Gets all names by default.
+        names (list of str, optional): A list of names to get.
     """
     cdef dict return_dict = {}
     cdef REAL_t[::1] array_1d
@@ -220,7 +220,7 @@ def get_state(names=None):
         input_names_set = set(names)
 
 {% for item in physics_2d_properties %}
-    if (names is None) or ('{{ item.name }}' in input_names_set):
+    if '{{ item.name }}' in input_names_set:
         array_2d = get_array_from_dims({{ item.dims | safe }})
         get_{{ item.fortran_name }}(&array_2d[0, 0])
         return_dict['{{ item.name }}'] = xr.DataArray(
@@ -231,7 +231,7 @@ def get_state(names=None):
 {% endfor %}
 
 {% for item in physics_3d_properties %}
-    if (names is None) or ('{{ item.name }}' in input_names_set):
+    if '{{ item.name }}' in input_names_set:
         array_3d = get_array_from_dims({{ item.dims | safe }})
         nz = array_3d.shape[0]
         get_{{ item.fortran_name }}(&array_3d[0, 0, 0], &nz)
@@ -244,7 +244,7 @@ def get_state(names=None):
 
 {% for item in dynamics_properties %}
     {% if item.dims|length == 3 %}
-    if (names is None) or ('{{ item.name }}' in input_names_set):
+    if '{{ item.name }}' in input_names_set:
         array_3d = get_array_from_dims({{ item.dims | safe }})
         get_{{ item.fortran_name }}(&array_3d[0, 0, 0])
         return_dict['{{ item.name }}'] = xr.DataArray(
@@ -253,7 +253,7 @@ def get_state(names=None):
             attrs={'units': '{{ item.units }}'}
         )
     {% elif item.dims|length == 2 %}
-    if (names is None) or ('{{ item.name }}' in input_names_set):
+    if '{{ item.name }}' in input_names_set:
         array_2d = get_array_from_dims({{ item.dims | safe }})
         get_{{ item.fortran_name }}(&array_2d[0, 0])
         return_dict['{{ item.name }}'] = xr.DataArray(
@@ -262,7 +262,7 @@ def get_state(names=None):
             attrs={'units': '{{ item.units }}'}
         )
     {% elif item.dims|length == 1 %}
-    if (names is None) or ('{{ item.name }}' in input_names_set):
+    if '{{ item.name }}' in input_names_set:
         array_1d = get_array_from_dims({{ item.dims | safe }})
         get_{{ item.fortran_name }}(&array_1d[0])
         return_dict['{{ item.name }}'] = xr.DataArray(
@@ -274,7 +274,7 @@ def get_state(names=None):
 {% endfor %}
 
     for tracer_name, tracer_data in get_tracer_metadata().items():
-        if (names is None) or (tracer_name in input_names_set):
+        if (tracer_name in input_names_set):
             i_tracer = tracer_data['i_tracer']
             array_3d = get_array_from_dims(['z', 'y', 'x'])
             get_tracer(&i_tracer, &array_3d[0, 0, 0])
