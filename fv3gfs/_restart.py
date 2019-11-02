@@ -4,7 +4,6 @@ import xarray as xr
 from . import _mpi as mpi
 from . import _wrapper
 from ._fortran_info import physics_properties, dynamics_properties
-from ._ghost_cells import with_ghost_cells
 
 calendar_name_dict = {
     'no_calendar': 0,
@@ -98,7 +97,7 @@ def get_restart_data(dirname, label=None):
             get_fv_tracer_data, get_surface_data, get_phy_data):
         state_dict.update(data_func(dirname, label=label))
     fix_state_dimension_names(state_dict)
-    return with_ghost_cells(state_dict)
+    return state_dict
 
 
 def get_integer_tokens(line, n_tokens):

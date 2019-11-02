@@ -70,6 +70,9 @@ class SetterTests(unittest.TestCase):
             self._set_names_helper([name])
             MPI.COMM_WORLD.barrier()
 
+    def test_set_then_get_air_temperature(self):
+        self._set_names_helper(['air_temperature'])
+
     def test_set_then_get_all_dynamics_names(self):
         self._set_names_helper(self.dynamics_data.keys())
 
@@ -116,7 +119,7 @@ class SetterTests(unittest.TestCase):
         for name, new_data_array in new_state.items():
             with self.subTest(name):
                 replace_data_array = replace_state[name]
-                self.assert_non_ghost_cells_equal(new_data_array, replace_data_array)
+                self.assert_values_equal(new_data_array, replace_data_array)
 
     def _set_names_one_at_a_time_helper(self, name_list):
         old_state = fv3gfs.get_state(names=name_list)
@@ -133,9 +136,9 @@ class SetterTests(unittest.TestCase):
                 self._check_gotten_state(new_state, name_list)
                 for name, new_data_array in new_state.items():
                     if name == replace_name:
-                        self.assert_non_ghost_cells_equal(new_data_array, replace_state[name])
+                        self.assert_values_equal(new_data_array, replace_state[name])
                     else:
-                        self.assert_non_ghost_cells_equal(new_data_array, old_state[name])
+                        self.assert_values_equal(new_data_array, old_state[name])
                 old_state = new_state
 
     def _check_gotten_state(self, state, name_list):
@@ -147,12 +150,8 @@ class SetterTests(unittest.TestCase):
             self.assertIn(name, state)
         self.assertEqual(len(name_list), len(state.keys()))
 
-    def assert_non_ghost_cells_equal(self, data_array1, data_array2):
-        data = fv3gfs.without_ghost_cells({
-            'array1': data_array1,
-            'array2': data_array2
-        })
-        self.assertTrue(np.all(data['array1'].values == data['array2'].values))
+    def assert_values_equal(self, data_array1, data_array2):
+        self.assertTrue(np.all(data_array1.values == data_array2.values))
 
 
 if __name__ == '__main__':

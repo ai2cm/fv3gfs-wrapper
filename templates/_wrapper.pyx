@@ -122,6 +122,14 @@ def set_time(time):
 
 
 def set_state(state):
+    """
+    Takes in a dictionary whose keys are quantity long names (with underscores instead of spaces)
+    and values are DataArrays containing that quantity's data. Sets the fortran state to
+    those values.
+
+    Arguments:
+        state (dict): values to set
+    """
     cdef REAL_t[:, :, ::1] input_value_3d
     cdef REAL_t[:, ::1] input_value_2d
     cdef REAL_t[::1] input_value_1d
@@ -165,8 +173,6 @@ cdef int set_3d_quantity(name, REAL_t[:, :, ::1] array, int nz, dict tracer_meta
 cdef int set_2d_quantity(name, REAL_t[:, ::1] array) except -1:
     if False:
         pass  # need this so we can use elif in template
-    if name == 'surface_geopotential':
-        set_phis(&array[0, 0])
 {% for item in dynamics_properties %}
     {% if item.dims|length == 2 %}
     elif name == '{{ item.name }}':
@@ -199,7 +205,7 @@ cdef int set_1d_quantity(name, REAL_t[::1] array) except -1:
 def get_state(names=None):
     """
     Returns a dictionary whose keys are quantity long names (with underscores instead of spaces)
-    and values are DataArrays containing that quantity's data. Includes ghost cells.
+    and values are DataArrays containing that quantity's data.
 
     Arguments:
         names (list of str, optional): A list of names to get. Gets all names by default.
