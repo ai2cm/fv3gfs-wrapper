@@ -10,3 +10,6 @@ recursive-exclude * *.py[co]
 recursive-include docs *.rst conf.py Makefile make.bat *.jpg *.png *.gif
 recursive-include lib *
 recursive-include fv3gfs *
+
+prune tests/*workdir
+prune tests/logs
