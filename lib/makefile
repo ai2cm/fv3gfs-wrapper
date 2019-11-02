@@ -7,8 +7,9 @@ include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
 endif
 
 TEMPLATES = $(shell ls ../templates)
+PROPERTIES_FILES = ../fv3gfs/dynamics_properties.json ../fv3gfs/physics_properties.json
 
-FFLAGS   += -I$(FV3GFS_BUILD_DIR)/fms -I$(FV3GFS_BUILD_DIR)/gfsphysics -I$(FV3GFS_BUILD_DIR)/io -I$(FV3GFS_BUILD_DIR)/atmos_cubed_sphere -I$(FV3GFS_BUILD_DIR)
+FFLAGS += -I$(FV3GFS_BUILD_DIR)/fms -I$(FV3GFS_BUILD_DIR)/gfsphysics -I$(FV3GFS_BUILD_DIR)/io -I$(FV3GFS_BUILD_DIR)/atmos_cubed_sphere -I$(FV3GFS_BUILD_DIR)
 
 all: coupler_lib.o dynamics_data.o physics_data.o _wrapper.pyx
 
@@ -23,7 +24,7 @@ clean:
 
 templates: $(TEMPLATES)
 
-$(TEMPLATES): %: ../templates/%
+$(TEMPLATES): %: ../templates/% $(PROPERTIES_FILES)
 	python3 ../fill_templates.py $@
 
 cleanall: clean

@@ -39,6 +39,7 @@ RUN rm -rf /cython_wrapper/fv3config
 
 # compile wrapper
 RUN cd /cython_wrapper && \
+    make clean && \
     make dist && \
     pip3 install -e /cython_wrapper
 
