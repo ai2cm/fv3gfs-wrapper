@@ -7,7 +7,7 @@ from ._wrapper import (
 from ._ghost_cells import without_ghost_cells, with_ghost_cells
 from ._exceptions import InvalidQuantityError
 from ._fortran_info import physics_properties, dynamics_properties
-from ._restart import get_restart_data
+from ._restart import load_fortran_restart_folder, read_state, write_state, get_restart_names
 
 __all__ = [
     'initialize', 'step', 'step_dynamics', 'step_physics', 'save_intermediate_restart_if_enabled',
@@ -17,7 +17,7 @@ __all__ = [
     'without_ghost_cells', 'with_ghost_cells',
     'InvalidQuantityError',
     'physics_properties', 'dynamics_properties',
-    'get_restart_data',
+    'load_fortran_restart_folder', 'read_state', 'write_state', 'get_restart_names'
 ]
 
 __version__ = '0.1.0'

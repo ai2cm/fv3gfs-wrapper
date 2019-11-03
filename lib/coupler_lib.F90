@@ -225,6 +225,13 @@ contains
         Atm%Time_step = Time_step_atmos
         !call  atmos_model_init (Atm,  Time_init, Time_atmos, Time_step_atmos)
         end subroutine initialize_time
+
+    subroutine get_time(year, month, day, hour, minute, second) bind(c, name='get_time_subroutine')
+        integer, intent(out) :: year, month, day, hour, minute, second
+        call get_date(Time_atmos, year, month, day, hour, minute, second)
+    end subroutine get_time
+
+
 !#######################################################################
 
    subroutine coupler_init

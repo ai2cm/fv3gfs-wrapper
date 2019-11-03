@@ -45,20 +45,6 @@ def test_data_equal(dict1, dict2, test_case=''):
         comm.barrier()
 
 
-def get_restart_filename(label):
-    rank = MPI.COMM_WORLD.Get_rank()
-    return os.path.join(os.getcwd(), f'RESTART/{label}-rank{rank}.nc')
-
-
-def save_restart(label):
-    state = fv3gfs.get_state(fv3gfs.get_restart_names())
-    fv3gfs.write_state(state, get_restart_filename(label))
-
-
-def load_restart(label):
-    return fv3gfs.read_state(get_restart_filename(label))
-
-
 if __name__ == '__main__':
     num_steps = 8
     fv3gfs.initialize()
@@ -66,21 +52,27 @@ if __name__ == '__main__':
         print(f'Step {i}')
         fv3gfs.step_dynamics()
         fv3gfs.step_physics()
-    save_restart(label='checkpoint')
+    fv3gfs.save_fortran_restart(label='checkpoint')
     comm.barrier()
-    checkpoint_data = load_restart('checkpoint')
+    checkpoint_data = fv3gfs.load_fortran_restart_folder(
+        os.path.join(os.getcwd(), 'RESTART'), label='checkpoint'
+    )
     for i in range(num_steps):
         print(f'Step {i}')
         fv3gfs.step_dynamics()
         fv3gfs.step_physics()
-    save_restart('first_time')
+    fv3gfs.save_fortran_restart(label='first_time')
     comm.barrier()
-    first_time_data = load_restart('first_time')
+    first_time_data = fv3gfs.load_fortran_restart_folder(
+        os.path.join(os.getcwd(), 'RESTART'), label='first_time'
+    )
     fv3gfs.set_state(checkpoint_data)
-    save_restart('after_checkpoint_reset')
+    fv3gfs.save_fortran_restart(label='after_checkpoint_reset')
     comm.barrier()
     logging.info('comparing checkpoint to restart output after resetting to checkpoint')
-    checkpoint_reset_data = load_restart('after_checkpoint_reset')
+    checkpoint_reset_data = fv3gfs.load_fortran_restart_folder(
+        os.path.join(os.getcwd(), 'RESTART'), label='after_checkpoint_reset'
+    )
     test_data_equal(
         fv3gfs.without_ghost_cells(checkpoint_data),
         fv3gfs.without_ghost_cells(checkpoint_reset_data),
@@ -90,9 +82,11 @@ if __name__ == '__main__':
         print(f'Step {i}')
         fv3gfs.step_dynamics()
         fv3gfs.step_physics()
-    save_restart('second_time')
+    fv3gfs.save_fortran_restart(label='second_time')
     comm.barrier()
-    second_time_data = load_restart('second_time')
+    second_time_data = fv3gfs.load_fortran_restart_folder(
+        os.path.join(os.getcwd(), 'RESTART'), label='second_time'
+    )
     logging.info('comparing first (continuous) and second (restarted) run')
     test_data_equal(
         fv3gfs.without_ghost_cells(first_time_data),

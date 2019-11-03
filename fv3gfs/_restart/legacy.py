@@ -1,17 +1,9 @@
 import os
 from datetime import datetime
 import xarray as xr
-from . import _mpi as mpi
-from . import _wrapper
-from ._fortran_info import physics_properties, dynamics_properties
-
-calendar_name_dict = {
-    'no_calendar': 0,
-    'thirty_day_months': 1,
-    'julian': 2,
-    'gregorian': 3,
-    'noleap': 4,
-}
+from .. import _mpi as mpi
+from .. import _wrapper
+from .._fortran_info import physics_properties, dynamics_properties
 
 
 tile = mpi.get_tile_number()
@@ -87,7 +79,7 @@ def get_tracer_dict():
     return out_dict
 
 
-def get_restart_data(dirname, label=None):
+def load_fortran_restart_folder(dirname, label=None):
     state_dict = {}
     for data_func in (
             get_time_data, get_fv_core_data, get_fv_srf_wind_data,

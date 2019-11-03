@@ -6,6 +6,7 @@ import numpy as np
 import xarray as xr
 from mpi4py import MPI
 from ._exceptions import InvalidQuantityError
+from datetime import datetime
 
 ctypedef cnp.double_t REAL_t
 real_type = np.float64
@@ -19,6 +20,7 @@ cdef extern:
     void save_intermediate_restart_if_enabled_subroutine()
     void save_intermediate_restart_subroutine(char *label, int *label_len)
     void initialize_time_subroutine(int *year, int *month, int *day, int *hour, int *minute, int *second)
+    void get_time_subroutine(int *year, int *month, int *day, int *hour, int *minute, int *second)
     void get_centered_grid_dimensions(int *nx, int *ny, int *nz)
     void get_n_ghost_cells_subroutine(int *n_ghost)
     void get_u(REAL_t *u_out)
@@ -121,6 +123,14 @@ def set_time(time):
     initialize_time_subroutine(&year, &month, &day, &hour, &minute, &second)
 
 
+def get_time():
+    """Returns a datetime corresponding to the current model time.
+    """
+    cdef int year, month, day, hour, minute, second
+    get_time_subroutine(&year, &month, &day, &hour, &minute, &second)
+    return datetime(year, month, day, hour, minute, second)
+
+
 def set_state(state):
     """
     Takes in a dictionary whose keys are quantity long names (with underscores instead of spaces)
@@ -216,8 +226,10 @@ def get_state(names):
     cdef REAL_t[:, :, ::1] array_3d
     cdef int nz, i_tracer
     cdef set input_names_set, processed_names_set
-    if names is not None:
-        input_names_set = set(names)
+    input_names_set = set(names)
+
+    if 'time' in input_names_set:
+        return_dict['time'] = get_time()
 
 {% for item in physics_2d_properties %}
     if '{{ item.name }}' in input_names_set:
