@@ -357,7 +357,7 @@ def save_intermediate_restart_if_enabled():
     save_intermediate_restart_if_enabled_subroutine()
 
 
-def save_intermediate_restart(label):
+def save_fortran_restart(label):
     cdef char* label_in = label
     cdef int label_len = len(label)
     save_intermediate_restart_subroutine(label_in, &label_len)
