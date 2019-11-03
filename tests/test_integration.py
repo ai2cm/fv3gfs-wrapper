@@ -4,18 +4,13 @@ import subprocess
 import shutil
 import hashlib
 from fv3config import get_default_config, write_run_directory
+from util import mpi_flags
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.abspath(os.path.join(base_dir, os.pardir))
 work_dir = os.path.join(base_dir, 'workdir')
 fortran_work_dir = os.path.join(base_dir, 'fortran_workdir')
 input_dir = '/FV3/inputdata/fv3gfs-data-docker/rundir'  # won't be hard-coded when we get a package for run directories
-
-
-mpi_flags = [
-    "--allow-run-as-root", "--oversubscribe",
-    "--mca", "btl_vader_single_copy_mechanism", "none",
-]
 
 
 def get_file_hash(filename):
@@ -25,7 +20,7 @@ def get_file_hash(filename):
     return hasher.hexdigest()
 
 
-class FV3GFSRunTests(unittest.TestCase):
+class IntegrationTests(unittest.TestCase):
 
     def setUp(self):
         print('Setting up')
@@ -36,8 +31,8 @@ class FV3GFSRunTests(unittest.TestCase):
 
     def tearDown(self):
         print('Tearing down')
-        clear_workdir(work_dir)
-        clear_workdir(fortran_work_dir)
+        # clear_workdir(work_dir)
+        # clear_workdir(fortran_work_dir)
 
     # def test_fortran(self):
     #     perform_fortran_run()  # test that the Fortran model runs without an error
@@ -45,19 +40,27 @@ class FV3GFSRunTests(unittest.TestCase):
     def test_restart_default_run(self):
         perform_python_run(os.path.join(base_dir, 'integration_scripts/test_restart.py'))
 
-    def test_legacy_restart_without_physics(self):
-        clear_workdir(work_dir)
-        os.mkdir(work_dir)
-        config = get_default_config()
-        config['namelist']['atmos_model_nml']['dycore_only'] = True
-        write_run_directory(config, work_dir)
-        perform_python_run(os.path.join(base_dir, 'integration_scripts/test_legacy_restart.py'))
+    # def test_legacy_restart_without_physics(self):
+    #     clear_workdir(work_dir)
+    #     os.mkdir(work_dir)
+    #     config = get_default_config()
+    #     config['namelist']['atmos_model_nml']['dycore_only'] = True
+    #     write_run_directory(config, work_dir)
+    #     perform_python_run(os.path.join(base_dir, 'integration_scripts/test_legacy_restart.py'))
 
     # def test_default_python_equals_fortran(self):
     #     perform_python_run()
     #     perform_fortran_run()
     #     failures = compare_paths(work_dir, fortran_work_dir, exclude_names=['logfile.000000.out'])
     #     self.assertFalse(failures)
+
+
+def run_unittest_script(filename, n_processes=6):
+    python_args = ['python3', filename]
+    subprocess.check_call(
+        ["mpirun", "-n", str(n_processes)] + mpi_flags + python_args,
+        cwd=work_dir,
+    )
 
 
 def compare_paths(path1, path2, exclude_names=None):
@@ -101,12 +104,12 @@ def clear_workdir(work_dir):
 
 def perform_python_run(filename=None, n_processes=6):
     if filename is None:
-        python_args = ["python3", "-m", "fv3gfs.run"]
+        python_args = ["python3", "-m", "mpi4py", "-m", "fv3gfs.run"]
     else:
         base_filename = os.path.basename(filename)
         work_filename = os.path.join(work_dir, base_filename)
         shutil.copy2(filename, work_filename)
-        python_args = ["python3", work_filename]
+        python_args = ["python3", "-m", "mpi4py", work_filename]
     with open(os.devnull, 'wb') as outfile:
         subprocess.check_call(
             ["mpirun", "-n", str(n_processes)] + mpi_flags + python_args,

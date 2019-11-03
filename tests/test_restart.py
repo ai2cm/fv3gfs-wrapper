@@ -2,10 +2,12 @@ import unittest
 import json
 import os
 import shutil
+from datetime import datetime
+from mpi4py import MPI
 import fv3config
 import fv3gfs
 import fv3gfs._restart as restart
-from mpi4py import MPI
+from util import redirect_stdout
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 rundir = os.path.join(test_dir, 'rundir')
@@ -33,8 +35,13 @@ class RestartTests(unittest.TestCase):
     def tearDown(self):
         MPI.COMM_WORLD.barrier()
 
-    def test_get_restart_data_no_raising(self):
-        restart.get_restart_data(os.path.join(rundir, 'INPUT'))
+    def test_load_fortran_restart_folder_no_raising(self):
+        restart.load_fortran_restart_folder(os.path.join(rundir, 'INPUT'))
+
+    def test_load_fortran_restart_folder_has_time(self):
+        state = restart.load_fortran_restart_folder(os.path.join(rundir, 'INPUT'))
+        self.assertIn('time', state)
+        self.assertIsInstance(state['time'], datetime)
 
 
 class TracerMetadataTests(unittest.TestCase):
@@ -87,7 +94,9 @@ if __name__ == '__main__':
     original_path = os.getcwd()
     os.chdir(rundir)
     try:
-        fv3gfs.initialize()
+        with redirect_stdout(os.devnull):
+            fv3gfs.initialize()
+            MPI.COMM_WORLD.barrier()
         if MPI.COMM_WORLD.Get_rank() != 0:
             kwargs = {'verbosity': 0}
         else:
