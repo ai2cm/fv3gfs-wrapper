@@ -6,14 +6,14 @@ from .. import _wrapper
 from .._fortran_info import physics_properties, dynamics_properties
 
 
-tile = mpi.get_tile_number()
-count = mpi.rank % mpi.size
-if mpi.size > 6:
-    rank_suffix = f'.tile{tile}.nc.{count:04}'
-else:
-    rank_suffix = f'.tile{tile}.nc'
-
-coupler_filename = 'coupler_res.nc'
+def get_rank_suffix():
+    tile = mpi.get_tile_number()
+    count = mpi.rank % mpi.size
+    if mpi.size > 6:
+        rank_suffix = f'.tile{tile}.nc.{count:04}'
+    else:
+        rank_suffix = f'.tile{tile}.nc'
+    return rank_suffix
 
 
 def fix_state_dimension_names(state):
@@ -121,19 +121,19 @@ def get_time_data(dirname, label=None):
 
 
 def get_fv_core_data(dirname, label=None):
-    fv_core_filename = prepend_label('fv_core.res', label) + rank_suffix
+    fv_core_filename = prepend_label('fv_core.res', label) + get_rank_suffix()
     ds = xr.open_dataset(os.path.join(dirname, fv_core_filename)).isel(Time=0)
     return load_dynamics_dataset(ds)
 
 
 def get_fv_srf_wind_data(dirname, label=None):
-    fv_srf_wind_filename = prepend_label('fv_srf_wnd.res', label) + rank_suffix
+    fv_srf_wind_filename = prepend_label('fv_srf_wnd.res', label) + get_rank_suffix()
     ds = xr.open_dataset(os.path.join(dirname, fv_srf_wind_filename)).isel(Time=0)
     return load_dynamics_dataset(ds)
 
 
 def get_fv_tracer_data(dirname, label=None):
-    fv_tracer_filename = prepend_label('fv_tracer.res', label) + rank_suffix
+    fv_tracer_filename = prepend_label('fv_tracer.res', label) + get_rank_suffix()
     ds = xr.open_dataset(os.path.join(dirname, fv_tracer_filename)).isel(Time=0)
     out_dict = {}
 
@@ -147,7 +147,7 @@ def get_fv_tracer_data(dirname, label=None):
 
 
 def get_surface_data(dirname, label=None):
-    sfc_data_filename = prepend_label('sfc_data', label) + rank_suffix
+    sfc_data_filename = prepend_label('sfc_data', label) + get_rank_suffix()
     if os.path.isfile(sfc_data_filename):
         ds = xr.open_dataset(os.path.join(dirname, sfc_data_filename)).isel(Time=0)
         return load_physics_dataset(ds)
@@ -156,7 +156,7 @@ def get_surface_data(dirname, label=None):
 
 
 def get_phy_data(dirname, label=None):
-    phy_data_filename = prepend_label('phy_data', label) + rank_suffix
+    phy_data_filename = prepend_label('phy_data', label) + get_rank_suffix()
     if os.path.isfile(phy_data_filename):
         ds = xr.open_dataset(os.path.join(dirname, phy_data_filename)).isel(Time=0)
         return load_physics_dataset(ds)
