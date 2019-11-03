@@ -62,6 +62,7 @@ def load_restart(label):
 if __name__ == '__main__':
     num_steps = 2
     fv3gfs.initialize()
+    start_time = fv3gfs.get_state(['time'])['time']
     for i in range(num_steps):
         print(f'Step {i}')
         fv3gfs.step_dynamics()
@@ -69,6 +70,8 @@ if __name__ == '__main__':
     save_restart(label='checkpoint')
     comm.barrier()
     checkpoint_data = load_restart('checkpoint')
+    if checkpoint_data['time'] <= start_time:
+        fail('checkpoint time should be greater than start time')
     for i in range(num_steps):
         print(f'Step {i}')
         fv3gfs.step_dynamics()
