@@ -11,7 +11,7 @@ from ._restart import load_fortran_restart_folder, read_state, write_state, get_
 
 __all__ = [
     'initialize', 'step', 'step_dynamics', 'step_physics', 'save_intermediate_restart_if_enabled',
-    'save_intermediate_restart',
+    'save_fortran_restart',
     'cleanup', 'get_state', 'set_state',
     'get_n_ghost_cells', 'get_step_count', 'get_tracer_metadata',
     'without_ghost_cells', 'with_ghost_cells',
