@@ -46,7 +46,7 @@ def test_data_equal(dict1, dict2, test_case=''):
 
 
 if __name__ == '__main__':
-    num_steps = 8
+    num_steps = 2
     fv3gfs.initialize()
     for i in range(num_steps):
         print(f'Step {i}')
