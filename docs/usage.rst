@@ -122,7 +122,7 @@ script with a general structure as follows:
 
     # after main loop is finished:
     restart_state = fv3gfs.get_state(fv3gfs.get_restart_names())
-    fv3gfs.write_state(restart_filename)
+    fv3gfs.write_state(restart_state, restart_filename)
 
 In this script, if a restart file exists in the RESTART directory, it will be read in and overwrite
 the model state after the Fortran initialization routines take place. Each MPI rank (process) reads
