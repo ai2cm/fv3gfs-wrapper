@@ -14,17 +14,18 @@ def redirect_stdout(filename):
 
     Behaves similarly to `contextlib.redirect_stdout`, but will also apply the
     redirection to code in compiled shared libraries.
+
+    Usage:
+        with redirect_stdout(log_filename):
+            # output will be redirected to log file
+            do_stuff()
     """
     return StdoutRedirector(filename)
 
 
 class StdoutRedirector(object):
-    """
-    Context manager for temporarily redirecting sys.stdout to another file.
-
-    Behaves similarly to `contextlib.redirect_stdout`, but will also apply the
-    redirection to code in compiled shared libraries.
-    """
+    
+    __doc__ = redirect_stdout.__doc__
 
     def __init__(self, filename):
         self.stream = open(filename, 'wb')
