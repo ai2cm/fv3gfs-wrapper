@@ -117,7 +117,9 @@ script with a general structure as follows:
     if os.path.isfile(restart_filename):
         restart_state = fv3gfs.read_state(restart_filename)
         fv3gfs.set_state(restart_state)
+
     # ... continue to main loop and other parts of run script
+
     # after main loop is finished:
     restart_state = fv3gfs.get_state(fv3gfs.get_restart_names())
     fv3gfs.write_state(restart_filename)
