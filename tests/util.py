@@ -8,7 +8,23 @@ libc = ctypes.CDLL(None)
 c_stdout = ctypes.c_void_p.in_dll(libc, 'stdout')
 
 
-class redirect_stdout(object):
+def redirect_stdout(filename):
+    """
+    Context manager for temporarily redirecting sys.stdout to another file.
+
+    Behaves similarly to `contextlib.redirect_stdout`, but will also apply the
+    redirection to code in compiled shared libraries.
+    """
+    return StdoutRedirector(filename)
+
+
+class StdoutRedirector(object):
+    """
+    Context manager for temporarily redirecting sys.stdout to another file.
+
+    Behaves similarly to `contextlib.redirect_stdout`, but will also apply the
+    redirection to code in compiled shared libraries.
+    """
 
     def __init__(self, filename):
         self.stream = open(filename, 'wb')
