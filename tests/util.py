@@ -8,7 +8,6 @@ import subprocess
 libc = ctypes.CDLL(None)
 c_stdout = ctypes.c_void_p.in_dll(libc, 'stdout')
 
-
 mpi_flags = [
     "--allow-run-as-root", "--oversubscribe",
     "--mca", "btl_vader_single_copy_mechanism", "none",
@@ -23,10 +22,23 @@ def run_unittest_script(filename, n_processes=6):
 
 
 def redirect_stdout(filename):
+    """
+    Context manager for temporarily redirecting sys.stdout to another file.
+
+    Behaves similarly to `contextlib.redirect_stdout`, but will also apply the
+    redirection to code in compiled shared libraries.
+
+    Usage:
+        with redirect_stdout(log_filename):
+            # output will be redirected to log file
+            do_stuff()
+    """
     return StdoutRedirector(filename)
 
 
 class StdoutRedirector(object):
+    
+    __doc__ = redirect_stdout.__doc__
 
     def __init__(self, filename):
         self.stream = open(filename, 'wb')

@@ -102,7 +102,7 @@ def clear_workdir(work_dir):
         shutil.rmtree(work_dir)
 
 
-def perform_python_run(filename=None, n_processes=6):
+def perform_python_run(run_name, filename=None, n_processes=6):
     if filename is None:
         python_args = ["python3", "-m", "mpi4py", "-m", "fv3gfs.run"]
     else:
@@ -117,7 +117,7 @@ def perform_python_run(filename=None, n_processes=6):
         )
 
 
-def perform_fortran_run(n_processes=6):
+def perform_fortran_run(run_name, n_processes=6):
     filename = os.path.join(parent_dir, 'fv3.exe')
     base_filename = os.path.basename(filename)
     work_filename = os.path.join(fortran_work_dir, base_filename)
