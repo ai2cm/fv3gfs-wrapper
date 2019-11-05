@@ -31,28 +31,28 @@ class IntegrationTests(unittest.TestCase):
 
     def tearDown(self):
         print('Tearing down')
-        # clear_workdir(work_dir)
-        # clear_workdir(fortran_work_dir)
+        clear_workdir(work_dir)
+        clear_workdir(fortran_work_dir)
 
-    # def test_fortran(self):
-    #     perform_fortran_run()  # test that the Fortran model runs without an error
+    def test_fortran(self):
+        perform_fortran_run()  # test that the Fortran model runs without an error
 
     def test_restart_default_run(self):
         perform_python_run(os.path.join(base_dir, 'integration_scripts/test_restart.py'))
 
-    # def test_legacy_restart_without_physics(self):
-    #     clear_workdir(work_dir)
-    #     os.mkdir(work_dir)
-    #     config = get_default_config()
-    #     config['namelist']['atmos_model_nml']['dycore_only'] = True
-    #     write_run_directory(config, work_dir)
-    #     perform_python_run(os.path.join(base_dir, 'integration_scripts/test_legacy_restart.py'))
+    def test_legacy_restart_without_physics(self):
+        clear_workdir(work_dir)
+        os.mkdir(work_dir)
+        config = get_default_config()
+        config['namelist']['atmos_model_nml']['dycore_only'] = True
+        write_run_directory(config, work_dir)
+        perform_python_run(os.path.join(base_dir, 'integration_scripts/test_legacy_restart.py'))
 
-    # def test_default_python_equals_fortran(self):
-    #     perform_python_run()
-    #     perform_fortran_run()
-    #     failures = compare_paths(work_dir, fortran_work_dir, exclude_names=['logfile.000000.out'])
-    #     self.assertFalse(failures)
+    def test_default_python_equals_fortran(self):
+        perform_python_run()
+        perform_fortran_run()
+        failures = compare_paths(work_dir, fortran_work_dir, exclude_names=['logfile.000000.out'])
+        self.assertFalse(failures)
 
 
 def run_unittest_script(filename, n_processes=6):
@@ -102,7 +102,7 @@ def clear_workdir(work_dir):
         shutil.rmtree(work_dir)
 
 
-def perform_python_run(run_name, filename=None, n_processes=6):
+def perform_python_run(filename=None, n_processes=6):
     if filename is None:
         python_args = ["python3", "-m", "mpi4py", "-m", "fv3gfs.run"]
     else:
@@ -117,7 +117,7 @@ def perform_python_run(run_name, filename=None, n_processes=6):
         )
 
 
-def perform_fortran_run(run_name, n_processes=6):
+def perform_fortran_run(n_processes=6):
     filename = os.path.join(parent_dir, 'fv3.exe')
     base_filename = os.path.basename(filename)
     work_filename = os.path.join(fortran_work_dir, base_filename)
