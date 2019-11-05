@@ -81,8 +81,7 @@ Restart
 -------
 
 Sometimes you may want to write out model state to disk so that you can restart the model
-from this state later. The FV3GFS Fortran model provides functionality to do so, but
-in its present version fails to load or save data from the physics package. We will describe
+from this state later. The FV3GFS Fortran model provides functionality to do so -- we will describe
 functions to interface with these Fortran restarts further below.
 
 As a replacement, we provide a python-centric method for saving out and loading model state.
