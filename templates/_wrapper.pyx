@@ -18,7 +18,7 @@ cdef extern:
     void do_dynamics()
     void do_physics()
     void save_intermediate_restart_if_enabled_subroutine()
-    void save_intermediate_restart_subroutine(char *label, int *label_len)
+    void save_intermediate_restart_subroutine()
     void initialize_time_subroutine(int *year, int *month, int *day, int *hour, int *minute, int *second)
     void get_time_subroutine(int *year, int *month, int *day, int *hour, int *minute, int *second)
     void get_centered_grid_dimensions(int *nx, int *ny, int *nz)
@@ -357,10 +357,8 @@ def save_intermediate_restart_if_enabled():
     save_intermediate_restart_if_enabled_subroutine()
 
 
-def save_fortran_restart(label):
-    cdef char* label_in = label
-    cdef int label_len = len(label)
-    save_intermediate_restart_subroutine(label_in, &label_len)
+def save_fortran_restart():
+    save_intermediate_restart_subroutine()
 
 
 def cleanup():

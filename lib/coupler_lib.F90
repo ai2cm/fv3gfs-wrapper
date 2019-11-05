@@ -161,17 +161,10 @@ contains
         nc = nc + 1
     end subroutine save_intermediate_restart_if_enabled_subroutine
 
-    subroutine save_intermediate_restart_subroutine(label_in, label_len) bind(c)
-        integer, intent(in) :: label_len
-        character(kind=c_char), dimension(label_len), intent(in) :: label_in
-        character(kind=c_char, len=128) :: label
-        integer :: i
-        label = ""
-        do i= 1, label_len
-            label(i:i) = label_in(i)
-        enddo
-        call atmos_model_restart(Atm, trim(label))
-        call coupler_res(trim(label))
+    subroutine save_intermediate_restart_subroutine() bind(c)
+        timestamp = date_to_string(Time_atmos)
+        call atmos_model_restart(Atm, timestamp)
+        call coupler_res(timestamp)
     end subroutine save_intermediate_restart_subroutine
 
     subroutine cleanup() bind(c, name='cleanup_subroutine')
