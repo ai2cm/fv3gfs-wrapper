@@ -15,7 +15,7 @@ def get_tile_number(tile_rank=None, total_ranks=None):
         tile_rank = rank
     if total_ranks is None:
         total_ranks = size
-    ranks_per_tile = total_ranks // 6
-    if ranks_per_tile * 6 != total_ranks:
+    if total_ranks % 6 != 0:
         raise ValueError(f'total_ranks {total_ranks} is not evenly divisible by 6')
+    ranks_per_tile = total_ranks // 6
     return tile_rank // ranks_per_tile + 1
