@@ -147,18 +147,24 @@ def get_fv_tracer_data(dirname, label=None):
 
 
 def get_surface_data(dirname, label=None):
-    sfc_data_filename = prepend_label('sfc_data', label) + get_rank_suffix()
+    sfc_data_filename = os.path.join(
+        dirname,
+        prepend_label('sfc_data', label) + get_rank_suffix()
+    )
     if os.path.isfile(sfc_data_filename):
-        ds = xr.open_dataset(os.path.join(dirname, sfc_data_filename)).isel(Time=0)
+        ds = xr.open_dataset(sfc_data_filename).isel(Time=0)
         return load_physics_dataset(ds)
     else:
         return {}  # physics data is optional
 
 
 def get_phy_data(dirname, label=None):
-    phy_data_filename = prepend_label('phy_data', label) + get_rank_suffix()
+    phy_data_filename = os.path.join(
+        dirname,
+        prepend_label('phy_data', label) + get_rank_suffix()
+    )
     if os.path.isfile(phy_data_filename):
-        ds = xr.open_dataset(os.path.join(dirname, phy_data_filename)).isel(Time=0)
+        ds = xr.open_dataset(phy_data_filename).isel(Time=0)
         return load_physics_dataset(ds)
     else:
         return {}  # physics data is optional
