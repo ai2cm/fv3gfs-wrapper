@@ -46,6 +46,10 @@ class IntegrationTests(unittest.TestCase):
         config = get_default_config()
         config['namelist']['atmos_model_nml']['dycore_only'] = True
         write_run_directory(config, work_dir)
+        shutil.copy2(
+            os.path.join(base_dir, 'integration_scripts/util.py'),
+            os.path.join(work_dir, 'util.py')
+        )
         perform_python_run(os.path.join(base_dir, 'integration_scripts/test_legacy_restart.py'))
 
     def test_default_python_equals_fortran(self):
@@ -109,6 +113,10 @@ def perform_python_run(filename=None, n_processes=6):
         base_filename = os.path.basename(filename)
         work_filename = os.path.join(work_dir, base_filename)
         shutil.copy2(filename, work_filename)
+        shutil.copy2(
+            os.path.join(base_dir, 'integration_scripts/util.py'),
+            os.path.join(work_dir, 'util.py')
+        )
         python_args = ["python3", "-m", "mpi4py", work_filename]
     with open(os.devnull, 'wb') as outfile:
         subprocess.check_call(
