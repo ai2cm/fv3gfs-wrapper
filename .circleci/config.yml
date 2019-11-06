@@ -11,8 +11,8 @@ jobs:
       GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-python:32bit
     steps:
       - checkout
-      - run: bash test_docker.sh
       - gcp-gcr/gcr-auth
+      - run: bash test_docker.sh
       - run: |
           if [[ "$CIRCLE_BRANCH" == "master" ]]
           then
@@ -27,8 +27,8 @@ jobs:
       GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-python:latest
     steps:
       - checkout
-      - run: bash test_docker.sh
       - gcp-gcr/gcr-auth
+      - run: bash test_docker.sh
       - run: |
           if [[ "$CIRCLE_BRANCH" == "master" ]]
           then
