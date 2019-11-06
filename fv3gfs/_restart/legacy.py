@@ -32,6 +32,8 @@ def fix_data_array_dimension_names(data_array, nx, ny, nz, nz_soil):
         data_array (DataArray): the object being modified
         nx (int): the number of grid cells along the x-axis
         ny (int): the number of grid cells along the y-axis
+        nz (int): the number of grid cells along the z-axis
+        nz_soil (int): the number of grid cells along the soil model z-axis
 
     Returns:
         renamed_array (DataArray): new object with renamed dimensions
