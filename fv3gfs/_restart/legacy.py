@@ -64,7 +64,7 @@ def fix_data_array_dimension_names(data_array, nx, ny, nz, nz_soil):
             except KeyError as e:
                 raise ValueError(
                     f'unable to determine dim name for dimension '
-                    f'{dim_name} with length {length} (ny={ny})'
+                    f'{dim_name} with length {length} (nz={nz}})'
                 ) from e
     return data_array.rename(replacement_dict)
 
