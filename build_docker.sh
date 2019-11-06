@@ -2,7 +2,7 @@
 
 if [ -z "$DOCKER_IMAGE" ]; then
     DOCKER_IMAGE = fv3gfs-python
-done
+fi
 
 for arg in $(< $DOCKER_BUILD_ARGS); do
     build_arg = $build_arg --build-arg $arg
