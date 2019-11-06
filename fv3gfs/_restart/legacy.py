@@ -81,16 +81,6 @@ def get_tracer_dict():
     return out_dict
 
 
-def load_fortran_restart_folder(dirname, label=None):
-    state_dict = {}
-    for data_func in (
-            get_time_data, get_fv_core_data, get_fv_srf_wind_data,
-            get_fv_tracer_data, get_surface_data, get_phy_data):
-        state_dict.update(data_func(dirname, label=label))
-    fix_state_dimension_names(state_dict)
-    return state_dict
-
-
 def get_integer_tokens(line, n_tokens):
     all_tokens = line.split()
     return [int(token) for token in all_tokens[:n_tokens]]
@@ -103,18 +93,27 @@ def prepend_label(filename, label=None):
         return filename
 
 
+def load_fortran_restart_folder(dirname, label=None):
+    state_dict = {}
+    for data_func in (
+            get_time_data, get_fv_core_data, get_fv_srf_wind_data,
+            get_fv_tracer_data, get_surface_data, get_phy_data):
+        state_dict.update(data_func(dirname, label=label))
+    fix_state_dimension_names(state_dict)
+    return state_dict
+
+
+#  The below get_*_data routines all return "state dictionaries" containing only a subset of the
+#  state dictionary corresponding to a particular Fortran restart file.
+
+
 def get_time_data(dirname, label=None):
     if label is None:
         filename = os.path.join(dirname, 'coupler.res')
     else:
         filename = os.path.join(dirname, label)
     return_dict = {}
-    # i_to_calendar_name = {i_calendar: name for name, i_calendar in calendar_name_dict.items()}
     with open(filename, 'r') as f:
-        # i_calendar = get_integer_tokens(f.readline(), 1)
-        # return_dict['calendar'] = i_to_calendar_name[i_calendar]
-        # year, month, day, hour, minute, second = get_integer_tokens(f.readline(), 6)
-        # return_dict['start_time'] = datetime(year, month, day, hour, minute, second)
         f.readline()
         f.readline()
         year, month, day, hour, minute, second = get_integer_tokens(f.readline(), 6)
