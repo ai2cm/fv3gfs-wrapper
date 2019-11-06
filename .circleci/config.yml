@@ -7,7 +7,7 @@ jobs:
       docker_layer_caching: true
     environment:
       DOCKER_IMAGE: test-image
-      DOCKER_BUILD_ARGS: FV3GFS_IMAGE=fv3gfs-compiled-32bit
+      DOCKER_BUILD_ARGS: FV3GFS_IMAGE=us.gcr.io/vcm-ml/fv3gfs-compiled-32bit
       GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-python:32bit
     steps:
       - checkout

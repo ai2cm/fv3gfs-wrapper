@@ -1,4 +1,4 @@
-ARG FV3GFS_IMAGE=fv3gfs-compiled_default:latest
+ARG FV3GFS_IMAGE=us.gcr.io/vcm-ml/fv3gfs-compiled-default:latest
 FROM $FV3GFS_IMAGE
 
 ENV FV3GFS_BUILD_DIR /FV3
