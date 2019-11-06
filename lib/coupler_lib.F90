@@ -183,7 +183,7 @@ contains
     end subroutine cleanup
 
     subroutine initialize_time(year, month, day, hour, minute, second) bind(c, name='initialize_time_subroutine')
-        integer, intent(in) :: year, month, day, hour, minute, second
+        integer(c_int), intent(in) :: year, month, day, hour, minute, second
         integer :: date(6), date_init(6)
 
         date(1) = year
