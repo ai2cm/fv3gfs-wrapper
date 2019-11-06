@@ -1,4 +1,5 @@
-FROM fv3gfs-compiled-default
+ARG FV3GFS_IMAGE=fv3gfs-compiled_default:latest
+FROM $FV3GFS_IMAGE
 
 ENV FV3GFS_BUILD_DIR /FV3
 

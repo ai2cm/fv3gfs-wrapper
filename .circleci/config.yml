@@ -1,0 +1,43 @@
+version: 2.1
+orbs:
+  gcp-gcr: circleci/gcp-gcr@0.6.1
+jobs:
+  build_32:
+    machine:
+      docker_layer_caching: true
+    environment:
+      DOCKER_IMAGE: test-image
+      DOCKER_BUILD_ARGS: FV3GFS_IMAGE=fv3gfs-compiled-32bit
+      GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-python:32bit
+    steps:
+      - checkout
+      - run: bash test_docker.sh
+      - gcp-gcr/gcr-auth
+      - run: |
+          if [[ "$CIRCLE_BRANCH" == "master" ]]
+          then
+              docker tag $DOCKER_IMAGE $GCR_IMAGE
+              docker push $GCR_IMAGE
+          fi
+  build_default:
+    machine:
+      docker_layer_caching: true
+    environment:
+      DOCKER_IMAGE: test-image
+      GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-python:latest
+    steps:
+      - checkout
+      - run: bash test_docker.sh
+      - gcp-gcr/gcr-auth
+      - run: |
+          if [[ "$CIRCLE_BRANCH" == "master" ]]
+          then
+              docker tag $DOCKER_IMAGE $GCR_IMAGE
+              docker push $GCR_IMAGE
+          fi
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build_32
+      - build_default
