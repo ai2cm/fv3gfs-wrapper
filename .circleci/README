@@ -23,7 +23,7 @@ this saves a `key.json` file containing the google key.
 
 2. Set the following environmental variables in [Circle CI's web console](https://circleci.com/gh/VulcanClimateModeling/fv3gfs/edit#env-vars).
   a. GCLOUD_SERVICE_KEY. copy paste contents of key.json into this entry
-  b. GCLOUD_COMPUTE_ZONE=us-central-1a
+  b. GOOGLE_COMPUTE_ZONE=us-central-1a
   c. GOOGLE_PROJECT_ID=vcm-ml
 
 After these steps, Circle CI should be able to authenaticate with google using
