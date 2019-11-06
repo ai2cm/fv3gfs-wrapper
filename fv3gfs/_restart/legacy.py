@@ -66,7 +66,7 @@ def fix_data_array_dimension_names(data_array, nx, ny, nz, nz_soil):
             except KeyError as e:
                 raise ValueError(
                     f'unable to determine dim name for dimension '
-                    f'{dim_name} with length {length} (nz={nz}})'
+                    f'{dim_name} with length {length} (nz={nz})'
                 ) from e
     return data_array.rename(replacement_dict)
 
@@ -108,10 +108,7 @@ def load_fortran_restart_folder(dirname, label=None):
 
 
 def get_time_data(dirname, label=None):
-    if label is None:
-        filename = os.path.join(dirname, 'coupler.res')
-    else:
-        filename = os.path.join(dirname, label)
+    filename = prepend_label('coupler.res', label)
     return_dict = {}
     with open(filename, 'r') as f:
         f.readline()
