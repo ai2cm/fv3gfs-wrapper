@@ -124,13 +124,13 @@ def get_time_data(dirname, label=None):
 def get_fv_core_data(dirname, label=None):
     fv_core_filename = prepend_label('fv_core.res', label) + get_rank_suffix()
     ds = xr.open_dataset(os.path.join(dirname, fv_core_filename)).isel(Time=0)
-    return load_dynamics_dataset(ds)
+    return load_dynamics_state_from_dataset(ds)
 
 
 def get_fv_srf_wind_data(dirname, label=None):
     fv_srf_wind_filename = prepend_label('fv_srf_wnd.res', label) + get_rank_suffix()
     ds = xr.open_dataset(os.path.join(dirname, fv_srf_wind_filename)).isel(Time=0)
-    return load_dynamics_dataset(ds)
+    return load_dynamics_state_from_dataset(ds)
 
 
 def get_fv_tracer_data(dirname, label=None):
@@ -154,7 +154,7 @@ def get_surface_data(dirname, label=None):
     )
     if os.path.isfile(sfc_data_filename):
         ds = xr.open_dataset(sfc_data_filename).isel(Time=0)
-        return load_physics_dataset(ds)
+        return load_physics_state_from_dataset(ds)
     else:
         return {}  # physics data is optional
 
@@ -166,12 +166,12 @@ def get_phy_data(dirname, label=None):
     )
     if os.path.isfile(phy_data_filename):
         ds = xr.open_dataset(phy_data_filename).isel(Time=0)
-        return load_physics_dataset(ds)
+        return load_physics_state_from_dataset(ds)
     else:
         return {}  # physics data is optional
 
 
-def load_physics_dataset(ds):
+def load_physics_state_from_dataset(ds):
     out_dict = {}
     remaining_names = set(ds.data_vars.keys())
     for properties in physics_properties:
@@ -189,7 +189,7 @@ def load_physics_dataset(ds):
     return out_dict
 
 
-def load_dynamics_dataset(ds):
+def load_dynamics_state_from_dataset(ds):
     out_dict = {}
     remaining_names = set(ds.data_vars.keys())
     for properties in dynamics_properties:
