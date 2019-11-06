@@ -23,7 +23,7 @@ def without_ghost_cells(state):
         elif not isinstance(value, xr.DataArray):
             raise TypeError(f'value for {name} is of type {type(value)}, should be DataArray')
         else:
-            dimension_count = len(value.shape)
+            dimension_count = val.ndim
             if dimension_count == 2:
                 state[name] = value[n_ghost:-n_ghost, n_ghost:-n_ghost]
             elif dimension_count == 3:
