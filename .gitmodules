@@ -1,3 +1,3 @@
 [submodule "fv3config"]
 	path = fv3config
-	url = vcm-automation:a7c88cf6eb98a905ed9aeba4877c93e0f62b166d@github.com:VulcanClimateModeling/fv3config.git
+	url = vcm-automation:a7c88cf6eb98a905ed9aeba4877c93e0f62b166d@github.com/VulcanClimateModeling/fv3config.git
