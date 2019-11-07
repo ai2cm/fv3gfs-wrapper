@@ -6,7 +6,7 @@ fi
 
 if [ ! -z "$DOCKER_BUILD_ARGS"]; then
     for arg in $(< $DOCKER_BUILD_ARGS); do
-        build_arg = $build_arg --build-arg $arg
+        build_arg="$build_arg --build-arg $arg"
     done
 fi
 
