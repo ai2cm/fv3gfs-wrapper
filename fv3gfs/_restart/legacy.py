@@ -1,9 +1,27 @@
+"""
+Routines to interact with restart data as output by the legacy Fortran code.
+"""
 import os
 from datetime import datetime
 import xarray as xr
 from .. import _mpi as mpi
 from .. import _wrapper
 from .._fortran_info import physics_properties, dynamics_properties
+
+
+__all__ = [
+    'load_fortran_restart_folder'
+]
+
+
+def load_fortran_restart_folder(dirname, label=None):
+    state_dict = {}
+    for data_func in (
+            get_time_data, get_fv_core_data, get_fv_srf_wind_data,
+            get_fv_tracer_data, get_surface_data, get_phy_data):
+        state_dict.update(data_func(dirname, label=label))
+    fix_state_dimension_names(state_dict)
+    return state_dict
 
 
 def get_rank_suffix():
@@ -91,16 +109,6 @@ def prepend_label(filename, label=None):
         return f'{label}.{filename}'
     else:
         return filename
-
-
-def load_fortran_restart_folder(dirname, label=None):
-    state_dict = {}
-    for data_func in (
-            get_time_data, get_fv_core_data, get_fv_srf_wind_data,
-            get_fv_tracer_data, get_surface_data, get_phy_data):
-        state_dict.update(data_func(dirname, label=label))
-    fix_state_dimension_names(state_dict)
-    return state_dict
 
 
 #  The below get_*_data routines all return "state dictionaries" containing only a subset of the
