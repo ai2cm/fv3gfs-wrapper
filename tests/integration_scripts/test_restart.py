@@ -5,7 +5,7 @@ import fv3gfs
 import os
 from mpi4py import MPI
 import xarray as xr
-from util import fail, test_has_failed, test_data_equal
+from util import fail, test_has_failed, fail_if_unequal
 
 comm = MPI.COMM_WORLD
 
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     comm.barrier()
     logging.info('comparing checkpoint to restart output after resetting to checkpoint')
     checkpoint_reset_data = load_restart('after_checkpoint_reset')
-    test_data_equal(
+    fail_if_unequal(
         fv3gfs.without_ghost_cells(checkpoint_data),
         fv3gfs.without_ghost_cells(checkpoint_reset_data),
         test_case='checkpoint'
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     comm.barrier()
     second_time_data = load_restart('second_time')
     logging.info('comparing first (continuous) and second (restarted) run')
-    test_data_equal(
+    fail_if_unequal(
         fv3gfs.without_ghost_cells(first_time_data),
         fv3gfs.without_ghost_cells(second_time_data),
         test_case='end'

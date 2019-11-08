@@ -20,7 +20,7 @@ def test_has_failed():
     return _test_has_failed
 
 
-def test_data_equal(dict1, dict2, test_case=''):
+def fail_if_unequal(dict1, dict2, test_case=''):
     for name in dict1.keys():
         if name not in dict2.keys():
             fail(f'{name} present in first dict but not second')
