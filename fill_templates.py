@@ -17,10 +17,6 @@ dim_ranges = {
 all_templates = ('physics_data.F90', '_wrapper.pyx', 'dynamics_data.F90')
 
 
-def first_is_newer(filename1, filename2):
-    return not os.path.exists(filename2) or (os.path.getmtime(filename1) > os.path.getmtime(filename2))
-
-
 def get_dim_range_string(dim_list):
     token_list = [dim_ranges[dim_name] for dim_name in dim_list]
     return ', '.join(reversed(token_list))  # Fortran order is opposite of Python
