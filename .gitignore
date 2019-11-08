@@ -1,4 +1,13 @@
 tests/logs/*.log
+tests/*workdir
+
+# Fortran compilation files
+*.o
+*.mod
+fv3.exe
+
+# Cython c-output
+*.c
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

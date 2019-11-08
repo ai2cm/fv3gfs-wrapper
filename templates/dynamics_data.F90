@@ -11,22 +11,22 @@ contains
 
     pure function i_start() result(i)
         integer :: i
-        i = Atm(mytile)%bd%isd
+        i = Atm(mytile)%bd%is
     end function i_start
 
     pure function i_end() result(i)
         integer :: i
-        i = Atm(mytile)%bd%ied
+        i = Atm(mytile)%bd%ie
     end function i_end
 
     pure function j_start() result(j)
         integer :: j
-        j = Atm(mytile)%bd%jsd
+        j = Atm(mytile)%bd%js
     end function j_start
 
     pure function j_end() result(j)
         integer :: j
-        j = Atm(mytile)%bd%jed
+        j = Atm(mytile)%bd%je
     end function j_end
 
     pure function nz() result(n)
@@ -49,12 +49,12 @@ contains
 {% for item in dynamics_properties %}
     subroutine set_{{ item.fortran_name }}({{ item.fortran_name }}_in) bind(c)
         real(c_double), intent(in), dimension({{ item.dim_ranges }}) :: {{ item.fortran_name }}_in
-        Atm(mytile)%{{ item.fortran_name }}({{ item.dim_colons }}) = {{ item.fortran_name }}_in
+        Atm(mytile)%{{ item.fortran_name }}({{ item.dim_ranges }}) = {{ item.fortran_name }}_in({{ item.dim_ranges }})
     end subroutine set_{{ item.fortran_name }}
 
     subroutine get_{{ item.fortran_name }}({{ item.fortran_name }}_out) bind(c)
         real(c_double), intent(out), dimension({{ item.dim_ranges }}) :: {{ item.fortran_name }}_out
-        {{ item.fortran_name }}_out({{ item.dim_colons }}) = Atm(mytile)%{{ item.fortran_name }}({{ item.dim_colons }})
+        {{ item.fortran_name }}_out({{ item.dim_ranges }}) = Atm(mytile)%{{ item.fortran_name }}({{ item.dim_ranges }})
     end subroutine get_{{ item.fortran_name }}
 {% endfor %}
 
@@ -70,9 +70,9 @@ contains
         integer(c_int) :: n_prognostic_tracers, n_total_tracers
         call get_tracer_count(n_prognostic_tracers, n_total_tracers)
         if (tracer_index <= n_prognostic_tracers) then
-            array_out(:, :, :) = Atm(mytile)%q(:, :, :, tracer_index)
+            array_out(:, :, :) = Atm(mytile)%q(i_start():i_end(), j_start():j_end(), 1:nz(), tracer_index)
         else
-            array_out(:, :, :) = Atm(mytile)%qdiag(:, :, :, tracer_index)
+            array_out(:, :, :) = Atm(mytile)%qdiag(i_start():i_end(), j_start():j_end(), 1:nz(), tracer_index)
         end if
     end subroutine get_tracer
 
@@ -83,9 +83,9 @@ contains
         integer(c_int) :: n_prognostic_tracers, n_total_tracers
         call get_tracer_count(n_prognostic_tracers, n_total_tracers)
         if (tracer_index <= n_prognostic_tracers) then
-            Atm(mytile)%q(:, :, :, tracer_index) = array_in(:, :, :)
+            Atm(mytile)%q(i_start():i_end(), j_start():j_end(), 1:nz(), tracer_index) = array_in
         else
-            Atm(mytile)%qdiag(:, :, :, tracer_index) = array_in(:, :, :)
+            Atm(mytile)%qdiag(i_start():i_end(), j_start():j_end(), 1:nz(), tracer_index) = array_in
         end if
     end subroutine set_tracer
 

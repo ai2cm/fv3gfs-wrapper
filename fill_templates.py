@@ -4,14 +4,17 @@ This script takes jinja2 templates in `templates` and converts them into code fi
 import jinja2
 import json
 import os
+import sys
 
 dim_ranges = {
     'x': 'i_start():i_end()',
     'x_interface': 'i_start():i_end()+1',
     'y': 'j_start():j_end()',
     'y_interface': 'j_start():j_end()+1',
-    'z': 'nz()',
+    'z': '1:nz()',
 }
+
+all_templates = ('physics_data.F90', '_wrapper.pyx', 'dynamics_data.F90')
 
 
 def get_dim_range_string(dim_list):
@@ -20,6 +23,8 @@ def get_dim_range_string(dim_list):
 
 
 if __name__ == '__main__':
+    requested_templates = sys.argv[1:]
+
     setup_dir = os.path.dirname(os.path.abspath(__file__))
     template_dir = os.path.join(setup_dir, 'templates')
     template_loader = jinja2.FileSystemLoader(searchpath=template_dir)
@@ -44,11 +49,16 @@ if __name__ == '__main__':
         properties['dim_colons'] = ', '.join(':' for dim in properties['dims'])
         dynamics_properties.append(properties)
 
-    for in_filename in ('physics_data.F90', '_wrapper.pyx', 'dynamics_data.F90'):
-        template = template_env.get_template(in_filename)
+    if len(requested_templates) == 0:
+        requested_templates = all_templates
+
+    for base_filename in requested_templates:
+        in_filename = os.path.join(setup_dir, f'templates/{base_filename}')
+        out_filename = os.path.join(setup_dir, f'lib/{base_filename}')
+        template = template_env.get_template(base_filename)
         result = template.render(
             physics_2d_properties=physics_2d_properties, physics_3d_properties=physics_3d_properties,
             dynamics_properties=dynamics_properties,
         )
-        with open(os.path.join(setup_dir, f'lib/{in_filename}'), 'w') as f:
+        with open(out_filename, 'w') as f:
             f.write(result)

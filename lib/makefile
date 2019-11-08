@@ -1,12 +1,15 @@
 SHELL = /bin/sh
 
 ifndef FV3GFS_BUILD_DIR
-$(error FV3GFS_BUILD_DIR is not set)
+$(warning FV3GFS_BUILD_DIR is not set)
+else
+include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
 endif
 
-include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
+TEMPLATES = $(shell ls ../templates)
+PROPERTIES_FILES = ../fv3gfs/dynamics_properties.json ../fv3gfs/physics_properties.json
 
-FFLAGS   += -I$(FV3GFS_BUILD_DIR)/fms -I$(FV3GFS_BUILD_DIR)/gfsphysics -I$(FV3GFS_BUILD_DIR)/io -I$(FV3GFS_BUILD_DIR)/atmos_cubed_sphere -I$(FV3GFS_BUILD_DIR)
+FFLAGS += -I$(FV3GFS_BUILD_DIR)/fms -I$(FV3GFS_BUILD_DIR)/gfsphysics -I$(FV3GFS_BUILD_DIR)/io -I$(FV3GFS_BUILD_DIR)/atmos_cubed_sphere -I$(FV3GFS_BUILD_DIR)
 
 all: coupler_lib.o dynamics_data.o physics_data.o _wrapper.pyx
 
@@ -17,15 +20,11 @@ all: coupler_lib.o dynamics_data.o physics_data.o _wrapper.pyx
 
 clean:
 	@echo "Cleaning ... "
-	$(RM) -f *.o *.mod *.lst depend
+	$(RM) -f *.o *.mod *.lst depend $(TEMPLATES)
 
-physics_data.F90: ../templates/physics_data.F90
-	python3 ../fill_templates.py
+templates: $(TEMPLATES)
 
-dynamics_data.F90: ../templates/dynamics_data.F90
-	python3 ../fill_templates.py
-
-_wrapper.pyx: ../templates/_wrapper.pyx
-	python3 ../fill_templates.py
+$(TEMPLATES): %: ../templates/% $(PROPERTIES_FILES)
+	python3 ../fill_templates.py $@
 
 cleanall: clean

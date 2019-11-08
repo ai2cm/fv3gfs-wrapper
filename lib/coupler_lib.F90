@@ -52,7 +52,6 @@ use data_override_mod, only: data_override_init
 use iso_c_binding
 
 implicit none
-private
 
 !-----------------------------------------------------------------------
 
@@ -69,7 +68,7 @@ character(len=128) :: tag = '$Name: ulm_201505 $'
 
    type (time_type) :: Time_atmos, Time_init, Time_end,  &
                        Time_step_atmos, Time_step_ocean, &
-                       Time_restart, Time_step_restart
+                       Time_restart, Time_step_restart, Run_length
    integer :: num_cpld_calls, num_atmos_calls, nc, na, ret
 
 ! ----- coupled model initial date -----
@@ -107,7 +106,7 @@ character(len=128) :: tag = '$Name: ulm_201505 $'
    character(len=32) :: timestamp
    logical :: intrm_rst
 
-   public :: module_init, do_step, cleanup, get_num_cpld_calls
+   public
 
 contains
 
@@ -136,31 +135,9 @@ contains
         mainClock = mpp_clock_id( 'Main loop' )
         termClock = mpp_clock_id( 'Termination' )
         call mpp_clock_begin(mainClock) !begin main loop
+        nc = 1
 
     end subroutine module_init
-
-    subroutine do_step() bind(c, name='do_step_subroutine')
-        Time_atmos = Time_atmos + Time_step_atmos
-
-        call update_atmos_model_dynamics (Atm)
-
-        call update_atmos_radiation_physics (Atm)
-
-        call update_atmos_model_state (Atm)
-
-    !--- intermediate restart
-        if (intrm_rst) then
-          if ((nc /= num_cpld_calls) .and. (Time_atmos == Time_restart)) then
-            timestamp = date_to_string (Time_restart)
-            call atmos_model_restart(Atm, timestamp)
-            call coupler_res(timestamp)
-            Time_restart = Time_restart + Time_step_restart
-          endif
-        endif
-
-        call print_memuse_stats('after full step')
-
-    end subroutine do_step
 
     subroutine do_dynamics() bind(c)
         Time_atmos = Time_atmos + Time_step_atmos
@@ -181,10 +158,14 @@ contains
             Time_restart = Time_restart + Time_step_restart
           endif
         endif
+        nc = nc + 1
     end subroutine save_intermediate_restart_if_enabled_subroutine
 
-    !-----------------------------------------------------------------------
-
+    subroutine save_intermediate_restart_subroutine() bind(c)
+        timestamp = date_to_string(Time_atmos)
+        call atmos_model_restart(Atm, timestamp)
+        call coupler_res(timestamp)
+    end subroutine save_intermediate_restart_subroutine
 
     subroutine cleanup() bind(c, name='cleanup_subroutine')
 #ifdef AVEC_TIMERS
@@ -201,6 +182,49 @@ contains
         call fms_end
     end subroutine cleanup
 
+    subroutine initialize_time(year, month, day, hour, minute, second) bind(c, name='initialize_time_subroutine')
+        integer(c_int), intent(in) :: year, month, day, hour, minute, second
+        integer :: date(6), date_init(6)
+
+        date(1) = year
+        date(2) = month
+        date(3) = day
+        date(4) = hour
+        date(5) = minute
+        date(6) = second
+
+        !call diag_manager_init (TIME_INIT=date)
+
+        call get_base_date ( date_init(1), date_init(2), date_init(3), &
+                             date_init(4), date_init(5), date_init(6)  )
+
+    !----- use current date if no base date ------
+
+        if ( date_init(1) == 0 ) date_init = date
+
+    !----- set initial and current time types ------
+
+        Time_init  = set_date (date_init(1), date_init(2), date_init(3), &
+                               date_init(4), date_init(5), date_init(6))
+
+        Time_atmos = set_date (date(1), date(2), date(3),  &
+                               date(4), date(5), date(6))
+
+        num_atmos_calls = Time_step_ocean / Time_step_atmos
+        Time_restart = Time_atmos + Time_step_restart
+
+        Atm%Time_init = Time_init
+        Atm%Time = Time_atmos
+        Atm%Time_step = Time_step_atmos
+        !call  atmos_model_init (Atm,  Time_init, Time_atmos, Time_step_atmos)
+        end subroutine initialize_time
+
+    subroutine get_time(year, month, day, hour, minute, second) bind(c, name='get_time_subroutine')
+        integer, intent(out) :: year, month, day, hour, minute, second
+        call get_date(Time_atmos, year, month, day, hour, minute, second)
+    end subroutine get_time
+
+
 !#######################################################################
 
    subroutine coupler_init
@@ -211,7 +235,6 @@ contains
     integer :: total_days, total_seconds, unit, ierr, io
     integer :: n, gnlon, gnlat
     integer :: date(6), flags
-    type (time_type) :: Run_length
     character(len=9) :: month
     logical :: use_namelist
     
