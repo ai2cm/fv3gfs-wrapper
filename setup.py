@@ -34,7 +34,12 @@ library_link_args = [
     '-lmvec', '-lblas',
 ]
 
-requirements = ['xarray>=0.13.0', 'netCDF4', 'numpy']
+requirements = [
+    'Click>=7.0',
+    'xarray>=0.13.0',
+    'netCDF4>=1.4.2',
+    'numpy'
+]
 
 setup_requirements = ['cython', 'numpy', 'jinja2']
 

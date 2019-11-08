@@ -21,7 +21,14 @@ RUN ln -s /bin/python3 /bin/python && \
     ln -s /bin/pip3 /bin/pip
 
 # install required python packages
-RUN pip3 install --no-cache-dir xarray==0.13.0 jinja2 netcdf4 Click f90nml appdirs requests
+RUN pip3 install --no-cache-dir \
+    xarray==0.13.0 \
+    jinja2==2.10.3 \
+    netcdf4==1.4.2 \
+    f90nml==1.1.2 \
+    appdirs==1.4.3 \
+    requests==2.22.0 \
+    Click==7.0
 
 # copy and install fv3config first so data cache does not get re-downloaded when non-fv3config code changes
 COPY ./fv3config /fv3config
