@@ -3,10 +3,16 @@ include LICENSE
 include README.md
 include fv3.exe
 
-recursive-include tests *
-recursive-exclude * __pycache__
-recursive-exclude * *.py[co]
-
+recursive-include tests *.py *.sh
+include tests/logs/README
 recursive-include docs *.rst conf.py Makefile make.bat *.jpg *.png *.gif
 recursive-include lib *
 recursive-include fv3gfs *
+
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+recursive-exclude * *.mod *.o
+recursive-exclude * *.log
+
+prune tests/*workdir
+prune tests/logs/*

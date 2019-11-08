@@ -3,9 +3,22 @@ import os
 import tempfile
 import io
 import ctypes
+import subprocess
 
 libc = ctypes.CDLL(None)
 c_stdout = ctypes.c_void_p.in_dll(libc, 'stdout')
+
+mpi_flags = [
+    "--allow-run-as-root", "--oversubscribe",
+    "--mca", "btl_vader_single_copy_mechanism", "none",
+]
+
+
+def run_unittest_script(filename, n_processes=6):
+    python_args = ['python3', '-m', 'mpi4py', filename]
+    subprocess.check_call(
+        ["mpirun", "-n", str(n_processes)] + mpi_flags + python_args
+    )
 
 
 def redirect_stdout(filename):

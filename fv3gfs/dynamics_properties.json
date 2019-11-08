@@ -55,5 +55,17 @@
         "fortran_name": "bk",
         "units": "",
         "dims": ["z"]
+    },
+    {
+        "name": "eastward_wind_at_surface",
+        "fortran_name": "u_srf",
+        "units": "m/s",
+        "dims": ["y", "x"]
+    },
+    {
+        "name": "northward_wind_at_surface",
+        "fortran_name": "v_srf",
+        "units": "m/s",
+        "dims": ["y", "x"]
     }
 ]

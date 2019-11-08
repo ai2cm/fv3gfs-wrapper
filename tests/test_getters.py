@@ -118,11 +118,13 @@ class GetterTests(unittest.TestCase):
     def _get_names_helper(self, name_list):
         state = fv3gfs.get_state(names=name_list)
         for name, value in state.items():
-            self.assertIsInstance(name, str)
-            self.assertIsInstance(value, xr.DataArray)
-            self.assertIn('units', value.attrs)
+            with self.subTest(name):
+                self.assertIsInstance(name, str)
+                self.assertIsInstance(value, xr.DataArray)
+                self.assertIn('units', value.attrs)
         for name in name_list:
-            self.assertIn(name, state)
+            with self.subTest(name):
+                self.assertIn(name, state)
         self.assertEqual(len(name_list), len(state.keys()))
 
 
@@ -171,7 +173,7 @@ if __name__ == '__main__':
     original_path = os.getcwd()
     os.chdir(rundir)
     try:
-        with redirect_stdout(os.path.join(test_dir, f'logs/test_getters.rank{rank}.log')):
+        with redirect_stdout(os.devnull):
             fv3gfs.initialize()
             MPI.COMM_WORLD.barrier()
         if rank != 0:
