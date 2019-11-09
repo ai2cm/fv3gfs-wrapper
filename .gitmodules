@@ -1,6 +1,6 @@
-[submodule "fv3config"]
+[submodule "external/fv3config"]
 	path = external/fv3config
 	url = https://a7c88cf6eb98a905ed9aeba4877c93e0f62b166d@github.com/VulcanClimateModeling/fv3config.git
 [submodule "lib/fv3gfs"]
 	path = lib/FV3
-	url = git@github.com:VulcanClimateModeling/fv3gfs.git
+	url = a7c88cf6eb98a905ed9aeba4877c93e0f62b166d@github.com:VulcanClimateModeling/fv3gfs.git
