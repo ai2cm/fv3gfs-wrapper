@@ -1,7 +1,8 @@
-ARG FV3GFS_IMAGE=us.gcr.io/vcm-ml/fv3gfs-compiled-default:latest
+ARG FV3GFS_IMAGE=us.gcr.io/vcm-ml/fv3gfs-environment:latest
 FROM $FV3GFS_IMAGE
 
-ENV FV3GFS_BUILD_DIR /FV3
+ENV FV3GFS_BUILD_DIR=/fv3gfs-python/lib/FV3/sorc/fv3gfs.fd/FV3/
+
 
 # install additional required packages
 RUN apt-get update && apt-get install -y \
@@ -17,10 +18,6 @@ RUN apt-get update && apt-get install -y \
     cython3 \
     python3-pip
 
-# enable python/pip (as opposed to python3/pip3)
-RUN ln -s /bin/python3 /bin/python && \
-    ln -s /bin/pip3 /bin/pip
-
 # install required python packages
 RUN pip3 install --no-cache-dir \
     xarray==0.13.0 \
@@ -31,25 +28,38 @@ RUN pip3 install --no-cache-dir \
     requests==2.22.0 \
     Click==7.0
 
-# copy and install fv3config first so data cache does not get re-downloaded when non-fv3config code changes
-COPY ./fv3config /fv3config
+# copy and install fv3config first so data cache is only re-downloaded
+# if fv3config itself changes
+COPY external /fv3gfs-python/external
 
-RUN pip3 install --no-cache-dir -e /fv3config
+RUN pip3 install --no-cache-dir -e /fv3gfs-python/external/fv3config
 
 # cache model data
 RUN python3 -m fv3config.download_data
 
-# copy wrapper source files
-COPY . /cython_wrapper
+# copy wrapper and fortran sources
+# directory copy commands must be separate due to docker limitations
+COPY fv3gfs /fv3gfs-python/fv3gfs
+COPY lib /fv3gfs-python/lib
+COPY templates /fv3gfs-python/templates
+COPY tests /fv3gfs-python/tests
+COPY examples /fv3gfs-python/examples
+COPY docs /fv3gfs-python/docs
+# files can be copied in one line
+COPY fill_templates.py HISTORY.md LICENSE makefile MANIFEST.in README.md setup.cfg setup.py /fv3gfs-python/
 
-# we already copied fv3config to root
-RUN rm -rf /cython_wrapper/fv3config
+ARG compile_option
+ARG configure_file=configure.fv3.gnu_docker
+
+# copy appropriate configuration file to configure.fv3
+RUN cp $FV3GFS_BUILD_DIR/conf/$configure_file $FV3GFS_BUILD_DIR/conf/configure.fv3 && \
+    if [ ! -z $compile_option ]; then sed -i "33i $compile_option" $FV3GFS_BUILD_DIR/conf/configure.fv3; fi
 
 # compile wrapper
-RUN cd /cython_wrapper && \
+RUN cd /fv3gfs-python && \
     make clean && \
-    make dist && \
-    pip3 install -e /cython_wrapper
+    make build -j8 && \
+    pip3 install -e /fv3gfs-python
 
 # interactive shell by default
 CMD ["bash"]

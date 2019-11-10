@@ -1,15 +1,16 @@
+from glob import glob
+import subprocess
+import os
+import shutil
 from setuptools import setup, find_packages
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 # This line only needed if building with NumPy in Cython file.
 from numpy import get_include
-from os import system
-from glob import glob
-import subprocess
-import os
-import shutil
 
+
+print('makeflags after imports', os.environ.get('MAKEFLAGS'))
 setup_dir = os.path.dirname(os.path.abspath(__file__))
 fv3gfs_build_path_environ_name = 'FV3GFS_BUILD_DIR'
 make_command = os.environ.get('MAKE', 'make')
@@ -65,12 +66,13 @@ wrapper_build_filenames = []
 for relative_filename in relative_wrapper_build_filenames:
     wrapper_build_filenames.append(os.path.join(package_dir, relative_filename))
 
+# make library dependencies before checking if they exist
+subprocess.check_call([make_command], cwd=os.path.join(package_dir, 'lib'))
+
 for filename in fortran_build_filenames:
     if not os.path.isfile(filename):
         raise BuildDirectoryError(f'File {filename} is missing, does {fv3gfs_build_path_environ_name} contain FV3GFS build artifacts?')
 
-
-subprocess.check_call([make_command, 'all'], cwd=os.path.join(package_dir, 'lib'))
 # copy2 preserves executable flag
 shutil.copy2(os.path.join(fv3gfs_build_path, 'fv3.exe'), os.path.join(package_dir, 'fv3.exe'))
 

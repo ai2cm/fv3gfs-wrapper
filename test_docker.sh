@@ -2,4 +2,4 @@
 
 DOCKER_IMAGE=fv3gfs-python
 
-./build_docker.sh && docker run -it $DOCKER_IMAGE bash -c "ulimit -s unlimited; cd /cython_wrapper/tests/; ./run_tests.sh"
+./build_docker.sh && docker run -it $DOCKER_IMAGE bash -c "cd /fv3gfs-python; make test"

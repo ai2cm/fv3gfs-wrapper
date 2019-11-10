@@ -37,7 +37,7 @@ BROWSER := python -c "$$BROWSER_PYSCRIPT"
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
+clean: clean-build clean-pyc clean-test clean-lib ## remove all build, test, coverage and Python artifacts
 
 clean-build: ## remove build artifacts
 	rm -fr build/
@@ -57,6 +57,9 @@ clean-test: ## remove test and coverage artifacts
 	rm -f .coverage
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
+
+clean-lib:
+	$(MAKE) -C lib clean
 
 lint: ## check style with flake8
 	flake8 fv3gfs tests
@@ -81,8 +84,11 @@ servedocs: docs ## compile the docs watching for changes
 release: dist ## package and upload a release
 	twine upload dist/*
 
+build:
+	python setup.py build_ext --inplace
+
 dist: clean ## builds source and wheel package
-	python setup.py build_ext
+	python setup.py build_ext --inplace
 	python setup.py sdist
 	python setup.py bdist_wheel
 	ls -l dist
