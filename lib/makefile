@@ -11,7 +11,7 @@ FFLAGS += -I$(FV3GFS_BUILD_DIR)/fms -I$(FV3GFS_BUILD_DIR)/gfsphysics -I$(FV3GFS_
 all: templates coupler_lib.o dynamics_data.o physics_data.o
 
 legacy_fortran:
-	cd $(FV3GFS_BUILD_DIR) && $(MAKE)
+	$(MAKE) -C $(FV3GFS_BUILD_DIR)
 
 dynamics_data.o: dynamics_data.F90 legacy_fortran
 	$(FC) $(CPPDEFS) $(CPPFLAGS) $(FPPFLAGS) $(FFLAGS) $(OTHERFLAGS) $(OTHER_FFLAGS) $(ESMF_INC) -c $< -o $@
