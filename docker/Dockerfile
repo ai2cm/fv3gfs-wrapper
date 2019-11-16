@@ -18,6 +18,9 @@ RUN apt-get update && apt-get install -y \
     cython3 \
     python3-pip
 
+ADD /docker/install_gcloud.sh /setup/install_gcloud.sh
+RUN bash /setup/install_gcloud.sh
+
 # install required python packages
 RUN pip3 install --no-cache-dir \
     xarray==0.13.0 \
@@ -26,13 +29,18 @@ RUN pip3 install --no-cache-dir \
     f90nml==1.1.2 \
     appdirs==1.4.3 \
     requests==2.22.0 \
-    Click==7.0
+    Click==7.0 \
+    pyyaml==5.1.2 \
+    google-cloud-storage==1.23.0 \
+    gcsfs==0.4.0
 
 # copy and install fv3config first so data cache is only re-downloaded
 # if fv3config itself changes
 COPY external /fv3gfs-python/external
 
 RUN pip3 install --no-cache-dir -e /fv3gfs-python/external/fv3config
+
+ENV FV3CONFIG_CACHE_DIR=/inputdata
 
 # cache model data
 RUN python3 -m fv3config.download_data
@@ -60,6 +68,7 @@ RUN cd /fv3gfs-python && \
     make clean && \
     make build -j8 && \
     pip3 install -e /fv3gfs-python
+
 
 # interactive shell by default
 CMD ["bash"]
