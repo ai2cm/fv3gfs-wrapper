@@ -45,6 +45,8 @@ ENV FV3CONFIG_CACHE_DIR=/inputdata
 # cache model data
 RUN python3 -m fv3config.download_data
 
+RUN chmod -R 755 /inputdata
+
 # copy wrapper and fortran sources
 # directory copy commands must be separate due to docker limitations
 COPY fv3gfs /fv3gfs-python/fv3gfs
@@ -68,7 +70,6 @@ RUN cd /fv3gfs-python && \
     make clean && \
     make build -j8 && \
     pip3 install -e /fv3gfs-python
-
 
 # interactive shell by default
 CMD ["bash"]
