@@ -65,10 +65,15 @@ ARG configure_file=configure.fv3.gnu_docker
 RUN cp $FV3GFS_BUILD_DIR/conf/$configure_file $FV3GFS_BUILD_DIR/conf/configure.fv3 && \
     if [ ! -z $compile_option ]; then sed -i "33i $compile_option" $FV3GFS_BUILD_DIR/conf/configure.fv3; fi
 
-# compile wrapper
+# make sources first, because -j8 doesn't propagate through setup.py layer
 RUN cd /fv3gfs-python && \
     make clean && \
-    make build -j8 && \
+    cd /fv3gfs-python/lib && \
+    make -j8
+
+# compile wrapper
+RUN cd /fv3gfs-python && \
+    make build && \
     pip3 install -e /fv3gfs-python
 
 # interactive shell by default

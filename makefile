@@ -6,7 +6,7 @@ else
 include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
 endif
 
-.PHONY: clean clean-test clean-pyc clean-build docs help
+.PHONY: build clean clean-test clean-pyc clean-build docs help
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
@@ -32,7 +32,7 @@ for line in sys.stdin:
 endef
 export PRINT_HELP_PYSCRIPT
 
-BROWSER := python -c "$$BROWSER_PYSCRIPT"
+BROWSER := python3 -c "$$BROWSER_PYSCRIPT"
 
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
