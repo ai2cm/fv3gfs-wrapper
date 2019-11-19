@@ -40,18 +40,6 @@ class IntegrationTests(unittest.TestCase):
     def test_restart_default_run(self):
         perform_python_run(os.path.join(base_dir, 'integration_scripts/test_restart.py'))
 
-    def test_legacy_restart_without_physics(self):
-        clear_workdir(work_dir)
-        os.mkdir(work_dir)
-        config = get_default_config()
-        config['namelist']['atmos_model_nml']['dycore_only'] = True
-        write_run_directory(config, work_dir)
-        shutil.copy2(
-            os.path.join(base_dir, 'integration_scripts/util.py'),
-            os.path.join(work_dir, 'util.py')
-        )
-        perform_python_run(os.path.join(base_dir, 'integration_scripts/test_legacy_restart.py'))
-
     def test_default_python_equals_fortran(self):
         perform_python_run()
         perform_fortran_run()
