@@ -1,12 +1,12 @@
 [
     {
-        "name": "eastward_wind",
+        "name": "x_wind",
         "fortran_name": "u",
         "units": "m/s",
         "dims": ["z", "y_interface", "x"]
     },
     {
-        "name": "northward_wind",
+        "name": "y_wind",
         "fortran_name": "v",
         "units": "m/s",
         "dims": ["z", "y", "x_interface"]

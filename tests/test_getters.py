@@ -37,7 +37,7 @@ class GetterTests(unittest.TestCase):
 
     def test_dynamics_quantities_present_in_metadata(self):
         """Test that some small subset of dynamics names are in the data dictionary"""
-        for name in ['eastward_wind', 'northward_wind', 'vertical_wind', 'surface_geopotential']:
+        for name in ['x_wind', 'y_wind', 'vertical_wind', 'surface_geopotential']:
             self.assertIn(name, self.dynamics_data.keys())
 
     def test_physics_quantities_present_in_metadata(self):
