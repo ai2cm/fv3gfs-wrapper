@@ -11,7 +11,6 @@ from numpy import get_include
 
 
 print('makeflags after imports', os.environ.get('MAKEFLAGS'))
-setup_dir = os.path.dirname(os.path.abspath(__file__))
 fv3gfs_build_path_environ_name = 'FV3GFS_BUILD_DIR'
 make_command = os.environ.get('MAKE', 'make')
 package_dir = os.path.dirname(os.path.abspath(__file__))
@@ -52,11 +51,7 @@ with open('README.md') as readme_file:
 with open('HISTORY.md') as history_file:
     history = history_file.read()
 
-if fv3gfs_build_path_environ_name not in os.environ:
-    raise BuildDirectoryError(f'Environment variable {fv3gfs_build_path_environ_name} must be set.')
-elif not os.path.isdir(os.environ[fv3gfs_build_path_environ_name]):
-    raise BuildDirectoryError(f'Environment variable {fv3gfs_build_path_environ_name} must point to a directory')
-fv3gfs_build_path = os.environ[fv3gfs_build_path_environ_name]
+fv3gfs_build_path = os.path.join(package_dir, 'lib/FV3/sorc/fv3gfs.fd/FV3/')
 
 fortran_build_filenames = []
 for relative_filename in relative_fv3gfs_build_filenames:
