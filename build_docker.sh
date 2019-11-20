@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z "$DOCKER_IMAGE" ]; then
-    DOCKER_IMAGE=fv3gfs-python
+    DOCKER_IMAGE=us.gcr.io/vcm-ml/fv3gfs-python:latest
 fi
 
 if [ ! -z "$DOCKER_BUILD_ARGS"]; then
