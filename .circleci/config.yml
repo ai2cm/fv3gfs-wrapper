@@ -9,6 +9,7 @@ jobs:
       DOCKER_IMAGE: test-image
       DOCKER_BUILD_ARGS: FV3GFS_IMAGE=us.gcr.io/vcm-ml/fv3gfs-compiled-32bit
       GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-python:32bit
+      ENVIRONMENT_IMAGE: us.gcr.io/vcm-ml/fv3gfs-environment
     steps:
       - checkout
       - add_ssh_keys:
@@ -20,6 +21,7 @@ jobs:
             git submodule init
             git submodule update
       - gcp-gcr/gcr-auth
+      - run: docker pull $ENVIRONMENT_IMAGE
       - run: bash test_docker.sh
       - run: |
           if [[ "$CIRCLE_BRANCH" == "master" ]]
@@ -44,6 +46,7 @@ jobs:
             git submodule init
             git submodule update
       - gcp-gcr/gcr-auth
+      - run: docker pull $ENVIRONMENT_IMAGE
       - run: bash test_docker.sh
       - run: |
           if [[ "$CIRCLE_BRANCH" == "master" ]]
