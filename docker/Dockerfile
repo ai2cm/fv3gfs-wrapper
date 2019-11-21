@@ -1,6 +1,7 @@
 FROM ubuntu:19.10 AS fv3gfs-env
 
 RUN apt-get update && apt-get install -y \
+    nano \
     curl \
     wget \
     gcc \
