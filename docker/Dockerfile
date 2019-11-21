@@ -75,7 +75,7 @@ COPY tests /fv3gfs-python/tests
 COPY examples /fv3gfs-python/examples
 COPY docs /fv3gfs-python/docs
 # files can be copied in one line
-COPY fill_templates.py HISTORY.md LICENSE makefile MANIFEST.in README.md setup.cfg setup.py /fv3gfs-python/
+COPY fill_templates.py HISTORY.md LICENSE Makefile MANIFEST.in README.md setup.cfg setup.py /fv3gfs-python/
 
 ARG compile_option
 ARG configure_file=configure.fv3.gnu_docker
