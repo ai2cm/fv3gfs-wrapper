@@ -1,16 +1,24 @@
-ARG FV3GFS_IMAGE=us.gcr.io/vcm-ml/fv3gfs-environment:latest
-FROM $FV3GFS_IMAGE
+FROM ubuntu:19.10 AS fv3gfs-env
 
-ENV FV3GFS_BUILD_DIR=/fv3gfs-python/lib/FV3/sorc/fv3gfs.fd/FV3/
-
-
-# install additional required packages
 RUN apt-get update && apt-get install -y \
     nano \
+    curl \
     wget \
+    gcc \
+    git \
+    libblas-dev \
+    liblapack-dev \
+    libnetcdf-dev \
+    libnetcdff-dev \
+    perl \
+    make \
+    rsync \
     libffi-dev \
     openssl \
+    python3 \
+    python3-pip \
     libopenmpi3 \
+    netcdf-bin \
     libssl-dev \
     python3 \
     python3-numpy \
@@ -33,6 +41,17 @@ RUN pip3 install --no-cache-dir \
     pyyaml==5.1.2 \
     google-cloud-storage==1.23.0 \
     gcsfs==0.4.0
+
+# download and install NCEP libraries
+RUN git config --global http.sslverify false && \
+    git clone https://github.com/NCAR/NCEPlibs.git && \
+    mkdir /opt/NCEPlibs && \
+    cd NCEPlibs && \
+    git checkout 3da51e139d5cd731c9fc27f39d88cb4e1328212b && \
+    echo "y" | ./make_ncep_libs.sh -s linux -c gnu -d /opt/NCEPlibs -o 1
+
+#-----------------------------------------------------------------------------
+FROM fv3gfs-env AS fv3gfs-python
 
 # copy and install fv3config first so data cache is only re-downloaded
 # if fv3config itself changes
@@ -60,6 +79,8 @@ COPY fill_templates.py HISTORY.md LICENSE makefile MANIFEST.in README.md setup.c
 
 ARG compile_option
 ARG configure_file=configure.fv3.gnu_docker
+
+ENV FV3GFS_BUILD_DIR=/fv3gfs-python/lib/FV3/sorc/fv3gfs.fd/FV3/
 
 # copy appropriate configuration file to configure.fv3
 RUN cp $FV3GFS_BUILD_DIR/conf/$configure_file $FV3GFS_BUILD_DIR/conf/configure.fv3 && \

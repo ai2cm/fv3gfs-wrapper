@@ -3,7 +3,8 @@ FV3GFS
 ======
 
 
-`fv3gfs` is a Python wrapper for the FV3GFS global climate model.
+fv3gfs-python (`import fv3gfs`), is a Python wrapper for the FV3GFS
+global climate model.
 
 
 Checking out
@@ -39,24 +40,13 @@ to building the Python package.
 Installation
 ------------
 
-1. Build the [Fortran code](https://github.com/VulcanClimateModeling/fv3gfs/tree/master/sorc/fv3gfs.fd/FV3)
-   for the FV3GFS model. Build artifacts (files ending in `.o` and `.a`) should remain in the directory.
-2. `export FV3GFS_BUILD_DIR = <FV3 directory>`
-3. From within the Python wrapper root directory, run `make dist` and `pip install .`.
-4. If the build worked correctly, the package should now be installed. If there were issues
-   in compiling the wrapper, there may be an incompatability between `setup.py` and your system.
-   [Open an issue](https://github.com/VulcanClimateModeling/fv3gfs/issues/new) on Github.
+The Docker image can be built using `build_docker.sh`, or built and then
+tested using `test_docker.sh` (which will use the existing build if present).
 
-Currently, this package only supports linux and Python 3.5 or greater.
+Without docker, the package can be built using `make build`, and then installed
+in development mode with `pip install -e .`.
 
-
-Docker Installation
--------------------
-
-The docker image can be built using `build_docker.sh`, or directly using the Dockerfile
-in the `docker` folder. It is based off of the `fv3gfs-compiled-default` image
-([github](https://github.com/VulcanClimateModeling/fv3gfs)), which must be built first.
-
+This package only supports linux and Python 3.5 or greater.
 
 Quickstart
 ----------
@@ -66,7 +56,7 @@ Once the docker image is built, you could enter it and run the online code examp
 .. code-block:: python
 
     docker run -it fv3gfs-python bash
-    cd /cython_wrapper/examples
+    cd /fv3gfs-python/examples
     ulimit -s unlimited
     mpirun -np 6 --oversubscribe --allow-run-as-root --mca btl_vader_single_copy_mechanism none python online_code.py
 
