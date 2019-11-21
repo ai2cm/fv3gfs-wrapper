@@ -54,6 +54,8 @@ COPY external /fv3gfs-python/external
 
 RUN pip3 install --no-cache-dir -e /fv3gfs-python/external/fv3config
 
+ENV FV3CONFIG_CACHE_DIR=/inputdata
+
 # cache model data
 RUN python3 -m fv3config.download_data
 
