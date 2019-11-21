@@ -6,7 +6,7 @@ else
 include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
 endif
 
-.PHONY: clean clean-test clean-pyc clean-build docs help
+.PHONY: build clean clean-test clean-pyc clean-build docs help
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
@@ -32,12 +32,12 @@ for line in sys.stdin:
 endef
 export PRINT_HELP_PYSCRIPT
 
-BROWSER := python -c "$$BROWSER_PYSCRIPT"
+BROWSER := python3 -c "$$BROWSER_PYSCRIPT"
 
 help:
-	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
+	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
+clean: clean-build clean-pyc clean-test clean-lib ## remove all build, test, coverage and Python artifacts
 
 clean-build: ## remove build artifacts
 	rm -fr build/
@@ -57,6 +57,9 @@ clean-test: ## remove test and coverage artifacts
 	rm -f .coverage
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
+
+clean-lib:
+	$(MAKE) -C lib clean
 
 lint: ## check style with flake8
 	flake8 fv3gfs tests
@@ -81,11 +84,14 @@ servedocs: docs ## compile the docs watching for changes
 release: dist ## package and upload a release
 	twine upload dist/*
 
+build:
+	python3 setup.py build_ext --inplace
+
 dist: clean ## builds source and wheel package
-	python setup.py build_ext
-	python setup.py sdist
-	python setup.py bdist_wheel
+	python3 setup.py build_ext --inplace
+	python3 setup.py sdist
+	python3 setup.py bdist_wheel
 	ls -l dist
 
 install: clean ## install the package to the active Python's site-packages
-	python setup.py install
+	python3 setup.py install

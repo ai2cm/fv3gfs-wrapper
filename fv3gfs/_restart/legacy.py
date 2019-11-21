@@ -118,7 +118,7 @@ def prepend_label(filename, label=None):
 def get_time_data(dirname, label=None):
     filename = prepend_label('coupler.res', label)
     return_dict = {}
-    with open(filename, 'r') as f:
+    with open(os.path.join(dirname, filename), 'r') as f:
         f.readline()
         f.readline()
         year, month, day, hour, minute, second = get_integer_tokens(f.readline(), 6)

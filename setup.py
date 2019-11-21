@@ -1,16 +1,15 @@
+from glob import glob
+import subprocess
+import os
+import shutil
 from setuptools import setup, find_packages
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 # This line only needed if building with NumPy in Cython file.
 from numpy import get_include
-from os import system
-from glob import glob
-import subprocess
-import os
-import shutil
 
-setup_dir = os.path.dirname(os.path.abspath(__file__))
+
 fv3gfs_build_path_environ_name = 'FV3GFS_BUILD_DIR'
 make_command = os.environ.get('MAKE', 'make')
 package_dir = os.path.dirname(os.path.abspath(__file__))
@@ -51,11 +50,7 @@ with open('README.md') as readme_file:
 with open('HISTORY.md') as history_file:
     history = history_file.read()
 
-if fv3gfs_build_path_environ_name not in os.environ:
-    raise BuildDirectoryError(f'Environment variable {fv3gfs_build_path_environ_name} must be set.')
-elif not os.path.isdir(os.environ[fv3gfs_build_path_environ_name]):
-    raise BuildDirectoryError(f'Environment variable {fv3gfs_build_path_environ_name} must point to a directory')
-fv3gfs_build_path = os.environ[fv3gfs_build_path_environ_name]
+fv3gfs_build_path = os.path.join(package_dir, 'lib/FV3/sorc/fv3gfs.fd/FV3/')
 
 fortran_build_filenames = []
 for relative_filename in relative_fv3gfs_build_filenames:
@@ -65,12 +60,13 @@ wrapper_build_filenames = []
 for relative_filename in relative_wrapper_build_filenames:
     wrapper_build_filenames.append(os.path.join(package_dir, relative_filename))
 
+# make library dependencies before checking if they exist
+subprocess.check_call([make_command], cwd=os.path.join(package_dir, 'lib'))
+
 for filename in fortran_build_filenames:
     if not os.path.isfile(filename):
         raise BuildDirectoryError(f'File {filename} is missing, does {fv3gfs_build_path_environ_name} contain FV3GFS build artifacts?')
 
-
-subprocess.check_call([make_command, 'all'], cwd=os.path.join(package_dir, 'lib'))
 # copy2 preserves executable flag
 shutil.copy2(os.path.join(fv3gfs_build_path, 'fv3.exe'), os.path.join(package_dir, 'fv3.exe'))
 
