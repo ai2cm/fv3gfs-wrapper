@@ -43,7 +43,7 @@ Installation
 The Docker image can be built using `build_docker.sh`, or built and then
 tested using `test_docker.sh` (which will use the existing build if present).
 
-Without docker, the package can be built using `make build`, and then installed
+On a host, the package can be built using `make build`, and then installed
 in development mode with `pip install -e .`.
 
 This package only supports linux and Python 3.5 or greater.
