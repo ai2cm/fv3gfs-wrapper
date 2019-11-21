@@ -10,7 +10,6 @@ from Cython.Build import cythonize
 from numpy import get_include
 
 
-print('makeflags after imports', os.environ.get('MAKEFLAGS'))
 fv3gfs_build_path_environ_name = 'FV3GFS_BUILD_DIR'
 make_command = os.environ.get('MAKE', 'make')
 package_dir = os.path.dirname(os.path.abspath(__file__))
