@@ -40,7 +40,8 @@ RUN pip3 install --no-cache-dir \
     Click==7.0 \
     pyyaml==5.1.2 \
     google-cloud-storage==1.23.0 \
-    gcsfs==0.4.0
+    gcsfs==0.4.0 \
+    fsspec==0.6.0
 
 # download and install NCEP libraries
 RUN git config --global http.sslverify false && \
