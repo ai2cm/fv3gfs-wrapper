@@ -18,16 +18,13 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     libopenmpi3 \
+    python3-mpi4py \
     netcdf-bin \
     libssl-dev \
     python3 \
     python3-numpy \
-    python3-mpi4py \
     cython3 \
     python3-pip
-
-ADD /docker/install_gcloud.sh /setup/install_gcloud.sh
-RUN bash /setup/install_gcloud.sh
 
 # install required python packages
 RUN pip3 install --no-cache-dir \
@@ -41,7 +38,8 @@ RUN pip3 install --no-cache-dir \
     pyyaml==5.1.2 \
     google-cloud-storage==1.23.0 \
     gcsfs==0.4.0 \
-    fsspec==0.6.0
+    fsspec==0.6.0 \
+    pytest==5.2.2
 
 # download and install NCEP libraries
 RUN git config --global http.sslverify false && \
@@ -52,20 +50,13 @@ RUN git config --global http.sslverify false && \
     echo "y" | ./make_ncep_libs.sh -s linux -c gnu -d /opt/NCEPlibs -o 1
 
 #-----------------------------------------------------------------------------
-FROM fv3gfs-env AS fv3gfs-python
+FROM fv3gfs-env as fv3config-inputdata
 
-# copy and install fv3config first so data cache is only re-downloaded
-# if fv3config itself changes
-COPY external /fv3gfs-python/external
+RUN wget http://storage.googleapis.com/vcm-ml-public/2019-10-23-data-for-running-fv3gfs.tar.gz && \
+    tar -xf /2019-10-23-data-for-running-fv3gfs.tar.gz --directory /
 
-RUN pip3 install --no-cache-dir -e /fv3gfs-python/external/fv3config
-
-ENV FV3CONFIG_CACHE_DIR=/inputdata
-
-# cache model data
-RUN python3 -m fv3config.download_data
-
-RUN chmod -R 755 /inputdata
+#-----------------------------------------------------------------------------
+FROM fv3gfs-env AS fv3gfs-build
 
 # copy wrapper and fortran sources
 # directory copy commands must be separate due to docker limitations
@@ -95,8 +86,25 @@ RUN cd /fv3gfs-python && \
 
 # compile wrapper
 RUN cd /fv3gfs-python && \
-    make build && \
-    pip3 install -e /fv3gfs-python
+    make build
+
+#-----------------------------------------------------------------------------
+FROM fv3gfs-env AS fv3gfs-python
+
+COPY --from=fv3gfs-build /fv3gfs-python /fv3gfs-python
+RUN pip3 install --no-cache-dir -e /fv3gfs-python
+
+# copy and install fv3config
+COPY external /fv3gfs-python/external
+
+RUN pip3 install --no-cache-dir -e /fv3gfs-python/external/fv3config
+
+ENV FV3CONFIG_CACHE_DIR=/inputdata
+
+# cache model data
+COPY --from=fv3config-inputdata /2019-10-23-data-for-running-fv3gfs /inputdata/fv3config-cache
+
+RUN chmod -R 755 /inputdata
 
 # interactive shell by default
 CMD ["bash"]
