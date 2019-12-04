@@ -2,10 +2,8 @@
 FV3GFS
 ======
 
-
 fv3gfs-python (`import fv3gfs`), is a Python wrapper for the FV3GFS
 global climate model.
-
 
 Checking out
 ------------

@@ -38,7 +38,7 @@ class SetterTests(unittest.TestCase):
     def test_dynamics_names_present(self):
         """Test that some small subset of dynamics names are in the data dictionary"""
         for name in [
-                'eastward_wind', 'northward_wind', 'vertical_wind',
+                'x_wind', 'y_wind', 'vertical_wind',
                 'surface_geopotential']:
             self.assertIn(name, self.dynamics_data.keys())
 
