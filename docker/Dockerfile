@@ -26,6 +26,9 @@ RUN apt-get update && apt-get install -y \
     cython3 \
     python3-pip
 
+ADD /docker/install_gcloud.sh /setup/install_gcloud.sh
+RUN bash /setup/install_gcloud.sh
+
 # install required python packages
 RUN pip3 install --no-cache-dir \
     xarray==0.13.0 \
@@ -35,7 +38,9 @@ RUN pip3 install --no-cache-dir \
     appdirs==1.4.3 \
     requests==2.22.0 \
     Click==7.0 \
-    pyyaml==5.1.2
+    pyyaml==5.1.2 \
+    google-cloud-storage==1.23.0 \
+    gcsfs==0.4.0
 
 # download and install NCEP libraries
 RUN git config --global http.sslverify false && \
@@ -58,6 +63,8 @@ ENV FV3CONFIG_CACHE_DIR=/inputdata
 
 # cache model data
 RUN python3 -m fv3config.download_data
+
+RUN chmod -R 755 /inputdata
 
 # copy wrapper and fortran sources
 # directory copy commands must be separate due to docker limitations

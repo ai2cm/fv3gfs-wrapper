@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE=fv3gfs-python
+IMAGE=us.gcr.io/vcm-ml/fv3gfs-python
 
 MOUNTS="-v $(pwd):/fv3gfs-python"
 
