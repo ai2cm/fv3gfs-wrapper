@@ -31,6 +31,9 @@ On Ubuntu, these can be installed with:
         libopenmpi3 \
         libssl-dev 
 
+The Fortran installation located under `lib/FV3` is used by default. This can be
+overridden by setting `FV3GFS_BUILD_DIR`. It is assumed that the build system under
+`FV3GFS_BUILD_DIR` is the same.
 
 Installation
 ------------
