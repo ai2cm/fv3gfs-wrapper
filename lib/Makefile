@@ -1,6 +1,8 @@
 SHELL = /bin/sh
 
-FV3GFS_BUILD_DIR=$(shell pwd)/FV3/sorc/fv3gfs.fd/FV3/
+ifndef FV3GFS_BUILD_DIR
+	FV3GFS_BUILD_DIR=$(shell pwd)/lib/FV3/sorc/fv3gfs.fd/FV3/
+endif
 include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
 
 TEMPLATES = $(shell ls ../templates)
