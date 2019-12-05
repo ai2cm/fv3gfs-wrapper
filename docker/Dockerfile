@@ -39,7 +39,8 @@ RUN pip3 install --no-cache-dir \
     google-cloud-storage==1.23.0 \
     gcsfs==0.4.0 \
     fsspec==0.6.0 \
-    pytest==5.2.2
+    pytest==5.2.2 \
+    kubernetes==10.0.1
 
 # download and install NCEP libraries
 RUN git config --global http.sslverify false && \
@@ -50,9 +51,11 @@ RUN git config --global http.sslverify false && \
     echo "y" | ./make_ncep_libs.sh -s linux -c gnu -d /opt/NCEPlibs -o 1
 
 #-----------------------------------------------------------------------------
-FROM fv3gfs-env as fv3config-inputdata
+FROM ubuntu:19.10 as fv3config-inputdata
 
-RUN wget http://storage.googleapis.com/vcm-ml-public/2019-10-23-data-for-running-fv3gfs.tar.gz && \
+RUN apt-get update && \
+    apt-get install -y wget && \
+    wget http://storage.googleapis.com/vcm-ml-public/2019-10-23-data-for-running-fv3gfs.tar.gz && \
     tar -xf /2019-10-23-data-for-running-fv3gfs.tar.gz --directory /
 
 #-----------------------------------------------------------------------------
@@ -72,11 +75,11 @@ COPY fill_templates.py HISTORY.md LICENSE Makefile MANIFEST.in README.md setup.c
 ARG compile_option
 ARG configure_file=configure.fv3.gnu_docker
 
-ENV FV3GFS_BUILD_DIR=/fv3gfs-python/lib/FV3/sorc/fv3gfs.fd/FV3/
-
 # copy appropriate configuration file to configure.fv3
-RUN cp $FV3GFS_BUILD_DIR/conf/$configure_file $FV3GFS_BUILD_DIR/conf/configure.fv3 && \
-    if [ ! -z $compile_option ]; then sed -i "33i $compile_option" $FV3GFS_BUILD_DIR/conf/configure.fv3; fi
+RUN cp /fv3gfs-python/lib/FV3/sorc/fv3gfs.fd/FV3/conf/$configure_file \
+        /fv3gfs-python/lib/FV3/sorc/fv3gfs.fd/FV3/conf/configure.fv3 && \
+    if [ ! -z $compile_option ]; then sed -i "33i $compile_option" \
+        /fv3gfs-python/lib/FV3/sorc/fv3gfs.fd/FV3/conf/configure.fv3; fi
 
 # make sources first, because -j8 doesn't propagate through setup.py layer
 RUN cd /fv3gfs-python && \
