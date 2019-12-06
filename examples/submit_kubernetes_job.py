@@ -3,8 +3,8 @@ import os
 import fsspec
 import yaml
 import fv3config
+import uuid
 
-logger = logging.getLogger("kubernetes.py")
 
 PARENT_BUCKET = (
     "gs://vcm-ml-data/fv3gfs-python-kubernetes-example/"
@@ -13,6 +13,7 @@ DOCKER_IMAGE = "us.gcr.io/vcm-ml/fv3gfs-python"
 
 
 if __name__ == "__main__":
+    logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.INFO)
     config = fv3config.get_default_config()
     config_location = os.path.join(PARENT_BUCKET, "fv3config.yml")
@@ -24,7 +25,7 @@ if __name__ == "__main__":
             config_location,
             outdir,
             DOCKER_IMAGE,
-            jobname='fv3gfs-python-kubernetes-example',
+            jobname=f'fv3gfs-python-example-{uuid.uuid4().hex}',
             namespace="default",
             memory_gb=3.6,
             cpu_count=1,
