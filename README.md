@@ -31,9 +31,9 @@ On Ubuntu, these can be installed with:
         libopenmpi3 \
         libssl-dev 
 
-When installing from sources, it also requires that you build the FV3GFS Fortran model prior
-to building the Python package.
-
+The Fortran installation located under `lib/FV3` is used by default. This can be
+overridden by setting `FV3GFS_BUILD_DIR`. It is assumed that the build system under
+`FV3GFS_BUILD_DIR` is the same.
 
 Installation
 ------------
@@ -64,8 +64,3 @@ Usage
 Example run scripts are included in [`examples`](https://github.com/VulcanClimateModeling/fv3gfs/tree/master/sorc/fv3gfs.fd/cython_wrapper/examples).
 These run scripts act as a drop-in replacement for `fv3.exe`, and get executed
 in the same way, using `mpirun`.
-
-Features
---------
-
-* TODO

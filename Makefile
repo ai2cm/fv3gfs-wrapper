@@ -1,10 +1,9 @@
 SHELL = /bin/sh
 
 ifndef FV3GFS_BUILD_DIR
-$(warning FV3GFS_BUILD_DIR is not set)
-else
-include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
+	FV3GFS_BUILD_DIR=$(shell pwd)/lib/FV3/sorc/fv3gfs.fd/FV3/
 endif
+include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
 
 .PHONY: build clean clean-test clean-pyc clean-build docs help
 .DEFAULT_GOAL := help

@@ -34,7 +34,6 @@ library_link_args = [
 ]
 
 requirements = [
-    'Click>=7.0',
     'xarray>=0.13.0',
     'netCDF4>=1.4.2',
     'numpy'
@@ -50,7 +49,10 @@ with open('README.md') as readme_file:
 with open('HISTORY.md') as history_file:
     history = history_file.read()
 
-fv3gfs_build_path = os.path.join(package_dir, 'lib/FV3/sorc/fv3gfs.fd/FV3/')
+if fv3gfs_build_path_environ_name in os.environ:
+    fv3gfs_build_path = os.environ(fv3gfs_build_path_environ_name)
+else:
+    fv3gfs_build_path = os.path.join(package_dir, 'lib/FV3/sorc/fv3gfs.fd/FV3/')
 
 fortran_build_filenames = []
 for relative_filename in relative_fv3gfs_build_filenames:
