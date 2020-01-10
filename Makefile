@@ -1,7 +1,7 @@
 SHELL = /bin/sh
 
 ifndef FV3GFS_BUILD_DIR
-	FV3GFS_BUILD_DIR=$(shell pwd)/lib/FV3/sorc/fv3gfs.fd/FV3/
+	FV3GFS_BUILD_DIR=$(shell pwd)/lib/external/FV3/
 endif
 include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
 
@@ -84,9 +84,11 @@ release: dist ## package and upload a release
 	twine upload dist/*
 
 build:
+	$(MAKE) -C lib
 	python3 setup.py build_ext --inplace
 
 dist: clean ## builds source and wheel package
+	$(MAKE) -C lib
 	python3 setup.py build_ext --inplace
 	python3 setup.py sdist
 	python3 setup.py bdist_wheel

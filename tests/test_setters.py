@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 from copy import deepcopy
+import yaml
 import xarray as xr
 import numpy as np
 import fv3config
@@ -156,7 +157,8 @@ class SetterTests(unittest.TestCase):
 
 if __name__ == '__main__':
     rank = MPI.COMM_WORLD.Get_rank()
-    config = fv3config.get_default_config()
+    with open(os.path.join(test_dir, 'default_config.yml'), 'r') as f:
+        config = yaml.safe_load(f)
     rundir = os.path.join(test_dir, 'rundir')
     if rank == 0:
         if os.path.isdir(rundir):

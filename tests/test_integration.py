@@ -3,6 +3,7 @@ import os
 import subprocess
 import shutil
 import hashlib
+import yaml
 from fv3config import get_default_config, write_run_directory
 from util import mpi_flags
 
@@ -85,7 +86,8 @@ def files_match_if_present(name1, name2):
 def prepare_workdir(work_dir):
     clear_workdir(work_dir)
     os.mkdir(work_dir)
-    config = get_default_config()
+    with open(os.path.join(base_dir, 'default_config.yml'), 'r') as f:
+        config = yaml.safe_load(f)
     write_run_directory(config, work_dir)
 
 

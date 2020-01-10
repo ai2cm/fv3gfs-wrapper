@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 from datetime import datetime
+import yaml
 from mpi4py import MPI
 import fv3config
 import fv3gfs
@@ -78,7 +79,8 @@ class TracerMetadataTests(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    config = fv3config.get_default_config()
+    with open(os.path.join(test_dir, 'default_config.yml'), 'r') as f:
+        config = yaml.safe_load(f)
     config['initial_conditions'] = 'restart_example'
     config['namelist']['fv_core_nml']['external_ic'] = False
     config['namelist']['fv_core_nml']['nggps_ic'] = False
