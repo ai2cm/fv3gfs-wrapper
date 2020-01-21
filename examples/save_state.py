@@ -29,7 +29,7 @@ def get_names(props):
     for var in props:
         yield var['name']
 
-VARIABLES = list(get_names(fv3gfs.dynamics_properties)) + list(get_names(fv3gfs.physics_properties))
+VARIABLES = list(state_io.CF_TO_RESTART_MAP)
 
 
 rundir_basename = 'rundir'
