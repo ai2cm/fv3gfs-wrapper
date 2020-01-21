@@ -123,5 +123,8 @@ COPY --from=fv3config-inputdata /2019-10-23-data-for-running-fv3gfs /inputdata/f
 
 RUN chmod -R 755 /inputdata
 
+# make stack size unlimited
+RUN echo "ulimit -s unlimited" >> /etc/bash.bashrc
+
 # interactive shell by default
 CMD ["bash"]
