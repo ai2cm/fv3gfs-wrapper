@@ -2,6 +2,6 @@
 import state_io
 
 with open("rundir/state.pkl", "rb")  as f:
-    data = state_io.load_state(f)
+    data = state_io.load(f)
     
 print(data)

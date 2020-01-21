@@ -59,5 +59,5 @@ if __name__ == '__main__':
 
     if rank == 0:
         with fsspec.open(output_path, "wb") as f:
-            state_io.save_state(combined, f)
+            state_io.dump(combined, f)
     fv3gfs.cleanup()
