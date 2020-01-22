@@ -74,3 +74,49 @@ class ZarrVariableWriter:
             logger.critical("Exception Raised on rank", self.rank)
             raise e
         self.idx += 1
+
+
+class ZarrScalarWriter:
+    def __init__(self, comm, group, name):
+        self.idx = 0
+        self.comm = comm
+        self.group = group
+        self.name = name
+        self.array = None
+
+        if self.rank == 0:
+            logger.info(f"initializing ZarrScalarWriter for {name}")
+    
+    @property
+    def rank(self):
+        return self.comm.Get_rank()
+
+    @property
+    def size(self):
+        return self.comm.Get_size()
+
+    def _init_zarr_root(self, array):
+        shape = (1, self.size) + array.shape
+        chunks = (1, 1) + array.shape
+        self.array = self.group.create_dataset(self.name, shape=shape,
+        dtype=array.dtype, chunks=chunks)
+
+
+    def append(self, array):
+
+        if self.array is None:
+            self._init_zarr(array)
+            self.set_dims(['time', 'rank'] + list(array.dims))
+
+        if self.idx >= self.array.shape[0]:
+            new_shape = (self.idx + 1, self.size) + self.array.shape[2:]
+            self.array.resize(*new_shape)
+            self.array.attrs.update(array.attrs)
+        
+
+        try:
+            self.array[self.idx, self.rank, ...] = np.asarray(array)
+        except Error as e:
+            logger.critical("Exception Raised on rank", self.rank)
+            raise e
+        self.idx += 1

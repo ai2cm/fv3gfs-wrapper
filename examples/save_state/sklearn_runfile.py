@@ -12,6 +12,7 @@ import run_sklearn
 import logging
 import f90nml
 import zarr
+from fv3gfs._wrapper import get_time
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('python')
