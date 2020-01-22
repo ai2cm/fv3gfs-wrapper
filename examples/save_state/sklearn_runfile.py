@@ -1,5 +1,6 @@
 import os
 from datetime import timedelta
+import sys
 from mpi4py import MPI
 import fv3gfs
 import fv3config
@@ -33,9 +34,29 @@ logger = logging.getLogger('python')
 # All together:
 # mpirun -n 6 --allow-run-as-root --oversubscribe --mca btl_vader_single_copy_mechanism none python3 save_state_runfile.py
 
+SPHUM = "specific_humidity"
 DELP = "pressure_thickness_of_atmospheric_layer"
 MODEL = run_sklearn.open_sklearn_model(run_sklearn.SKLEARN_MODEL)
 VARIABLES = list(state_io.CF_TO_RESTART_MAP)+ [DELP]
+
+cp = 1004
+
+
+def compute_diagnostics(state, diags):
+    return dict(
+        net_precip=(diags['Q2'] * state[DELP] / 9.81).sum('z').assign_attrs(units='kg/m^2/s'),
+        PW=(state[SPHUM] * state[DELP] / 9.81).sum('z').assign_attrs(units='mm'),
+        net_heating=(diags['Q1'] * state[DELP] / 9.81 * cp).sum('z').assign_attrs(units='W/m^2'),
+    )
+
+
+def init_writers(group, comm, diags):
+    return {key: state_io.ZarrVariableWriter(comm, group, name=key) for key in diags}
+
+
+def append_to_writers(writers, diags):
+    for key in writers:
+        writers[key].append(diags[key])
 
 
 rundir_basename = 'rundir'
@@ -48,8 +69,6 @@ if __name__ == '__main__':
     comm = MPI.COMM_WORLD
 
     group = zarr.open_group('test.zarr', mode='w')
-    q2_writer = state_io.ZarrVariableWriter(comm, group, name='Q2')
-    net_precip_writer = state_io.ZarrVariableWriter(comm, group, name='net_precip') 
 
     rank = comm.Get_rank()
     current_dir = os.getcwd()
@@ -69,6 +88,8 @@ if __name__ == '__main__':
         if rank == 0:
             logger.debug(f"Getting state variables: {VARIABLES}")
         state = fv3gfs.get_state(names=VARIABLES)
+
+
         if rank == 0:
             logger.debug("Computing RF updated variables")
         preds, diags = run_sklearn.update(MODEL, state, dt=TIMESTEP)
@@ -78,9 +99,11 @@ if __name__ == '__main__':
         if rank == 0:
             logger.debug("Setting Fortran State")
 
-        q2_writer.append(diags['Q2'])
-        net_precip = (diags['Q2'] * state[DELP] / 9.81).sum('z')
-        net_precip_writer.append(net_precip)
+        diagnostics = compute_diagnostics(state, diags)
+
+        if i == 0:
+            writers = init_writers(group, comm, diagnostics)
+        append_to_writers(writers, diagnostics)
         
 
     fv3gfs.cleanup()

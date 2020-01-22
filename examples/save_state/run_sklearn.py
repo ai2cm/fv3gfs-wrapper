@@ -41,7 +41,7 @@ def update(model, state, dt):
     updated = state.assign(sphum=state['sphum'] + tend.Q2 * dt,
                            T=state.T + tend.Q1 * dt)
 
-    return rename_to_orig(updated), tend
+    return rename_to_orig(updated), rename_to_orig(tend)
     
 
 if __name__ == '__main__':

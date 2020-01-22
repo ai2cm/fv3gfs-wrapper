@@ -1,6 +1,9 @@
 import xarray as xr
 import numpy as np
 import pickle
+import logging
+
+logger = logging.getLogger(__name__)
 
 CF_TO_RESTART_MAP = {
     'specific_humidity': 'sphum', 
@@ -27,6 +30,9 @@ class ZarrVariableWriter:
         self.group = group
         self.name = name
         self.array = None
+
+        if self.rank == 0:
+            logger.info(f"initializing ZarrVariableWriter for {name}")
     
     @property
     def rank(self):
@@ -59,6 +65,7 @@ class ZarrVariableWriter:
         if self.idx >= self.array.shape[0]:
             new_shape = (self.idx + 1, self.size) + self.array.shape[2:]
             self.array.resize(*new_shape)
+            self.array.attrs.update(array.attrs)
         
 
         try:
@@ -67,5 +74,3 @@ class ZarrVariableWriter:
             logger.critical("Exception Raised on rank", self.rank)
             raise e
         self.idx += 1
-
-
