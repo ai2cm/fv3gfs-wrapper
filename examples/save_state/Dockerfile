@@ -3,5 +3,5 @@ FROM us.gcr.io/vcm-ml/fv3gfs-python@sha256:4870c4e91bc5988df222631f27967572bff97
 
 ADD fv3net-0.1.0-py3-none-any.whl /wheels/fv3net-0.1.0-py3-none-any.whl
 RUN pip3 install --no-deps /wheels/fv3net-0.1.0-py3-none-any.whl && \
-    pip3 install scikit-learn==0.22 joblib
+    pip3 install scikit-learn==0.22 joblib zarr
 

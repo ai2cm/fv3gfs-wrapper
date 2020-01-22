@@ -6,7 +6,7 @@ LOCAL_DIR_ARGS = -w /code -v $(shell pwd):/code
 RUN_ARGS = $(KEY_ARGS) $(LOCAL_DIR_ARGS) $(IMAGE)
 RUN_INTERACTIVE = docker run -ti $(RUN_ARGS)
 RUN = docker run $(RUN_ARGS)
-MPIRUN = $(RUN) mpirun -n 6 --allow-run-as-root --oversubscribe --mca btl_vader_single_copy_mechanism none
+MPIRUN = $(RUN_INTERACTIVE) mpirun -n 6 --allow-run-as-root --oversubscribe --mca btl_vader_single_copy_mechanism none
 
 
 build:
