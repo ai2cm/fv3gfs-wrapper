@@ -42,11 +42,11 @@ def update(model, state, dt):
     return rename_to_orig(updated)
     
 
+if __name__ == '__main__':
+    with open("rundir/state.pkl", "rb") as f:
+        data = state_io.load(f)
 
-with open("rundir/state.pkl", "rb") as f:
-    data = state_io.load(f)
-
-tile = data[0]
-model = open_sklearn_model(SKLEARN_MODEL)
-preds = update(model, tile, dt=1)
-print(preds)
+    tile = data[0]
+    model = open_sklearn_model(SKLEARN_MODEL)
+    preds = update(model, tile, dt=1)
+    print(preds)
