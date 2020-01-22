@@ -23,7 +23,7 @@ import state_io
 #     to silence a certain inconsequential MPI error: --mca btl_vader_single_copy_mechanism none
 
 # All together:
-# mpirun -n 6 --allow-run-as-root --oversubscribe --mca btl_vader_single_copy_mechanism none python3 save_state.py
+# mpirun -n 6 --allow-run-as-root --oversubscribe --mca btl_vader_single_copy_mechanism none python3 save_state_runfile.py
 
 def get_names(props):
     for var in props:
@@ -33,24 +33,17 @@ VARIABLES = list(state_io.CF_TO_RESTART_MAP)
 
 
 rundir_basename = 'rundir'
-output_path = 'state.pkl'
+output_path = '/code/state.pkl'
 
 if __name__ == '__main__':
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     current_dir = os.getcwd()
     rundir_path = os.path.join(current_dir, rundir_basename)
-    config = fv3config.get_default_config()
-    if rank == 0:  # Only create run directory from one rank
-        # Can alter this config dictionary to configure the run
-        fv3config.write_run_directory(config, rundir_path)
     MPI.COMM_WORLD.barrier()  # wait for master rank to write run directory
     os.chdir(rundir_path)
 
     # Calculate factor for relaxing humidity to zero
-    relaxation_rate = timedelta(days=7)
-    timestep = timedelta(seconds=config['namelist']['coupler_nml']['dt_atmos'])
-
     fv3gfs.initialize()
     fv3gfs.step_dynamics()
     fv3gfs.step_physics()
