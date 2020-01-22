@@ -5,11 +5,11 @@ import pickle
 from sklearn.externals import joblib
 import xarray as xr
 
-memory = joblib.Memory(location='cache')
+#memory = joblib.Memory(location='cache')
 
 SKLEARN_MODEL = "gs://vcm-ml-data/test-annak/ml-pipeline-output/2020-01-17_rf_40d_run.pkl"
 
-@memory.cache
+#@memory.cache
 def open_sklearn_model(url):
     # Load the model
     with fsspec.open(url, "rb") as f:
