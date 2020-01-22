@@ -16,28 +16,37 @@ def open_sklearn_model(url):
         return joblib.load(f)
 
 
-def rename_dims(x):
-    return x.rename({'z': 'pfull'})
-
-
 def rename_to_restart(state):
-    return {state_io.CF_TO_RESTART_MAP.get(key, key): rename_dims(state[key]) for key in state}
+    return {state_io.CF_TO_RESTART_MAP.get(key, key): state[key].rename({'z': 'pfull'}) for key in state}
+
+
+def rename_to_orig(state):
+    return {state_io.RESTART_TO_CF_MAP.get(key, key): state[key].rename({'pfull': 'z'}) for key in state}
 
 
 def predict(model, state):
-    state = xr.Dataset(state)
     stacked = state.stack(sample=['x', 'y'])
-    output = model.predict(stacked, 'sample')
-    return output.unstack('sample')
+    output = model.predict(stacked, 'sample').unstack('sample')
+    return output
+
+
+def update(model, state, dt):
+    renamed = rename_to_restart(state)
+    state = xr.Dataset(renamed)
+
+    tend = predict(model, state)
+
+    updated = state.assign(sphum=state['sphum'] + tend.Q2 * dt,
+                           T=state.T + tend.Q1 * dt)
+
+    return rename_to_orig(updated)
+    
 
 
 with open("rundir/state.pkl", "rb") as f:
     data = state_io.load(f)
 
-
-
-renamed = [rename_to_restart(it) for it in data]
-tile = renamed[0]
+tile = data[0]
 model = open_sklearn_model(SKLEARN_MODEL)
-preds = predict(model, tile)
+preds = update(model, tile, dt=1)
 print(preds)
