@@ -3,6 +3,7 @@ import sys
 import fsspec
 import pickle
 from sklearn.externals import joblib
+from sklearn.utils import parallel_backend
 import xarray as xr
 
 #memory = joblib.Memory(location='cache')
@@ -26,7 +27,8 @@ def rename_to_orig(state):
 
 def predict(model, state):
     stacked = state.stack(sample=['x', 'y'])
-    output = model.predict(stacked, 'sample').unstack('sample')
+    with parallel_backend('threading', n_jobs=1):
+        output = model.predict(stacked, 'sample').unstack('sample')
     return output
 
 
@@ -39,7 +41,7 @@ def update(model, state, dt):
     updated = state.assign(sphum=state['sphum'] + tend.Q2 * dt,
                            T=state.T + tend.Q1 * dt)
 
-    return rename_to_orig(updated)
+    return rename_to_orig(updated), tend
     
 
 if __name__ == '__main__':
