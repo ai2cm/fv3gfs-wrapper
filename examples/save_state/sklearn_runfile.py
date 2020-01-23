@@ -15,7 +15,7 @@ import zarr
 from fv3gfs._wrapper import get_time
 
 logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger('python')
+logger = logging.getLogger(__name__)
 
 
 # This code shows an example where we relax specific humidity towards zero with a 7-day timescale.
@@ -37,7 +37,6 @@ logger = logging.getLogger('python')
 
 SPHUM = "specific_humidity"
 DELP = "pressure_thickness_of_atmospheric_layer"
-MODEL = run_sklearn.open_sklearn_model(run_sklearn.SKLEARN_MODEL)
 VARIABLES = list(state_io.CF_TO_RESTART_MAP)+ [DELP]
 
 cp = 1004
@@ -65,6 +64,7 @@ input_nml = 'rundir/input.nml'
 NML = f90nml.read(input_nml)
 TIMESTEP = NML['coupler_nml']['dt_atmos']
 
+times = []
 
 if __name__ == '__main__':
     comm = MPI.COMM_WORLD
@@ -72,6 +72,16 @@ if __name__ == '__main__':
     group = zarr.open_group('test.zarr', mode='w')
 
     rank = comm.Get_rank()
+
+    if rank == 0:
+        logger.info("Downloading Sklearn Model")
+        MODEL = run_sklearn.open_sklearn_model(run_sklearn.SKLEARN_MODEL)
+        logger.info("Model downloaded")
+    else:
+        MODEL = None
+
+    MODEL = comm.bcast(MODEL, root=0)
+
     current_dir = os.getcwd()
     rundir_path = os.path.join(current_dir, rundir_basename)
     MPI.COMM_WORLD.barrier()  # wait for master rank to write run directory
@@ -82,9 +92,10 @@ if __name__ == '__main__':
     # Calculate factor for relaxing humidity to zero
     fv3gfs.initialize()
     for i in range(fv3gfs.get_step_count()):
+        if rank == 0:
+            logger.debug(f"Dynamics Step")
         fv3gfs.step_dynamics()
         fv3gfs.step_physics()
-
  
         if rank == 0:
             logger.debug(f"Getting state variables: {VARIABLES}")
@@ -106,5 +117,6 @@ if __name__ == '__main__':
             writers = init_writers(group, comm, diagnostics)
         append_to_writers(writers, diagnostics)
         
+        times.append(get_time())
 
     fv3gfs.cleanup()

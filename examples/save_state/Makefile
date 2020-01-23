@@ -23,3 +23,6 @@ save_state:
 
 sklearn_run:
 	$(MPIRUN) python3 sklearn_runfile.py
+
+clean:
+	rm -rf net_precip net_heating/ PW
