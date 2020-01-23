@@ -30,7 +30,7 @@ def plot_frame_i(i, key, **kwargs):
     print("Saving frame %d" % i)
     ds = open_ds()
     FMT = "%y-%m-%d %H:%M:%S"
-    ax = plot_axes(ds.isel(time=i), 'net_precip', **kwargs)[1]
+    ax = plot_axes(ds.isel(time=i), key, **kwargs)[1]
     ax.item().set_title(ds.time[i].item().strftime(FMT))
     plt.savefig(f"{key}/{i:04d}")
     plt.close()
