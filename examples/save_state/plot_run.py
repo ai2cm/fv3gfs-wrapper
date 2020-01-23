@@ -33,6 +33,7 @@ def plot_frame_i(i, key, **kwargs):
     ax = plot_axes(ds.isel(time=i), 'net_precip', **kwargs)[1]
     ax.item().set_title(ds.time[i].item().strftime(FMT))
     plt.savefig(f"{key}/{i:04d}")
+    plt.close()
 
 
 def plot_field(pool, key, **kwargs):
@@ -45,4 +46,5 @@ import os
 
 pool = Pool(16)
 plot_field(pool, 'net_precip', vmin=-100/86400, vmax=100/86400)
-plot_field(pool, 'net_heating')
+plot_field(pool, 'net_heating', vmin=-20000, vmax=20000)
+plot_field(pool, 'PW', vmin=0, vmax=90)
