@@ -36,7 +36,7 @@ ENV FMS_LIB=${FMS_DIR}/libFMS/.libs/
 ENV ESMF_LIB=${ESMF_DIR}/lib/libO3/Linux.gfortran.64.mpiuni.default/
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ESMF_LIB}:${FMS_LIB}
 
-ARG FV3GFS_BUILD_ROOT=/fv3gfs
+ARG FV3GFS_BUILD_ROOT=/
 
 COPY --from=fv3gfs-fms /FMS $FMS_DIR
 COPY --from=fv3gfs-esmf /usr/local/esmf ${ESMF_DIR}
@@ -107,9 +107,9 @@ RUN pip3 install --no-cache-dir -e /fv3gfs-python && \
 ENV FV3CONFIG_CACHE_DIR=/inputdata
 
 # cache model data
-COPY --from=fv3config-inputdata /2019-10-23-data-for-running-fv3gfs /inputdata/fv3config-cache
+COPY --from=fv3config-inputdata /2019-10-23-data-for-running-fv3gfs $FV3CONFIG_CACHE_DIR/fv3config-cache
 
-RUN chmod -R 755 /inputdata
+RUN chmod -R 777 $FV3CONFIG_CACHE_DIR
 
 # interactive shell by default
 CMD ["bash"]
