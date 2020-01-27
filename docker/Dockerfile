@@ -36,6 +36,8 @@ ENV FMS_LIB=${FMS_DIR}/libFMS/.libs/
 ENV ESMF_LIB=${ESMF_DIR}/lib/libO3/Linux.gfortran.64.mpiuni.default/
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ESMF_LIB}:${FMS_LIB}
 
+ARG FV3GFS_BUILD_ROOT=/fv3gfs
+
 COPY --from=fv3gfs-fms /FMS $FMS_DIR
 COPY --from=fv3gfs-esmf /usr/local/esmf ${ESMF_DIR}
 
@@ -45,10 +47,9 @@ COPY --from=fv3gfs-esmf /usr/local/esmf/lib/libO3/Linux.gfortran.64.mpiuni.defau
 # copy wrapper and fortran sources
 # directory copy commands must be separate due to docker limitations
 COPY lib /fv3gfs-python/lib
-COPY --from=fv3gfs-fortran-build /stochastic_physics /fv3gfs-python/lib/external/FV3/stochastic_physics
-COPY --from=fv3gfs-fortran-build /FV3 /fv3gfs-python/lib/external/FV3
+COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/stochastic_physics /fv3gfs-python/lib/external/stochastic_physics
+COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/FV3 /fv3gfs-python/lib/external/FV3
 COPY templates /fv3gfs-python/templates
-COPY tests /fv3gfs-python/tests
 COPY examples /fv3gfs-python/examples
 COPY docs /fv3gfs-python/docs
 # files can be copied in one line
@@ -95,6 +96,7 @@ COPY --from=fv3gfs-fms /FMS/libFMS/.libs/*.so* /lib64/
 COPY --from=fv3gfs-esmf /usr/local/esmf/lib/libO3/Linux.gfortran.64.mpiuni.default/*.so* /lib64/
 
 COPY --from=fv3gfs-python-build /fv3gfs-python /fv3gfs-python
+COPY tests /fv3gfs-python/tests
 
 # copy and install fv3config
 COPY external /fv3gfs-python/external
