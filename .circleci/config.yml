@@ -7,8 +7,13 @@ jobs:
       docker_layer_caching: true
     environment:
       GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-python
+      GOOGLE_APPLICATION_CREDENTIALS: /tmp/key.json
     steps:
       - checkout
+      - run:
+          name: "save gcloud key for gcsfs"
+          command: |
+            echo $ENCODED_GCR_KEY | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS
       - add_ssh_keys:
           fingerprints:
             - "b6:e7:38:b9:a6:61:ec:f2:27:81:0c:8e:b9:79:41:ca"
