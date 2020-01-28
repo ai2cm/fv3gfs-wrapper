@@ -6,7 +6,6 @@ jobs:
     machine:
       docker_layer_caching: true
     environment:
-      DOCKER_IMAGE: test-image
       GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-python
     steps:
       - checkout
@@ -23,11 +22,10 @@ jobs:
       - run: |
           if [[ "$CIRCLE_BRANCH" == "master" ]]
           then
-              docker tag $DOCKER_IMAGE $GCR_IMAGE
               docker push $GCR_IMAGE
               if [[ "$CIRCLE_TAG" != "" ]]
               then
-                  docker tag $DOCKER_IMAGE $GCR_IMAGE:$CIRCLE_TAG
+                  docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_TAG
                   docker push $GCR_IMAGE:$CIRCLE_TAG
               fi
           fi
