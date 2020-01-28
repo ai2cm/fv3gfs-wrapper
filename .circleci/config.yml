@@ -27,7 +27,7 @@ jobs:
       - run: |
           if [[ "$CIRCLE_BRANCH" == "master" ]]
           then
-              if [[ -z "$CIRCLE_TAG"]]
+              if [[ -z "$CIRCLE_TAG" ]]
               then
                   docker push $GCR_IMAGE
               else
