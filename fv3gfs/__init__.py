@@ -20,4 +20,4 @@ __all__ = [
     'load_fortran_restart_folder', 'read_state', 'write_state', 'get_restart_names'
 ]
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
