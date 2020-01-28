@@ -7,6 +7,7 @@ DOCKER_IMAGE=us.gcr.io/vcm-ml/fv3gfs-python
 ./build_docker.sh
 
 if [[ "GOOGLE_APPLICATION_CREDENTIALS" == "" ]]
+then
     docker run -it $DOCKER_IMAGE bash -c "pytest /fv3gfs-python/external/fv3config/tests"
 else
 # needed for circleci tests on machine executor, even though we're accessing public data only
