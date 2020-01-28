@@ -119,9 +119,9 @@ RUN pip3 install --no-cache-dir -e /fv3gfs-python && \
 ENV FV3CONFIG_CACHE_DIR=/inputdata
 
 # cache model data
-COPY --from=fv3config-inputdata /2019-10-23-data-for-running-fv3gfs /inputdata/fv3config-cache
+COPY --from=fv3config-inputdata /2019-10-23-data-for-running-fv3gfs $FV3CONFIG_CACHE_DIR/fv3config-cache
 
-RUN chmod -R 755 /inputdata
+RUN chmod -R 777 $FV3CONFIG_CACHE_DIR
 
 # make stack size unlimited
 RUN echo "ulimit -s unlimited" >> /etc/bash.bashrc
