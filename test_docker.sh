@@ -19,3 +19,5 @@ else
         --env GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS \
         -it $DOCKER_IMAGE bash -c "cd /fv3gfs-python; make test"
 fi
+
+pytest ./tests/image_tests/*.py

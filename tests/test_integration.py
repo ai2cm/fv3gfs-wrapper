@@ -51,8 +51,8 @@ class IntegrationTests(unittest.TestCase):
     #     )
     #     perform_python_run(os.path.join(base_dir, 'integration_scripts/test_restart.py'))
 
-    def test_restart_default_run(self):
-        perform_python_run(os.path.join(base_dir, 'integration_scripts/test_restart.py'))
+    # def test_restart_default_run(self):
+    #     perform_python_run(os.path.join(base_dir, 'integration_scripts/test_restart.py'))
 
     def test_default_python_equals_fortran(self):
         perform_python_run()
