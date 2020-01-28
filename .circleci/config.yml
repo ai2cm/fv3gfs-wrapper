@@ -5,9 +5,6 @@ jobs:
   build_default:
     machine:
       docker_layer_caching: true
-    environment:
-      DOCKER_IMAGE: test-image
-      GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-python:latest
     steps:
       - checkout
       - add_ssh_keys:
@@ -23,8 +20,7 @@ jobs:
       - run: |
           if [[ "$CIRCLE_BRANCH" == "master" ]]
           then
-              docker tag $DOCKER_IMAGE $GCR_IMAGE
-              docker push $GCR_IMAGE
+              docker push us.gcr.io/vcm-ml/fv3gfs-python
           fi
 workflows:
   version: 2

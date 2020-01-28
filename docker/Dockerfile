@@ -111,5 +111,8 @@ COPY --from=fv3config-inputdata /2019-10-23-data-for-running-fv3gfs $FV3CONFIG_C
 
 RUN chmod -R 777 $FV3CONFIG_CACHE_DIR
 
+# make stack size unlimited
+RUN echo "ulimit -s unlimited" >> /etc/bash.bashrc
+
 # interactive shell by default
 CMD ["bash"]
