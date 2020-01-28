@@ -20,7 +20,7 @@ jobs:
       - gcp-gcr/gcr-auth
       - run: bash test_docker.sh
       - run: |
-          if [[ "$CIRCLE_BRANCH" == "master" ]]
+          if [[ "$CIRCLE_BRANCH" != "master" ]]
           then
               docker push $GCR_IMAGE
               if [[ "$CIRCLE_TAG" != "" ]]
