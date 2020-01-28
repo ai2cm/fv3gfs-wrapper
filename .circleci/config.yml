@@ -39,11 +39,3 @@ workflows:
   build:
     jobs:
       - build_default
-  tagged-build:
-    jobs:
-      - build_default:
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              only: master
