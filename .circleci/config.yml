@@ -36,7 +36,7 @@ workflows:
       - build_default
   tagged-build:
     jobs:
-      - build:
+      - build_default:
           filters:
             tags:
               only: /^v.*/
