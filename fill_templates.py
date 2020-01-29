@@ -15,6 +15,8 @@ dim_ranges = {
 }
 
 all_templates = ('physics_data.F90', '_wrapper.pyx', 'dynamics_data.F90')
+SETUP_DIR = os.path.dirname(os.path.abspath(__file__))
+PROPERTIES_DIR = os.path.join(SETUP_DIR, 'external/fv3util/fv3util')
 
 
 def get_dim_range_string(dim_list):
@@ -30,8 +32,8 @@ if __name__ == '__main__':
     template_loader = jinja2.FileSystemLoader(searchpath=template_dir)
     template_env = jinja2.Environment(loader=template_loader, autoescape=True)
 
-    physics_data = json.load(open(os.path.join(setup_dir, 'fv3gfs/physics_properties.json')))
-    dynamics_data = json.load(open(os.path.join(setup_dir, 'fv3gfs/dynamics_properties.json')))
+    physics_data = json.load(open(os.path.join(PROPERTIES_DIR, 'physics_properties.json')))
+    dynamics_data = json.load(open(os.path.join(PROPERTIES_DIR, 'dynamics_properties.json')))
 
     physics_2d_properties = []
     physics_3d_properties = []
