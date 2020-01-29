@@ -14,17 +14,18 @@ __all__ = [
 ]
 
 
-def load_fortran_restart_folder(dirname, label=None):
+def load_fortran_restart_folder(dirname, rank, total_ranks, label=None):
     state_dict = {}
+    rank_suffix = get_rank_suffix(rank, total_ranks)
     for data_func in (
             get_time_data, get_fv_core_data, get_fv_srf_wind_data,
             get_fv_tracer_data, get_surface_data, get_phy_data):
-        state_dict.update(data_func(dirname, label=label))
+        state_dict.update(data_func(dirname, rank_suffix, label=label))
     fix_state_dimension_names(state_dict)
     return state_dict
 
 
-def get_rank_suffix():
+def get_rank_suffix(rank, total_ranks):
     tile = mpi.get_tile_number()
     count = mpi.rank % mpi.size
     if mpi.size > 6:
@@ -115,7 +116,7 @@ def prepend_label(filename, label=None):
 #  state dictionary corresponding to a particular Fortran restart file.
 
 
-def get_time_data(dirname, label=None):
+def get_time_data(dirname, rank_suffix, label=None):
     filename = prepend_label('coupler.res', label)
     return_dict = {}
     with open(os.path.join(dirname, filename), 'r') as f:
@@ -126,20 +127,20 @@ def get_time_data(dirname, label=None):
     return return_dict
 
 
-def get_fv_core_data(dirname, label=None):
-    fv_core_filename = prepend_label('fv_core.res', label) + get_rank_suffix()
+def get_fv_core_data(dirname, rank_suffix, label=None):
+    fv_core_filename = prepend_label('fv_core.res', label) + rank_suffix
     ds = xr.open_dataset(os.path.join(dirname, fv_core_filename)).isel(Time=0)
     return load_state_from_dataset(ds)
 
 
-def get_fv_srf_wind_data(dirname, label=None):
-    fv_srf_wind_filename = prepend_label('fv_srf_wnd.res', label) + get_rank_suffix()
+def get_fv_srf_wind_data(dirname, rank_suffix, label=None):
+    fv_srf_wind_filename = prepend_label('fv_srf_wnd.res', label) + rank_suffix
     ds = xr.open_dataset(os.path.join(dirname, fv_srf_wind_filename)).isel(Time=0)
     return load_state_from_dataset(ds)
 
 
-def get_fv_tracer_data(dirname, label=None):
-    fv_tracer_filename = prepend_label('fv_tracer.res', label) + get_rank_suffix()
+def get_fv_tracer_data(dirname, rank_suffix, label=None):
+    fv_tracer_filename = prepend_label('fv_tracer.res', label) + rank_suffix
     ds = xr.open_dataset(os.path.join(dirname, fv_tracer_filename)).isel(Time=0)
     out_dict = {}
 
@@ -152,10 +153,10 @@ def get_fv_tracer_data(dirname, label=None):
     return out_dict
 
 
-def get_surface_data(dirname, label=None):
+def get_surface_data(dirname, rank_suffix, label=None):
     sfc_data_filename = os.path.join(
         dirname,
-        prepend_label('sfc_data', label) + get_rank_suffix()
+        prepend_label('sfc_data', label) + rank_suffix
     )
     if os.path.isfile(sfc_data_filename):
         ds = xr.open_dataset(sfc_data_filename).isel(Time=0)
@@ -164,10 +165,10 @@ def get_surface_data(dirname, label=None):
         return {}  # physics data is optional
 
 
-def get_phy_data(dirname, label=None):
+def get_phy_data(dirname, rank_suffix, label=None):
     phy_data_filename = os.path.join(
         dirname,
-        prepend_label('phy_data', label) + get_rank_suffix()
+        prepend_label('phy_data', label) + rank_suffix
     )
     if os.path.isfile(phy_data_filename):
         ds = xr.open_dataset(phy_data_filename).isel(Time=0)
