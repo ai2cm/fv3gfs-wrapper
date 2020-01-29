@@ -29,9 +29,16 @@ jobs:
             [ -d /opt/circleci/.pyenv/versions/3.6.2 ] || pyenv install 3.6.2
             pyenv global 3.6.2
             pip install --upgrade pip setuptools
-            pip install external/fv3config
             pip install -r requirements.txt
-      - run: bash test_docker.sh
+            pip install external/fv3config external/fv3util
+      - run:
+          name: "Perform pure Python tests"
+          command: |
+            pytest external/fv3util/tests
+      - run: 
+          name: "Compile model and perform model tests"
+          command: |
+            bash test_docker.sh
       - gcp-gcr/gcr-auth
       - run: |
           echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://gcr.io
