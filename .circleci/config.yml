@@ -32,6 +32,10 @@ jobs:
             pip install external/fv3config
             pip install -r requirements.txt
       - run: bash test_docker.sh
+      - run: 
+          name: "Reset python version for google tools"
+          command: |
+            pyenv global 2.7.12
       - gcp-gcr/gcr-auth
       - run: |
           echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://gcr.io
