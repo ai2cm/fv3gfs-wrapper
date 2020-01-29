@@ -23,23 +23,23 @@ jobs:
             git submodule init
             git submodule update
       - gcp-gcr/gcr-auth
-      - run: bash test_docker.sh
+      - run: bash build_docker.sh
       - run: |
-          if [[ "$CIRCLE_BRANCH" == "master" ]]
+          echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://gcr.io
+          if [[ "$CIRCLE_BRANCH" == "fix/versioning" ]]
           then
-              if [[ -z "$CIRCLE_TAG" ]]
-              then
-                  docker push $GCR_IMAGE
-              else
-                  docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_TAG
-                  docker push $GCR_IMAGE:$CIRCLE_TAG
-              fi
+              echo "pushing untagged image $GCR_IMAGE"
+              docker push $GCR_IMAGE
           fi
+          if [[ ! -z "$CIRCLE_TAG" ]]
+          then
+              echo "pushing tagged image $GCR_IMAGE:$CIRCLE_TAG"
+              docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_TAG
+              docker push $GCR_IMAGE:$CIRCLE_TAG
+          fi
+
 workflows:
   version: 2
-  build:
-    jobs:
-      - build_default
   tagged-build:
     jobs:
       - build_default:
