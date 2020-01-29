@@ -28,24 +28,21 @@ jobs:
           echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://gcr.io
           if [[ "$CIRCLE_BRANCH" == "fix/versioning" ]]
           then
-              if [[ -z "$CIRCLE_TAG" ]]
-              then
-                  echo "pushing untagged image"
-                  docker push $GCR_IMAGE
-              else
-                  echo "pushing tagged image"
-                  docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_TAG
-                  docker push $GCR_IMAGE:$CIRCLE_TAG
-              fi
+              echo "pushing untagged image $GCR_IMAGE"
+              docker push $GCR_IMAGE
           fi
+          if [[ ! -z "$CIRCLE_TAG" ]]
+          then
+              echo "pushing tagged image $GCR_IMAGE:$CIRCLE_TAG"
+              docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_TAG
+              docker push $GCR_IMAGE:$CIRCLE_TAG
+          fi
+
 workflows:
   version: 2
   build:
     jobs:
       - build_default
-  tagged-build:
-    jobs:
-      - build_default:
           filters:
             tags:
               only: /^v.*/
