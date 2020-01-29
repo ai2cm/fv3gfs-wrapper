@@ -25,17 +25,24 @@ jobs:
       - gcp-gcr/gcr-auth
       - run: bash test_docker.sh
       - run: |
-          if [[ "$CIRCLE_BRANCH" == "master" ]]
+          echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://gcr.io
+          if [[ "$CIRCLE_BRANCH" == "fix/versioning" ]]
           then
+              echo "pushing untagged image $GCR_IMAGE"
               docker push $GCR_IMAGE
-              if [[ "$CIRCLE_TAG" != "" ]]
-              then
-                  docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_TAG
-                  docker push $GCR_IMAGE:$CIRCLE_TAG
-              fi
           fi
+          if [[ ! -z "$CIRCLE_TAG" ]]
+          then
+              echo "pushing tagged image $GCR_IMAGE:$CIRCLE_TAG"
+              docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_TAG
+              docker push $GCR_IMAGE:$CIRCLE_TAG
+          fi
+
 workflows:
   version: 2
-  build:
+  tagged-build:
     jobs:
-      - build_default
+      - build_default:
+          filters:
+            tags:
+              only: /^v.*/

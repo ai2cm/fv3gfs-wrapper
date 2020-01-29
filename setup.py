@@ -110,6 +110,6 @@ setup(
     include_dirs=[get_include()],
     ext_modules=cythonize(ext_modules),
     url='https://github.com/VulcanClimateModeling/fv3gfs',
-    version='0.2.0',
+    version='0.2.1',
     zip_safe=False,
 )
