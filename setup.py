@@ -9,6 +9,7 @@ from Cython.Build import cythonize
 # This line only needed if building with NumPy in Cython file.
 from numpy import get_include
 
+PACKAGE_VERSION = '0.2.1'
 
 fv3gfs_build_path_environ_name = 'FV3GFS_BUILD_DIR'
 make_command = os.environ.get('MAKE', 'make')
@@ -37,7 +38,8 @@ library_link_args = [
 requirements = [
     'xarray>=0.13.0',
     'netCDF4>=1.4.2',
-    'numpy'
+    'numpy',
+    f'fv3util=={PACKAGE_VERSION}',
 ]
 
 setup_requirements = ['cython', 'numpy', 'jinja2']
@@ -110,6 +112,6 @@ setup(
     include_dirs=[get_include()],
     ext_modules=cythonize(ext_modules),
     url='https://github.com/VulcanClimateModeling/fv3gfs-python',
-    version='0.2.1',
+    version=PACKAGE_VERSION,
     zip_safe=False,
 )
