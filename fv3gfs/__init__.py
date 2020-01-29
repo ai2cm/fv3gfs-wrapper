@@ -5,9 +5,9 @@ from ._wrapper import (
     get_n_ghost_cells, get_step_count, get_tracer_metadata
 )
 from ._restart import load_fortran_restart_folder, get_restart_names
+from ._ghost_cells import without_ghost_cells, with_ghost_cells
 from fv3util import (
-    InvalidQuantityError, dynamics_properties, physics_properties, without_ghost_cells,
-    with_ghost_cells, read_state, write_state
+    InvalidQuantityError, dynamics_properties, physics_properties, read_state, write_state
 )
 
 
