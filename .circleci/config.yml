@@ -43,6 +43,6 @@ workflows:
   build:
     jobs:
       - build_default
-          filters:
-            tags:
-              only: /^v.*/
+    filters:
+      tags:
+        only: /^v.*/
