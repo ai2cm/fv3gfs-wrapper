@@ -101,8 +101,10 @@ COPY tests /fv3gfs-python/tests
 # copy and install fv3config
 COPY external /fv3gfs-python/external
 
-RUN pip3 install --no-cache-dir -e /fv3gfs-python && \
-    pip3 install --no-cache-dir -e /fv3gfs-python/external/fv3config
+RUN pip3 install --no-cache-dir -e \
+    /fv3gfs-python/external/fv3config \
+    /fv3gfs-python/external/fv3util && \
+    pip3 install --no-cache-dir -e /fv3gfs-python
 
 ENV FV3CONFIG_CACHE_DIR=/inputdata
 
