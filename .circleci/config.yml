@@ -23,7 +23,7 @@ jobs:
             git submodule init
             git submodule update
       - gcp-gcr/gcr-auth
-      - run: bash build_docker.sh
+      - run: bash test_docker.sh
       - run: |
           echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://gcr.io
           if [[ "$CIRCLE_BRANCH" == "fix/versioning" ]]
