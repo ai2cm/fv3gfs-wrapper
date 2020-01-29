@@ -84,7 +84,7 @@ ext_modules = [
 ]
 
 setup(
-    author="Vulcan Technologies, LLC",
+    author="Vulcan Technologies LLC",
     author_email='jeremym@vulcan.com',
     python_requires='>=3.5',
     classifiers=[
@@ -100,7 +100,7 @@ setup(
     install_requires=requirements,
     setup_requires=setup_requirements,
     tests_require=test_requirements,
-    name='fv3gfs',
+    name='fv3gfs-python',
     license="BSD license",
     long_description=readme + '\n\n' + history,
     cmdclass={'build_ext': build_ext},
@@ -109,7 +109,7 @@ setup(
     # This includes the NumPy headers when compiling.
     include_dirs=[get_include()],
     ext_modules=cythonize(ext_modules),
-    url='https://github.com/VulcanClimateModeling/fv3gfs',
+    url='https://github.com/VulcanClimateModeling/fv3gfs-python',
     version='0.2.1',
     zip_safe=False,
 )
