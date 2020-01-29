@@ -40,9 +40,6 @@ jobs:
 
 workflows:
   version: 2
-  untagged-build:
-    jobs:
-      - build_default
   tagged-build:
     jobs:
       - build_default:
