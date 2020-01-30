@@ -4,7 +4,7 @@ from ._wrapper import (
     cleanup, get_state, set_state,
     get_n_ghost_cells, get_step_count, get_tracer_metadata
 )
-from ._restart import load_fortran_restart_folder, get_restart_names
+from ._restart import get_restart_names
 from ._ghost_cells import without_ghost_cells, with_ghost_cells
 from fv3util import (
     InvalidQuantityError, dynamics_properties, physics_properties, read_state, write_state
@@ -19,7 +19,7 @@ __all__ = [
     'without_ghost_cells', 'with_ghost_cells',
     'InvalidQuantityError',
     'physics_properties', 'dynamics_properties',
-    'load_fortran_restart_folder', 'read_state', 'write_state', 'get_restart_names'
+    'read_state', 'write_state', 'get_restart_names'
 ]
 
 __version__ = '0.2.1'

@@ -8,6 +8,7 @@ from mpi4py import MPI
 import fv3config
 import fv3gfs
 import fv3gfs._restart as restart
+import fv3util
 from util import redirect_stdout
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
@@ -20,14 +21,10 @@ class RestartTests(unittest.TestCase):
         super(RestartTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.get_tracer_metadata()
         self.dynamics_data = {
-            entry['name']: entry for entry in json.load(open(
-                os.path.join(test_dir, '../fv3gfs/dynamics_properties.json')
-            ))
+            entry['name']: entry for entry in fv3util.dynamics_properties
         }
         self.physics_data = {
-            entry['name']: entry for entry in json.load(open(
-                os.path.join(test_dir, '../fv3gfs/physics_properties.json')
-            ))
+            entry['name']: entry for entry in fv3util.physics_properties
         }
 
     def setUp(self):

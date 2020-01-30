@@ -7,6 +7,7 @@ import xarray as xr
 import numpy as np
 import fv3config
 import fv3gfs
+import fv3util
 from mpi4py import MPI
 from util import redirect_stdout
 
@@ -19,14 +20,10 @@ class GetterTests(unittest.TestCase):
         super(GetterTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.get_tracer_metadata()
         self.dynamics_data = {
-            entry['name']: entry for entry in json.load(open(
-                os.path.join(test_dir, '../fv3gfs/dynamics_properties.json')
-            ))
+            entry['name']: entry for entry in fv3util.dynamics_properties
         }
         self.physics_data = {
-            entry['name']: entry for entry in json.load(open(
-                os.path.join(test_dir, '../fv3gfs/physics_properties.json')
-            ))
+            entry['name']: entry for entry in fv3util.physics_properties
         }
         self.mpi_comm = MPI.COMM_WORLD
 
