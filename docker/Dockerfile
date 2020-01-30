@@ -25,6 +25,10 @@ RUN pip3 install --no-cache-dir \
     requests==2.22.0 \
     pytest==5.2.2 
 
+# enable python/pip (as opposed to python3/pip3)
+RUN ln -s /bin/python3 /bin/python && \
+    ln -s /bin/pip3 /bin/pip
+
 #-----------------------------------------------------------------------------
 FROM fv3gfs-python-env AS fv3gfs-python-build
 
@@ -92,6 +96,8 @@ ENV FMS_LIB=${FMS_DIR}/libFMS/.libs/
 ENV ESMF_LIB=${ESMF_DIR}/lib/libO3/Linux.gfortran.64.mpiuni.default/
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ESMF_LIB}:${FMS_LIB}
 
+COPY --from=fv3gfs-fms /FMS $FMS_DIR
+COPY --from=fv3gfs-esmf /usr/local/esmf ${ESMF_DIR}
 COPY --from=fv3gfs-fms /FMS/libFMS/.libs/*.so* /lib64/
 COPY --from=fv3gfs-esmf /usr/local/esmf/lib/libO3/Linux.gfortran.64.mpiuni.default/*.so* /lib64/
 

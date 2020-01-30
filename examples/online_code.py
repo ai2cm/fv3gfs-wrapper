@@ -3,6 +3,7 @@ from datetime import timedelta
 from mpi4py import MPI
 import fv3gfs
 import fv3config
+import yaml
 
 # This code shows an example where we relax specific humidity towards zero with a 7-day timescale.
 # The relaxation is done purely in Python. You can use a similar method for any kind of online
@@ -28,11 +29,14 @@ if __name__ == '__main__':
     rank = comm.Get_rank()
     current_dir = os.getcwd()
     rundir_path = os.path.join(current_dir, rundir_basename)
-    config = fv3config.get_default_config()
     if rank == 0:  # Only create run directory from one rank
+        with open('default.yml', 'r') as config_file:
+            config = yaml.safe_load(config_file)
         # Can alter this config dictionary to configure the run
         fv3config.write_run_directory(config, rundir_path)
     MPI.COMM_WORLD.barrier()  # wait for master rank to write run directory
+    with open('default.yml', 'r') as config_file:
+        config = yaml.safe_load(config_file)
     os.chdir(rundir_path)
 
     # Calculate factor for relaxing humidity to zero
