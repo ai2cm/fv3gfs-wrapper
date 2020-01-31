@@ -1,6 +1,8 @@
 tests/logs/*.log
 tests/*workdir
 
+.DS_Store
+
 # Fortran compilation files
 *.o
 *.mod

@@ -10,4 +10,9 @@ if [ ! -z "$DOCKER_BUILD_ARGS" ]; then
     done
 fi
 
-docker build -f docker/Dockerfile -t $DOCKER_IMAGE $build_arg . --target fv3gfs-python
+
+docker build -f lib/external/docker/Dockerfile --target fv3gfs-env -t fv3gfs-fortran-env lib/external && \
+    docker build -f lib/external/docker/Dockerfile --target fv3gfs-fms -t fv3gfs-fms lib/external && \
+    docker build -f lib/external/docker/Dockerfile --target fv3gfs-esmf -t fv3gfs-esmf lib/external && \
+    docker build -f lib/external/docker/Dockerfile --target fv3gfs-build -t fv3gfs-fortran-build lib/external && \
+    docker build -f docker/Dockerfile -t $DOCKER_IMAGE $build_arg . --target fv3gfs-python

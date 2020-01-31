@@ -16,4 +16,4 @@ recursive-exclude * *.log
 
 prune tests/*workdir
 prune tests/logs/*
-prune lib/FV3
+prune lib/external

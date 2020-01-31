@@ -22,15 +22,16 @@ class BuildDirectoryError(Exception):
 relative_wrapper_build_filenames = ['lib/coupler_lib.o', 'lib/physics_data.o', 'lib/dynamics_data.o', ]
 
 relative_fv3gfs_build_filenames = [
-    'atmos_model.o', 'atmos_cubed_sphere/libfv3core.a', 'io/libfv3io.a',
-    'gfsphysics/libgfsphys.a', 'stochastic_physics/libstochastic_physics.a', 'fms/libfms.a',
+    'atmos_model.o', 'module_fv3_config.o', 'cpl/libfv3cpl.a',
+    'ipd/libipd.a', 'atmos_cubed_sphere/libfv3core.a', 'io/libfv3io.a',
+    'gfsphysics/libgfsphys.a', '../stochastic_physics/libstochastic_physics.a',
     '/opt/NCEPlibs/lib/libnemsio_d.a', '/opt/NCEPlibs/lib/libbacio_4.a',
     '/opt/NCEPlibs/lib/libsp_v2.0.2_d.a', '/opt/NCEPlibs/lib/libw3emc_d.a', '/opt/NCEPlibs/lib/libw3nco_d.a',
 ]
 
 library_link_args = [
-    '-lgfortran', '-lpython3.7m', '-lmpi_mpifh', '-lmpi', '-lnetcdf', '-lnetcdff', '-fopenmp',
-    '-lmvec', '-lblas',
+    '-lFMS', '-lesmf', '-lgfortran', '-lpython3.7m', '-lmpi_mpifh', '-lmpi',
+    '-lnetcdf', '-lnetcdff', '-fopenmp', '-lmvec', '-lblas', '-lc', '-lrt',
 ]
 
 requirements = [
@@ -52,7 +53,7 @@ with open('HISTORY.md') as history_file:
 if fv3gfs_build_path_environ_name in os.environ:
     fv3gfs_build_path = os.environ(fv3gfs_build_path_environ_name)
 else:
-    fv3gfs_build_path = os.path.join(package_dir, 'lib/FV3/sorc/fv3gfs.fd/FV3/')
+    fv3gfs_build_path = os.path.join(package_dir, 'lib/external/FV3/')
 
 fortran_build_filenames = []
 for relative_filename in relative_fv3gfs_build_filenames:
@@ -62,12 +63,9 @@ wrapper_build_filenames = []
 for relative_filename in relative_wrapper_build_filenames:
     wrapper_build_filenames.append(os.path.join(package_dir, relative_filename))
 
-# make library dependencies before checking if they exist
-subprocess.check_call([make_command], cwd=os.path.join(package_dir, 'lib'))
-
 for filename in fortran_build_filenames:
     if not os.path.isfile(filename):
-        raise BuildDirectoryError(f'File {filename} is missing, does {fv3gfs_build_path_environ_name} contain FV3GFS build artifacts?')
+        raise BuildDirectoryError(f'File {filename} is missing, first run make in {fv3gfs_build_path}')
 
 # copy2 preserves executable flag
 shutil.copy2(os.path.join(fv3gfs_build_path, 'fv3.exe'), os.path.join(package_dir, 'fv3.exe'))
@@ -80,7 +78,7 @@ ext_modules = [
         include_dirs=[
             get_include(),
         ],
-        extra_link_args= wrapper_build_filenames + fortran_build_filenames + library_link_args,
+        extra_link_args=wrapper_build_filenames + fortran_build_filenames + library_link_args,
         depends=fortran_build_filenames + wrapper_build_filenames,
     )
 ]

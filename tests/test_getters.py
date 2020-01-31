@@ -1,5 +1,6 @@
 import unittest
 import json
+import yaml
 import os
 import shutil
 import xarray as xr
@@ -163,7 +164,7 @@ class TracerMetadataTests(unittest.TestCase):
 
 if __name__ == '__main__':
     rank = MPI.COMM_WORLD.Get_rank()
-    config = fv3config.get_default_config()
+    config = yaml.safe_load(open(os.path.join(test_dir, 'default_config.yml'), 'r'))
     rundir = os.path.join(test_dir, 'rundir')
     if rank == 0:
         if os.path.isdir(rundir):
