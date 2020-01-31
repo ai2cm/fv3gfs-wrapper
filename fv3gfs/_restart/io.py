@@ -1,7 +1,4 @@
-import xarray as xr
-from datetime import datetime
-import numpy as np
-from .._fortran_info import dynamics_properties, physics_properties
+from fv3util import dynamics_properties, physics_properties
 from .._wrapper import get_tracer_metadata
 
 # these variables are found not to be needed for smooth restarts
@@ -24,27 +21,3 @@ def get_restart_names():
         if name in return_list:
             return_list.remove(name)
     return return_list
-
-
-def datetime64_to_datetime(dt64):
-    utc_start = np.datetime64(0, 's')
-    timestamp = (dt64 - utc_start) / np.timedelta64(1, 's')
-    return datetime.utcfromtimestamp(timestamp)
-
-
-def write_state(state, filename):
-    if 'time' not in state:
-        raise ValueError('state must include a value for "time"')
-    ds = xr.Dataset(data_vars=state)
-    ds.to_netcdf(filename)
-
-
-def read_state(filename):
-    out_dict = {}
-    ds = xr.open_dataset(filename)
-    for name, value in ds.data_vars.items():
-        if name == 'time':
-            out_dict[name] = datetime64_to_datetime(value)
-        else:
-            out_dict[name] = value
-    return out_dict

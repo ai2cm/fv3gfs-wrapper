@@ -2,7 +2,6 @@ import subprocess
 import unittest
 from mpi4py import MPI
 from util import mpi_flags, run_unittest_script
-from test_get_tile_number import TileNumberTests
 from test_integration import IntegrationTests
 import os
 

@@ -9,6 +9,7 @@ from Cython.Build import cythonize
 # This line only needed if building with NumPy in Cython file.
 from numpy import get_include
 
+PACKAGE_VERSION = '0.3.0'
 
 fv3gfs_build_path_environ_name = 'FV3GFS_BUILD_DIR'
 make_command = os.environ.get('MAKE', 'make')
@@ -37,7 +38,8 @@ library_link_args = [
 requirements = [
     'xarray>=0.13.0',
     'netCDF4>=1.4.2',
-    'numpy'
+    'numpy',
+    f'fv3util=={PACKAGE_VERSION}',
 ]
 
 setup_requirements = ['cython', 'numpy', 'jinja2']
@@ -84,7 +86,7 @@ ext_modules = [
 ]
 
 setup(
-    author="Vulcan Technologies, LLC",
+    author="Vulcan Technologies LLC",
     author_email='jeremym@vulcan.com',
     python_requires='>=3.5',
     classifiers=[
@@ -100,7 +102,7 @@ setup(
     install_requires=requirements,
     setup_requires=setup_requirements,
     tests_require=test_requirements,
-    name='fv3gfs',
+    name='fv3gfs-python',
     license="BSD license",
     long_description=readme + '\n\n' + history,
     cmdclass={'build_ext': build_ext},
@@ -109,7 +111,7 @@ setup(
     # This includes the NumPy headers when compiling.
     include_dirs=[get_include()],
     ext_modules=cythonize(ext_modules),
-    url='https://github.com/VulcanClimateModeling/fv3gfs',
-    version='0.3.0',
+    url='https://github.com/VulcanClimateModeling/fv3gfs-python',
+    version=PACKAGE_VERSION,
     zip_safe=False,
 )
