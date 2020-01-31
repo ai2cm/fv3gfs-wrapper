@@ -33,13 +33,13 @@ class RestartTests(unittest.TestCase):
     def tearDown(self):
         MPI.COMM_WORLD.barrier()
 
-    def test_load_fortran_restart_folder_no_raising(self):
-        restart.load_fortran_restart_folder(os.path.join(rundir, 'INPUT'))
+    # def test_load_fortran_restart_folder_no_raising(self):
+    #     restart.load_fortran_restart_folder(os.path.join(rundir, 'INPUT'))
 
-    def test_load_fortran_restart_folder_has_time(self):
-        state = restart.load_fortran_restart_folder(os.path.join(rundir, 'INPUT'))
-        self.assertIn('time', state)
-        self.assertIsInstance(state['time'], datetime)
+    # def test_load_fortran_restart_folder_has_time(self):
+    #     state = restart.load_fortran_restart_folder(os.path.join(rundir, 'INPUT'))
+    #     self.assertIn('time', state)
+    #     self.assertIsInstance(state['time'], datetime)
 
 
 class TracerMetadataTests(unittest.TestCase):
