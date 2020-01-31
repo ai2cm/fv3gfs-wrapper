@@ -1,8 +1,8 @@
 History
 =======
 
-latest
-------
+0.3.0
+-----
 
 Major changes:
 - Fortran sources are updated from the older fv3gfs repo to the newer fv3atm repo. Running the model is the same, but small changes to the repo require different namelist options when running the model, so configuration dictionaries will need to be updated accordingly.
