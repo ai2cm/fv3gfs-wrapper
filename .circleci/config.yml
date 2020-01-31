@@ -2,6 +2,38 @@ version: 2.1
 orbs:
   gcp-gcr: circleci/gcp-gcr@0.6.1
 jobs:
+  test_python:
+    docker:
+      - image: circleci/python:3.7
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements_dev.txt" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip3 install -r external/fv3util/requirements.txt
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "external/fv3util/requirements_dev.txt" }}
+
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            pip3 install -e external/fv3util
+            pytest external/fv3util/tests
+
   build_default:
     machine:
       docker_layer_caching: true
@@ -62,7 +94,13 @@ workflows:
   version: 2
   tagged-build:
     jobs:
+      - test_python:
+          filters:
+            tags:
+              only: /^v.*/
       - build_default:
+          requires:
+            - test_python
           filters:
             tags:
               only: /^v.*/
