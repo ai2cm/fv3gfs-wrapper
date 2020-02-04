@@ -5,7 +5,7 @@ cimport numpy as cnp
 import numpy as np
 import xarray as xr
 from mpi4py import MPI
-from ._exceptions import InvalidQuantityError
+from fv3util import InvalidQuantityError
 from datetime import datetime
 
 ctypedef cnp.double_t REAL_t

@@ -2,6 +2,38 @@ version: 2.1
 orbs:
   gcp-gcr: circleci/gcp-gcr@0.6.1
 jobs:
+  test_python:
+    docker:
+      - image: circleci/python:3.7
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "external/fv3util/requirements.txt" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip3 install -r external/fv3util/requirements.txt
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "external/fv3util/requirements.txt" }}
+
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            pip3 install -e external/fv3util
+            pytest external/fv3util/tests
+
   build_default:
     machine:
       docker_layer_caching: true
@@ -29,17 +61,20 @@ jobs:
             [ -d /opt/circleci/.pyenv/versions/3.6.2 ] || pyenv install 3.6.2
             pyenv global 3.6.2
             pip install --upgrade pip setuptools
-            pip install external/fv3config
             pip install -r requirements.txt
-      - run: bash test_docker.sh
+            pip install external/fv3config
       - run: 
-          name: "Reset python version for google tools"
+          name: "Compile model and perform model tests"
+          command: |
+            bash test_docker.sh
+      - run:
+          name: "Enable Python 2 for google cloud tools"
           command: |
             pyenv global 2.7.12
       - gcp-gcr/gcr-auth
       - run: |
           echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://gcr.io
-          if [[ "$CIRCLE_BRANCH" == "fix/versioning" ]]
+          if [[ "$CIRCLE_BRANCH" == "master" ]]
           then
               echo "pushing untagged image $GCR_IMAGE"
               docker push $GCR_IMAGE
@@ -55,7 +90,13 @@ workflows:
   version: 2
   tagged-build:
     jobs:
+      - test_python:
+          filters:
+            tags:
+              only: /^v.*/
       - build_default:
+          requires:
+            - test_python
           filters:
             tags:
               only: /^v.*/

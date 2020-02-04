@@ -7,6 +7,7 @@ import xarray as xr
 import numpy as np
 import fv3config
 import fv3gfs
+import fv3util
 from mpi4py import MPI
 from util import redirect_stdout
 
@@ -19,14 +20,10 @@ class GetterTests(unittest.TestCase):
         super(GetterTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.get_tracer_metadata()
         self.dynamics_data = {
-            entry['name']: entry for entry in json.load(open(
-                os.path.join(test_dir, '../fv3gfs/dynamics_properties.json')
-            ))
+            entry['name']: entry for entry in fv3util.DYNAMICS_PROPERTIES
         }
         self.physics_data = {
-            entry['name']: entry for entry in json.load(open(
-                os.path.join(test_dir, '../fv3gfs/physics_properties.json')
-            ))
+            entry['name']: entry for entry in fv3util.PHYSICS_PROPERTIES
         }
         self.mpi_comm = MPI.COMM_WORLD
 
@@ -153,7 +150,7 @@ class TracerMetadataTests(unittest.TestCase):
                 self.assertIsInstance(metadata['i_tracer'], int)
                 self.assertIsInstance(metadata['fortran_name'], str)
 
-    def test_all_traces_present(self):
+    def test_all_tracers_present(self):
         tracer_names = [
             'specific_humidity', 'cloud_water_mixing_ratio', 'rain_mixing_ratio', 'cloud_ice_mixing_ratio',
             'snow_mixing_ratio', 'graupel_mixing_ratio', 'ozone_mixing_ratio', 'cloud_amount'

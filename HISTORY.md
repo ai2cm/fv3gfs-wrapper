@@ -1,6 +1,18 @@
 History
 =======
 
+latest
+------
+
+Major changes:
+- In order to facilitate testing of pure python code, this PR splits code that has no dependencies on the Fortran wrapper into its own subpackage, `fv3util`. That code then gets imported and used by the `fv3gfs` python package.
+- Removed legacy restart loading code (`load_fortran_restart_folder`). This will be added back in a future PR with better logic for identifying dimensions in restart data, using the properties dictionaries.
+
+Minor changes:
+- fixed bug where master branch was not pushing untagged images to GCR
+- fixed `fv3util.__version__` variable to indicate the correct version (0.3.0)
+
+
 0.3.0
 -----
 
@@ -28,6 +40,7 @@ Minor changes:
 -----
 
 * Initial tagged release using public fv3gfs repository
+
 
 0.1.0
 -----
