@@ -20,10 +20,10 @@ class GetterTests(unittest.TestCase):
         super(GetterTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.get_tracer_metadata()
         self.dynamics_data = {
-            entry['name']: entry for entry in fv3util.dynamics_properties
+            entry['name']: entry for entry in fv3util.DYNAMICS_PROPERTIES
         }
         self.physics_data = {
-            entry['name']: entry for entry in fv3util.physics_properties
+            entry['name']: entry for entry in fv3util.PHYSICS_PROPERTIES
         }
         self.mpi_comm = MPI.COMM_WORLD
 
