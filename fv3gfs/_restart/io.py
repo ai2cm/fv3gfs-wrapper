@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-from fv3util import dynamics_properties, physics_properties
-=======
 import fv3util
->>>>>>> master
 from .._wrapper import get_tracer_metadata
 
 # these variables are found not to be needed for smooth restarts
