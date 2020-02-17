@@ -2,6 +2,7 @@ tests/logs/*.log
 tests/*workdir
 
 .DS_Store
+.idea
 
 # Fortran compilation files
 *.o
