@@ -8,7 +8,8 @@ from ._restart import get_restart_names, open_restart
 from ._ghost_cells import without_ghost_cells, with_ghost_cells
 from fv3util import (
     InvalidQuantityError, DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES,
-    read_state, write_state, apply_nudging, get_nudging_tendencies, ZarrMonitor
+    read_state, write_state, apply_nudging, get_nudging_tendencies, ZarrMonitor,
+    Partitioner
 )
 
 
@@ -21,7 +22,8 @@ __all__ = [
     'InvalidQuantityError',
     'DYNAMICS_PROPERTIES', 'PHYSICS_PROPERTIES',
     'read_state', 'write_state', 'get_restart_names',
-    'apply_nudging', 'get_nudging_tendencies', 'open_restart', 'ZarrMonitor'
+    'apply_nudging', 'get_nudging_tendencies', 'open_restart', 'ZarrMonitor',
+    'Partitioner',
 ]
 
 __version__ = '0.3.0'
