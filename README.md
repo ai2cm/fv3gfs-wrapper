@@ -5,35 +5,15 @@ FV3GFS
 fv3gfs-python (`import fv3gfs`), is a Python wrapper for the FV3GFS
 global climate model.
 
+See the documentation for more detailed instructions.
+
 Checking out
 ------------
 
 This package uses submodules. After you check out the repository, you must run
 `git submodule init` followed by `git submodule update` in the root directory of this package.
 
-
 * Free software: BSD license
-
-Dependencies
-------------
-
-`fv3gfs` depends on a number of development libraries that can't be installed through `pip`.
-On Ubuntu, these can be installed with:
-
-.. code-block:: console
-
-    apt-get update && apt-get install -y \
-        libblas-dev \
-        liblapack-dev \
-        libnetcdf-dev \
-        libnetcdff-dev \
-        libffi-dev \
-        libopenmpi3 \
-        libssl-dev 
-
-The Fortran installation located under `lib/FV3` is used by default. This can be
-overridden by setting `FV3GFS_BUILD_DIR`. It is assumed that the build system under
-`FV3GFS_BUILD_DIR` is the same.
 
 Installation
 ------------
