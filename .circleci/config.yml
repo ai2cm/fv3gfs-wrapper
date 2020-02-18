@@ -53,7 +53,7 @@ jobs:
           name: "Pull submodules"
           command: |
             git submodule init
-            git submodule update
+            git submodule update --recursive
       - run: 
           name: "Install Python test dependencies"
           command: |
