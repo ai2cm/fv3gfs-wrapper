@@ -80,7 +80,7 @@ Diagnostic IO
 State can be persisted to disk using either :py:func:`fv3gfs.write_state` (described below)
 or :py:class:`fv3gfs.ZarrMonitor`. The latter will coordinate between ranks to
 write state to a unified Zarr store. Initializing it requires passing grid information.
-This can be done directly from the namelist in a configuration dictionary like so:: python
+This can be done directly from the namelist in a configuration dictionary like so::
 
     import fv3gfs
     from mpi4py import MPI
@@ -90,7 +90,7 @@ This can be done directly from the namelist in a configuration dictionary like s
         config = yaml.safe_load(f)
     partitioner = fv3gfs.Partitioner.from_namelist(config['namelist'])
 
-Alternatively, the grid information can be specified manually:: python
+Alternatively, the grid information can be specified manually::
 
     partitioner = fv3gfs.Partitioner.from_namelist(
         nz=79,  # nz, ny, and nx here are based on grid centers
@@ -100,9 +100,7 @@ Alternatively, the grid information can be specified manually:: python
     )
 
 Once you have a :py:class:`fv3gfs.Partitioner`, the monitor can be created using any
-Zarr store:: python
-
-    :: python
+Zarr store::
 
     import zarr
     store = zarr.storage.DirectoryStore('output_dir')  # relative or absolute path

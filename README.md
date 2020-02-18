@@ -26,6 +26,15 @@ in development mode with `pip install -e .`.
 
 This package only supports linux and Python 3.5 or greater.
 
+Building Docs
+-------------
+
+Once the docker image is built, the documentation can be built and shown using:
+
+    make docs-docker
+
+This will produce html documentation in `docs/html`.
+
 Quickstart
 ----------
 
