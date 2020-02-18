@@ -11,8 +11,7 @@ Checking out
 ------------
 
 This package uses submodules. After you check out the repository, you must run
-`git submodule init` followed by `git submodule update --recursive`
-in the root directory of this package.
+`git submodule update --init --recursive` in the root directory of this package.
 
 * Free software: BSD license
 
