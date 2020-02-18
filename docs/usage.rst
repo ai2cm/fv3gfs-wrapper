@@ -88,17 +88,11 @@ This can be done directly from the namelist in a configuration dictionary like s
 
     with open('fv3config.yml', 'r') as f:
         config = yaml.safe_load(f)
-    partitioner = fv3gfs.Partitioner.from_namelist(
-        MPI.COMM_WORLD.Get_rank(),
-        MPI.COMM_WORLD.Get_size(),
-        config['namelist']
-    )
+    partitioner = fv3gfs.Partitioner.from_namelist(config['namelist'])
 
 Alternatively, the grid information can be specified manually:: python
 
     partitioner = fv3gfs.Partitioner.from_namelist(
-        MPI.COMM_WORLD.Get_rank(),
-        MPI.COMM_WORLD.Get_size(),
         nz=79,  # nz, ny, and nx here are based on grid centers
         ny=48,
         nx=48,
