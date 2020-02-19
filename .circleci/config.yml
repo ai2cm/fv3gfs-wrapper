@@ -88,7 +88,7 @@ jobs:
           name: "Delete data files"
           command: |
             rm ./tests/image_tests/output/*/INPUT/*.nc
-            rm ./tests/image_tests/output/*/*.grb
+            rm ./tests/image_tests/output/*/grb/*.grb
           when: on_fail
       - store_artifacts:
           path: ./tests/image_tests/output
