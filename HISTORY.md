@@ -2,6 +2,11 @@ History
 =======
 
 
+0.2.2
+-----
+
+* Update fv3gfs source to include internal npz=79 vertical grid definition
+
 0.2.1
 -----
 
