@@ -84,6 +84,14 @@ jobs:
               docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_TAG
               docker push $GCR_IMAGE:$CIRCLE_TAG
           fi
+      - run:
+          name: "Delete data files"
+          command: |
+            rm ./tests/image_tests/output/*/INPUT/*.nc
+            rm ./tests/image_tests/output/*/*.grb
+          when: on_fail
+      - store_artifacts:
+          path: ./tests/image_tests/output
 
 workflows:
   version: 2
