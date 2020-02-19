@@ -53,6 +53,11 @@ jobs:
           name: "Pull submodules"
           command: |
             git submodule update --init --recursive
+      - restore_cache:
+          keys:
+            - v1-build-dependencies-{{ checksum "requirements.txt" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-build-dependencies-
       - run: 
           name: "Install Python test dependencies"
           command: |
@@ -61,7 +66,12 @@ jobs:
             pyenv global 3.6.2
             pip install --upgrade pip setuptools
             pip install -r requirements.txt
-            pip install external/fv3config
+            pip install -e external/fv3config
+            pip install -e external/fv3util
+      - save_cache:
+          paths:
+            - /opt/circleci/.pyenv/versions/3.6.2
+          key: v1-build-dependencies-{{ checksum "requirements.txt" }}
       - run: 
           name: "Compile model and perform model tests"
           command: |
