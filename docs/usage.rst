@@ -72,7 +72,8 @@ Nudging
 
 Nudging functionality is provided by :py:func:`fv3gfs.apply_nudging` and
 :py:func:`fv3gfs.get_nudging_tendencies`. The nudging tendencies can be stored to disk
-by the user, for example using a :py:class:`fv3gfs.ZarrMonitor`.
+by the user, for example using a :py:class:`fv3gfs.ZarrMonitor`. A runfile using this
+functionality can be found in the `examples` directory.
 
 Diagnostic IO
 -------------
