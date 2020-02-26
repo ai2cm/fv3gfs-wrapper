@@ -7,8 +7,8 @@ Developers Notes
 Here are some fairly informal notes about the build system and package organization
 structure for the ``fv3gfs-python`` wrapper.
 
-fv3util package
----------------
+``fv3util`` Package
+-------------------
 
 Much of the functionality of ``fv3gfs-python`` is split out into a package called ``fv3util``.
 Any functionality that can be written to be independent of the wrapped Fortran model
@@ -20,13 +20,13 @@ codes to use the same routines used by the Fortran model.
 Versions of ``fv3util`` are paired with versions of ``fv3gfs-python``. The wrapper
 requires a copy of ``fv3util`` with the same version.
 
-templates
+Templates
 ---------
 
 Several Fortran Jinja "template" files exist in ``templates``. During model build, these are
 converted into Fortran sources which are then compiled.
 
-properties files
+Properties Files
 ----------------
 
 Inside fv3util are "properties" for Fortran model variables. These are separated into

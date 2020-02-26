@@ -6,7 +6,7 @@ from .. import _mpi as mpi
 from .. import _wrapper
 
 
-def open_restart(dirname: str, partitioner: fv3util.Partitioner, label: str = '', only_names: List[str] = None) -> dict:
+def open_restart(dirname: str, partitioner: fv3util.CubedSpherePartitioner, label: str = '', only_names: List[str] = None) -> dict:
     """Load restart files output by the Fortran model into a state dictionary.
     
     See :py:func:`fv3gfs.set_state` if you would like to load the resulting state into

@@ -9,7 +9,7 @@ from ._ghost_cells import without_ghost_cells, with_ghost_cells
 from fv3util import (
     InvalidQuantityError, DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES,
     read_state, write_state, apply_nudging, get_nudging_tendencies, ZarrMonitor,
-    Partitioner
+    CubedSpherePartitioner
 )
 
 
@@ -23,7 +23,7 @@ __all__ = [
     'DYNAMICS_PROPERTIES', 'PHYSICS_PROPERTIES',
     'read_state', 'write_state', 'get_restart_names',
     'apply_nudging', 'get_nudging_tendencies', 'open_restart', 'ZarrMonitor',
-    'Partitioner',
+    'CubedSpherePartitioner',
 ]
 
 __version__ = '0.3.0'

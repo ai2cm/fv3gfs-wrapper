@@ -58,7 +58,7 @@ if __name__ == '__main__':
     with open('fv3config.yml', 'r') as config_file:
         config = yaml.safe_load(config_file)
     MPI.COMM_WORLD.barrier()  # wait for master rank to write run directory
-    partitioner = fv3gfs.Partitioner.from_namelist(config["namelist"])
+    partitioner = fv3gfs.CubedSpherePartitioner.from_namelist(config["namelist"])
     nudging_timescales = get_timescales_from_config(config)
     timestep = get_timestep(config)
     tendency_monitor = fv3gfs.ZarrMonitor(
