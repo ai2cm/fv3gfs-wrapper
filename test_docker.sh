@@ -2,7 +2,9 @@
 
 set -e
 
-DOCKER_IMAGE=us.gcr.io/vcm-ml/fv3gfs-python
+if [ -z "$DOCKER_IMAGE" ]; then
+    DOCKER_IMAGE=us.gcr.io/vcm-ml/fv3gfs-python
+fi
 
 ./build_docker.sh
 

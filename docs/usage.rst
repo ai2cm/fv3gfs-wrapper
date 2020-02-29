@@ -14,13 +14,12 @@ errors that occur when running like this (these appear also in the pure Fortran 
 as root inside a Docker container, you need to add :code:`--allow-run-as-root`
 (this should be avoided outside of Docker).
 
-You also need to ensure that when the script executes model subroutines (e.g. :code:`fv3gfs.initialize`), the current
+You also need to ensure that when the script executes model subroutines (e.g. :py:func:`fv3gfs.initialize`), the current
 working directory is a valid run directory. This can be done within the model script using the :code:`fv3config`
 package (as is done in the provided example scripts), or any other method you'd like to use.
 
 You additionally may need to extend the stack size using `ulimit -s unlimited`. Not doing this may result in a
-segmentation fault.
-
+segmentation fault. The docker image is set up to use this setting by default in bash.
 
 Running the model
 -----------------
@@ -38,10 +37,10 @@ Basic model operation can be seen in this short, self-explanatory example::
     fv3gfs.cleanup()
 
 This operation can be modified with getters and setters, described below, to read model state or
-insert new operations into the model. As of writing you do need to include both :code:`step_dynamics`
-and :code:`step_physics` in each iteration, in that order. :code:`fv3gfs.get_step_count` gets the
+insert new operations into the model. As of writing you do need to include both :py:func:`fv3gfs.step_dynamics`
+and :py:func:`fv3gfs.step_physics` in each iteration, in that order. :py:func:`fv3gfs.get_step_count` gets the
 number of times the Fortran code itself would execute the main loop before exiting.
-:code:`fv3gfs.cleanup()` could be ommitted as far as memory cleanup is concerned, but it does write
+:py:func:`fv3gfs.cleanup` could be ommitted as far as memory cleanup is concerned, but it does write
 final restart output and should be included if you want to maintain the normal behavior you would get
 in the Fortran model.
 
@@ -51,31 +50,64 @@ Instead of using a Python script, it is also possible to get precisely the behav
 
     $ python -m fv3gfs.run
 
-
 Getting/setting state
 ---------------------
 
 In addition to just running the model the same as in Fortran, the Python wrapper allows you to interact
-with the model state while it is still running. This is done through :code:`get_state` and :code:`set_state`.
+with the model state while it is still running. This is done through :py:func:`fv3gfs.get_state` and :py:func:`fv3gfs.set_state`.
 The getters and setters do not include ghost cells in the horizontal. If you need to add them, you can add and
-remove ghost cells using :code:`with_ghost_cells` and :code:`without_ghost_cells`.
+remove ghost cells using :py:func:`fv3gfs.with_ghost_cells` and :py:func:`fv3gfs.without_ghost_cells`.
 The getters will return arrays which nominally have units information, but these aren't guaranteed
 to be accurate and in some cases are indicated as missing.
 
 An example which gets and sets the model state to damp moisture is present in the examples folder of this repo.
 
-You should also keep in mind that the arrays used by :code:`get_state` and :code:`set_state` are domain-decomposed
-fields (as opposed to global fields). As of writing we do not have logic to go from a local 0-based index to
-a global index, but this can be done in principle by retrieving the process rank from :code:`mpi4py`.
+You should also keep in mind that the arrays used by :py:func:`fv3gfs.get_state` and :py:func:`fv3gfs.set_state`
+are domain-decomposed fields (as opposed to global fields). As of writing we do not have
+logic to go from a local 0-based index to a global index, but this can be done
+in principle by retrieving the process rank from :code:`mpi4py`.
 
-.. autofunction:: fv3gfs.get_state
+Nudging
+-------
 
-.. autofunction:: fv3gfs.set_state
+Nudging functionality is provided by :py:func:`fv3gfs.apply_nudging` and
+:py:func:`fv3gfs.get_nudging_tendencies`. The nudging tendencies can be stored to disk
+by the user, for example using a :py:class:`fv3gfs.ZarrMonitor`. A runfile using this
+functionality can be found in the `examples` directory.
 
-.. autofunction:: fv3gfs.with_ghost_cells
+Diagnostic IO
+-------------
 
-.. autofunction:: fv3gfs.without_ghost_cells
+State can be persisted to disk using either :py:func:`fv3gfs.write_state` (described below)
+or :py:class:`fv3gfs.ZarrMonitor`. The latter will coordinate between ranks to
+write state to a unified Zarr store. Initializing it requires passing grid information.
+This can be done directly from the namelist in a configuration dictionary like so::
 
+    import fv3gfs
+    from mpi4py import MPI
+    import yaml
+
+    with open('fv3config.yml', 'r') as f:
+        config = yaml.safe_load(f)
+    partitioner = fv3gfs.Partitioner.from_namelist(config['namelist'])
+
+Alternatively, the grid information can be specified manually::
+
+    partitioner = fv3gfs.Partitioner.from_namelist(
+        nz=79,  # nz, ny, and nx here are based on grid centers
+        ny=48,
+        nx=48,
+        layout=(1, 1)
+    )
+
+Once you have a :py:class:`fv3gfs.Partitioner`, the monitor can be created using any
+Zarr store::
+
+    import zarr
+    store = zarr.storage.DirectoryStore('output_dir')  # relative or absolute path
+    ZarrMonitor(partitioner, store, mode='w', mpi_comm=MPI.COMM_WORLD)
+
+Note this can be used with any directory store available in ``zarr``.
 
 Restart
 -------
@@ -124,8 +156,10 @@ script with a general structure as follows:
     fv3gfs.write_state(restart_state, restart_filename)
 
 In this script, if a restart file exists in the RESTART directory, it will be read in and overwrite
-the model state after the Fortran initialization routines take place. Each MPI rank (process) reads
-or writes a netCDF file with all of its restart data.
+the model state after the Fortran initialization routines take place. Each MPI rank
+(process) reads (with :py:func:`fv3gfs.read_state`) or writes (with :py:func:`fv3gfs.write_state)
+a netCDF file with all of its restart data. :py:func:`fv3gfs.get_restart_names` returns
+a list of all quantity names required to restart the model.
 
 :py:func:`save_intermediate_restart_if_enabled`
 will call the portion of the normal Fortran main loop that checks how many timesteps have elapsed
@@ -136,8 +170,14 @@ given label (instead of the model timestamp). :py:func:`load_fortran_restart_fol
 will load restart files from the given directory, using the provided label if given (e.g. timestamp
 if Fortran intermediate restarts, or chosen saved label if using the wrapper direct-save routine).
 
-.. autofunction:: fv3gfs.get_restart_names
+Loading legacy restarts
+-----------------------
 
-.. autofunction:: fv3gfs.write_state
+A function :py:func:`fv3gfs.open_restart` is available to load restart files that have
+been output by the Fortran code. Currently, it assumes the restart file has not been
+partitioned in any way (i.e. that the IO layout is (1, 1)). This routine will handle
+loading the data on a single processor per tile and then distribute the data to other
+processes on the same tile. This may cause out-of-memory errors, which can be mitigated
+in a couple different ways through changes to the code base (e.g. loading a subset of
+the variables or levels at a time before distributing across ranks).
 
-.. autofunction:: fv3gfs.read_state

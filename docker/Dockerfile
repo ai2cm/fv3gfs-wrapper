@@ -9,24 +9,25 @@ RUN apt-get update && \
 #-----------------------------------------------------------------------------
 FROM fv3gfs-fortran-env as fv3gfs-python-env
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
+    libpython3-dev \
+    python3-dev \
+    python3-setuptools \
+    python3-pytest \
+    python3-numpy-dbg \
     python3-pip \
     python3-mpi4py \
     python3-numpy \
-    cython3
-
-# install python wrapper requirements
-RUN pip3 install --no-cache-dir \
+    cython3 && \
+    pip3 install --no-cache-dir \
     jinja2==2.10.3 \
     xarray==0.13.0 \
     netcdf4==1.4.2 \
     f90nml==1.1.2 \
     requests==2.22.0 \
-    pytest==5.2.2 
-
-# enable python/pip (as opposed to python3/pip3)
-RUN ln -s /bin/python3 /bin/python && \
+    pytest==5.2.2 && \
+    ln -s /bin/python3 /bin/python && \
     ln -s /bin/pip3 /bin/pip
 
 #-----------------------------------------------------------------------------
@@ -73,21 +74,6 @@ RUN cd /fv3gfs-python && \
 #-----------------------------------------------------------------------------
 FROM fv3gfs-python-env AS fv3gfs-python
 
-# install fv3config requirements and utility packages
-RUN pip3 install --no-cache-dir \
-    appdirs==1.4.3 \
-    pyyaml==5.1.2 \
-    google-cloud-storage==1.23.0 \
-    gcsfs==0.4.0 \
-    fsspec==0.6.0 \
-    kubernetes==10.0.1 && \
-    apt-get update && \
-    apt-get install -y \
-    wget \
-    nano \
-    curl \
-    netcdf-bin
-
 ENV FMS_DIR=/fv3gfs-python/lib/external/FMS
 ENV ESMF_DIR=/fv3gfs-python/lib/external/esmf
 ENV ESMF_INC="-I${ESMF_DIR}/include -I${ESMF_DIR}/mod/modO3/Linux.gfortran.64.mpiuni.default/"
@@ -95,6 +81,29 @@ ENV ESMF_INC="-I${ESMF_DIR}/include -I${ESMF_DIR}/mod/modO3/Linux.gfortran.64.mp
 ENV FMS_LIB=${FMS_DIR}/libFMS/.libs/
 ENV ESMF_LIB=${ESMF_DIR}/lib/libO3/Linux.gfortran.64.mpiuni.default/
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ESMF_LIB}:${FMS_LIB}
+
+ENV FV3CONFIG_CACHE_DIR=/inputdata
+
+# install fv3config requirements and utility packages
+RUN pip3 install --no-cache-dir \
+    appdirs==1.4.3 \
+    pyyaml==5.1.2 \
+    google-cloud-storage==1.23.0 \
+    gcsfs==0.4.0 \
+    fsspec==0.6.0 \
+    kubernetes==10.0.1 \
+    numcodecs==0.6.4 \
+    zarr==2.3.2 \
+    h5py==2.10.0 \
+    h5netcdf==0.8.0 \
+    sphinx==2.2.0 \
+    sphinx_rtd_theme && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+    wget \
+    nano \
+    curl \
+    netcdf-bin
 
 COPY --from=fv3gfs-fms /FMS $FMS_DIR
 COPY --from=fv3gfs-esmf /usr/local/esmf ${ESMF_DIR}
@@ -112,15 +121,11 @@ RUN pip3 install --no-cache-dir -e \
     /fv3gfs-python/external/fv3util && \
     pip3 install --no-cache-dir -e /fv3gfs-python
 
-ENV FV3CONFIG_CACHE_DIR=/inputdata
-
 # cache model data
 COPY --from=fv3config-inputdata /2019-10-23-data-for-running-fv3gfs $FV3CONFIG_CACHE_DIR/fv3config-cache
 
-RUN chmod -R 777 $FV3CONFIG_CACHE_DIR
-
-# make stack size unlimited
-RUN echo "ulimit -s unlimited" >> /etc/bash.bashrc
+RUN chmod -R 777 $FV3CONFIG_CACHE_DIR && \
+    echo "ulimit -s unlimited" >> /etc/bash.bashrc
 
 # interactive shell by default
 CMD ["bash"]

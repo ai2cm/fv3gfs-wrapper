@@ -49,32 +49,22 @@ cdef extern:
 
 
 cpdef get_n_ghost_cells():
+    """Return the number of ghost cells used by the Fortran dynamical core."""
     cdef int n_ghost
     get_n_ghost_cells_subroutine(&n_ghost)
     return n_ghost
 
 
 def get_step_count():
+    """Return the number of physics steps the Fortran model would like to complete
+    before exiting, based on its configuration."""
     cdef int return_value
     get_num_cpld_calls(&return_value)
     return return_value
 
 
-def get_output_array(int nx_delta=0, int ny_delta=0, int nq=-1, bint include_z=True):
-    cdef int nx, ny, nz
-    cdef bint include_q_axis = nq != -1
-    get_centered_grid_dimensions(&nx, &ny, &nz)
-    assert not (include_q_axis and not include_z)  # tracers (q) should always be 3D
-    if include_q_axis:
-        shape = (nq, nz, ny + ny_delta, nx + nx_delta)
-    elif include_z:
-        shape = (nz, ny + ny_delta, nx + nx_delta)
-    else:
-        shape = (ny + ny_delta, nx + nx_delta)
-    return np.empty(shape, dtype=real_type)
-
-
 def get_dimension_lengths():
+    """Return a dictionary specifying the (grid center) dimension lengths of the Fortran model."""
     cdef int nx, ny, nz, nz_soil
     get_centered_grid_dimensions(&nx, &ny, &nz)
     get_nz_soil_subroutine(&nz_soil)
@@ -82,6 +72,7 @@ def get_dimension_lengths():
 
 
 def get_array_from_dims(dim_name_list):
+    """Given a list of dimension names, return an empty array of dtype `_wrapper.real_type`."""
     cdef int nx, ny, nz, nz_soil
     get_centered_grid_dimensions(&nx, &ny, &nz)
     get_nz_soil_subroutine(&nz_soil)
@@ -334,32 +325,43 @@ cdef list get_tracer_metadata_list():
 
 
 def initialize():
+    """Call initialization routines for the Fortran model."""
     cdef int comm
     comm = MPI.COMM_WORLD.py2f()
     initialize_subroutine(&comm)
 
 
 def step():
+    """Perform one dynamics-physics cycle of the Fortran model."""
     do_dynamics()
     do_physics()
     save_intermediate_restart_if_enabled_subroutine()
 
 
 def step_dynamics():
+    """Perform one physics step worth of dynamics in the Fortran model."""
     do_dynamics()
 
 
 def step_physics():
+    """Perform a physics step in the Fortran model."""
     do_physics()
 
 
 def save_intermediate_restart_if_enabled():
+    """If the Fortran model wants to do so on this timestep, write intermediate restart files.
+
+    This function is used at the end of the Fortran main loop to replicate the
+    intermediate restart behavior of the Fortran model.
+    """
     save_intermediate_restart_if_enabled_subroutine()
 
 
 def save_fortran_restart():
+    """Trigger the Fortran model to write restart files."""
     save_intermediate_restart_subroutine()
 
 
 def cleanup():
+    """Call the Fortran cleanup routines, which clear memory and write final restart files."""
     cleanup_subroutine()
