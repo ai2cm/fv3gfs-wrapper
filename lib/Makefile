@@ -36,7 +36,8 @@ coupler_lib.o: coupler_lib.F90 fortran_libs
 clean:
 	@echo "Cleaning ... "
 	$(RM) -f *.o *.mod *.lst depend $(TEMPLATES)
-	$(MAKE) -C $(FV3GFS_BUILD_DIR) clean
+	$(RM) -rf tests/pytest/output/*
+	(cd external && make clean)
 
 $(TEMPLATES): %: ../templates/% $(PROPERTIES_FILES)
 	python3 ../fill_templates.py $@

@@ -5,7 +5,7 @@ ifndef FV3GFS_BUILD_DIR
 endif
 include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
 
-.PHONY: build clean clean-test clean-pyc clean-build docs help
+.PHONY: build clean clean-test clean-pyc clean-build docs help docs-docker
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
@@ -32,6 +32,8 @@ endef
 export PRINT_HELP_PYSCRIPT
 
 BROWSER := python3 -c "$$BROWSER_PYSCRIPT"
+
+DOCKER_IMAGE?=us.gcr.io/vcm-ml/fv3gfs-python:latest
 
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
@@ -76,6 +78,16 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
+
+docs-docker:
+	docker run --rm -v $(shell pwd)/docs:/fv3gfs-python/docs -w /fv3gfs-python $(DOCKER_IMAGE) make docs
+	$(BROWSER) docs/_build/html/index.html
+
+build-docker:
+	./build_docker.sh
+
+test-docker:
+	./test_docker.sh
 
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .

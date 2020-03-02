@@ -7,10 +7,26 @@ latest
 Major changes:
 - In order to facilitate testing of pure python code, this PR splits code that has no dependencies on the Fortran wrapper into its own subpackage, `fv3util`. That code then gets imported and used by the `fv3gfs` python package.
 - Removed legacy restart loading code (`load_fortran_restart_folder`). This will be added back in a future PR with better logic for identifying dimensions in restart data, using the properties dictionaries.
+- `Partitioner` class added to handle domain decomposition and inter-rank communication
+- filesystem module added to use fsspec to handle remote locations
+- Added logic to manage model properties into fv3util. Dynamics and physics properties are stored at the package level in JSON files, while tracer properties are registered externally. This allows support for different microphysics packages and field tables, and allows the wrapper to automatically register the tracers being used by the present model configuration.
+- Added `open_restart` routine to load restart files. One rank per tile loads the file, and then distributes the data over MPI to each other process. Can choose to load only a subset of the variables to reduce data transfer when the directory is remote.
+- Added `apply_nudging` and `get_nudging_tendencies` functions to nudge a model state to a reference state according to given timescales and a timestep.
+- Added `ZarrMonitor` object which stores a sequence of model states in a Zarr store. Data is chunked such that each process is responsible for one chunk (with the last process being responsible for two chunks, in the case of interface-level variables).
+- Significant additions and reworks to documentation. Removed outdated build instructions and added docker-centric build instructions. Added developer notes about fv3util.
+- Added docs-docker make target to build docs inside docker
+- Removed old, unused `get_output_array` routine in the `_wrapper.so`.
 
 Minor changes:
 - fixed bug where master branch was not pushing untagged images to GCR
 - fixed `fv3util.__version__` variable to indicate the correct version (0.3.0)
+- Nudging example runfile added
+- Updated target fortran sources, requiring small tweaks to docker build instructions
+- Added docstrings to any routines missing them in the API docs
+- Removed recommended installation targets for apt-get and reduced the number of RUN commands in docker to reduce disk space requirements for intermediate images
+- Added new dependencies for zarr writing and documentation building to docker image
+- Changed documentation theme to readthedocs theme
+- Added IDE directory to gitignore
 
 
 0.3.0
