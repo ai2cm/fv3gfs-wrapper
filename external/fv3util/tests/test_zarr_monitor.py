@@ -101,14 +101,20 @@ def test_monitor_file_store(state_list, nz, ny, nx):
         monitor = fv3util.ZarrMonitor(tempdir, domain)
         for state in state_list:
             monitor.store(state)
-        validate_store(state_list, tempdir)
+        validate_group(state_list, tempdir)
+        validate_xarray_can_open(tempdir)
 
 
-def validate_store(states, filename):
+def validate_xarray_can_open(dirname):
+    # just checking there are no crashes, validate_group checks data
+    xr.open_zarr(dirname)
+
+
+def validate_group(states, dirname):
     nt = len(states)
 
-    def assert_no_missing_names(store, state):
-        missing_names = set(states[0].keys()).difference(store.array_keys())
+    def assert_no_missing_names(group, state):
+        missing_names = set(states[0].keys()).difference(group.array_keys())
         assert len(missing_names) == 0, missing_names
 
     def validate_array_shape(name, array):
@@ -133,9 +139,9 @@ def validate_store(states, filename):
             for i, s in enumerate(states):
                 np.testing.assert_array_equal(array[i, 0, :], s[name].values)
 
-    store = zarr.open_group(filename, mode='r')
-    assert_no_missing_names(store, states[0])  # states in test all have same names defined
-    for name, array in store.arrays():
+    group = zarr.open_group(dirname, mode='r')
+    assert_no_missing_names(group, states[0])  # states in test all have same names defined
+    for name, array in group.arrays():
         validate_array_shape(name, array)
         validate_array_dimensions_and_attributes(name, array)
         validate_array_values(name, array)
