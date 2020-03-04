@@ -4,6 +4,10 @@ History
 latest
 ------
 
+
+0.3.1
+-----
+
 Major changes:
 - In order to facilitate testing of pure python code, this PR splits code that has no dependencies on the Fortran wrapper into its own subpackage, `fv3util`. That code then gets imported and used by the `fv3gfs` python package.
 - Removed legacy restart loading code (`load_fortran_restart_folder`). This will be added back in a future PR with better logic for identifying dimensions in restart data, using the properties dictionaries.
