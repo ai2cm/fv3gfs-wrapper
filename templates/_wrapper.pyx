@@ -135,15 +135,15 @@ def set_state(state):
     cdef REAL_t[::1] input_value_1d
     tracer_metadata = get_tracer_metadata()
     cdef set processed_names_set = set()
-    for name, data_array in state.items():
+    for name, quantity in state.items():
         if name == 'time':
             set_time(state[name])
-        elif len(data_array.shape) == 3:
-            set_3d_quantity(name, data_array.values, data_array.shape[0], tracer_metadata)
-        elif len(data_array.shape) == 2:
-            set_2d_quantity(name, data_array.values)
-        elif len(data_array.shape) == 1:
-            set_1d_quantity(name, data_array.values)
+        elif len(quantity.dims) == 3:
+            set_3d_quantity(name, np.ascontiguousarray(quantity.view[:]), quantity.extent[0], tracer_metadata)
+        elif len(quantity.dims) == 2:
+            set_2d_quantity(name, np.ascontiguousarray(quantity.view[:]))
+        elif len(quantity.dims) == 1:
+            set_1d_quantity(name, np.ascontiguousarray(quantity.view[:]))
         else:
             raise ValueError(f'no setter available for {name}')
 
