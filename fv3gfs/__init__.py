@@ -5,11 +5,10 @@ from ._wrapper import (
     get_n_ghost_cells, get_step_count, get_tracer_metadata
 )
 from ._restart import get_restart_names, open_restart
-from ._ghost_cells import without_ghost_cells, with_ghost_cells
 from fv3util import (
     InvalidQuantityError, DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES,
     read_state, write_state, apply_nudging, get_nudging_tendencies, ZarrMonitor,
-    CubedSpherePartitioner
+    CubedSpherePartitioner, TilePartitioner, CubedSphereCommunicator, TileCommunicator
 )
 
 
@@ -18,12 +17,11 @@ __all__ = [
     'save_fortran_restart',
     'cleanup', 'get_state', 'set_state',
     'get_n_ghost_cells', 'get_step_count', 'get_tracer_metadata',
-    'without_ghost_cells', 'with_ghost_cells',
     'InvalidQuantityError',
     'DYNAMICS_PROPERTIES', 'PHYSICS_PROPERTIES',
     'read_state', 'write_state', 'get_restart_names',
     'apply_nudging', 'get_nudging_tendencies', 'open_restart', 'ZarrMonitor',
-    'CubedSpherePartitioner',
+    'CubedSpherePartitioner', 'TilePartitioner', 'CubedSphereCommunicator', 'TileCommunicator'
 ]
 
 __version__ = '0.3.0'
