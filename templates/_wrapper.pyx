@@ -3,9 +3,8 @@
 # cython: c_string_type=unicode, c_string_encoding=utf8
 cimport numpy as cnp
 import numpy as np
-import xarray as xr
+import fv3util
 from mpi4py import MPI
-from fv3util import InvalidQuantityError
 from datetime import datetime
 
 ctypedef cnp.double_t REAL_t
@@ -226,10 +225,10 @@ def get_state(names):
     if '{{ item.name }}' in input_names_set:
         array_2d = get_array_from_dims({{ item.dims | safe }})
         get_{{ item.fortran_name }}(&array_2d[0, 0])
-        return_dict['{{ item.name }}'] = xr.DataArray(
+        return_dict['{{ item.name }}'] = fv3util.Quantity(
             np.asarray(array_2d),
             dims={{ item.dims | safe }},
-            attrs={'units': '{{ item.units }}'}
+            units="{{ item.units }}"
         )
 {% endfor %}
 
@@ -238,10 +237,10 @@ def get_state(names):
         array_3d = get_array_from_dims({{ item.dims | safe }})
         nz = array_3d.shape[0]
         get_{{ item.fortran_name }}(&array_3d[0, 0, 0], &nz)
-        return_dict['{{ item.name }}'] = xr.DataArray(
+        return_dict['{{ item.name }}'] = fv3util.Quantity(
             np.asarray(array_3d),
             dims={{ item.dims | safe }},
-            attrs={'units': '{{ item.units }}'}
+            units="{{ item.units }}"
         )
 {% endfor %}
 
@@ -250,28 +249,28 @@ def get_state(names):
     if '{{ item.name }}' in input_names_set:
         array_3d = get_array_from_dims({{ item.dims | safe }})
         get_{{ item.fortran_name }}(&array_3d[0, 0, 0])
-        return_dict['{{ item.name }}'] = xr.DataArray(
+        return_dict['{{ item.name }}'] = fv3util.Quantity(
             np.asarray(array_3d),
             dims={{ item.dims | safe }},
-            attrs={'units': '{{ item.units }}'}
+            units="{{ item.units }}"
         )
     {% elif item.dims|length == 2 %}
     if '{{ item.name }}' in input_names_set:
         array_2d = get_array_from_dims({{ item.dims | safe }})
         get_{{ item.fortran_name }}(&array_2d[0, 0])
-        return_dict['{{ item.name }}'] = xr.DataArray(
+        return_dict['{{ item.name }}'] = fv3util.Quantity(
             np.asarray(array_2d),
             dims={{ item.dims | safe }},
-            attrs={'units': '{{ item.units }}'}
+            units="{{ item.units }}"
         )
     {% elif item.dims|length == 1 %}
     if '{{ item.name }}' in input_names_set:
         array_1d = get_array_from_dims({{ item.dims | safe }})
         get_{{ item.fortran_name }}(&array_1d[0])
-        return_dict['{{ item.name }}'] = xr.DataArray(
+        return_dict['{{ item.name }}'] = fv3util.Quantity(
             np.asarray(array_1d),
             dims={{ item.dims | safe }},
-            attrs={'units': '{{ item.units }}'}
+            units="{{ item.units }}"
         )
     {% endif %}
 {% endfor %}
@@ -281,15 +280,17 @@ def get_state(names):
             i_tracer = tracer_data['i_tracer']
             array_3d = get_array_from_dims(['z', 'y', 'x'])
             get_tracer(&i_tracer, &array_3d[0, 0, 0])
-            return_dict[tracer_name] = xr.DataArray(
+            return_dict[tracer_name] = fv3util.Quantity(
                 np.asarray(array_3d),
-                dims=['z', 'y', 'x'],
-                attrs={'units': tracer_data['units']},
+                dims=[fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
+                units=tracer_data['units']
             )
 
     for name in names:
         if name not in return_dict:
-            raise InvalidQuantityError(f'Quantity {name} does not exist - is there a typo?')
+            raise fv3util.InvalidQuantityError(
+                f'Quantity {name} does not exist - is there a typo?'
+            )
     return return_dict
 
 
