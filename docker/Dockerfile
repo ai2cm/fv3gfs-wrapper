@@ -97,6 +97,7 @@ RUN pip3 install --no-cache-dir \
     h5py==2.10.0 \
     h5netcdf==0.8.0 \
     sphinx==2.2.0 \
+    pytest-subtests==0.3.0 \
     sphinx_rtd_theme && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
