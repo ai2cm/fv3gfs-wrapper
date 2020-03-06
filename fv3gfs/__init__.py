@@ -8,7 +8,8 @@ from ._restart import get_restart_names, open_restart
 from fv3util import (
     InvalidQuantityError, DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES,
     read_state, write_state, apply_nudging, get_nudging_tendencies, ZarrMonitor,
-    CubedSpherePartitioner, TilePartitioner, CubedSphereCommunicator, TileCommunicator
+    CubedSpherePartitioner, TilePartitioner, CubedSphereCommunicator, TileCommunicator,
+    Quantity
 )
 
 
@@ -21,7 +22,8 @@ __all__ = [
     'DYNAMICS_PROPERTIES', 'PHYSICS_PROPERTIES',
     'read_state', 'write_state', 'get_restart_names',
     'apply_nudging', 'get_nudging_tendencies', 'open_restart', 'ZarrMonitor',
-    'CubedSpherePartitioner', 'TilePartitioner', 'CubedSphereCommunicator', 'TileCommunicator'
+    'CubedSpherePartitioner', 'TilePartitioner', 'CubedSphereCommunicator', 'TileCommunicator',
+    'Quantity',
 ]
 
 __version__ = '0.3.0'
