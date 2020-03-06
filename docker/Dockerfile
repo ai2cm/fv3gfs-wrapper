@@ -74,8 +74,8 @@ RUN cd /fv3gfs-python && \
 #-----------------------------------------------------------------------------
 FROM fv3gfs-python-env AS fv3gfs-python
 
-ENV FMS_DIR=/fv3gfs-python/lib/external/FMS
-ENV ESMF_DIR=/fv3gfs-python/lib/external/esmf
+ENV FMS_DIR=/FMS
+ENV ESMF_DIR=/esmf
 ENV ESMF_INC="-I${ESMF_DIR}/include -I${ESMF_DIR}/mod/modO3/Linux.gfortran.64.mpiuni.default/"
 
 ENV FMS_LIB=${FMS_DIR}/libFMS/.libs/
@@ -119,7 +119,7 @@ COPY external /fv3gfs-python/external
 
 RUN pip3 install --no-cache-dir -e \
     /fv3gfs-python/external/fv3config \
-    /fv3gfs-python/external/fv3util && \
+    -e /fv3gfs-python/external/fv3util && \
     pip3 install --no-cache-dir -e /fv3gfs-python
 
 # cache model data

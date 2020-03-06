@@ -58,6 +58,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -f .coverage
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
+	rm -fr tests/image_tests/output/*
 
 clean-lib:
 	$(MAKE) -C lib clean

@@ -98,7 +98,7 @@ class SetterTests(unittest.TestCase):
     def test_set_non_existent_quantity(self):
         with self.assertRaises(ValueError):
             fv3gfs.set_state({
-                'non_quantity': xr.DataArray([0.], dims=['dim1'], attrs={'units': ''})
+                'non_quantity': fv3util.Quantity(np.array([0.]), dims=['dim1'], units='')
             })
 
     def _set_names_helper(self, name_list):
@@ -109,47 +109,46 @@ class SetterTests(unittest.TestCase):
         old_state = fv3gfs.get_state(names=name_list)
         self._check_gotten_state(old_state, name_list)
         replace_state = deepcopy(old_state)
-        for name, data_array in replace_state.items():
-            data_array.values[:] = np.random.uniform(size=data_array.shape)
+        for name, quantity in replace_state.items():
+            quantity.view[:] = np.random.uniform(size=quantity.extent)
         fv3gfs.set_state(replace_state)
         new_state = fv3gfs.get_state(names=name_list)
         self._check_gotten_state(new_state, name_list)
-        for name, new_data_array in new_state.items():
+        for name, new_quantity in new_state.items():
             with self.subTest(name):
-                replace_data_array = replace_state[name]
-                self.assert_values_equal(new_data_array, replace_data_array)
+                replace_quantity = replace_state[name]
+                self.assert_values_equal(new_quantity, replace_quantity)
 
     def _set_names_one_at_a_time_helper(self, name_list):
         old_state = fv3gfs.get_state(names=name_list)
         self._check_gotten_state(old_state, name_list)
         for replace_name in name_list:
             with self.subTest(replace_name):
-                data_array = deepcopy(old_state[replace_name])
-                data_array.values[:] = np.random.uniform(size=data_array.shape)
+                quantity = deepcopy(old_state[replace_name])
+                quantity.view[:] = np.random.uniform(size=quantity.extent)
                 replace_state = {
-                    replace_name: data_array
+                    replace_name: quantity
                 }
                 fv3gfs.set_state(replace_state)
                 new_state = fv3gfs.get_state(names=name_list)
                 self._check_gotten_state(new_state, name_list)
-                for name, new_data_array in new_state.items():
+                for name, new_quantity in new_state.items():
                     if name == replace_name:
-                        self.assert_values_equal(new_data_array, replace_state[name])
+                        self.assert_values_equal(new_quantity, replace_state[name])
                     else:
-                        self.assert_values_equal(new_data_array, old_state[name])
+                        self.assert_values_equal(new_quantity, old_state[name])
                 old_state = new_state
 
     def _check_gotten_state(self, state, name_list):
         for name, value in state.items():
             self.assertIsInstance(name, str)
-            self.assertIsInstance(value, xr.DataArray)
-            self.assertIn('units', value.attrs)
+            self.assertIsInstance(value, fv3util.Quantity)
         for name in name_list:
             self.assertIn(name, state)
         self.assertEqual(len(name_list), len(state.keys()))
 
-    def assert_values_equal(self, data_array1, data_array2):
-        self.assertTrue(np.all(data_array1.values == data_array2.values))
+    def assert_values_equal(self, quantity1, quantity2):
+        self.assertTrue(np.all(quantity1.view[:] == quantity2.view[:]))
 
 
 if __name__ == '__main__':
