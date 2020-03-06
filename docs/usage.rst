@@ -72,14 +72,11 @@ This can be done directly from the namelist in a configuration dictionary like s
 
     with open('fv3config.yml', 'r') as f:
         config = yaml.safe_load(f)
-    partitioner = fv3gfs.Partitioner.from_namelist(config['namelist'])
+    partitioner = fv3gfs.TilePartitioner.from_namelist(config['namelist'])
 
 Alternatively, the grid information can be specified manually::
 
-    partitioner = fv3gfs.Partitioner.from_namelist(
-        nz=79,  # nz, ny, and nx here are based on grid centers
-        ny=48,
-        nx=48,
+    partitioner = fv3gfs.TilePartitioner(
         layout=(1, 1)
     )
 
