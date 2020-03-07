@@ -23,10 +23,6 @@ cdef extern:
     void get_time_subroutine(int *year, int *month, int *day, int *hour, int *minute, int *second)
     void get_centered_grid_dimensions(int *nx, int *ny, int *nz)
     void get_n_ghost_cells_subroutine(int *n_ghost)
-    void get_u(REAL_t *u_out)
-    void set_u(REAL_t *u_in)
-    void get_v(REAL_t *v_out)
-    void set_v(REAL_t *v_in)
 {% for item in dynamics_properties %}
     void get_{{ item.fortran_name }}(REAL_t *{{ item.fortran_name }}_out)
     void set_{{ item.fortran_name }}(REAL_t *{{ item.fortran_name }}_in)
@@ -45,6 +41,7 @@ cdef extern:
     void get_{{ item.fortran_name }}(REAL_t *{{ item.fortran_name }}_out, int *nz)
     void set_{{ item.fortran_name }}(REAL_t *{{ item.fortran_name }}_in, int *nz)
 {% endfor %}
+    void update_dwinds_phys_subroutine(float *dt, REAL_t *u_dt, REAL_t *v_dt, REAL_t *u, REAL_t *v)
 
 
 
@@ -149,7 +146,7 @@ def set_state(state):
             raise ValueError(f'no setter available for {name}')
 
 
-cdef int set_3d_quantity(name, REAL_t[:, :, ::1] array, int nz, dict tracer_metadata) except -1: 
+cdef int set_3d_quantity(name, REAL_t[:, :, ::1] array, int nz, dict tracer_metadata) except -1:
     cdef int i_tracer
     if False:
         pass  # need this so we can use elif in template
@@ -365,3 +362,13 @@ def save_fortran_restart():
 def cleanup():
     """Call the Fortran cleanup routines, which clear memory and write final restart files."""
     cleanup_subroutine()
+
+
+def update_dgrid_winds_with_agrid_tendencies(dt, u_dt, v_dt, u, v):
+    """Apply the A-grid wind tendencies u_dt and v_dt onto the D-grid winds u and v"""
+    update_numpy(dt, u_dt.values, v_dt.values, u.values, v.values)
+    return u, v
+
+
+cdef update_numpy(float dt, REAL_t[:, :, ::1] u_dt, REAL_t[:, :, ::1] v_dt, REAL_t[:, :, ::1] u, REAL_t[:, :, ::1] v):
+    update_dwinds_phys_subroutine(&dt, &u_dt[0, 0, 0], &v_dt[0, 0, 0], &u[0, 0, 0], &v[0, 0, 0])

@@ -22,7 +22,7 @@ FFLAGS += \
 
 .PHONY: clean cleanall fortran_libs
 
-all: coupler_lib.o dynamics_data.o physics_data.o $(TEMPLATES)
+all: coupler_lib.o dynamics_data.o physics_data.o update_dwinds_phys.o $(TEMPLATES)
 
 dynamics_data.o: dynamics_data.F90 fortran_libs
 	$(FC) $(CPPDEFS) $(CPPFLAGS) $(FPPFLAGS) $(FFLAGS) $(OTHERFLAGS) $(OTHER_FFLAGS) $(ESMF_INC) -c $< -o $@
@@ -31,6 +31,9 @@ physics_data.o: physics_data.F90 dynamics_data.o fortran_libs
 	$(FC) $(CPPDEFS) $(CPPFLAGS) $(FPPFLAGS) $(FFLAGS) $(OTHERFLAGS) $(OTHER_FFLAGS) $(ESMF_INC) -c $< -o $@
 
 coupler_lib.o: coupler_lib.F90 fortran_libs
+	$(FC) $(CPPDEFS) $(CPPFLAGS) $(FPPFLAGS) $(FFLAGS) $(OTHERFLAGS) $(OTHER_FFLAGS) $(ESMF_INC) -c $< -o $@
+
+update_dwinds_phys.o: update_dwinds_phys.F90 fortran_libs
 	$(FC) $(CPPDEFS) $(CPPFLAGS) $(FPPFLAGS) $(FFLAGS) $(OTHERFLAGS) $(OTHER_FFLAGS) $(ESMF_INC) -c $< -o $@
 
 clean:

@@ -20,7 +20,9 @@ class BuildDirectoryError(Exception):
     pass
 
 
-relative_wrapper_build_filenames = ['lib/coupler_lib.o', 'lib/physics_data.o', 'lib/dynamics_data.o', ]
+relative_wrapper_build_filenames = [
+    'lib/coupler_lib.o', 'lib/physics_data.o', 'lib/dynamics_data.o', 'lib/update_dwinds_phys.o'
+]
 
 relative_fv3gfs_build_filenames = [
     'atmos_model.o', 'module_fv3_config.o', 'cpl/libfv3cpl.a',
