@@ -12,3 +12,5 @@ Partitioning is managed by so-called "Partitioner" objects. The
 :py:class:`fv3gfs.TilePartitioner` manages one of the six faces of the cube, or a
 region on one of those faces. For communication, we similarly have
 :py:class:`fv3gfs.CubedSphereCommunicator` and :py:class:`fv3gfs.TileCommunicator`.
+Please see their API documentation for an up-to-date list of current communications
+routines.

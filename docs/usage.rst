@@ -154,8 +154,7 @@ Loading legacy restarts
 -----------------------
 
 A function :py:func:`fv3gfs.open_restart` is available to load restart files that have
-been output by the Fortran code. Currently, it assumes the restart file has not been
-partitioned in any way (i.e. that the IO layout is (1, 1)). This routine will handle
+been output by the Fortran code. This routine will handle
 loading the data on a single processor per tile and then distribute the data to other
 processes on the same tile. This may cause out-of-memory errors, which can be mitigated
 in a couple different ways through changes to the code base (e.g. loading a subset of

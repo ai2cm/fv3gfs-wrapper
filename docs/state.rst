@@ -6,18 +6,15 @@ Getting/setting state
 ---------------------
 
 In addition to just running the model the same as in Fortran, the Python wrapper allows you to interact
-with the model state while it is still running. This is done through :py:func:`fv3gfs.get_state` and :py:func:`fv3gfs.set_state`.
-The getters and setters do not include ghost cells in the horizontal. If you need to add them, you can add and
-remove ghost cells using :py:func:`fv3gfs.with_ghost_cells` and :py:func:`fv3gfs.without_ghost_cells`.
-The getters will return arrays which nominally have units information, but these aren't guaranteed
+with the model state while it is still running.
+This is done through :py:func:`fv3gfs.get_state` and :py:func:`fv3gfs.set_state`.
+The getters will return Quantity objects which nominally have units information, but these aren't guaranteed
 to be accurate and in some cases are indicated as missing.
 
 An example which gets and sets the model state to damp moisture is present in the examples folder of this repo.
 
 You should also keep in mind that the arrays used by :py:func:`fv3gfs.get_state` and :py:func:`fv3gfs.set_state`
-are domain-decomposed fields (as opposed to global fields). As of writing we do not have
-logic to go from a local 0-based index to a global index, but this can be done
-in principle by retrieving the process rank from :code:`mpi4py`.
+are domain-decomposed fields (as opposed to global fields).
 
 Quantity
 --------
