@@ -99,6 +99,7 @@ RUN pip3 install --no-cache-dir \
     pytest-subtests==0.3.0 \
     dask==2.10.1 \
     toolz==0.10.0 \
+    scipy==1.3.1 \
     sphinx==2.2.0 \
     sphinx_rtd_theme && \
     apt-get update && \
