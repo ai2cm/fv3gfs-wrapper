@@ -370,5 +370,7 @@ def update_dgrid_winds_with_agrid_tendencies(dt, u_dt, v_dt, u, v):
     return u, v
 
 
-cdef update_numpy(float dt, REAL_t[:, :, ::1] u_dt, REAL_t[:, :, ::1] v_dt, REAL_t[:, :, ::1] u, REAL_t[:, :, ::1] v):
+cdef update_dgrid_winds_cdef(
+    float dt, REAL_t[:, :, ::1] u_dt, REAL_t[:, :, ::1] v_dt, REAL_t[:, :, ::1] u, REAL_t[:, :, ::1] v
+):
     update_dwinds_phys_subroutine(&dt, &u_dt[0, 0, 0], &v_dt[0, 0, 0], &u[0, 0, 0], &v[0, 0, 0])
