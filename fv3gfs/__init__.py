@@ -2,7 +2,8 @@ from ._wrapper import (
     initialize, step, step_dynamics, step_physics, save_intermediate_restart_if_enabled,
     save_fortran_restart,
     cleanup, get_state, set_state,
-    get_n_ghost_cells, get_step_count, get_tracer_metadata
+    get_n_ghost_cells, get_step_count, get_tracer_metadata, 
+    mpp_error
 )
 from ._restart import get_restart_names, open_restart
 from ._ghost_cells import without_ghost_cells, with_ghost_cells
@@ -14,6 +15,7 @@ from fv3util import (
 
 
 __all__ = [
+    'mpp_error',
     'initialize', 'step', 'step_dynamics', 'step_physics', 'save_intermediate_restart_if_enabled',
     'save_fortran_restart',
     'cleanup', 'get_state', 'set_state',

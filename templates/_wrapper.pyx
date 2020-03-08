@@ -14,6 +14,7 @@ real_type = np.float64
 cdef extern:
     void initialize_subroutine(int *comm)
     void do_step_subroutine()
+    void abort_model()
     void cleanup_subroutine()
     void do_dynamics()
     void do_physics()
@@ -69,6 +70,10 @@ def get_dimension_lengths():
     get_centered_grid_dimensions(&nx, &ny, &nz)
     get_nz_soil_subroutine(&nz_soil)
     return {'nx': nx, 'ny': ny, 'nz': nz, 'nz_soil': nz_soil}
+
+
+def mpp_error():
+    abort_model()
 
 
 def get_array_from_dims(dim_name_list):
