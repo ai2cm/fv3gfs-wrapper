@@ -2,7 +2,7 @@
 Communication
 =============
 
-As mentioned when discussing State_, each process or "rank" in fv3gfs is responsible
+As mentioned when discussing :ref:`State`, each process or "rank" in fv3gfs is responsible
 for a subset of the cubed sphere grid. In order to operate, the model needs to know
 how to partition that cubed sphere into parts for each rank, and to be able to
 communicate data between those ranks.

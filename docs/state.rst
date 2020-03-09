@@ -1,3 +1,4 @@
+.. _state-overview:
 =====
 State
 =====
@@ -19,7 +20,7 @@ are domain-decomposed fields (as opposed to global fields).
 Quantity
 --------
 
-Data in `fv3gfs-python` is managed using a container type called :py:class:`fv3gfs.Quantity`.
+Data in ``fv3gfs-python`` is managed using a container type called :py:class:`fv3gfs.Quantity`.
 This stores metadata such as dimensions and units (in ``quantity.dims`` and ``quantity.units``),
 and manages the "computational domain" of the data.
 
