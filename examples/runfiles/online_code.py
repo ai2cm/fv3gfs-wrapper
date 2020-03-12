@@ -11,7 +11,6 @@ import yaml
 
 # May need to run 'ulimit -s unlimited' before running this example
 # If you're running in our prepared docker container, you definitely need to do this
-# sets the stack size to unlimited
 
 # Run using mpirun -n 6 python3 basic_model.py
 # mpirun flags that may be useful:
@@ -51,6 +50,6 @@ if __name__ == '__main__':
 
         # dry out the model with the given relaxation rate
         state = fv3gfs.get_state(names=['specific_humidity'])
-        state['specific_humidity'].values[:] -= state['specific_humidity'].values * timestep.total_seconds() / relaxation_rate.total_seconds()
+        state['specific_humidity'].view[:] -= state['specific_humidity'].view * timestep.total_seconds() / relaxation_rate.total_seconds()
         fv3gfs.set_state(state)
     fv3gfs.cleanup()

@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import timedelta
 import yaml
 import fv3gfs
 from mpi4py import MPI
@@ -29,16 +29,16 @@ def get_restart_directory(label):
     return os.path.join(REFERENCE_DIR, label)
 
 
-def get_reference_state(time, partitioner, only_names):
+def get_reference_state(time, communicator, only_names):
     label = time_to_label(time)
     dirname = get_restart_directory(label)
     return fv3gfs.open_restart(
-        dirname, partitioner, label=label, only_names=only_names
+        dirname, communicator, label=label, only_names=only_names
     )
 
 
-def nudge_to_reference(state, partitioner, timescales, timestep):
-    reference = get_reference_state(state['time'], partitioner, only_names=timescales.keys())
+def nudge_to_reference(state, communicator, timescales, timestep):
+    reference = get_reference_state(state['time'], communicator, only_names=timescales.keys())
     tendencies = fv3gfs.apply_nudging(state, reference, timescales, timestep)
     tendencies = append_key_label(tendencies, '_tendency_due_to_nudging')
     tendencies['time'] = state['time']
@@ -58,12 +58,15 @@ if __name__ == '__main__':
     with open('fv3config.yml', 'r') as config_file:
         config = yaml.safe_load(config_file)
     MPI.COMM_WORLD.barrier()  # wait for master rank to write run directory
-    partitioner = fv3gfs.CubedSpherePartitioner.from_namelist(config["namelist"])
+    communicator = fv3gfs.CubedSphereCommunicator(
+        MPI.COMM_WORLD,
+        fv3gfs.CubedSpherePartitioner.from_namelist(config["namelist"])
+    )
     nudging_timescales = get_timescales_from_config(config)
     timestep = get_timestep(config)
     tendency_monitor = fv3gfs.ZarrMonitor(
         os.path.join(RUN_DIR, "tendencies.zarr"),
-        partitioner,
+        communicator.partitioner,
         mode="w",
         mpi_comm=MPI.COMM_WORLD,
     )
@@ -75,7 +78,7 @@ if __name__ == '__main__':
         fv3gfs.save_intermediate_restart_if_enabled()
 
         state = fv3gfs.get_state(names=['time'] + list(nudging_timescales.keys()))
-        tendencies = nudge_to_reference(state, partitioner, nudging_timescales, timestep)
+        tendencies = nudge_to_reference(state, communicator, nudging_timescales, timestep)
         tendency_monitor.store(tendencies)
         fv3gfs.set_state(state)
     fv3gfs.cleanup()

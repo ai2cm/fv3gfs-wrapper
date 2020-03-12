@@ -52,7 +52,7 @@ class TilePartitioner:
 
     @classmethod
     def from_namelist(cls, namelist):
-        """Initialize a HorizontalGridSpec from a Fortran namelist.
+        """Initialize a TilePartitioner from a Fortran namelist.
 
         Args:
             namelist (dict): the Fortran namelist
@@ -249,6 +249,15 @@ class CubedSpherePartitioner:
         if not isinstance(tile, TilePartitioner):
             raise TypeError('tile must be a TilePartitioner')
         self.tile = tile
+
+    @classmethod
+    def from_namelist(cls, namelist):
+        """Initialize a CubedSpherePartitioner from a Fortran namelist.
+
+        Args:
+            namelist (dict): the Fortran namelist
+        """
+        return cls(TilePartitioner.from_namelist(namelist))
 
     def _ensure_square_layout(self) -> None:
         if not self.tile.layout[0] == self.tile.layout[1]:

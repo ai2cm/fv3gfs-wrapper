@@ -5,7 +5,7 @@ ifndef FV3GFS_BUILD_DIR
 endif
 include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
 
-.PHONY: build clean clean-test clean-pyc clean-build docs help docs-docker
+.PHONY: build clean clean-test clean-pyc clean-build clean-examples examples lint test coverage docs help docs-docker
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
@@ -38,7 +38,7 @@ DOCKER_IMAGE?=us.gcr.io/vcm-ml/fv3gfs-python:latest
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-clean: clean-build clean-pyc clean-test clean-lib ## remove all build, test, coverage and Python artifacts
+clean: clean-build clean-pyc clean-test clean-lib clean-examples ## remove all build, test, coverage and Python artifacts
 
 clean-build: ## remove build artifacts
 	rm -fr build/
@@ -62,6 +62,12 @@ clean-test: ## remove test and coverage artifacts
 
 clean-lib:
 	$(MAKE) -C lib clean
+
+examples:
+	$(MAKE) -C examples/runfiles
+
+clean-examples:
+	$(MAKE) -C examples/runfiles clean
 
 lint: ## check style with flake8
 	flake8 fv3gfs tests
