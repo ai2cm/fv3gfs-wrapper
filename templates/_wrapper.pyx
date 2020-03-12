@@ -124,8 +124,10 @@ def get_time():
 def set_state(state):
     """
     Takes in a dictionary whose keys are quantity long names (with underscores instead of spaces)
-    and values are DataArrays containing that quantity's data. Sets the fortran state to
+    and values are Quantity objects containing that quantity's data. Sets the fortran state to
     those values.
+
+    Assumes quantity units are equivalent to what is used in the fortran code.
 
     Arguments:
         state (dict): values to set
