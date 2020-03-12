@@ -95,19 +95,6 @@ def test_rotate_subtile_rank(rank, layout, n_clockwise_rotations, new_rank):
     assert result == new_rank
 
 
-# @pytest.mark.parametrize(
-#     "rank, layout, new_rank",
-#     [
-#         (12, (4, 4), 3),
-#         (14, (4, 4), 11),
-#         (0, (1, 1), 0),
-#         (2, (2, 2), 1)
-#     ]
-# )
-# def test_transpose_subtile_rank(rank, layout, new_rank):
-#     result = fv3util.partitioner.transpose_subtile_rank(rank, layout)
-#     assert result == new_rank
-
 @pytest.mark.parametrize(
     "from_rank, to_rank, n_clockwise_rotations",
     [
