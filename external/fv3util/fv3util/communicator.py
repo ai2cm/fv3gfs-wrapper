@@ -45,7 +45,7 @@ class TileCommunicator(Communicator):
             metadata: QuantityMetadata,
             send_quantity: Quantity = None,
             recv_quantity: Quantity = None) -> Quantity:
-        """Transfer data from the tile master rank to all subtiles.
+        """Transfer a quantity from the tile master rank to all subtiles.
         
         Args:
             metadata: the metadata of the quantity being transferred, used to
@@ -78,6 +78,44 @@ class TileCommunicator(Communicator):
             )
         self.comm.Scatter(sendbuf, recv_quantity.data, root=0)
         return recv_quantity
+
+    def scatter_state(self, tile_state: dict = None):
+        """Transfer a state dictionary from the tile master rank to all subtiles.
+        
+        Args:
+            tile_state: the model state to be sent containing the entire tile,
+                required only from the master rank
+        Returns:
+            rank_state: the state corresponding to this rank's subdomain
+        """
+        def broadcast_master():
+            if tile_state is None:
+                raise TypeError('tile_state is a required argument on the master rank')
+            name_list = list(tile_state.keys())
+            while 'time' in name_list:
+                name_list.remove('time')
+            name_list = self.comm.bcast(name_list, root=constants.MASTER_RANK)
+            array_list = [tile_state[name] for name in name_list]
+            metadata_list = bcast_metadata_list(self.comm, array_list)
+            for name, array, metadata in zip(name_list, array_list, metadata_list):
+                state[name] = self.scatter(metadata, send_quantity=array)
+            state['time'] = self.comm.bcast(tile_state.get('time', None), root=constants.MASTER_RANK)
+
+        def broadcast_client():
+            name_list = self.comm.bcast(None, root=constants.MASTER_RANK)
+            metadata_list = bcast_metadata_list(self.comm, None)
+            for name, metadata in zip(name_list, metadata_list):
+                state[name] = self.scatter(metadata)
+            time = self.comm.bcast(None, root=constants.MASTER_RANK)
+            if time is not None:
+                state['time'] = time
+
+        state = {}
+        if self.rank == constants.MASTER_RANK:
+            broadcast_master()
+        else:
+            broadcast_client()
+        return state
 
 
 class CubedSphereCommunicator(Communicator):
