@@ -26,17 +26,13 @@ rundir_basename = 'rundir'
 if __name__ == '__main__':
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
-    current_dir = os.getcwd()
-    rundir_path = os.path.join(current_dir, rundir_basename)
-    if rank == 0:  # Only create run directory from one rank
+    MPI.COMM_WORLD.barrier()  # wait for master rank to write run directory
+    if MPI.COMM_WORLD.Get_rank() == 0:  # only use filesystem on one rank
         with open('default.yml', 'r') as config_file:
             config = yaml.safe_load(config_file)
-        # Can alter this config dictionary to configure the run
-        fv3config.write_run_directory(config, rundir_path)
-    MPI.COMM_WORLD.barrier()  # wait for master rank to write run directory
-    with open('default.yml', 'r') as config_file:
-        config = yaml.safe_load(config_file)
-    os.chdir(rundir_path)
+        config = MPI.COMM_WORLD.scatter(config)
+    else:
+        config = MPI.COMM_WORLD.scatter(None)
 
     # Calculate factor for relaxing humidity to zero
     relaxation_rate = timedelta(days=7)
