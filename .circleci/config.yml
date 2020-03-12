@@ -77,7 +77,8 @@ jobs:
           command: |
             bash test_docker.sh
       - run:
-          name: run example runfiles
+          name: "Run example runfiles"
+          command: |
             make examples
       - run:
           name: "Enable Python 2 for google cloud tools"
