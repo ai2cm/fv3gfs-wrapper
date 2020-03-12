@@ -6,7 +6,7 @@ DOCKER_IMAGE ?= us.gcr.io/vcm-ml/fv3gfs-python
 
 CASES=basic_model online_code
 
-all: $(CASES)
+all: $(CASES) nudging
 
 fv3run:
 	fv3run --runfile $(RUNFILE) --dockerimage $(DOCKER_IMAGE) $(CONFIG) $(OUTDIR)
