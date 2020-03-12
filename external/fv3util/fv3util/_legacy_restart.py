@@ -27,7 +27,7 @@ def open_restart(
 
     Args:
         dirname: location of restart files, can be local or remote
-        partitioner: domain decomposition for this rank
+        communicator: object for communication over the cubed sphere
         label: prepended string on the restart files to load
         only_names (optional): list of standard names to load
 
