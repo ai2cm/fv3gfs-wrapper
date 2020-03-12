@@ -26,13 +26,12 @@ rundir_basename = 'rundir'
 if __name__ == '__main__':
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
-    MPI.COMM_WORLD.barrier()  # wait for master rank to write run directory
-    if MPI.COMM_WORLD.Get_rank() == 0:  # only use filesystem on one rank
-        with open('default.yml', 'r') as config_file:
+    if rank == 0:  # only use filesystem on one rank
+        with open('fv3config.yml', 'r') as config_file:
             config = yaml.safe_load(config_file)
-        config = MPI.COMM_WORLD.scatter(config)
+        config = comm.bcast(config)
     else:
-        config = MPI.COMM_WORLD.scatter(None)
+        config = comm.bcast(None)
 
     # Calculate factor for relaxing humidity to zero
     relaxation_rate = timedelta(days=7)
@@ -46,6 +45,6 @@ if __name__ == '__main__':
 
         # dry out the model with the given relaxation rate
         state = fv3gfs.get_state(names=['specific_humidity'])
-        state['specific_humidity'].view[:] -= state['specific_humidity'].view * timestep.total_seconds() / relaxation_rate.total_seconds()
+        state['specific_humidity'].view[:] -= state['specific_humidity'].view[:] * timestep.total_seconds() / relaxation_rate.total_seconds()
         fv3gfs.set_state(state)
     fv3gfs.cleanup()

@@ -2,9 +2,13 @@
 FROM ubuntu:19.10 as fv3config-inputdata
 
 RUN apt-get update && \
-    apt-get install -y wget && \
-    wget http://storage.googleapis.com/vcm-ml-public/2019-10-23-data-for-running-fv3gfs.tar.gz && \
-    tar -xf /2019-10-23-data-for-running-fv3gfs.tar.gz --directory /
+    apt-get install -y python3 python3-pip wget && \
+    pip3 install --no-cache-dir gsutil
+RUN wget http://storage.googleapis.com/vcm-ml-public/2019-10-23-data-for-running-fv3gfs.tar.gz && \
+    tar -xf /2019-10-23-data-for-running-fv3gfs.tar.gz --directory / && \
+    mv /2019-10-23-data-for-running-fv3gfs /fv3config-cache && \
+    mkdir -p /fv3config-cache/gs/vcm-fv3config && \
+    gsutil -m cp -r gs://vcm-fv3config/ /fv3config-cache/gs/vcm-fv3config/
 
 #-----------------------------------------------------------------------------
 FROM fv3gfs-fortran-env as fv3gfs-python-env
@@ -126,7 +130,7 @@ RUN pip3 install --no-cache-dir -e \
     pip3 install --no-cache-dir -e /fv3gfs-python
 
 # cache model data
-COPY --from=fv3config-inputdata /2019-10-23-data-for-running-fv3gfs $FV3CONFIG_CACHE_DIR/fv3config-cache
+COPY --from=fv3config-inputdata /fv3config-cache $FV3CONFIG_CACHE_DIR/fv3config-cache
 
 RUN chmod -R 777 $FV3CONFIG_CACHE_DIR && \
     echo "ulimit -s unlimited" >> /etc/bash.bashrc
