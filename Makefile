@@ -66,6 +66,9 @@ clean-lib:
 examples:
 	$(MAKE) -C examples/runfiles
 
+public_examples:
+	$(MAKE) -C examples/runfiles public_examples
+
 clean-examples:
 	$(MAKE) -C examples/runfiles clean
 

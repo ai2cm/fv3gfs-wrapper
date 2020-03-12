@@ -8,6 +8,8 @@ CASES=basic_model online_code
 
 all: $(CASES) nudging
 
+public_examples: $(CASES)
+
 fv3run:
 	fv3run --runfile $(RUNFILE) --dockerimage $(DOCKER_IMAGE) $(CONFIG) $(OUTDIR)
 
@@ -20,4 +22,4 @@ nudging:
 clean:
 	$(RM) -rf outdir nudging_outdir basic_model_outdir online_code_outdir
 
-.PHONY: all fv3run basic_model nudging online_code
+.PHONY: all fv3run basic_model nudging online_code public_examples

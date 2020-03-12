@@ -79,7 +79,7 @@ jobs:
       - run:
           name: "Run example runfiles"
           command: |
-            make examples
+            make public_examples
       - run:
           name: "Enable Python 2 for google cloud tools"
           command: |
