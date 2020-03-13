@@ -155,21 +155,21 @@ class CubedSphereCommunicator(Communicator):
         tile_comm = self.comm.Split(color=self.partitioner.tile_index(self.rank), key=self.rank)
         self._tile_communicator = TileCommunicator(tile_comm, self.partitioner.tile)
 
-    def start_halo_update(self, quantity: Quantity, n_ghost: int):
+    def start_halo_update(self, quantity: Quantity, n_points: int):
         """Initiate an asynchronous halo update of a quantity."""
-        if n_ghost == 0:
-            raise ValueError('cannot perform a halo update on zero ghost cells')
+        if n_points == 0:
+            raise ValueError('cannot perform a halo update on zero halo points')
         for boundary_type, boundary in self.boundaries.items():
-            data = boundary.send_view(quantity, n_points=n_ghost)
+            data = boundary.send_view(quantity, n_points=n_points)
             data = quantity.np.ascontiguousarray(
                 rotate_data(data, quantity.metadata, boundary.n_clockwise_rotations)
             )
             self.comm.Isend(data, dest=boundary.to_rank)
 
-    def finish_halo_update(self, quantity: Quantity, n_ghost: int):
+    def finish_halo_update(self, quantity: Quantity, n_points: int):
         """Complete an asynchronous halo update of a quantity."""
         for boundary_type, boundary in self.boundaries.items():
-            dest_view = boundary.recv_view(quantity, n_points=n_ghost)
+            dest_view = boundary.recv_view(quantity, n_points=n_points)
             dest_buffer = quantity.np.empty(dest_view.shape, dtype=dest_view.dtype)
             self.comm.Recv(dest_buffer, source=boundary.to_rank)
             dest_view[:] = dest_buffer
