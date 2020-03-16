@@ -17,6 +17,8 @@ cdef extern:
     void cleanup_subroutine()
     void do_dynamics()
     void do_physics()
+    void compute_physics_subroutine()
+    void apply_physics_subroutine()
     void save_intermediate_restart_if_enabled_subroutine()
     void save_intermediate_restart_subroutine()
     void initialize_time_subroutine(int *year, int *month, int *day, int *hour, int *minute, int *second)
@@ -348,6 +350,16 @@ def step_physics():
     do_physics()
 
 
+def compute_physics():
+    """Call physics routines in the Fortran model."""
+    compute_physics_subroutine()
+
+
+def apply_physics():
+    """Update model prognostic state with output from physics routines."""
+    apply_physics_subroutine()
+
+
 def save_intermediate_restart_if_enabled():
     """If the Fortran model wants to do so on this timestep, write intermediate restart files.
 
@@ -363,5 +375,3 @@ def save_fortran_restart():
 
 
 def cleanup():
-    """Call the Fortran cleanup routines, which clear memory and write final restart files."""
-    cleanup_subroutine()

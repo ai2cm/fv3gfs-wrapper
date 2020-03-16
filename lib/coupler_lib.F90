@@ -149,6 +149,14 @@ contains
         call update_atmos_model_state (Atm)
     end subroutine do_physics
 
+    subroutine compute_physics_subroutine() bind(c)
+        call update_atmos_radiation_physics (Atm)
+    end subroutine compute_physics_subroutine
+
+    subroutine apply_physics_subroutine() bind(c)
+        call update_atmos_model_state (Atm)
+    end subroutine apply_physics_subroutine
+
     subroutine save_intermediate_restart_if_enabled_subroutine() bind(c)
         if (intrm_rst) then
           if ((nc /= num_cpld_calls) .and. (Time_atmos == Time_restart)) then
