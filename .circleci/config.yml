@@ -77,6 +77,10 @@ jobs:
           command: |
             bash test_docker.sh
       - run:
+          name: "Run example runfiles"
+          command: |
+            make public_examples
+      - run:
           name: "Enable Python 2 for google cloud tools"
           command: |
             pyenv global 2.7.12

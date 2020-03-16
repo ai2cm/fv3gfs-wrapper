@@ -26,10 +26,25 @@ and manages the "computational domain" of the data.
 
 When running a model on multiple
 processors ("ranks"), each process is responsible for a subset of the domain, called its
-"computational domain". Arrays may contain additional data in a "halo" of "ghost cells",
-which a different rank is responsible for updating, but need to be used as inputs for
-the local rank. Depending on optimization choices, it may also make sense to include
-"filler" data which serves only to align the computational domain into blocks within
+"compute domain" or "computational domain". Arrays may contain additional data in a "halo" of "ghost cells"
+which hold data from another rank's compute domain to be used as inputs for
+the local rank. This data needs to be periodically retrieved from nearby ranks, as
+the local rank cannot compute the new values outside of its compute domain.
+
+A 3-by-3 array with one set of halo points would look something like::
+
+    x x x x x
+    x 0 0 0 x
+    x 0 0 0 x
+    x 0 0 0 x
+    x x x x x
+
+where `0` values represent the compute domain, and `x` represents points in the halo.
+If you are interested in learning more, look up the "Ghost Cell Pattern" or
+"Halo Exchange".
+
+Depending on optimization choices, it may also make sense to include
+filler data which serves only to align the computational domain into blocks within
 memory.
 
 If all of that sounded confusing, we agree! That's why :py:class:`fv3gfs.Quantity`
@@ -42,7 +57,7 @@ domain::
     array = quantity.view[:]  # gives an array accessing just the compute domain
     new_array = np.ascontiguousarray(quantity.view[:])  # gives a *copy* of the compute domain
 
-If you actually do want to access data in ghost cells, instead of ``.view`` you should
+If you want to access data in ghost cells, instead of ``.view`` you should
 access ``.data``, which is the underlying ``ndarray``-like object used by the ``Quantity``::
 
     quantity.data[:] = 0.  # set all data this rank has, including ghost cells, to zero
