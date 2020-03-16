@@ -139,6 +139,10 @@ contains
 
     end subroutine module_init
 
+    subroutine abort_model() bind(c)
+        call mpp_error("python wrapper", "aborted from python", FATAL)
+    end subroutine abort_model
+
     subroutine do_dynamics() bind(c)
         Time_atmos = Time_atmos + Time_step_atmos
         call update_atmos_model_dynamics (Atm)
