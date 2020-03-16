@@ -162,7 +162,7 @@ class CubedSphereCommunicator(Communicator):
         for boundary_type, boundary in self.boundaries.items():
             data = boundary.send_view(quantity, n_points=n_points)
             data = quantity.np.ascontiguousarray(
-                rotate_data(data, quantity.metadata, boundary.n_clockwise_rotations)
+                rotate_scalar_data(data, quantity.metadata, boundary.n_clockwise_rotations)
             )
             self.comm.Isend(data, dest=boundary.to_rank)
 
@@ -174,8 +174,30 @@ class CubedSphereCommunicator(Communicator):
             self.comm.Recv(dest_buffer, source=boundary.to_rank)
             dest_view[:] = dest_buffer
 
+    def start_vector_halo_update(self, x_quantity: Quantity, y_quantity: Quantity, n_points: int):
+        """Initiate an asynchronous halo update of a horizontal vector quantity."""
+        if n_points == 0:
+            raise ValueError('cannot perform a halo update on zero halo points')
+        for boundary_type, boundary in self.boundaries.items():
+            x_data = boundary.send_view(x_quantity, n_points=n_points)
+            y_data = boundary.send_view(y_quantity, n_points=n_points)
+            x_data, y_data = rotate_vector_data(
+                x_data, y_data,
+                x_quantity.metadata, y_quantity.metadata,
+                boundary.n_clockwise_rotations
+            )
+            x_data = x_quantity.np.ascontiguousarray(x_data)
+            y_data = y_quantity.np.ascontiguousarray(y_data)
+            self.comm.Isend(x_data, dest=boundary.to_rank)
+            self.comm.Isend(y_data, dest=boundary.to_rank)
 
-def rotate_data(data, metadata, n_clockwise_rotations):
+    def finish_vector_halo_update(self, x_quantity: Quantity, y_quantity: Quantity, n_points: int):
+        """Complete an asynchronous halo update of a horizontal vector quantity."""
+        self.finish_halo_update(x_quantity, n_points)
+        self.finish_halo_update(y_quantity, n_points)
+
+
+def rotate_scalar_data(data, metadata, n_clockwise_rotations):
     n_clockwise_rotations = n_clockwise_rotations % 4
     if n_clockwise_rotations == 0:
         pass
@@ -200,3 +222,41 @@ def rotate_data(data, metadata, n_clockwise_rotations):
         data = data[slice_list]
     return data
 
+
+def rotate_vector_data(x_data, y_data, x_metadata, y_metadata, n_clockwise_rotations):
+    if x_metadata.dims != y_metadata.dims:
+        raise ValueError(
+            "vector quantities must have the same dimensions, "
+            f"have {x_metadata.dims} and {y_metadata.dims}"
+        )
+    data = [y_data, x_data]
+    metadata = x_metadata
+    n_clockwise_rotations = n_clockwise_rotations % 4
+    if n_clockwise_rotations == 0:
+        pass
+    elif n_clockwise_rotations in (1, 3):
+        x_dim, y_dim = None, None
+        for i, dim in enumerate(metadata.dims):
+            if dim in constants.X_DIMS:
+                x_dim = i
+            elif dim in constants.Y_DIMS:
+                y_dim = i
+        for i, entry in enumerate(data):
+            if n_clockwise_rotations == 1:
+                data[i] = metadata.np.rot90(entry, axes=(x_dim, y_dim))
+            elif n_clockwise_rotations == 3:
+                data[i] = metadata.np.rot90(entry, axes=(y_dim, x_dim))
+        if n_clockwise_rotations == 1:
+            data[0], data[1] = -data[1], data[0]
+        else:  # 3 rotations
+            data[0], data[1] = data[1], -data[0]
+    elif n_clockwise_rotations == 2:
+        slice_list = []
+        for dim in metadata.dims:
+            if dim in constants.HORIZONTAL_DIMS:
+                slice_list.append(slice(None, None, -1))
+            else:
+                slice_list.append(slice(None, None))
+        for i, entry in enumerate(data):
+            data[i] = entry[slice_list]
+    return data

@@ -33,12 +33,20 @@ class DummyComm:
         return self._buffer[buffer_type][i_buffer]
 
     def _get_send_recv(self, from_rank):
-        self._buffer['send_recv'] = self._buffer.get('send_recv', {})
-        return self._buffer['send_recv'].pop((from_rank, self.rank))
+        key = (from_rank, self.rank)
+        if 'send_recv' not in self._buffer:
+            raise ValueError('buffer not initialized for send_recv, likely recv called before send')
+        elif key not in self._buffer['send_recv']:
+            raise ValueError(
+                f"rank-specific buffer not initialized for send_recv, likely "
+                f"recv called before send from rank {from_rank} to rank {self.rank}")
+        return self._buffer['send_recv'][key].pop(0)
 
     def _put_send_recv(self, value, to_rank):
+        key = (self.rank, to_rank)
         self._buffer['send_recv'] = self._buffer.get('send_recv', {})
-        self._buffer['send_recv'][(self.rank, to_rank)] = value
+        self._buffer['send_recv'][key] = self._buffer['send_recv'].get(key, [])
+        self._buffer['send_recv'][key].append(value)
 
     @property
     def _bcast_buffer(self):
