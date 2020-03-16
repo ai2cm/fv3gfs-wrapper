@@ -2,9 +2,18 @@
 FROM ubuntu:19.10 as fv3config-inputdata
 
 RUN apt-get update && \
-    apt-get install -y wget && \
-    wget http://storage.googleapis.com/vcm-ml-public/2019-10-23-data-for-running-fv3gfs.tar.gz && \
-    tar -xf /2019-10-23-data-for-running-fv3gfs.tar.gz --directory /
+    apt-get install -y python3 python3-pip wget && \
+    pip3 install --no-cache-dir gsutil
+RUN wget http://storage.googleapis.com/vcm-ml-public/2019-10-23-data-for-running-fv3gfs.tar.gz && \
+    tar -xf /2019-10-23-data-for-running-fv3gfs.tar.gz --directory / && \
+    mv /2019-10-23-data-for-running-fv3gfs /fv3config-cache && \
+    mkdir -p /fv3config-cache/gs/vcm-fv3config && \
+    gsutil -m cp -r gs://vcm-fv3config/ /fv3config-cache/gs/vcm-fv3config && \
+    rm -rf /fv3config-cache/gs/vcm-fv3config/data/base_forcing/v1.0 \
+        /fv3config-cache/gs/vcm-fv3config/data/orographic_data/v1.0/C384 \
+        /fv3config-cache/gs/vcm-fv3config/data/orographic_data/v1.0/C96 \
+        /fv3config-cache/orographic_data/C384 \
+        /fv3config-cache/base_forcing
 
 #-----------------------------------------------------------------------------
 FROM fv3gfs-fortran-env as fv3gfs-python-env
@@ -74,8 +83,8 @@ RUN cd /fv3gfs-python && \
 #-----------------------------------------------------------------------------
 FROM fv3gfs-python-env AS fv3gfs-python
 
-ENV FMS_DIR=/fv3gfs-python/lib/external/FMS
-ENV ESMF_DIR=/fv3gfs-python/lib/external/esmf
+ENV FMS_DIR=/FMS
+ENV ESMF_DIR=/esmf
 ENV ESMF_INC="-I${ESMF_DIR}/include -I${ESMF_DIR}/mod/modO3/Linux.gfortran.64.mpiuni.default/"
 
 ENV FMS_LIB=${FMS_DIR}/libFMS/.libs/
@@ -96,8 +105,10 @@ RUN pip3 install --no-cache-dir \
     zarr==2.3.2 \
     h5py==2.10.0 \
     h5netcdf==0.8.0 \
+    pytest-subtests==0.3.0 \
     dask==2.10.1 \
     toolz==0.10.0 \
+    scipy==1.3.1 \
     sphinx==2.2.0 \
     sphinx_rtd_theme && \
     apt-get update && \
@@ -120,11 +131,11 @@ COPY external /fv3gfs-python/external
 
 RUN pip3 install --no-cache-dir -e \
     /fv3gfs-python/external/fv3config \
-    /fv3gfs-python/external/fv3util && \
+    -e /fv3gfs-python/external/fv3util && \
     pip3 install --no-cache-dir -e /fv3gfs-python
 
 # cache model data
-COPY --from=fv3config-inputdata /2019-10-23-data-for-running-fv3gfs $FV3CONFIG_CACHE_DIR/fv3config-cache
+COPY --from=fv3config-inputdata /fv3config-cache $FV3CONFIG_CACHE_DIR/fv3config-cache
 
 RUN chmod -R 777 $FV3CONFIG_CACHE_DIR && \
     echo "ulimit -s unlimited" >> /etc/bash.bashrc

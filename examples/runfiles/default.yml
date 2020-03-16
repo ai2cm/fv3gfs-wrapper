@@ -1,8 +1,9 @@
 data_table: default
-diag_table: "gs://vcm-fv3config/config/diag_table/default/v1.0/diag_table"
+diag_table: default
 experiment_name: default
-forcing: "gs://vcm-fv3config/data/base_forcing/v1.1/"
-initial_conditions: "gs://vcm-fv3config/data/initial_conditions/gfs_initial_conditions/v1.0/"
+forcing: gs://vcm-fv3config/data/base_forcing/v1.1/
+orographic_forcing: gs://vcm-fv3config/data/orographic_data/v1.0
+initial_conditions: gs://vcm-fv3config/data/initial_conditions/gfs_c12_example/v1.0 
 namelist:
   amip_interp_nml:
     data_set: reynolds_oi
@@ -139,8 +140,8 @@ namelist:
     nggps_ic: true
     no_dycore: false
     nord: 2
-    npx: 49
-    npy: 49
+    npx: 13
+    npy: 13
     npz: 63
     ntiles: 6
     nudge: false
