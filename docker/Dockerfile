@@ -93,10 +93,11 @@ RUN apt-get update && apt-get install -y \
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 10
 
-RUN pip install --no-cache-dir scikit-build && \
-    git clone https://github.com/MeteoSwiss-APN/dawn.git /usr/src/dawn && \
-    pip install --no-cache-dir /usr/src/dawn/dawn
-RUN pip wheel /usr/src/dawn/dawn
+# Disabling Dawn for now until the dycore is further along, as it takes forever to build
+# RUN pip install --no-cache-dir scikit-build && \
+#     git clone https://github.com/MeteoSwiss-APN/dawn.git /usr/src/dawn && \
+#     pip install --no-cache-dir /usr/src/dawn/dawn
+# RUN pip wheel /usr/src/dawn/dawn
 RUN git clone --depth 1 -b new-gt4py https://github.com/twicki/gt4py.git /usr/src/gt4py && \
     pip install --no-cache-dir -e /usr/src/gt4py && \
     cd /usr/src/gt4py && python -m gt4py.gt_src_manager install
@@ -143,11 +144,13 @@ COPY --from=fv3gfs-fms /FMS $FMS_DIR
 COPY --from=fv3gfs-esmf /usr/local/esmf ${ESMF_DIR}
 COPY --from=fv3gfs-fms /FMS/libFMS/.libs/*.so* /lib64/
 COPY --from=fv3gfs-esmf /usr/local/esmf/lib/libO3/Linux.gfortran.64.mpiuni.default/*.so* /lib64/
-COPY --from=gt4py-build /usr/src/dawn /usr/src/dawn
-COPY --from=gt4py-build /dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
+# Disabling Dawn for now until the dycore is further along, as it takes forever to build
+# COPY --from=gt4py-build /usr/src/dawn /usr/src/dawn
+# COPY --from=gt4py-build /dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
 COPY --from=gt4py-build /usr/src/gt4py /usr/src/gt4py
 
-RUN pip3 install --no-cache-dir /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl /usr/src/gt4py
+# RUN pip3 install --no-cache-dir /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
+RUN pip3 install --no-cache-dir /usr/src/gt4py
 
 COPY --from=fv3gfs-python-build /fv3gfs-python /fv3gfs-python
 COPY tests /fv3gfs-python/tests
