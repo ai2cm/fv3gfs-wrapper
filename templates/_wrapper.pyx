@@ -375,3 +375,5 @@ def save_fortran_restart():
 
 
 def cleanup():
+    """Call the Fortran cleanup routines, which clear memory and write final restart files."""
+    cleanup_subroutine()
