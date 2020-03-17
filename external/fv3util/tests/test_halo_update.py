@@ -46,7 +46,7 @@ def n_points(request):
 def n_points_update(request, n_points):
     update = n_points + {'fewer': -1, 'more': 1, 'same': 0}[request.param]
     if update > n_points:
-        pytest.skip()
+        pytest.skip('cannot update more points than exist in the halo')
     else:
         return update
 
