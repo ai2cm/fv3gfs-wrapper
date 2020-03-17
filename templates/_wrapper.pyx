@@ -151,7 +151,7 @@ def set_state(state):
             raise ValueError(f'no setter available for {name}')
 
 
-cdef int set_3d_quantity(name, REAL_t[:, :, ::1] array, int nz, dict tracer_metadata) except -1: 
+cdef int set_3d_quantity(name, REAL_t[:, :, ::1] array, int nz, dict tracer_metadata) except -1:
     cdef int i_tracer
     if False:
         pass  # need this so we can use elif in template
@@ -341,22 +341,29 @@ def step():
 
 
 def step_dynamics():
-    """Perform one physics step worth of dynamics in the Fortran model."""
+    """Perform one physics step worth of dynamics in the Fortran model.
+
+    Physics quantities are not updated by this routine."""
     do_dynamics()
 
 
 def step_physics():
-    """Perform a physics step in the Fortran model."""
+    """Perform a physics step in the Fortran model.
+
+    Equivalent to calling compute_physics() and apply_physics() in that order."""
     do_physics()
 
 
 def compute_physics():
-    """Call physics routines in the Fortran model."""
+    """Call physics routines in the Fortran model and update physics prognostic state.
+
+    It is necessary to call apply_physics() after this to update the dynamical
+    prognostic state with the output from the routines called by this function."""
     compute_physics_subroutine()
 
 
 def apply_physics():
-    """Update model prognostic state with output from physics routines."""
+    """Update dynamical prognostic state with output from physics routines."""
     apply_physics_subroutine()
 
 
