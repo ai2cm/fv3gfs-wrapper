@@ -98,7 +98,7 @@ RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 10
 #     git clone https://github.com/MeteoSwiss-APN/dawn.git /usr/src/dawn && \
 #     pip install --no-cache-dir /usr/src/dawn/dawn
 # RUN pip wheel /usr/src/dawn/dawn
-RUN git clone --depth 1 -b new-gt4py https://github.com/twicki/gt4py.git /usr/src/gt4py && \
+RUN git clone --depth 1 -b fv3-validation https://github.com/eddie-c-davis/gt4py.git /usr/src/gt4py && \
     pip install --no-cache-dir -e /usr/src/gt4py && \
     cd /usr/src/gt4py && python -m gt4py.gt_src_manager install
 
