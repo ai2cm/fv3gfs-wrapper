@@ -16,7 +16,6 @@ cdef extern:
     void do_step_subroutine()
     void cleanup_subroutine()
     void do_dynamics()
-    void do_physics()
     void compute_physics_subroutine()
     void apply_physics_subroutine()
     void save_intermediate_restart_if_enabled_subroutine()
@@ -351,7 +350,8 @@ def step_physics():
     """Perform a physics step in the Fortran model.
 
     Equivalent to calling compute_physics() and apply_physics() in that order."""
-    do_physics()
+    compute_physics_subroutine()
+    apply_physics_subroutine()
 
 
 def compute_physics():

@@ -144,11 +144,6 @@ contains
         call update_atmos_model_dynamics (Atm)
     end subroutine do_dynamics
 
-    subroutine do_physics() bind(c)
-        call update_atmos_radiation_physics (Atm)
-        call update_atmos_model_state (Atm)
-    end subroutine do_physics
-
     subroutine compute_physics_subroutine() bind(c)
         call update_atmos_radiation_physics (Atm)
     end subroutine compute_physics_subroutine
