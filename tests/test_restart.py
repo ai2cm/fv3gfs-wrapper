@@ -1,8 +1,6 @@
 import unittest
-import json
 import os
 import shutil
-from datetime import datetime
 import yaml
 from mpi4py import MPI
 import fv3config

@@ -6,7 +6,7 @@ rank = comm.Get_rank()
 size = comm.Get_size()
 
 
-def get_tile_number(tile_rank=None, total_ranks=None):
+def get_tile_index(tile_rank=None, total_ranks=None):
     """Returns the tile number for a given rank and total number of ranks.
     
     Uses the rank for the current MPI process, and total number of processes,
@@ -16,4 +16,4 @@ def get_tile_number(tile_rank=None, total_ranks=None):
         tile_rank = rank
     if total_ranks is None:
         total_ranks = size
-    return fv3util.get_tile_number(tile_rank, total_ranks)
+    return fv3util.get_tile_index(tile_rank, total_ranks)

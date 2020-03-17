@@ -6,7 +6,7 @@ from .. import _mpi as mpi
 from .. import _wrapper
 
 
-def open_restart(dirname: str, partitioner: fv3util.CubedSpherePartitioner, label: str = '', only_names: List[str] = None) -> dict:
+def open_restart(dirname: str, communicator: fv3util.CubedSphereCommunicator, label: str = '', only_names: List[str] = None) -> dict:
     """Load restart files output by the Fortran model into a state dictionary.
     
     See :py:func:`fv3gfs.set_state` if you would like to load the resulting state into
@@ -14,7 +14,7 @@ def open_restart(dirname: str, partitioner: fv3util.CubedSpherePartitioner, labe
 
     Args:
         dirname: location of restart files, can be local or remote
-        partitioner: domain decomposition for this rank
+        communicator: communication object for the cubed sphere
         label: prepended string on the restart files to load
         only_names (optional): list of standard names to load
 
@@ -26,7 +26,7 @@ def open_restart(dirname: str, partitioner: fv3util.CubedSpherePartitioner, labe
         for entry in properties:
             entry['dims'] = ['z', 'y', 'x']
         fv3util.fortran_info.set_tracer_properties(properties)
-    return fv3util.open_restart(dirname, partitioner, mpi.comm, label=label, only_names=only_names)
+    return fv3util.open_restart(dirname, communicator, label=label, only_names=only_names)
 
 
 def _metadata_to_properties(metadata):

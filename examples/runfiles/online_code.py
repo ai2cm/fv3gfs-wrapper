@@ -11,7 +11,6 @@ import yaml
 
 # May need to run 'ulimit -s unlimited' before running this example
 # If you're running in our prepared docker container, you definitely need to do this
-# sets the stack size to unlimited
 
 # Run using mpirun -n 6 python3 basic_model.py
 # mpirun flags that may be useful:
@@ -27,17 +26,12 @@ rundir_basename = 'rundir'
 if __name__ == '__main__':
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
-    current_dir = os.getcwd()
-    rundir_path = os.path.join(current_dir, rundir_basename)
-    if rank == 0:  # Only create run directory from one rank
-        with open('default.yml', 'r') as config_file:
+    if rank == 0:  # only use filesystem on one rank
+        with open('fv3config.yml', 'r') as config_file:
             config = yaml.safe_load(config_file)
-        # Can alter this config dictionary to configure the run
-        fv3config.write_run_directory(config, rundir_path)
-    MPI.COMM_WORLD.barrier()  # wait for master rank to write run directory
-    with open('default.yml', 'r') as config_file:
-        config = yaml.safe_load(config_file)
-    os.chdir(rundir_path)
+        config = comm.bcast(config)
+    else:
+        config = comm.bcast(None)
 
     # Calculate factor for relaxing humidity to zero
     relaxation_rate = timedelta(days=7)
@@ -51,6 +45,6 @@ if __name__ == '__main__':
 
         # dry out the model with the given relaxation rate
         state = fv3gfs.get_state(names=['specific_humidity'])
-        state['specific_humidity'].values[:] -= state['specific_humidity'].values * timestep.total_seconds() / relaxation_rate.total_seconds()
+        state['specific_humidity'].view[:] -= state['specific_humidity'].view[:] * timestep.total_seconds() / relaxation_rate.total_seconds()
         fv3gfs.set_state(state)
     fv3gfs.cleanup()

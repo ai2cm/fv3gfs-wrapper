@@ -8,6 +8,8 @@ Welcome to FV3GFS's documentation!
    readme
    installation
    usage
+   state
+   communication
    developers
    api
    history

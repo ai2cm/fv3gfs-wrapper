@@ -56,23 +56,6 @@ Instead of using a Python script, it is also possible to get precisely the behav
 
     $ python -m fv3gfs.run
 
-Getting/setting state
----------------------
-
-In addition to just running the model the same as in Fortran, the Python wrapper allows you to interact
-with the model state while it is still running. This is done through :py:func:`fv3gfs.get_state` and :py:func:`fv3gfs.set_state`.
-The getters and setters do not include ghost cells in the horizontal. If you need to add them, you can add and
-remove ghost cells using :py:func:`fv3gfs.with_ghost_cells` and :py:func:`fv3gfs.without_ghost_cells`.
-The getters will return arrays which nominally have units information, but these aren't guaranteed
-to be accurate and in some cases are indicated as missing.
-
-An example which gets and sets the model state to damp moisture is present in the examples folder of this repo.
-
-You should also keep in mind that the arrays used by :py:func:`fv3gfs.get_state` and :py:func:`fv3gfs.set_state`
-are domain-decomposed fields (as opposed to global fields). As of writing we do not have
-logic to go from a local 0-based index to a global index, but this can be done
-in principle by retrieving the process rank from :code:`mpi4py`.
-
 Nudging
 -------
 
@@ -95,14 +78,11 @@ This can be done directly from the namelist in a configuration dictionary like s
 
     with open('fv3config.yml', 'r') as f:
         config = yaml.safe_load(f)
-    partitioner = fv3gfs.Partitioner.from_namelist(config['namelist'])
+    partitioner = fv3gfs.TilePartitioner.from_namelist(config['namelist'])
 
 Alternatively, the grid information can be specified manually::
 
-    partitioner = fv3gfs.Partitioner.from_namelist(
-        nz=79,  # nz, ny, and nx here are based on grid centers
-        ny=48,
-        nx=48,
+    partitioner = fv3gfs.TilePartitioner(
         layout=(1, 1)
     )
 
@@ -180,8 +160,7 @@ Loading legacy restarts
 -----------------------
 
 A function :py:func:`fv3gfs.open_restart` is available to load restart files that have
-been output by the Fortran code. Currently, it assumes the restart file has not been
-partitioned in any way (i.e. that the IO layout is (1, 1)). This routine will handle
+been output by the Fortran code. This routine will handle
 loading the data on a single processor per tile and then distribute the data to other
 processes on the same tile. This may cause out-of-memory errors, which can be mitigated
 in a couple different ways through changes to the code base (e.g. loading a subset of

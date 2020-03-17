@@ -48,32 +48,32 @@ class GetterTests(unittest.TestCase):
 
     def test_air_temperatures_are_reasonable(self):
         """Test that air temperatures are numbers that look like air temperatures"""
-        state = fv3gfs.without_ghost_cells(fv3gfs.get_state(names=['air_temperature']))
+        state = fv3gfs.get_state(names=['air_temperature'])
         self.assertIn('air_temperature', state.keys())
-        data_array = state['air_temperature']
-        self.assertIsInstance(data_array, xr.DataArray)
-        self.assertIn('units', data_array.attrs)
-        self.assertEqual(data_array.attrs['units'], 'degK')
-        self.assertTrue(np.all(data_array.values > 150.))
-        self.assertTrue(np.all(data_array.values < 400.))
+        quantity = state['air_temperature']
+        self.assertIsInstance(quantity, fv3util.Quantity)
+        
+        self.assertEqual(quantity.units, 'degK')
+        self.assertTrue(np.all(quantity.values > 150.))
+        self.assertTrue(np.all(quantity.values < 400.))
 
     def test_get_surface_geopotential(self):
         """This is a special test because it's the only 2D dynamics variable."""
-        state = fv3gfs.without_ghost_cells(fv3gfs.get_state(names=['surface_geopotential']))
+        state = fv3gfs.get_state(names=['surface_geopotential'])
         self.assertIn('surface_geopotential', state.keys())
-        data_array = state['surface_geopotential']
-        self.assertIsInstance(data_array, xr.DataArray)
-        self.assertIn('units', data_array.attrs)
-        self.assertEqual(data_array.attrs['units'], 'm^2 s^-2')
+        quantity = state['surface_geopotential']
+        self.assertIsInstance(quantity, fv3util.Quantity)
+        
+        self.assertEqual(quantity.units, 'm^2 s^-2')
 
     def test_get_soil_temperature(self):
         """This is a special test because it uses a different vertical grid (soil levels)."""
-        state = fv3gfs.without_ghost_cells(fv3gfs.get_state(names=['soil_temperature']))
+        state = fv3gfs.get_state(names=['soil_temperature'])
         self.assertIn('soil_temperature', state.keys())
-        data_array = state['soil_temperature']
-        self.assertIsInstance(data_array, xr.DataArray)
-        self.assertIn('units', data_array.attrs)
-        self.assertEqual(data_array.attrs['units'], 'degK')
+        quantity = state['soil_temperature']
+        self.assertIsInstance(quantity, fv3util.Quantity)
+        
+        self.assertEqual(quantity.units, 'degK')
 
     def test_get_cloud_amount(self):
         """Included because this caused a segfault at some point, as a diagnostic tracer."""
@@ -118,8 +118,7 @@ class GetterTests(unittest.TestCase):
         for name, value in state.items():
             with self.subTest(name):
                 self.assertIsInstance(name, str)
-                self.assertIsInstance(value, xr.DataArray)
-                self.assertIn('units', value.attrs)
+                self.assertIsInstance(value, fv3util.Quantity)
         for name in name_list:
             with self.subTest(name):
                 self.assertIn(name, state)

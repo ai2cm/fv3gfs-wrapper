@@ -3,7 +3,24 @@ History
 
 latest
 ------
+Major changes:
+- Added Quantity object to replace DataArray in the state dictionary. Quantity.view[:] provides something akin to DataArray.values, except that it may be a cupy or numpy array. Quantity.values is a read-only numpy array.
+- Partitioner has been replaced by TilePartitioner
+- Added TilePartitioner and CubedSpherePartitioner objects for domain decomposition.
+- Added TileCommunicator and CubedSphereCommunicator objects for inter-rank communication.
+- Tile scattering is now in `TileCommunicator.scatter`.
+- Added `to_dataset(state)` which turns a state dictionary into an xarray Dataset object.
+- Added constants `X_DIM, X_INTERFACE_DIM, Y_DIM, Y_INTERFACE_DIM, Z_DIM, Z_INTERFACE_DIM, X_DIMS, Y_DIMS, HORIZONTAL_DIMS`, and `INTERFACE_DIMS`
+- updated ZarrMonitor, `get_state`, `set_state`, `open_restart`, `apply_nudging`, `get_nudging_tendencies`, `read_state`, `write_state` and tests to work with a Quantity-based state.
+- updated `open_restart` to work with the new communicator objects
+- Removed `without_ghost_cells` and `with_ghost_cells`, as a ghost-cell independent view is now available as `Quantity.view`.
+- examples are updated for the new code and now run on CircleCI
 
+Minor changes:
+- Added C12 regression test for `open_restart`
+- added scipy and pytest-subtests to requirements and docker container
+- fixed docker container so that `dev_docker.sh` no longer overwrites ESMF and FMS installations
+- Removed the old  "integration" tests, as their functionality (at least what was enabled) is covered entirely by the newer "image" tests which are compared against the results from the pure-fortran repo.
 
 0.3.1
 -----
