@@ -334,9 +334,8 @@ def initialize():
 
 def step():
     """Perform one dynamics-physics cycle of the Fortran model."""
-    do_dynamics()
-    compute_physics_subroutine()
-    apply_physics_subroutine()
+    step_dynamics()
+    step_physics()
     save_intermediate_restart_if_enabled_subroutine()
 
 
