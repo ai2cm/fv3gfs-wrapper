@@ -15,12 +15,16 @@ Major changes:
 - updated `open_restart` to work with the new communicator objects
 - Removed `without_ghost_cells` and `with_ghost_cells`, as a ghost-cell independent view is now available as `Quantity.view`.
 - examples are updated for the new code and now run on CircleCI
+- gt4py is included in the `fv3gfs-python` image
+- `Quantity.from_storage` and `Quantity.storage` are removed - storages are treated the same as if they were numpy/cupy arrays. To retrieve the storage, use `Quantity.data` on a quantity that has been initialized from a storage object.
+- All tests using numpy arrays now also run using gt4py `CPUStorage` objects.
 
 Minor changes:
 - Added C12 regression test for `open_restart`
 - added scipy and pytest-subtests to requirements and docker container
 - fixed docker container so that `dev_docker.sh` no longer overwrites ESMF and FMS installations
 - Removed the old  "integration" tests, as their functionality (at least what was enabled) is covered entirely by the newer "image" tests which are compared against the results from the pure-fortran repo.
+- Incremented fv3config commit to include fix to version string
 
 0.3.1
 -----
