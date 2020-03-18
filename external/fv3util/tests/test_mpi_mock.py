@@ -15,19 +15,52 @@ if MPI is not None and MPI.COMM_WORLD.Get_size() == 1:
     MPI = None
 
 
-def return_worker(comm):
+worker_function_list = []
+
+
+def worker(func):
+    worker_function_list.append(func)
+    return func
+
+
+@worker
+def return_constant(comm):
     return 1
 
 
-def send_worker(comm):
+@worker
+def send_recv_worker(comm):
     rank = comm.Get_rank()
     size = comm.Get_size()
-    comm.
+    data = np.asarray([rank], dtype=np.int)
+
+    if rank < size - 1:
+        if isinstance(comm, fv3util.testing.DummyComm):
+            print(f"sending data from {rank} to {rank + 1}")
+        comm.Send(data, dest=rank + 1)
+    if rank > 0:
+        if isinstance(comm, fv3util.testing.DummyComm):
+            print(f"recieving data from {rank - 1} to {rank}")
+        comm.Recv(data, source=rank - 1)
+    return data
 
 
-@pytest.fixture(params=['return_worker', 'send_worker'])
-def worker_function():
-    return globals()[request.param]
+@worker
+def isend_irecv_worker(comm):
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+    data = np.asarray([rank], dtype=np.int)
+    if rank < size - 1:
+        comm.Isend(data, dest=(rank + 1) % size)
+    if rank > 0:
+        req = comm.Irecv(data, source=(rank - 1) % size)
+        req.wait()
+    return data
+
+
+@pytest.fixture(params=worker_function_list)
+def worker_function(request):
+    return request.param
 
 
 def gather_decorator(worker_function):
@@ -39,7 +72,7 @@ def gather_decorator(worker_function):
 
 @pytest.fixture
 def total_ranks():
-    return 6
+    return MPI.COMM_WORLD.Get_size()
 
 
 @pytest.fixture
@@ -67,9 +100,11 @@ def mpi_results(comm, worker_function):
 
 @pytest.fixture
 def dummy_results(worker_function, dummy_list):
-    result_list = []
-    for comm in dummy_list:
-        result_list.append(worker_function(comm))
+    print('Getting dummy results')
+    result_list = [None] * len(dummy_list)
+    for i, comm in enumerate(dummy_list):
+        result_list[i] = worker_function(comm)
+    print('done getting dummy results')
     return result_list
 
 
@@ -77,10 +112,6 @@ def dummy_results(worker_function, dummy_list):
     MPI is None, reason='mpi4py is not available or pytest was not run in parallel'
 )
 def test_worker(comm, dummy_results, mpi_results):
-    comm.barrier()
+    comm.barrier()  # synchronize the test "dots" across ranks
     if comm.Get_rank() == 0:
-        for dummy_result, mpi_result in zip(dummy_results, mpi_results):
-            if isinstance(dummy_result, np.ndarray):
-                np.testing.assert_array_equal(dummy_result, mpi_result)
-            else:
-                assert dummy_result == mpi_result
+        assert dummy_results == mpi_results

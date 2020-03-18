@@ -1,7 +1,23 @@
 import logging
+import copy
 
 
 logger = logging.getLogger('fv3util')
+
+
+class ConcurrencyError(Exception):
+    """Exception to denote that a rank cannot proceed because it is waiting on a
+    call from another rank."""
+    pass
+
+
+class AsyncResult:
+
+    def __init__(self, result):
+        self._result = result
+
+    def wait(self):
+        return self._result()
 
 
 class DummyComm:
@@ -35,18 +51,19 @@ class DummyComm:
     def _get_send_recv(self, from_rank):
         key = (from_rank, self.rank)
         if 'send_recv' not in self._buffer:
-            raise ValueError('buffer not initialized for send_recv, likely recv called before send')
+            raise ConcurrencyError('buffer not initialized for send_recv, likely recv called before send')
         elif key not in self._buffer['send_recv']:
-            raise ValueError(
+            raise ConcurrencyError(
                 f"rank-specific buffer not initialized for send_recv, likely "
                 f"recv called before send from rank {from_rank} to rank {self.rank}")
-        return self._buffer['send_recv'][key].pop(0)
+        return_value = self._buffer['send_recv'][key].pop(0)
+        return return_value
 
     def _put_send_recv(self, value, to_rank):
         key = (self.rank, to_rank)
         self._buffer['send_recv'] = self._buffer.get('send_recv', {})
         self._buffer['send_recv'][key] = self._buffer['send_recv'].get(key, [])
-        self._buffer['send_recv'][key].append(value)
+        self._buffer['send_recv'][key].append(copy.deepcopy(value))
 
     @property
     def _bcast_buffer(self):
@@ -86,7 +103,7 @@ class DummyComm:
         recvbuf[:] = self._get_send_recv(source)
 
     def Irecv(self, recvbuf, source):
-        return self.Recv(recvbuf, source)
+        return AsyncResult(lambda: self.Recv(recvbuf, source))
 
     def Split(self, color, key):
         # key argument is ignored, assumes we're calling the ranks from least to
