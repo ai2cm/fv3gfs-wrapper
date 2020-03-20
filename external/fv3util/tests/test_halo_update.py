@@ -81,7 +81,7 @@ def total_ranks(ranks_per_tile):
     return 6 * ranks_per_tile
 
 
-@pytest.fixture([0, 1])
+@pytest.fixture(params=[0, 1])
 def n_buffer(request):
     return request.param
 

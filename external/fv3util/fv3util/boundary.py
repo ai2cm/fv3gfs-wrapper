@@ -81,7 +81,7 @@ def _get_boundary_slice(dims, origin, extent, boundary_type, n_points, interior)
     boundary_slice = []
     for dim, origin_1d, extent_1d in zip(dims, origin, extent):
         if dim not in constants.HORIZONTAL_DIMS:
-            boundary_slice.append(slice(None, None))
+            boundary_slice.append(slice(origin_1d, origin_1d + extent_1d))
         elif boundary_type in dim_to_starts[dim]:
             edge_index = origin_1d
             if interior:
