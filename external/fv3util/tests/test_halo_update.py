@@ -81,16 +81,21 @@ def total_ranks(ranks_per_tile):
     return 6 * ranks_per_tile
 
 
+@pytest.fixture([0, 1])
+def n_buffer(request):
+    return request.param
+
+
 @pytest.fixture
-def shape(nz, ny, nx, dims, n_points):
+def shape(nz, ny, nx, dims, n_points, n_buffer):
     return_list = []
     length_dict = {
-        fv3util.X_DIM: 2 * n_points + nx,
-        fv3util.X_INTERFACE_DIM: 2 * n_points + nx + 1,
-        fv3util.Y_DIM: 2 * n_points + ny,
-        fv3util.Y_INTERFACE_DIM: 2 * n_points + ny + 1,
-        fv3util.Z_DIM: nz,
-        fv3util.Z_INTERFACE_DIM: nz + 1,
+        fv3util.X_DIM: 2 * n_points + nx + n_buffer,
+        fv3util.X_INTERFACE_DIM: 2 * n_points + nx + 1 + n_buffer,
+        fv3util.Y_DIM: 2 * n_points + ny + n_buffer,
+        fv3util.Y_INTERFACE_DIM: 2 * n_points + ny + 1 + n_buffer,
+        fv3util.Z_DIM: nz + n_buffer,
+        fv3util.Z_INTERFACE_DIM: nz + 1 + n_buffer,
     }
     for dim in dims:
         return_list.append(length_dict[dim])
@@ -98,15 +103,15 @@ def shape(nz, ny, nx, dims, n_points):
 
 
 @pytest.fixture
-def origin(n_points, dims):
+def origin(n_points, dims, n_buffer):
     return_list = []
     origin_dict = {
-        fv3util.X_DIM: n_points,
-        fv3util.X_INTERFACE_DIM: n_points,
-        fv3util.Y_DIM: n_points,
-        fv3util.Y_INTERFACE_DIM: n_points,
-        fv3util.Z_DIM: 0,
-        fv3util.Z_INTERFACE_DIM: 0,
+        fv3util.X_DIM: n_points + n_buffer,
+        fv3util.X_INTERFACE_DIM: n_points + n_buffer,
+        fv3util.Y_DIM: n_points + n_buffer,
+        fv3util.Y_INTERFACE_DIM: n_points + n_buffer,
+        fv3util.Z_DIM: n_buffer,
+        fv3util.Z_INTERFACE_DIM: n_buffer,
     }
     for dim in dims:
         return_list.append(origin_dict[dim])
