@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, Hashable
 from .quantity import Quantity, QuantityMetadata
 from .partitioner import CubedSpherePartitioner, TilePartitioner
 from . import constants
@@ -42,19 +42,23 @@ class TileCommunicator(Communicator):
 
     def scatter(
             self,
-            metadata: QuantityMetadata,
             send_quantity: Quantity = None,
             recv_quantity: Quantity = None) -> Quantity:
-        """Transfer a quantity from the tile master rank to all subtiles.
+        """Transfer subtile regions of a full-tile quantity
+        from the tile master rank to all subtiles.
         
         Args:
-            metadata: the metadata of the quantity being transferred, used to
-                initialize the default recieve buffer
-            send_quantity: quantity to send, only used on the tile master rank
+            send_quantity: quantity to send, only required/used on the tile master rank
             recv_quantity: if provided, assign received data into this Quantity.
         Returns:
             recv_quantity
         """
+        if self.rank == constants.MASTER_RANK and send_quantity is None:
+            raise TypeError('send_quantity is a required argument on the master rank')
+        if self.rank == constants.MASTER_RANK:
+            metadata = self.comm.bcast(send_quantity.metadata, root=constants.MASTER_RANK)
+        else:
+            metadata = self.comm.bcast(None, root=constants.MASTER_RANK)
         shape = self.partitioner.subtile_extent(metadata)
         if self.rank == constants.MASTER_RANK:
             sendbuf = metadata.np.empty(
@@ -76,19 +80,61 @@ class TileCommunicator(Communicator):
                 dims=metadata.dims,
                 units=metadata.units,
             )
-        self.comm.Scatter(sendbuf, recv_quantity.data, root=0)
+        self.comm.Scatter(sendbuf, recv_quantity.view[:], root=0)
         return recv_quantity
 
-    def scatter_state(self, tile_state: dict = None):
+    def gather(
+            self,
+            send_quantity: Quantity,
+            recv_quantity: Quantity = None) -> Quantity:
+        """Transfer subtile regions of a full-tile quantity
+        from each rank to the tile master rank.
+        
+        Args:
+            send_quantity: quantity to send
+            recv_quantity: if provided, assign received data into this Quantity (only
+                used on the tile master rank)
+        Returns:
+            recv_quantity
+        """
+        if self.rank == constants.MASTER_RANK:
+            recvbuf = send_quantity.np.empty(
+                [self.partitioner.total_ranks] + list(send_quantity.extent),
+                dtype=send_quantity.data.dtype
+            )
+            self.comm.Gather(send_quantity.view[:], recvbuf, root=constants.MASTER_RANK)
+            if recv_quantity is None:
+                tile_extent = self.partitioner.tile_extent(send_quantity.metadata)
+                recv_quantity = Quantity(
+                    send_quantity.np.empty(
+                        tile_extent,
+                        dtype=send_quantity.data.dtype
+                    ),
+                    dims=send_quantity.dims,
+                    units=send_quantity.units,
+                    origin=tuple([0 for dim in send_quantity.dims]),
+                    extent=tile_extent,
+                )
+            for rank in range(recvbuf.shape[0]):
+                to_slice = self.partitioner.subtile_slice(rank, recv_quantity.metadata, overlap=True)
+                recv_quantity.view[to_slice] = recvbuf[rank, :]
+            result = recv_quantity
+        else:
+            result = self.comm.Gather(send_quantity.view[:], recvbuf=None, root=constants.MASTER_RANK)
+        return result
+
+    def scatter_state(self, tile_state: dict = None, recv_state: dict = None):
         """Transfer a state dictionary from the tile master rank to all subtiles.
         
         Args:
             tile_state: the model state to be sent containing the entire tile,
                 required only from the master rank
+            recv_state: the pre-allocated state in which to recieve the scattered
+                state. Only variables which are scattered will be written to.
         Returns:
             rank_state: the state corresponding to this rank's subdomain
         """
-        def broadcast_master():
+        def scatter_master():
             if tile_state is None:
                 raise TypeError('tile_state is a required argument on the master rank')
             name_list = list(tile_state.keys())
@@ -96,26 +142,31 @@ class TileCommunicator(Communicator):
                 name_list.remove('time')
             name_list = self.comm.bcast(name_list, root=constants.MASTER_RANK)
             array_list = [tile_state[name] for name in name_list]
-            metadata_list = bcast_metadata_list(self.comm, array_list)
-            for name, array, metadata in zip(name_list, array_list, metadata_list):
-                state[name] = self.scatter(metadata, send_quantity=array)
-            state['time'] = self.comm.bcast(tile_state.get('time', None), root=constants.MASTER_RANK)
+            for name, array in zip(name_list, array_list):
+                if name in recv_state:
+                    self.scatter(send_quantity=array, recv_quantity=recv_state[name])
+                else:
+                    recv_state[name] = self.scatter(send_quantity=array)
+            recv_state['time'] = self.comm.bcast(tile_state.get('time', None), root=constants.MASTER_RANK)
 
-        def broadcast_client():
+        def scatter_client():
             name_list = self.comm.bcast(None, root=constants.MASTER_RANK)
-            metadata_list = bcast_metadata_list(self.comm, None)
-            for name, metadata in zip(name_list, metadata_list):
-                state[name] = self.scatter(metadata)
+            for name in name_list:
+                if name in recv_state:
+                    self.scatter(recv_quantity=recv_state[name])
+                else:
+                    recv_state[name] = self.scatter()
             time = self.comm.bcast(None, root=constants.MASTER_RANK)
             if time is not None:
-                state['time'] = time
+                recv_state['time'] = time
 
-        state = {}
+        if recv_state is None:
+            recv_state = {}
         if self.rank == constants.MASTER_RANK:
-            broadcast_master()
+            scatter_master()
         else:
-            broadcast_client()
-        return state
+            scatter_client()
+        return recv_state
 
 
 class CubedSphereCommunicator(Communicator):
@@ -166,16 +217,20 @@ class CubedSphereCommunicator(Communicator):
             )
             self.comm.Isend(data, dest=boundary.to_rank)
 
-    def finish_halo_update(self, quantity: Quantity, n_points: int):
+    def finish_halo_update(self, quantity: Quantity, n_points: int, tag: Hashable = None):
         """Complete an asynchronous halo update of a quantity."""
         for boundary_type, boundary in self.boundaries.items():
             dest_view = boundary.recv_view(quantity, n_points=n_points)
-            dest_buffer = quantity.np.empty(dest_view.shape, dtype=dest_view.dtype)
-            self.comm.Recv(dest_buffer, source=boundary.to_rank)
-            dest_view[:] = dest_buffer
+            if tag is None:
+                self.comm.Recv(dest_view, source=boundary.to_rank)
+            else:
+                self.comm.Recv(dest_view, source=boundary.to_rank, tag=tag)
 
-    def start_vector_halo_update(self, x_quantity: Quantity, y_quantity: Quantity, n_points: int):
-        """Initiate an asynchronous halo update of a horizontal vector quantity."""
+    def start_vector_halo_update(self, x_quantity: Quantity, y_quantity: Quantity, n_points: int, tag: Hashable = None):
+        """Initiate an asynchronous halo update of a horizontal vector quantity.
+
+        Assumes the x and y dimension indices are the same between the two quantities.
+        """
         if n_points == 0:
             raise ValueError('cannot perform a halo update on zero halo points')
         for boundary_type, boundary in self.boundaries.items():
@@ -183,18 +238,26 @@ class CubedSphereCommunicator(Communicator):
             y_data = boundary.send_view(y_quantity, n_points=n_points)
             x_data, y_data = rotate_vector_data(
                 x_data, y_data,
-                x_quantity.metadata, y_quantity.metadata,
-                boundary.n_clockwise_rotations
+                boundary.n_clockwise_rotations,
+                x_quantity.dims, x_quantity.np
             )
             x_data = x_quantity.np.ascontiguousarray(x_data)
             y_data = y_quantity.np.ascontiguousarray(y_data)
-            self.comm.Isend(x_data, dest=boundary.to_rank)
-            self.comm.Isend(y_data, dest=boundary.to_rank)
+            if tag is None:
+                self.comm.Isend(x_data, dest=boundary.to_rank)
+                self.comm.Isend(y_data, dest=boundary.to_rank)
+            else:
+                self.comm.Isend(x_data, dest=boundary.to_rank, tag=tag)
+                self.comm.Isend(y_data, dest=boundary.to_rank, tag=tag)
 
-    def finish_vector_halo_update(self, x_quantity: Quantity, y_quantity: Quantity, n_points: int):
+    def finish_vector_halo_update(self, x_quantity: Quantity, y_quantity: Quantity, n_points: int, tag: Hashable = None):
         """Complete an asynchronous halo update of a horizontal vector quantity."""
-        self.finish_halo_update(x_quantity, n_points)
-        self.finish_halo_update(y_quantity, n_points)
+        if tag is None:
+            self.finish_halo_update(x_quantity, n_points)
+            self.finish_halo_update(y_quantity, n_points)
+        else:
+            self.finish_halo_update(x_quantity, n_points, tag=tag)
+            self.finish_halo_update(y_quantity, n_points, tag=tag)
 
 
 def rotate_scalar_data(data, metadata, n_clockwise_rotations):
@@ -223,40 +286,41 @@ def rotate_scalar_data(data, metadata, n_clockwise_rotations):
     return data
 
 
-def rotate_vector_data(x_data, y_data, x_metadata, y_metadata, n_clockwise_rotations):
-    if x_metadata.dims != y_metadata.dims:
-        raise ValueError(
-            "vector quantities must have the same dimensions, "
-            f"have {x_metadata.dims} and {y_metadata.dims}"
-        )
+def rotate_vector_data(x_data, y_data, n_clockwise_rotations, dims, numpy):
     data = [y_data, x_data]
-    metadata = x_metadata
     n_clockwise_rotations = n_clockwise_rotations % 4
     if n_clockwise_rotations == 0:
         pass
     elif n_clockwise_rotations in (1, 3):
         x_dim, y_dim = None, None
-        for i, dim in enumerate(metadata.dims):
+        for i, dim in enumerate(dims):
             if dim in constants.X_DIMS:
                 x_dim = i
             elif dim in constants.Y_DIMS:
                 y_dim = i
-        for i, entry in enumerate(data):
-            if n_clockwise_rotations == 1:
-                data[i] = metadata.np.rot90(entry, axes=(x_dim, y_dim))
-            elif n_clockwise_rotations == 3:
-                data[i] = metadata.np.rot90(entry, axes=(y_dim, x_dim))
+        is_none = [x_dim is None, y_dim is None]
+        if any(is_none) and not all(is_none):
+            raise ValueError(
+                f'cannot rotate 90/270 degrees without both horizontal dimensions, '
+                'was given {dims}'
+            )
+        elif not any(is_none):
+            for i, entry in enumerate(data):
+                if n_clockwise_rotations == 1:
+                    data[i] = numpy.rot90(entry, axes=(y_dim, x_dim))
+                elif n_clockwise_rotations == 3:
+                    data[i] = numpy.rot90(entry, axes=(x_dim, y_dim))
         if n_clockwise_rotations == 1:
-            data[0], data[1] = -data[1], data[0]
-        else:  # 3 rotations
             data[0], data[1] = data[1], -data[0]
+        else:  # 3 rotations
+            data[0], data[1] = -data[1], data[0]
     elif n_clockwise_rotations == 2:
         slice_list = []
-        for dim in metadata.dims:
+        for dim in dims:
             if dim in constants.HORIZONTAL_DIMS:
                 slice_list.append(slice(None, None, -1))
             else:
                 slice_list.append(slice(None, None))
         for i, entry in enumerate(data):
-            data[i] = entry[slice_list]
+            data[i] = -entry[slice_list]
     return data

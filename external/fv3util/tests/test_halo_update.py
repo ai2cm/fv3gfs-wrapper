@@ -1,5 +1,6 @@
 import pytest
 import fv3util
+import copy
 
 
 @pytest.fixture
@@ -311,6 +312,31 @@ def test_zeros_halo_update(
                     numpy.testing.assert_array_equal(
                         quantity.data[tuple(boundary_slice)], 0.
                     )
+
+
+def test_zeros_vector_halo_update(
+        zeros_quantity_list, communicator_list, n_points_update, n_points, numpy,
+        subtests, boundary_dict, ranks_per_tile):
+    """test that zeros from adjacent domains get written over ones on local halo"""
+    x_list = zeros_quantity_list
+    y_list = copy.deepcopy(x_list)
+    if 0 < n_points_update <= n_points:
+        for communicator, y_quantity, x_quantity in zip(communicator_list, y_list, x_list):
+            communicator.start_vector_halo_update(y_quantity, x_quantity, n_points_update)
+        for communicator, y_quantity, x_quantity in zip(communicator_list, y_list, x_list):
+            communicator.finish_vector_halo_update(y_quantity, x_quantity, n_points_update)
+        for rank, (y_quantity, x_quantity) in enumerate(zip(y_list, x_list)):
+            boundaries = boundary_dict[rank % ranks_per_tile]
+            for boundary in boundaries:
+                boundary_slice = fv3util.boundary._get_boundary_slice(
+                    x_quantity.dims, x_quantity.origin, x_quantity.extent,
+                    boundary, n_points_update, interior=False
+                )
+                with subtests.test(x_quantity=x_quantity, rank=rank, boundary=boundary, boundary_slice=boundary_slice):
+                    for quantity in y_quantity, x_quantity:
+                        numpy.testing.assert_array_equal(
+                            quantity.data[tuple(boundary_slice)], 0.
+                        )
 
 
 def get_horizontal_dims(dims):

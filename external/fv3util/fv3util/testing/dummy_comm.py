@@ -77,6 +77,12 @@ class DummyComm:
             self._buffer['scatter'] = []
         return self._buffer['scatter']
 
+    @property
+    def _gather_buffer(self):
+        if 'gather' not in self._buffer:
+            self._buffer['gather'] = [None for i in range(self.total_ranks)]
+        return self._buffer['gather']
+
     def bcast(self, value, root=0):
         if root != 0:
             raise NotImplementedError('DummyComm assumes ranks are called in order, so root must be the bcast source')
@@ -93,6 +99,16 @@ class DummyComm:
         sendbuf = self._get_buffer('scatter', sendbuf)
         recvbuf[:] = sendbuf[self.rank]
 
+    def Gather(self, sendbuf, recvbuf, root=0):
+        gather_buffer = self._gather_buffer
+        if len(gather_buffer) == 0:
+            for i in range(self.total_ranks):
+                gather_buffer.append(None)
+        gather_buffer[self.rank] = sendbuf
+        if self.rank == root:
+            for i, sendbuf in enumerate(gather_buffer):
+                recvbuf[i, :] = sendbuf
+
     def Send(self, sendbuf, dest):
         self._put_send_recv(sendbuf, dest)
 
@@ -103,7 +119,9 @@ class DummyComm:
         recvbuf[:] = self._get_send_recv(source)
 
     def Irecv(self, recvbuf, source):
-        return AsyncResult(lambda: self.Recv(recvbuf, source))
+        def receive():
+            return self.Recv(recvbuf, source)
+        return AsyncResult(receive)
 
     def Split(self, color, key):
         # key argument is ignored, assumes we're calling the ranks from least to
