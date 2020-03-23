@@ -301,9 +301,9 @@ def rotate_scalar_data(data, dims, numpy, n_clockwise_rotations):
 
 
 def rotate_vector_data(x_data, y_data, n_clockwise_rotations, dims, numpy):
-    rotate_scalar_data(x_data, dims, numpy, n_clockwise_rotations)
-    rotate_scalar_data(y_data, dims, numpy, n_clockwise_rotations)
-    data = [y_data, x_data]
+    x_data = rotate_scalar_data(x_data, dims, numpy, n_clockwise_rotations)
+    y_data = rotate_scalar_data(y_data, dims, numpy, n_clockwise_rotations)
+    data = [x_data, y_data]
     n_clockwise_rotations = n_clockwise_rotations % 4
     if n_clockwise_rotations == 0:
         pass
