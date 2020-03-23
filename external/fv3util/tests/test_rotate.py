@@ -31,21 +31,21 @@ import numpy as np
         ),
         pytest.param(
             np.zeros([2, 3]),
-            0,
+            1,
             [fv3util.X_DIM, fv3util.Y_DIM],
             np.zeros([3, 2]),
             id="2d_1_rotation"
         ),
         pytest.param(
             np.zeros([2, 3]),
-            0,
+            2,
             [fv3util.X_DIM, fv3util.Y_DIM],
             np.zeros([2, 3]),
             id="2d_2_rotations"
         ),
         pytest.param(
             np.zeros([2, 3]),
-            0,
+            3,
             [fv3util.X_DIM, fv3util.Y_DIM],
             np.zeros([3, 2]),
             id="2d_3_rotations"
@@ -58,6 +58,13 @@ import numpy as np
             id="2d_x_increasing_values"
         ),
         pytest.param(
+            np.arange(5)[:, None],
+            2,
+            [fv3util.X_DIM, fv3util.Y_DIM],
+            np.arange(5)[::-1, None],
+            id="2d_x_increasing_values_double_rotate"
+        ),
+        pytest.param(
             np.arange(5)[None, :],
             1,
             [fv3util.X_DIM, fv3util.Y_DIM],
@@ -68,8 +75,6 @@ import numpy as np
 )
 def test_rotate_scalar_data(
         start_data, n_clockwise_rotations, dims, target_data):
-    help(fv3util.communicator.rotate_scalar_data)
-    print(fv3util.communicator.__file__)
     result = fv3util.communicator.rotate_scalar_data(
         start_data, dims, np, n_clockwise_rotations
     )
