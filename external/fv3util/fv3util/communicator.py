@@ -3,8 +3,11 @@ from .quantity import Quantity, QuantityMetadata
 from .partitioner import CubedSpherePartitioner, TilePartitioner
 from . import constants
 from .boundary import Boundary
+import logging
 
 __all__ = ['TileCommunicator', 'CubedSphereCommunicator']
+
+logger = logging.getLogger('fv3util')
 
 
 def bcast_metadata_list(comm, quantity_list):
@@ -213,7 +216,7 @@ class CubedSphereCommunicator(Communicator):
         for boundary_type, boundary in self.boundaries.items():
             data = boundary.send_view(quantity, n_points=n_points)
             data = quantity.np.ascontiguousarray(
-                rotate_scalar_data(data, quantity.metadata, boundary.n_clockwise_rotations)
+                rotate_scalar_data(data, quantity.dims, quantity.np, boundary.n_clockwise_rotations)
             )
             self.comm.Isend(data, dest=boundary.to_rank)
 
@@ -221,6 +224,7 @@ class CubedSphereCommunicator(Communicator):
         """Complete an asynchronous halo update of a quantity."""
         for boundary_type, boundary in self.boundaries.items():
             dest_view = boundary.recv_view(quantity, n_points=n_points)
+            logger.debug('finish_halo_update: retrieving boundary_type=%s shape=%s from_rank=%s to_rank=%s', boundary_type, dest_view.shape, boundary.to_rank, self.rank)
             if tag is None:
                 self.comm.Recv(dest_view, source=boundary.to_rank)
             else:
@@ -236,13 +240,15 @@ class CubedSphereCommunicator(Communicator):
         for boundary_type, boundary in self.boundaries.items():
             x_data = boundary.send_view(x_quantity, n_points=n_points)
             y_data = boundary.send_view(y_quantity, n_points=n_points)
+            logger.debug("%s %s", x_data.shape, y_data.shape)
             x_data, y_data = rotate_vector_data(
                 x_data, y_data,
                 boundary.n_clockwise_rotations,
                 x_quantity.dims, x_quantity.np
             )
-            x_data = x_quantity.np.ascontiguousarray(x_data)
-            y_data = y_quantity.np.ascontiguousarray(y_data)
+            # x_data = x_quantity.np.ascontiguousarray(x_data)
+            # y_data = y_quantity.np.ascontiguousarray(y_data)
+            logger.debug("%s %s %s %s %s", boundary.from_rank, boundary.to_rank, boundary.n_clockwise_rotations, x_data.shape, y_data.shape)
             if tag is None:
                 self.comm.Isend(x_data, dest=boundary.to_rank)
                 self.comm.Isend(y_data, dest=boundary.to_rank)
@@ -253,41 +259,18 @@ class CubedSphereCommunicator(Communicator):
     def finish_vector_halo_update(self, x_quantity: Quantity, y_quantity: Quantity, n_points: int, tag: Hashable = None):
         """Complete an asynchronous halo update of a horizontal vector quantity."""
         if tag is None:
+            logger.debug('finish_vector_halo_update: retrieving x quantity on rank=%i', self.rank)
             self.finish_halo_update(x_quantity, n_points)
+            logger.debug('finish_vector_halo_update: retrieving y quantity on rank=%i', self.rank)
             self.finish_halo_update(y_quantity, n_points)
         else:
+            logger.debug('finish_vector_halo_update: retrieving x quantity on rank=%i', self.rank)
             self.finish_halo_update(x_quantity, n_points, tag=tag)
+            logger.debug('finish_vector_halo_update: retrieving y quantity on rank=%i', self.rank)
             self.finish_halo_update(y_quantity, n_points, tag=tag)
 
 
-def rotate_scalar_data(data, metadata, n_clockwise_rotations):
-    n_clockwise_rotations = n_clockwise_rotations % 4
-    if n_clockwise_rotations == 0:
-        pass
-    elif n_clockwise_rotations in (1, 3):
-        x_dim, y_dim = None, None
-        for i, dim in enumerate(metadata.dims):
-            if dim in constants.X_DIMS:
-                x_dim = i
-            elif dim in constants.Y_DIMS:
-                y_dim = i
-        if n_clockwise_rotations == 1:
-            data = metadata.np.rot90(data, axes=(x_dim, y_dim))
-        elif n_clockwise_rotations == 3:
-            data = metadata.np.rot90(data, axes=(y_dim, x_dim))
-    elif n_clockwise_rotations == 2:
-        slice_list = []
-        for dim in metadata.dims:
-            if dim in constants.HORIZONTAL_DIMS:
-                slice_list.append(slice(None, None, -1))
-            else:
-                slice_list.append(slice(None, None))
-        data = data[slice_list]
-    return data
-
-
-def rotate_vector_data(x_data, y_data, n_clockwise_rotations, dims, numpy):
-    data = [y_data, x_data]
+def rotate_scalar_data(data, dims, numpy, n_clockwise_rotations):
     n_clockwise_rotations = n_clockwise_rotations % 4
     if n_clockwise_rotations == 0:
         pass
@@ -298,22 +281,10 @@ def rotate_vector_data(x_data, y_data, n_clockwise_rotations, dims, numpy):
                 x_dim = i
             elif dim in constants.Y_DIMS:
                 y_dim = i
-        is_none = [x_dim is None, y_dim is None]
-        if any(is_none) and not all(is_none):
-            raise ValueError(
-                f'cannot rotate 90/270 degrees without both horizontal dimensions, '
-                'was given {dims}'
-            )
-        elif not any(is_none):
-            for i, entry in enumerate(data):
-                if n_clockwise_rotations == 1:
-                    data[i] = numpy.rot90(entry, axes=(y_dim, x_dim))
-                elif n_clockwise_rotations == 3:
-                    data[i] = numpy.rot90(entry, axes=(x_dim, y_dim))
         if n_clockwise_rotations == 1:
-            data[0], data[1] = data[1], -data[0]
-        else:  # 3 rotations
-            data[0], data[1] = -data[1], data[0]
+            data = numpy.rot90(data, axes=(x_dim, y_dim))
+        elif n_clockwise_rotations == 3:
+            data = numpy.rot90(data, axes=(y_dim, x_dim))
     elif n_clockwise_rotations == 2:
         slice_list = []
         for dim in dims:
@@ -321,6 +292,22 @@ def rotate_vector_data(x_data, y_data, n_clockwise_rotations, dims, numpy):
                 slice_list.append(slice(None, None, -1))
             else:
                 slice_list.append(slice(None, None))
-        for i, entry in enumerate(data):
-            data[i] = -entry[slice_list]
+        data = data[slice_list]
     return data
+
+
+def rotate_vector_data(x_data, y_data, n_clockwise_rotations, dims, numpy):
+    rotate_scalar_data(x_data, dims, numpy, n_clockwise_rotations)
+    rotate_scalar_data(y_data, dims, numpy, n_clockwise_rotations)
+    data = [y_data, x_data]
+    n_clockwise_rotations = n_clockwise_rotations % 4
+    if n_clockwise_rotations == 0:
+        pass
+    elif n_clockwise_rotations == 1:
+        data[0], data[1] = data[1], -data[0]
+    elif n_clockwise_rotations == 2:
+        data[0], data[1] = -data[0], -data[1]
+    elif n_clockwise_rotations == 3:
+        data[0], data[1] = -data[1], data[0]
+    return data
+
