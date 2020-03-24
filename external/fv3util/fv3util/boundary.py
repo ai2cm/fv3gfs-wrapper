@@ -66,7 +66,7 @@ class SimpleBoundary(Boundary):
 
 
 @functools.lru_cache(maxsize=None)
-def _get_boundary_slice(dims, origin, extent, boundary_type, n_points, interior):
+def _get_boundary_slice(dims, origin, extent, boundary_type, n_halo, interior):
     if boundary_type in constants.EDGE_BOUNDARY_TYPES:
         dim_to_starts = DIM_TO_START_EDGE
         dim_to_ends = DIM_TO_END_EDGE
@@ -80,17 +80,24 @@ def _get_boundary_slice(dims, origin, extent, boundary_type, n_points, interior)
         )
     boundary_slice = []
     for dim, origin_1d, extent_1d in zip(dims, origin, extent):
+        if dim in constants.INTERFACE_DIMS:
+            n_overlap = 1
+        else:
+            n_overlap = 0
+        n_points = n_halo
         if dim not in constants.HORIZONTAL_DIMS:
             boundary_slice.append(slice(origin_1d, origin_1d + extent_1d))
         elif boundary_type in dim_to_starts[dim]:
             edge_index = origin_1d
             if interior:
+                edge_index += n_overlap
                 boundary_slice.append(slice(edge_index, edge_index + n_points))
             else:
                 boundary_slice.append(slice(edge_index - n_points, edge_index))
         elif boundary_type in dim_to_ends[dim]:
             edge_index = origin_1d + extent_1d
             if interior:
+                edge_index -= n_overlap
                 boundary_slice.append(slice(edge_index - n_points, edge_index))
             else:
                 boundary_slice.append(slice(edge_index, edge_index + n_points))

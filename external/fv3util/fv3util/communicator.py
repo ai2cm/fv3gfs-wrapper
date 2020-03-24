@@ -307,11 +307,11 @@ def rotate_vector_data(x_data, y_data, n_clockwise_rotations, dims, numpy):
     n_clockwise_rotations = n_clockwise_rotations % 4
     if n_clockwise_rotations == 0:
         pass
-    elif n_clockwise_rotations == 1:
+    elif n_clockwise_rotations == 3:
         data[0], data[1] = data[1], -data[0]
     elif n_clockwise_rotations == 2:
         data[0], data[1] = -data[0], -data[1]
-    elif n_clockwise_rotations == 3:
+    elif n_clockwise_rotations == 1:
         data[0], data[1] = -data[1], data[0]
     return data
 
