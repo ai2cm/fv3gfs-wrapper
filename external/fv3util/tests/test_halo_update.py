@@ -219,9 +219,9 @@ def depth_quantity_list(total_ranks, dims, units, origin, extent, shape, numpy, 
     return_list = []
     for rank in range(total_ranks):
         data = numpy.zeros(shape, dtype=dtype) + numpy.nan
-        for n_inside in range(n_points - 1, -1, -1):
+        for n_inside in range(max(n_points, max(extent) // 2), -1, -1):
             for i, dim in enumerate(dims):
-                if dim in fv3util.HORIZONTAL_DIMS:
+                if (n_inside <= extent[i] // 2) and (dim in fv3util.HORIZONTAL_DIMS):
                     pos = [slice(None, None)] * len(dims)
                     pos[i] = origin[i] + n_inside
                     data[tuple(pos)] = n_inside
@@ -266,14 +266,14 @@ def test_depth_halo_update(
             for rank, quantity in enumerate(depth_quantity_list):
                 with subtests.test(rank=rank, quantity=quantity):
                     for dim, extent in ((y_dim, y_extent), (x_dim, x_extent)):
-                        assert numpy.all(quantity.sel(**{dim: -1}) == 0)
-                        assert numpy.all(quantity.sel(**{dim: extent}) == 0)
+                        assert numpy.all(quantity.sel(**{dim: -1}) <= 1)
+                        assert numpy.all(quantity.sel(**{dim: extent}) <= 1)
                         if n_points_update >= 2:
-                            assert numpy.all(quantity.sel(**{dim: -2}) <= 1)
-                            assert numpy.all(quantity.sel(**{dim: extent + 1}) <= 1)
+                            assert numpy.all(quantity.sel(**{dim: -2}) <= 2)
+                            assert numpy.all(quantity.sel(**{dim: extent + 1}) <= 2)
                         if n_points_update >= 3:
-                            assert numpy.all(quantity.sel(**{dim: -3}) <= 2)
-                            assert numpy.all(quantity.sel(**{dim: extent + 2}) <= 2)
+                            assert numpy.all(quantity.sel(**{dim: -3}) <= 3)
+                            assert numpy.all(quantity.sel(**{dim: extent + 2}) <= 3)
                         if n_points_update > 3:
                             raise NotImplementedError(n_points_update)
 

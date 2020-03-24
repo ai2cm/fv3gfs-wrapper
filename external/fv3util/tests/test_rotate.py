@@ -1,4 +1,4 @@
-import fv3util
+import fv3util.rotate
 import pytest
 import numpy as np
 
@@ -75,7 +75,7 @@ import numpy as np
 )
 def test_rotate_scalar_data(
         start_data, n_clockwise_rotations, dims, target_data):
-    result = fv3util.communicator.rotate_scalar_data(
+    result = fv3util.rotate.rotate_scalar_data(
         start_data, dims, np, n_clockwise_rotations
     )
     np.testing.assert_array_equal(result, target_data)
@@ -132,7 +132,7 @@ def test_rotate_vector_data(
         start_data, n_clockwise_rotations, dims, target_data):
     x_data, y_data = start_data
     x_target, y_target = target_data
-    x_result, y_result = fv3util.communicator.rotate_vector_data(
+    x_result, y_result = fv3util.rotate.rotate_vector_data(
         x_data, y_data, n_clockwise_rotations, dims, np
     )
     np.testing.assert_array_equal(x_result, x_target)

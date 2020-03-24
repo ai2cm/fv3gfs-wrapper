@@ -10,6 +10,11 @@ class Boundary:
     from_rank: int
     to_rank: int
     n_clockwise_rotations: int
+    """
+    number of clockwise rotations data undergoes if it moves from the from_rank
+    to the to_rank. The same as the number of clockwise rotations to get from the
+    orientation of the axes in from_rank to the orientation of the axes in to_rank.
+    """
 
     def rotate(self, y_data, x_data):
         if self.n_clockwise_rotations % 4 == 0:
