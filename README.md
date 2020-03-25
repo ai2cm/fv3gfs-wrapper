@@ -38,7 +38,8 @@ docker image with bind-mounts into your local filesystem. Just be sure to `make 
 when you're done to remove the build artifacts, or it may cause problems when you
 build the docker image.
 
-With the image already built by `build_docker.sh`, run `dev_docker.sh`. This will
+With the image already built by `build_docker.sh` or pulled using
+`docker pull us.gcr.io/vcm-ml/fv3gfs-python`, run `dev_docker.sh`. This will
 bind-mount the `fv3gfs`, `lib`, `tests`, `external`, and `templates` directories into the
 docker image. Inside the docker image, you can build or re-build the model with
 `make build` inside the `/fv3gfs-python` directory, and run the test suite with
