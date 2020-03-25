@@ -1,0 +1,251 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Developers Notes &mdash; FV3GFS 0.3.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API" href="api.html" />
+    <link rel="prev" title="Communication" href="communication.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> FV3GFS
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="state.html">State</a></li>
+<li class="toctree-l1"><a class="reference internal" href="communication.html">Communication</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Developers Notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#fv3util-package"><code class="docutils literal notranslate"><span class="pre">fv3util</span></code> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#templates">Templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#properties-files">Properties Files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">FV3GFS</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Developers Notes</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/developers.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="developers-notes">
+<h1>Developers Notes<a class="headerlink" href="#developers-notes" title="Permalink to this headline">¶</a></h1>
+<p>Here are some fairly informal notes about the build system and package organization
+structure for the <code class="docutils literal notranslate"><span class="pre">fv3gfs-python</span></code> wrapper.</p>
+<div class="section" id="fv3util-package">
+<h2><code class="docutils literal notranslate"><span class="pre">fv3util</span></code> Package<a class="headerlink" href="#fv3util-package" title="Permalink to this headline">¶</a></h2>
+<p>Much of the functionality of <code class="docutils literal notranslate"><span class="pre">fv3gfs-python</span></code> is split out into a package called <code class="docutils literal notranslate"><span class="pre">fv3util</span></code>.
+Any functionality that can be written to be independent of the wrapped Fortran model
+is put into <code class="docutils literal notranslate"><span class="pre">fv3util</span></code>. This makes it much easier to iterate on and test pure Python
+code for the model, as one can install the package onto the host system without needing
+to use Docker to handle Fortran dependencies. This also makes it possible for analysis
+codes to use the same routines used by the Fortran model.</p>
+<p>Versions of <code class="docutils literal notranslate"><span class="pre">fv3util</span></code> are paired with versions of <code class="docutils literal notranslate"><span class="pre">fv3gfs-python</span></code>. The wrapper
+requires a copy of <code class="docutils literal notranslate"><span class="pre">fv3util</span></code> with the same version.</p>
+</div>
+<div class="section" id="templates">
+<h2>Templates<a class="headerlink" href="#templates" title="Permalink to this headline">¶</a></h2>
+<p>Several Fortran Jinja “template” files exist in <code class="docutils literal notranslate"><span class="pre">templates</span></code>. During model build, these are
+converted into Fortran sources which are then compiled.</p>
+</div>
+<div class="section" id="properties-files">
+<h2>Properties Files<a class="headerlink" href="#properties-files" title="Permalink to this headline">¶</a></h2>
+<p>Inside fv3util are “properties” for Fortran model variables. These are separated into
+“dynamics”, “physics”, and “tracer”. “tracer” properties don’t exist in fv3util itself
+but rather have to be registered into the package. This allows the Fortran model to
+pass information about the tracers being used with the current run configuration.
+Analysis codes can similarly pass tracer properties into fv3util. This is required,
+for example, to load restart data that includes tracers.</p>
+<p>While building the model, these properties are used by the Jinja templates to
+automatically write getters and setters for each model variable. This allows
+<a class="reference internal" href="api.html#fv3gfs.get_state" title="fv3gfs.get_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.get_state()</span></code></a> and <a class="reference internal" href="api.html#fv3gfs.set_state" title="fv3gfs.set_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.set_state()</span></code></a> to interface with those
+variables in the Fortran model. Getting/setting new variables involves updating those
+properties (in their respective JSON files) and then rebuilding the wrapper.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="communication.html" class="btn btn-neutral float-left" title="Communication" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Vulcan Technologies, LLC
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

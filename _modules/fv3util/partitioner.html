@@ -1,0 +1,857 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>fv3util.partitioner &mdash; FV3GFS 0.3.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> FV3GFS
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../state.html">State</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../communication.html">Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developers.html">Developers Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">FV3GFS</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>fv3util.partitioner</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for fv3util.partitioner</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">dataclasses</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">NORTH</span><span class="p">,</span> <span class="n">SOUTH</span><span class="p">,</span> <span class="n">WEST</span><span class="p">,</span> <span class="n">EAST</span><span class="p">,</span> <span class="n">NORTHWEST</span><span class="p">,</span> <span class="n">NORTHEAST</span><span class="p">,</span> <span class="n">SOUTHWEST</span><span class="p">,</span> <span class="n">SOUTHEAST</span>
+<span class="p">)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">boundary</span> <span class="k">as</span> <span class="n">bd</span>
+<span class="kn">from</span> <span class="nn">.quantity</span> <span class="kn">import</span> <span class="n">QuantityMetadata</span>
+
+<span class="n">BOUNDARY_CACHE_SIZE</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;TilePartitioner&#39;</span><span class="p">,</span> <span class="s1">&#39;CubedSpherePartitioner&#39;</span><span class="p">,</span> <span class="s1">&#39;get_tile_index&#39;</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">get_tile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">total_ranks</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the tile number for a given rank and total number of ranks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">total_ranks</span> <span class="o">%</span> <span class="mi">6</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;total_ranks </span><span class="si">{</span><span class="n">total_ranks</span><span class="si">}</span><span class="s1"> is not evenly divisible by 6&#39;</span><span class="p">)</span>
+    <span class="n">ranks_per_tile</span> <span class="o">=</span> <span class="n">total_ranks</span> <span class="o">//</span> <span class="mi">6</span>
+    <span class="k">return</span> <span class="n">rank</span> <span class="o">//</span> <span class="n">ranks_per_tile</span>
+
+
+<span class="k">def</span> <span class="nf">get_tile_number</span><span class="p">(</span><span class="n">tile_rank</span><span class="p">,</span> <span class="n">total_ranks</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the tile number for a given rank and total number of ranks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="ne">FutureWarning</span><span class="p">(</span>
+        <span class="s1">&#39;get_tile_number will be removed in a later version, &#39;</span>
+        <span class="s1">&#39;use get_tile_index(rank, total_ranks) + 1 instead&#39;</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">total_ranks</span> <span class="o">%</span> <span class="mi">6</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;total_ranks </span><span class="si">{</span><span class="n">total_ranks</span><span class="si">}</span><span class="s1"> is not evenly divisible by 6&#39;</span><span class="p">)</span>
+    <span class="n">ranks_per_tile</span> <span class="o">=</span> <span class="n">total_ranks</span> <span class="o">//</span> <span class="mi">6</span>
+    <span class="k">return</span> <span class="n">tile_rank</span> <span class="o">//</span> <span class="n">ranks_per_tile</span> <span class="o">+</span> <span class="mi">1</span>
+
+
+<div class="viewcode-block" id="TilePartitioner"><a class="viewcode-back" href="../../api.html#fv3gfs.TilePartitioner">[docs]</a><span class="k">class</span> <span class="nc">TilePartitioner</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">layout</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an object for fv3gfs tile decomposition.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">layout</span>
+
+<div class="viewcode-block" id="TilePartitioner.from_namelist"><a class="viewcode-back" href="../../api.html#fv3gfs.TilePartitioner.from_namelist">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_namelist</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">namelist</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a TilePartitioner from a Fortran namelist.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            namelist (dict): the Fortran namelist</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">namelist</span><span class="p">[</span><span class="s1">&#39;fv_core_nml&#39;</span><span class="p">][</span><span class="s1">&#39;layout&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="TilePartitioner.subtile_index"><a class="viewcode-back" href="../../api.html#fv3gfs.TilePartitioner.subtile_index">[docs]</a>    <span class="k">def</span> <span class="nf">subtile_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return the (y, x) subtile position of a given rank as an integer number of subtiles.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_ranks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">total_ranks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<div class="viewcode-block" id="TilePartitioner.tile_extent"><a class="viewcode-back" href="../../api.html#fv3gfs.TilePartitioner.tile_extent">[docs]</a>    <span class="k">def</span> <span class="nf">tile_extent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank_metadata</span><span class="p">:</span> <span class="n">QuantityMetadata</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return the shape of a full tile representation for the given dimensions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            metadata: quantity metadata</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            extent: shape of full tile representation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">tile_extent_from_rank_metadata</span><span class="p">(</span><span class="n">rank_metadata</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">rank_metadata</span><span class="o">.</span><span class="n">extent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TilePartitioner.subtile_extent"><a class="viewcode-back" href="../../api.html#fv3gfs.TilePartitioner.subtile_extent">[docs]</a>    <span class="k">def</span> <span class="nf">subtile_extent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_metadata</span><span class="p">:</span> <span class="n">QuantityMetadata</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return the shape of a single rank representation for the given dimensions.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">rank_extent_from_tile_metadata</span><span class="p">(</span>
+            <span class="n">tile_metadata</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">tile_metadata</span><span class="o">.</span><span class="n">extent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TilePartitioner.subtile_slice"><a class="viewcode-back" href="../../api.html#fv3gfs.TilePartitioner.subtile_slice">[docs]</a>    <span class="k">def</span> <span class="nf">subtile_slice</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">tile_metadata</span><span class="p">:</span> <span class="n">QuantityMetadata</span><span class="p">,</span>
+            <span class="n">overlap</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">slice</span><span class="p">,</span> <span class="nb">slice</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return the subtile slice of a given rank on an array.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rank: the rank of the process</span>
+<span class="sd">            tile_metadata: the metadata for a quantity on a tile</span>
+<span class="sd">            overlap (optional): if True, for interface variables include the part</span>
+<span class="sd">                of the array shared by adjacent ranks in both ranks. If False, ensure</span>
+<span class="sd">                only one of those ranks (the greater rank) is assigned the overlapping</span>
+<span class="sd">                section. Default is False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            y_range: the y range of the array on the tile</span>
+<span class="sd">            x_range: the x range of the array on the tile</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">subtile_slice</span><span class="p">(</span>
+            <span class="n">tile_metadata</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span>
+            <span class="n">tile_metadata</span><span class="o">.</span><span class="n">extent</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">),</span>
+            <span class="n">overlap</span><span class="o">=</span><span class="n">overlap</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="TilePartitioner.on_tile_top"><a class="viewcode-back" href="../../api.html#fv3gfs.TilePartitioner.on_tile_top">[docs]</a>    <span class="k">def</span> <span class="nf">on_tile_top</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">on_tile_top</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TilePartitioner.on_tile_bottom"><a class="viewcode-back" href="../../api.html#fv3gfs.TilePartitioner.on_tile_bottom">[docs]</a>    <span class="k">def</span> <span class="nf">on_tile_bottom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">on_tile_bottom</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="TilePartitioner.on_tile_left"><a class="viewcode-back" href="../../api.html#fv3gfs.TilePartitioner.on_tile_left">[docs]</a>    <span class="k">def</span> <span class="nf">on_tile_left</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">on_tile_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="TilePartitioner.on_tile_right"><a class="viewcode-back" href="../../api.html#fv3gfs.TilePartitioner.on_tile_right">[docs]</a>    <span class="k">def</span> <span class="nf">on_tile_right</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">on_tile_right</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TilePartitioner.boundary"><a class="viewcode-back" href="../../api.html#fv3gfs.TilePartitioner.boundary">[docs]</a>    <span class="k">def</span> <span class="nf">boundary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">boundary_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a boundary of the requested type for a given rank.</span>
+
+<span class="sd">        Target ranks will be on the same tile as the given rank, wrapping around as</span>
+<span class="sd">        in a doubly-periodic boundary condition.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            boundary_type: the type of boundary</span>
+<span class="sd">            rank: the processor rank</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            boundary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">boundary</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cached_boundary</span><span class="p">(</span><span class="n">boundary_type</span><span class="p">,</span> <span class="n">rank</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">boundary</span></div>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="n">BOUNDARY_CACHE_SIZE</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_cached_boundary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">boundary_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="n">boundary</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">WEST</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_left_edge</span><span class="p">,</span>
+            <span class="n">EAST</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_right_edge</span><span class="p">,</span>
+            <span class="n">NORTH</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_edge</span><span class="p">,</span>
+            <span class="n">SOUTH</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_edge</span><span class="p">,</span>
+            <span class="n">NORTHWEST</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_left_corner</span><span class="p">,</span>
+            <span class="n">NORTHEAST</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_right_corner</span><span class="p">,</span>
+            <span class="n">SOUTHWEST</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_left_corner</span><span class="p">,</span>
+            <span class="n">SOUTHEAST</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_right_corner</span><span class="p">,</span>
+        <span class="p">}[</span><span class="n">boundary_type</span><span class="p">](</span><span class="n">rank</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">boundary</span>
+
+    <span class="k">def</span> <span class="nf">_left_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_tile_left</span><span class="p">(</span><span class="n">rank</span><span class="p">):</span>
+            <span class="n">to_rank</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">to_rank</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">(</span>
+            <span class="n">boundary_type</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">WEST</span><span class="p">,</span>
+            <span class="n">from_rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
+            <span class="n">to_rank</span><span class="o">=</span><span class="n">to_rank</span><span class="p">,</span>
+            <span class="n">n_clockwise_rotations</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_right_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_tile_right</span><span class="p">(</span><span class="n">rank</span><span class="p">):</span>
+            <span class="n">to_rank</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">to_rank</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">(</span>
+            <span class="n">boundary_type</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">EAST</span><span class="p">,</span>
+            <span class="n">from_rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
+            <span class="n">to_rank</span><span class="o">=</span><span class="n">to_rank</span><span class="p">,</span>
+            <span class="n">n_clockwise_rotations</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_top_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_tile_top</span><span class="p">(</span><span class="n">rank</span><span class="p">):</span>
+            <span class="n">to_rank</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">to_rank</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">(</span>
+            <span class="n">boundary_type</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">NORTH</span><span class="p">,</span>
+            <span class="n">from_rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
+            <span class="n">to_rank</span><span class="o">=</span><span class="n">to_rank</span><span class="p">,</span>
+            <span class="n">n_clockwise_rotations</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_bottom_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_tile_bottom</span><span class="p">(</span><span class="n">rank</span><span class="p">):</span>
+            <span class="n">to_rank</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">to_rank</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">(</span>
+            <span class="n">boundary_type</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">SOUTH</span><span class="p">,</span>
+            <span class="n">from_rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
+            <span class="n">to_rank</span><span class="o">=</span><span class="n">to_rank</span><span class="p">,</span>
+            <span class="n">n_clockwise_rotations</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_top_left_corner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_get_corner</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">NORTHWEST</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_left_edge</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_edge</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_top_right_corner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_get_corner</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">NORTHEAST</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_right_edge</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_edge</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_bottom_left_corner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_get_corner</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">SOUTHWEST</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_left_edge</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_edge</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_bottom_right_corner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_get_corner</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">SOUTHEAST</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_right_edge</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_edge</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TilePartitioner.fliplr_rank"><a class="viewcode-back" href="../../api.html#fv3gfs.TilePartitioner.fliplr_rank">[docs]</a>    <span class="k">def</span> <span class="nf">fliplr_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fliplr_subtile_rank</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TilePartitioner.rotate_rank"><a class="viewcode-back" href="../../api.html#fv3gfs.TilePartitioner.rotate_rank">[docs]</a>    <span class="k">def</span> <span class="nf">rotate_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_clockwise_rotations</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rotate_subtile_rank</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="n">n_clockwise_rotations</span><span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_get_corner</span><span class="p">(</span>
+        <span class="n">boundary_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">edge_func_1</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">bd</span><span class="o">.</span><span class="n">Boundary</span><span class="p">],</span>
+        <span class="n">edge_func_2</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">bd</span><span class="o">.</span><span class="n">Boundary</span><span class="p">]):</span>
+    <span class="n">edge_1</span> <span class="o">=</span> <span class="n">edge_func_1</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span>
+    <span class="n">edge_2</span> <span class="o">=</span> <span class="n">edge_func_2</span><span class="p">(</span><span class="n">edge_1</span><span class="o">.</span><span class="n">to_rank</span><span class="p">)</span>
+    <span class="n">rotations</span> <span class="o">=</span> <span class="n">edge_1</span><span class="o">.</span><span class="n">n_clockwise_rotations</span> <span class="o">+</span> <span class="n">edge_2</span><span class="o">.</span><span class="n">n_clockwise_rotations</span>
+    <span class="k">return</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">(</span>
+        <span class="n">boundary_type</span><span class="o">=</span><span class="n">boundary_type</span><span class="p">,</span>
+        <span class="n">from_rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
+        <span class="n">to_rank</span><span class="o">=</span><span class="n">edge_2</span><span class="o">.</span><span class="n">to_rank</span><span class="p">,</span>
+        <span class="n">n_clockwise_rotations</span><span class="o">=</span><span class="n">rotations</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="CubedSpherePartitioner"><a class="viewcode-back" href="../../api.html#fv3gfs.CubedSpherePartitioner">[docs]</a><span class="k">class</span> <span class="nc">CubedSpherePartitioner</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">tile</span><span class="p">:</span> <span class="n">TilePartitioner</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an object for fv3gfs cubed-sphere domain decomposition.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            tile: partitioner for the cube faces</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="n">TilePartitioner</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;tile must be a TilePartitioner&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tile</span> <span class="o">=</span> <span class="n">tile</span>
+
+<div class="viewcode-block" id="CubedSpherePartitioner.from_namelist"><a class="viewcode-back" href="../../api.html#fv3gfs.CubedSpherePartitioner.from_namelist">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_namelist</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">namelist</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a CubedSpherePartitioner from a Fortran namelist.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            namelist (dict): the Fortran namelist</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">TilePartitioner</span><span class="o">.</span><span class="n">from_namelist</span><span class="p">(</span><span class="n">namelist</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">_ensure_square_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;currently only square layouts are supported&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CubedSpherePartitioner.tile_index"><a class="viewcode-back" href="../../api.html#fv3gfs.CubedSpherePartitioner.tile_index">[docs]</a>    <span class="k">def</span> <span class="nf">tile_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the tile index of a given rank&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">get_tile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_ranks</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CubedSpherePartitioner.tile_master_rank"><a class="viewcode-back" href="../../api.html#fv3gfs.CubedSpherePartitioner.tile_master_rank">[docs]</a>    <span class="k">def</span> <span class="nf">tile_master_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the lowest rank on the same tile as a given rank.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">total_ranks</span> <span class="o">*</span> <span class="p">(</span><span class="n">rank</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">total_ranks</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">layout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">layout</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">total_ranks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;the number of ranks on the cubed sphere&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">6</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">total_ranks</span>
+
+<div class="viewcode-block" id="CubedSpherePartitioner.boundary"><a class="viewcode-back" href="../../api.html#fv3gfs.CubedSpherePartitioner.boundary">[docs]</a>    <span class="k">def</span> <span class="nf">boundary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">boundary_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a boundary of the requested type for a given rank.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            boundary_type: the type of boundary</span>
+<span class="sd">            rank: the processor rank</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            boundary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">boundary</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cached_boundary</span><span class="p">(</span><span class="n">boundary_type</span><span class="p">,</span> <span class="n">rank</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">boundary</span></div>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="n">BOUNDARY_CACHE_SIZE</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_cached_boundary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">boundary_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="n">boundary</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">WEST</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_left_edge</span><span class="p">,</span>
+            <span class="n">EAST</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_right_edge</span><span class="p">,</span>
+            <span class="n">NORTH</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_edge</span><span class="p">,</span>
+            <span class="n">SOUTH</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_edge</span><span class="p">,</span>
+            <span class="n">NORTHWEST</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_left_corner</span><span class="p">,</span>
+            <span class="n">NORTHEAST</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_right_corner</span><span class="p">,</span>
+            <span class="n">SOUTHWEST</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_left_corner</span><span class="p">,</span>
+            <span class="n">SOUTHEAST</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_right_corner</span><span class="p">,</span>
+        <span class="p">}[</span><span class="n">boundary_type</span><span class="p">](</span><span class="n">rank</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">boundary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">boundary</span><span class="o">.</span><span class="n">to_rank</span> <span class="o">=</span> <span class="n">boundary</span><span class="o">.</span><span class="n">to_rank</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_ranks</span>
+        <span class="k">return</span> <span class="n">boundary</span>
+
+    <span class="k">def</span> <span class="nf">_left_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_square_layout</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">on_tile_left</span><span class="p">(</span><span class="n">rank</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">is_even</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">)):</span>
+                <span class="n">to_master_rank</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile_master_rank</span><span class="p">(</span><span class="n">rank</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">total_ranks</span><span class="p">)</span>
+                <span class="n">tile_rank</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">total_ranks</span>
+                <span class="n">to_tile_rank</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">fliplr_rank</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">rotate_rank</span><span class="p">(</span><span class="n">tile_rank</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">to_rank</span> <span class="o">=</span> <span class="n">to_master_rank</span> <span class="o">+</span> <span class="n">to_tile_rank</span>
+                <span class="n">rotations</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">boundary</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">(</span>
+                    <span class="n">boundary_type</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">WEST</span><span class="p">,</span>
+                    <span class="n">from_rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
+                    <span class="n">to_rank</span><span class="o">=</span><span class="n">to_rank</span><span class="p">,</span>
+                    <span class="n">n_clockwise_rotations</span><span class="o">=</span><span class="n">rotations</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">boundary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">boundary</span><span class="p">(</span><span class="n">WEST</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+                <span class="n">boundary</span><span class="o">.</span><span class="n">to_rank</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">total_ranks</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">boundary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">boundary</span><span class="p">(</span><span class="n">WEST</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">boundary</span>
+
+    <span class="k">def</span> <span class="nf">_right_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_square_layout</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">on_tile_right</span><span class="p">(</span><span class="n">rank</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_even</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">)):</span>
+                <span class="n">to_master_rank</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile_master_rank</span><span class="p">(</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">total_ranks</span><span class="p">)</span>
+                <span class="n">tile_rank</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">total_ranks</span>
+                <span class="n">to_tile_rank</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">fliplr_rank</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">rotate_rank</span><span class="p">(</span><span class="n">tile_rank</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">boundary</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">(</span>
+                    <span class="n">boundary_type</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">EAST</span><span class="p">,</span>
+                    <span class="n">from_rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
+                    <span class="n">to_rank</span><span class="o">=</span><span class="n">to_master_rank</span> <span class="o">+</span> <span class="n">to_tile_rank</span><span class="p">,</span>
+                    <span class="n">n_clockwise_rotations</span><span class="o">=</span><span class="mi">1</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">boundary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">boundary</span><span class="p">(</span><span class="n">EAST</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+                <span class="n">boundary</span><span class="o">.</span><span class="n">to_rank</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">total_ranks</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">boundary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">boundary</span><span class="p">(</span><span class="n">EAST</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">boundary</span>
+
+    <span class="k">def</span> <span class="nf">_top_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_square_layout</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">on_tile_top</span><span class="p">(</span><span class="n">rank</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">is_even</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">)):</span>
+                <span class="n">to_master_rank</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">total_ranks</span>
+                <span class="n">tile_rank</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">total_ranks</span>
+                <span class="n">to_tile_rank</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">fliplr_rank</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">rotate_rank</span><span class="p">(</span><span class="n">tile_rank</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">boundary</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">(</span>
+                    <span class="n">boundary_type</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">NORTH</span><span class="p">,</span>
+                    <span class="n">from_rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
+                    <span class="n">to_rank</span><span class="o">=</span><span class="n">to_master_rank</span> <span class="o">+</span> <span class="n">to_tile_rank</span><span class="p">,</span>
+                    <span class="n">n_clockwise_rotations</span><span class="o">=</span><span class="mi">3</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">boundary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">boundary</span><span class="p">(</span><span class="n">NORTH</span><span class="p">,</span> <span class="n">rank</span><span class="p">)</span>
+                <span class="n">boundary</span><span class="o">.</span><span class="n">to_rank</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">total_ranks</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">boundary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">boundary</span><span class="p">(</span><span class="n">NORTH</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">boundary</span>
+
+    <span class="k">def</span> <span class="nf">_bottom_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_square_layout</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">on_tile_bottom</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="ow">not</span> <span class="n">is_even</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">))</span>
+        <span class="p">):</span>
+            <span class="n">to_master_rank</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">total_ranks</span>
+            <span class="n">tile_rank</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">total_ranks</span>
+            <span class="n">to_tile_rank</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">fliplr_rank</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">rotate_rank</span><span class="p">(</span><span class="n">tile_rank</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">boundary</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">(</span>
+                <span class="n">boundary_type</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">SOUTH</span><span class="p">,</span>
+                <span class="n">from_rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
+                <span class="n">to_rank</span><span class="o">=</span><span class="n">to_master_rank</span> <span class="o">+</span> <span class="n">to_tile_rank</span><span class="p">,</span>
+                <span class="n">n_clockwise_rotations</span><span class="o">=</span><span class="mi">3</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">boundary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">boundary</span><span class="p">(</span><span class="n">SOUTH</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">on_tile_bottom</span><span class="p">(</span><span class="n">rank</span><span class="p">):</span>
+                <span class="n">boundary</span><span class="o">.</span><span class="n">to_rank</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">total_ranks</span>
+        <span class="k">return</span> <span class="n">boundary</span>
+
+    <span class="k">def</span> <span class="nf">_top_left_corner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">on_tile_top</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">on_tile_left</span><span class="p">(</span><span class="n">rank</span><span class="p">)):</span>
+            <span class="n">corner</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_even</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">))</span> <span class="ow">and</span> <span class="n">on_tile_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">)):</span>
+                <span class="n">second_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_left_edge</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">second_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_edge</span>
+            <span class="n">corner</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_corner</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">NORTHWEST</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_left_edge</span><span class="p">,</span> <span class="n">second_edge</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">corner</span>
+
+    <span class="k">def</span> <span class="nf">_top_right_corner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">on_tile_top</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="n">on_tile_right</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)):</span>
+            <span class="n">corner</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_even</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">))</span> <span class="ow">and</span> <span class="n">on_tile_top</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">):</span>
+                <span class="n">second_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_edge</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">second_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_right_edge</span>
+            <span class="n">corner</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_corner</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">NORTHEAST</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_edge</span><span class="p">,</span> <span class="n">second_edge</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">corner</span>
+
+    <span class="k">def</span> <span class="nf">_bottom_left_corner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">on_tile_bottom</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">))</span> <span class="ow">and</span>
+                <span class="n">on_tile_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">))):</span>
+            <span class="n">corner</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_even</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">))</span> <span class="ow">and</span> <span class="n">on_tile_bottom</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">)):</span>
+                <span class="n">second_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_edge</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">second_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_left_edge</span>
+            <span class="n">corner</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_corner</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">SOUTHWEST</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_edge</span><span class="p">,</span> <span class="n">second_edge</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">corner</span>
+
+    <span class="k">def</span> <span class="nf">_bottom_right_corner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">on_tile_bottom</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">))</span> <span class="ow">and</span>
+                <span class="n">on_tile_right</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)):</span>
+            <span class="n">corner</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_even</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">))</span> <span class="ow">and</span> <span class="n">on_tile_bottom</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile</span><span class="o">.</span><span class="n">subtile_index</span><span class="p">(</span><span class="n">rank</span><span class="p">)):</span>
+                <span class="n">second_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_edge</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">second_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_right_edge</span>
+            <span class="n">corner</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_corner</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">SOUTHEAST</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_edge</span><span class="p">,</span> <span class="n">second_edge</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">corner</span>
+
+    <span class="k">def</span> <span class="nf">_get_corner</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">boundary_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">edge_func_1</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">bd</span><span class="o">.</span><span class="n">Boundary</span><span class="p">],</span>
+            <span class="n">edge_func_2</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">bd</span><span class="o">.</span><span class="n">Boundary</span><span class="p">]):</span>
+        <span class="n">edge_1</span> <span class="o">=</span> <span class="n">edge_func_1</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span>
+        <span class="n">edge_2</span> <span class="o">=</span> <span class="n">edge_func_2</span><span class="p">(</span><span class="n">edge_1</span><span class="o">.</span><span class="n">to_rank</span><span class="p">)</span>
+        <span class="n">rotations</span> <span class="o">=</span> <span class="n">edge_1</span><span class="o">.</span><span class="n">n_clockwise_rotations</span> <span class="o">+</span> <span class="n">edge_2</span><span class="o">.</span><span class="n">n_clockwise_rotations</span>
+        <span class="k">return</span> <span class="n">bd</span><span class="o">.</span><span class="n">SimpleBoundary</span><span class="p">(</span>
+            <span class="n">boundary_type</span><span class="o">=</span><span class="n">boundary_type</span><span class="p">,</span>
+            <span class="n">from_rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
+            <span class="n">to_rank</span><span class="o">=</span><span class="n">edge_2</span><span class="o">.</span><span class="n">to_rank</span><span class="p">,</span>
+            <span class="n">n_clockwise_rotations</span><span class="o">=</span><span class="n">rotations</span>
+        <span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">on_tile_left</span><span class="p">(</span><span class="n">subtile_index</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">subtile_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+
+
+<span class="k">def</span> <span class="nf">on_tile_right</span><span class="p">(</span><span class="n">subtile_index</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">layout</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">subtile_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">layout</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+
+
+<span class="k">def</span> <span class="nf">on_tile_top</span><span class="p">(</span><span class="n">subtile_index</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">layout</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">subtile_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">layout</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+
+
+<span class="k">def</span> <span class="nf">on_tile_bottom</span><span class="p">(</span><span class="n">subtile_index</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">subtile_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+
+
+<span class="k">def</span> <span class="nf">rotate_subtile_rank</span><span class="p">(</span>
+        <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">layout</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">n_clockwise_rotations</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the rank position where this rank would be if you rotated the</span>
+<span class="sd">    tile n_clockwise_rotations times.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">n_clockwise_rotations</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">to_tile_rank</span> <span class="o">=</span> <span class="n">rank</span>
+    <span class="k">elif</span> <span class="n">n_clockwise_rotations</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">total_ranks</span> <span class="o">=</span> <span class="n">layout</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">layout</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">rank_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">total_ranks</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+        <span class="n">rotated_rank_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rot90</span><span class="p">(</span><span class="n">rank_array</span><span class="p">)</span>
+        <span class="n">to_tile_rank</span> <span class="o">=</span> <span class="n">rank_array</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rotated_rank_array</span> <span class="o">==</span> <span class="n">rank</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">to_tile_rank</span>
+
+
+<span class="k">def</span> <span class="nf">transpose_subtile_rank</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the rank position where this rank would be if you transposed</span>
+<span class="sd">    the tile.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">transform_subtile_rank</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">layout</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">fliplr_subtile_rank</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the rank position where this rank would be if you flipped the</span>
+<span class="sd">    tile along a vertical axis</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">transform_subtile_rank</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fliplr</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">layout</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">flipud_subtile_rank</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the rank position where this rank would be if you flipped the</span>
+<span class="sd">    tile along a horizontal axis</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">transform_subtile_rank</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">layout</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">transform_subtile_rank</span><span class="p">(</span>
+        <span class="n">transform_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">layout</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the rank position where this rank would be if you performed</span>
+<span class="sd">    a transformation on the tile which strictly moves ranks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">total_ranks</span> <span class="o">=</span> <span class="n">layout</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">layout</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">rank_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">total_ranks</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+    <span class="n">transformed_rank_array</span> <span class="o">=</span> <span class="n">transform_func</span><span class="p">(</span><span class="n">rank_array</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rank_array</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">transformed_rank_array</span> <span class="o">==</span> <span class="n">rank</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">subtile_index</span><span class="p">(</span>
+        <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">ranks_per_tile</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">layout</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="n">within_tile_rank</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">%</span> <span class="n">ranks_per_tile</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">within_tile_rank</span> <span class="o">//</span> <span class="n">layout</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">within_tile_rank</span> <span class="o">%</span> <span class="n">layout</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">j</span><span class="p">,</span> <span class="n">i</span>
+
+
+<span class="k">def</span> <span class="nf">is_even</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">value</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+
+
+<span class="k">def</span> <span class="nf">tile_extent_from_rank_metadata</span><span class="p">(</span>
+        <span class="n">dims</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">rank_extent</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">layout</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the extent of a tile given data about a single rank, and the tile</span>
+<span class="sd">    layout.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dims: dimension names</span>
+<span class="sd">        rank_extent: the extent of one rank</span>
+<span class="sd">        layout: the (y, x) number of ranks along each tile axis</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tile_extent: the extent of one tile</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">layout_factors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">list_by_dims</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">non_horizontal_value</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">extent_from_metadata</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">rank_extent</span><span class="p">,</span> <span class="n">layout_factors</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">rank_extent_from_tile_metadata</span><span class="p">(</span>
+        <span class="n">dims</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">tile_extent</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">layout</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the extent of a rank given data about a tile, and the tile</span>
+<span class="sd">    layout.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dims: dimension names</span>
+<span class="sd">        rank_extent: the extent of a tile</span>
+<span class="sd">        layout: the (y, x) number of ranks along each tile axis</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        rank_extent: the extent of one rank</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">layout_factors</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">list_by_dims</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">non_horizontal_value</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">extent_from_metadata</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">tile_extent</span><span class="p">,</span> <span class="n">layout_factors</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">extent_from_metadata</span><span class="p">(</span>
+        <span class="n">dims</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+        <span class="n">extent</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+        <span class="n">layout_factors</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+    <span class="n">return_extents</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">rank_extent</span><span class="p">,</span> <span class="n">layout_factor</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">extent</span><span class="p">,</span> <span class="n">layout_factors</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">INTERFACE_DIMS</span><span class="p">:</span>
+            <span class="n">add_extent</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">add_extent</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">tile_extent</span> <span class="o">=</span> <span class="p">(</span><span class="n">rank_extent</span> <span class="o">+</span> <span class="n">add_extent</span><span class="p">)</span> <span class="o">*</span> <span class="n">layout_factor</span> <span class="o">-</span> <span class="n">add_extent</span>
+        <span class="n">return_extents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">tile_extent</span><span class="p">))</span>  <span class="c1"># layout_factor is float, need to cast</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">return_extents</span><span class="p">)</span>
+
+
+<span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">_IndexData1D</span><span class="p">:</span>
+    <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">extent</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">i_subtile</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">n_ranks</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">base_extent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">extent</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">extent_minus_gridcell_count</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">extent_minus_gridcell_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">INTERFACE_DIMS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_end_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">i_subtile</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_ranks</span> <span class="o">-</span> <span class="mi">1</span>
+
+
+<span class="k">def</span> <span class="nf">_index_generator</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">tile_extent</span><span class="p">,</span> <span class="n">subtile_index</span><span class="p">,</span> <span class="n">horizontal_layout</span><span class="p">):</span>
+    <span class="n">subtile_extent</span> <span class="o">=</span> <span class="n">rank_extent_from_tile_metadata</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">tile_extent</span><span class="p">,</span> <span class="n">horizontal_layout</span><span class="p">)</span>
+    <span class="n">quantity_layout</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">list_by_dims</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">horizontal_layout</span><span class="p">,</span> <span class="n">non_horizontal_value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">quantity_subtile_index</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">list_by_dims</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">subtile_index</span><span class="p">,</span> <span class="n">non_horizontal_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">extent</span><span class="p">,</span> <span class="n">i_subtile</span><span class="p">,</span> <span class="n">n_ranks</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">dims</span><span class="p">,</span> <span class="n">subtile_extent</span><span class="p">,</span> <span class="n">quantity_subtile_index</span><span class="p">,</span> <span class="n">quantity_layout</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">_IndexData1D</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">extent</span><span class="p">,</span> <span class="n">i_subtile</span><span class="p">,</span> <span class="n">n_ranks</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">subtile_slice</span><span class="p">(</span>
+        <span class="n">dims</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">tile_extent</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">layout</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">subtile_index</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">overlap</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">slice</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the slice of data within a tile&#39;s computational domain belonging</span>
+<span class="sd">    to a single rank.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dims: dimension names for each axis</span>
+<span class="sd">        tile_extent: size of the tile&#39;s computational domain</span>
+<span class="sd">        layout: the (y, x) number of ranks along each tile axis</span>
+<span class="sd">        subtile_index: the (y, x) position of the rank on the tile</span>
+<span class="sd">        overlap: whether to assign regions which belong to multiple ranks</span>
+<span class="sd">            to both ranks, or only to the higher rank (default)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">return_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># discard last index for interface variables, unless you&#39;re the last rank</span>
+    <span class="c1"># done so that only one rank is responsible for the shared interface point</span>
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">_index_generator</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">tile_extent</span><span class="p">,</span> <span class="n">subtile_index</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">i_subtile</span> <span class="o">*</span> <span class="n">index</span><span class="o">.</span><span class="n">base_extent</span>
+        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">is_end_index</span> <span class="ow">or</span> <span class="n">overlap</span><span class="p">:</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">index</span><span class="o">.</span><span class="n">extent</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">index</span><span class="o">.</span><span class="n">base_extent</span>
+        <span class="n">return_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">return_list</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Vulcan Technologies, LLC
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

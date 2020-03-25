@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>History &mdash; FV3GFS 0.3.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="API" href="api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> FV3GFS
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="state.html">State</a></li>
+<li class="toctree-l1"><a class="reference internal" href="communication.html">Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">Developers Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#latest">latest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">0.3.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">0.3.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">0.2.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id4">0.2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id5">0.1.0</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">FV3GFS</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>History</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/history.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="history">
+<h1>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="latest">
+<h2>latest<a class="headerlink" href="#latest" title="Permalink to this headline">¶</a></h2>
+<p>Major changes:
+- Added Quantity object to replace DataArray in the state dictionary. Quantity.view[:] provides something akin to DataArray.values, except that it may be a cupy or numpy array. Quantity.values is a read-only numpy array.
+- Partitioner has been replaced by TilePartitioner
+- Added TilePartitioner and CubedSpherePartitioner objects for domain decomposition.
+- Added TileCommunicator and CubedSphereCommunicator objects for inter-rank communication.
+- Tile scattering is now in <cite>TileCommunicator.scatter</cite>.
+- Added <cite>to_dataset(state)</cite> which turns a state dictionary into an xarray Dataset object.
+- Added constants <cite>X_DIM, X_INTERFACE_DIM, Y_DIM, Y_INTERFACE_DIM, Z_DIM, Z_INTERFACE_DIM, X_DIMS, Y_DIMS, HORIZONTAL_DIMS</cite>, and <cite>INTERFACE_DIMS</cite>
+- updated ZarrMonitor, <cite>get_state</cite>, <cite>set_state</cite>, <cite>open_restart</cite>, <cite>apply_nudging</cite>, <cite>get_nudging_tendencies</cite>, <cite>read_state</cite>, <cite>write_state</cite> and tests to work with a Quantity-based state.
+- updated <cite>open_restart</cite> to work with the new communicator objects
+- Removed <cite>without_ghost_cells</cite> and <cite>with_ghost_cells</cite>, as a ghost-cell independent view is now available as <cite>Quantity.view</cite>.
+- examples are updated for the new code and now run on CircleCI
+- gt4py is included in the <cite>fv3gfs-python</cite> image
+- <cite>Quantity.from_storage</cite> and <cite>Quantity.storage</cite> are removed - storages are treated the same as if they were numpy/cupy arrays. To retrieve the storage, use <cite>Quantity.data</cite> on a quantity that has been initialized from a storage object.
+- All tests using numpy arrays now also run using gt4py <cite>CPUStorage</cite> objects.</p>
+<p>Minor changes:
+- Added C12 regression test for <cite>open_restart</cite>
+- added scipy and pytest-subtests to requirements and docker container
+- fixed docker container so that <cite>dev_docker.sh</cite> no longer overwrites ESMF and FMS installations
+- Removed the old  “integration” tests, as their functionality (at least what was enabled) is covered entirely by the newer “image” tests which are compared against the results from the pure-fortran repo.
+- Incremented fv3config commit to include fix to version string</p>
+</div>
+<div class="section" id="id1">
+<h2>0.3.1<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>Major changes:
+- In order to facilitate testing of pure python code, this PR splits code that has no dependencies on the Fortran wrapper into its own subpackage, <cite>fv3util</cite>. That code then gets imported and used by the <cite>fv3gfs</cite> python package.
+- Removed legacy restart loading code (<cite>load_fortran_restart_folder</cite>). This will be added back in a future PR with better logic for identifying dimensions in restart data, using the properties dictionaries.
+- <cite>Partitioner</cite> class added to handle domain decomposition and inter-rank communication
+- filesystem module added to use fsspec to handle remote locations
+- Added logic to manage model properties into fv3util. Dynamics and physics properties are stored at the package level in JSON files, while tracer properties are registered externally. This allows support for different microphysics packages and field tables, and allows the wrapper to automatically register the tracers being used by the present model configuration.
+- Added <cite>open_restart</cite> routine to load restart files. One rank per tile loads the file, and then distributes the data over MPI to each other process. Can choose to load only a subset of the variables to reduce data transfer when the directory is remote.
+- Added <cite>apply_nudging</cite> and <cite>get_nudging_tendencies</cite> functions to nudge a model state to a reference state according to given timescales and a timestep.
+- Added <cite>ZarrMonitor</cite> object which stores a sequence of model states in a Zarr store. Data is chunked such that each process is responsible for one chunk (with the last process being responsible for two chunks, in the case of interface-level variables).
+- Significant additions and reworks to documentation. Removed outdated build instructions and added docker-centric build instructions. Added developer notes about fv3util.
+- Added docs-docker make target to build docs inside docker
+- Removed old, unused <cite>get_output_array</cite> routine in the <cite>_wrapper.so</cite>.</p>
+<p>Minor changes:
+- fixed bug where master branch was not pushing untagged images to GCR
+- fixed <cite>fv3util.__version__</cite> variable to indicate the correct version (0.3.0)
+- Nudging example runfile added
+- Updated target fortran sources, requiring small tweaks to docker build instructions
+- Added docstrings to any routines missing them in the API docs
+- Removed recommended installation targets for apt-get and reduced the number of RUN commands in docker to reduce disk space requirements for intermediate images
+- Added new dependencies for zarr writing and documentation building to docker image
+- Changed documentation theme to readthedocs theme
+- Added IDE directory to gitignore</p>
+</div>
+<div class="section" id="id2">
+<h2>0.3.0<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>Major changes:
+- Fortran sources are updated from the older fv3gfs repo to the newer fv3atm repo. Running the model is the same, but small changes to the repo require different namelist options when running the model, so configuration dictionaries will need to be updated accordingly.</p>
+<p>Minor changes:
+- Fixed name of “patch” version in RELEASE.rst
+- Docker build instructions are used directly from the Fortran repo, instead of copying build instructions in two places.
+- The new repo requires ESMF and FMS to be built separately
+- 32bit builds are disabled, will require fixing the build steps in fv3gfs-fortran to properly pass 32bit build flags when building FMS. Flags can still be sent to fv3atm the same way as before.
+- Fortran build sources are back to being a PHONY build target, because make was not able to follow through and build them.
+- Regression tests are added that use the regression target data in the fv3gfs-fortran repo. This makes some of our other tests redundant, they may be removed later.
+- Configuration dictionaries are explicitly specified for tests instead of using <cite>get_default_config</cite>.
+- Commented-out restart tests are re-introduced as fixing restarts on the new repo is a work in progress.</p>
+</div>
+<div class="section" id="id3">
+<h2>0.2.1<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed Circle CI tagging logic</p></li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h2>0.2.0<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Initial tagged release using public fv3gfs repository</p></li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h2>0.1.0<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Initial release.</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="api.html" class="btn btn-neutral float-left" title="API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Vulcan Technologies, LLC
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

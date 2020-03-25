@@ -1,0 +1,782 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API &mdash; FV3GFS 0.3.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="History" href="history.html" />
+    <link rel="prev" title="Developers Notes" href="developers.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> FV3GFS
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="state.html">State</a></li>
+<li class="toctree-l1"><a class="reference internal" href="communication.html">Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">Developers Notes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">FV3GFS</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>API</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-fv3gfs">
+<span id="api"></span><h1>API<a class="headerlink" href="#module-fv3gfs" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="fv3gfs.initialize">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call initialization routines for the Fortran model.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.step">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">step</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform one dynamics-physics cycle of the Fortran model.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.step_dynamics">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">step_dynamics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.step_dynamics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform one physics step worth of dynamics in the Fortran model.</p>
+<p>Physics quantities are not updated by this routine.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.step_physics">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">step_physics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.step_physics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a physics step in the Fortran model.</p>
+<p>Equivalent to calling compute_physics() and apply_physics() in that order.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.save_intermediate_restart_if_enabled">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">save_intermediate_restart_if_enabled</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.save_intermediate_restart_if_enabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the Fortran model wants to do so on this timestep, write intermediate restart files.</p>
+<p>This function is used at the end of the Fortran main loop to replicate the
+intermediate restart behavior of the Fortran model.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.compute_physics">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">compute_physics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.compute_physics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call physics routines in the Fortran model and update physics prognostic state.</p>
+<p>It is necessary to call apply_physics() after this to update the dynamical
+prognostic state with the output from the routines called by this function.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.apply_physics">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">apply_physics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.apply_physics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update dynamical prognostic state with output from physics routines.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.save_fortran_restart">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">save_fortran_restart</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.save_fortran_restart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trigger the Fortran model to write restart files.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.cleanup">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the Fortran cleanup routines, which clear memory and write final restart files.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.get_state">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">get_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.get_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary whose keys are quantity long names (with underscores instead of spaces)
+and values are DataArrays containing that quantity’s data.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>names (list of str, optional): A list of names to get.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.set_state">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">set_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.set_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes in a dictionary whose keys are quantity long names (with underscores instead of spaces)
+and values are Quantity objects containing that quantity’s data. Sets the fortran state to
+those values.</p>
+<p>Assumes quantity units are equivalent to what is used in the fortran code.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>state (dict): values to set</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.get_n_ghost_cells">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">get_n_ghost_cells</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.get_n_ghost_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of ghost cells used by the Fortran dynamical core.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.get_step_count">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">get_step_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.get_step_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of physics steps the Fortran model would like to complete
+before exiting, based on its configuration.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.get_tracer_metadata">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">get_tracer_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.get_tracer_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict whose keys are tracer names and values are dictionaries with metadata.</p>
+<p>Metadata includes the keys ‘i_tracer’ (tracer index number in Fortran), ‘fortran_name’
+(the short name in Fortran) and ‘units’.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="fv3gfs.InvalidQuantityError">
+<em class="property">exception </em><code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">InvalidQuantityError</code><a class="reference internal" href="_modules/fv3util/_exceptions.html#InvalidQuantityError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.InvalidQuantityError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.read_state">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">read_state</code><span class="sig-paren">(</span><em class="sig-param">filename: str</em><span class="sig-paren">)</span> &#x2192; dict<a class="reference internal" href="_modules/fv3util/io.html#read_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.read_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a model state from a NetCDF file.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>filename: local or remote location of the NetCDF file</p>
+</dd>
+<dt>Returns:</dt><dd><p>state: a model state dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.write_state">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">write_state</code><span class="sig-paren">(</span><em class="sig-param">state: dict</em>, <em class="sig-param">filename: str</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/fv3util/io.html#write_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.write_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a model state to a NetCDF file.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>state: a model state dictionary
+filename: local or remote location to write the NetCDF file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.get_restart_names">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">get_restart_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3gfs/_restart/io.html#get_restart_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.get_restart_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of variables names needed for a clean restart.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.apply_nudging">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">apply_nudging</code><span class="sig-paren">(</span><em class="sig-param">state</em>, <em class="sig-param">reference_state</em>, <em class="sig-param">nudging_timescales</em>, <em class="sig-param">timestep</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3util/nudging.html#apply_nudging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.apply_nudging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Nudge the given state towards the reference state according to the provided
+nudging timescales.</p>
+<p>Nudging is applied to the state in-place.</p>
+<dl>
+<dt>Args:</dt><dd><p>state (dict): A state dictionary.
+reference_state (dict): A reference state dictionary.
+nudging_timescales (dict): A dictionary whose keys are standard names and</p>
+<blockquote>
+<div><p>values are timedelta objects indicating the relaxation timescale for that
+variable.</p>
+</div></blockquote>
+<p>timestep (timedelta): length of the timestep</p>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>nudging_tendencies (dict): A dictionary whose keys are standard names</dt><dd><p>and values are Quantity objects indicating the nudging tendency
+of that standard name.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.get_nudging_tendencies">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">get_nudging_tendencies</code><span class="sig-paren">(</span><em class="sig-param">state</em>, <em class="sig-param">reference_state</em>, <em class="sig-param">nudging_timescales</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3util/nudging.html#get_nudging_tendencies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.get_nudging_tendencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the nudging tendency of the given state towards the reference state
+according to the provided nudging timescales.</p>
+<dl>
+<dt>Args:</dt><dd><p>state (dict): A state dictionary.
+reference_state (dict): A reference state dictionary.
+nudging_timescales (dict): A dictionary whose keys are standard names and</p>
+<blockquote>
+<div><p>values are timedelta objects indicating the relaxation timescale for that
+variable.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>nudging_tendencies (dict): A dictionary whose keys are standard names</dt><dd><p>and values are Quantity objects indicating the nudging tendency
+of that standard name.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.open_restart">
+<code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">open_restart</code><span class="sig-paren">(</span><em class="sig-param">dirname: str</em>, <em class="sig-param">communicator: fv3util.communicator.CubedSphereCommunicator</em>, <em class="sig-param">label: str = ''</em>, <em class="sig-param">only_names: List[str] = None</em><span class="sig-paren">)</span> &#x2192; dict<a class="reference internal" href="_modules/fv3gfs/_restart/legacy.html#open_restart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.open_restart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load restart files output by the Fortran model into a state dictionary.</p>
+<p>See <a class="reference internal" href="#fv3gfs.set_state" title="fv3gfs.set_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.set_state()</span></code></a> if you would like to load the resulting state into
+the Fortran model.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>dirname: location of restart files, can be local or remote
+communicator: communication object for the cubed sphere
+label: prepended string on the restart files to load
+only_names (optional): list of standard names to load</p>
+</dd>
+<dt>Returns:</dt><dd><p>state: model state dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="fv3gfs.ZarrMonitor">
+<em class="property">class </em><code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">ZarrMonitor</code><span class="sig-paren">(</span><em class="sig-param">store: Union[str, collections.abc.MutableMapping], partitioner: fv3util.partitioner.CubedSpherePartitioner, mode: str = 'w', mpi_comm=&lt;fv3util.zarr_monitor.DummyComm object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3util/zarr_monitor.html#ZarrMonitor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.ZarrMonitor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>sympl.Monitor-style object for storing model state dictionaries in a Zarr store.</p>
+<dl class="method">
+<dt id="fv3gfs.ZarrMonitor.store">
+<code class="sig-name descname">store</code><span class="sig-paren">(</span><em class="sig-param">state: dict</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/fv3util/zarr_monitor.html#ZarrMonitor.store"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.ZarrMonitor.store" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append the model state dictionary to the zarr store.</p>
+<p>Requires the state contain the same quantities with the same metadata as the
+first time this is called. Quantities are stored with dimensions [time, rank]
+followed by the dimensions included in any one state snapshot. The one exception
+is “time” which is stored with dimensions [time].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fv3gfs.CubedSpherePartitioner">
+<em class="property">class </em><code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">CubedSpherePartitioner</code><span class="sig-paren">(</span><em class="sig-param">tile: fv3util.partitioner.TilePartitioner</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3util/partitioner.html#CubedSpherePartitioner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.CubedSpherePartitioner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="fv3gfs.CubedSpherePartitioner.boundary">
+<code class="sig-name descname">boundary</code><span class="sig-paren">(</span><em class="sig-param">boundary_type: str</em>, <em class="sig-param">rank: int</em><span class="sig-paren">)</span> &#x2192; fv3util.boundary.SimpleBoundary<a class="reference internal" href="_modules/fv3util/partitioner.html#CubedSpherePartitioner.boundary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.CubedSpherePartitioner.boundary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a boundary of the requested type for a given rank.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>boundary_type: the type of boundary
+rank: the processor rank</p>
+</dd>
+<dt>Returns:</dt><dd><p>boundary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.CubedSpherePartitioner.from_namelist">
+<em class="property">classmethod </em><code class="sig-name descname">from_namelist</code><span class="sig-paren">(</span><em class="sig-param">namelist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3util/partitioner.html#CubedSpherePartitioner.from_namelist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.CubedSpherePartitioner.from_namelist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a CubedSpherePartitioner from a Fortran namelist.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>namelist (dict): the Fortran namelist</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.CubedSpherePartitioner.layout">
+<em class="property">property </em><code class="sig-name descname">layout</code><a class="headerlink" href="#fv3gfs.CubedSpherePartitioner.layout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.CubedSpherePartitioner.tile_index">
+<code class="sig-name descname">tile_index</code><span class="sig-paren">(</span><em class="sig-param">rank: int</em><span class="sig-paren">)</span> &#x2192; Tuple[int, int]<a class="reference internal" href="_modules/fv3util/partitioner.html#CubedSpherePartitioner.tile_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.CubedSpherePartitioner.tile_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the tile index of a given rank</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.CubedSpherePartitioner.tile_master_rank">
+<code class="sig-name descname">tile_master_rank</code><span class="sig-paren">(</span><em class="sig-param">rank: int</em><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/fv3util/partitioner.html#CubedSpherePartitioner.tile_master_rank"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.CubedSpherePartitioner.tile_master_rank" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the lowest rank on the same tile as a given rank.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.CubedSpherePartitioner.total_ranks">
+<em class="property">property </em><code class="sig-name descname">total_ranks</code><a class="headerlink" href="#fv3gfs.CubedSpherePartitioner.total_ranks" title="Permalink to this definition">¶</a></dt>
+<dd><p>the number of ranks on the cubed sphere</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fv3gfs.TilePartitioner">
+<em class="property">class </em><code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">TilePartitioner</code><span class="sig-paren">(</span><em class="sig-param">layout: Tuple[int, int]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3util/partitioner.html#TilePartitioner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TilePartitioner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="fv3gfs.TilePartitioner.boundary">
+<code class="sig-name descname">boundary</code><span class="sig-paren">(</span><em class="sig-param">boundary_type: str</em>, <em class="sig-param">rank: int</em><span class="sig-paren">)</span> &#x2192; fv3util.boundary.SimpleBoundary<a class="reference internal" href="_modules/fv3util/partitioner.html#TilePartitioner.boundary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TilePartitioner.boundary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a boundary of the requested type for a given rank.</p>
+<p>Target ranks will be on the same tile as the given rank, wrapping around as
+in a doubly-periodic boundary condition.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>boundary_type: the type of boundary
+rank: the processor rank</p>
+</dd>
+<dt>Returns:</dt><dd><p>boundary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.TilePartitioner.fliplr_rank">
+<code class="sig-name descname">fliplr_rank</code><span class="sig-paren">(</span><em class="sig-param">rank: int</em><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/fv3util/partitioner.html#TilePartitioner.fliplr_rank"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TilePartitioner.fliplr_rank" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.TilePartitioner.from_namelist">
+<em class="property">classmethod </em><code class="sig-name descname">from_namelist</code><span class="sig-paren">(</span><em class="sig-param">namelist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3util/partitioner.html#TilePartitioner.from_namelist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TilePartitioner.from_namelist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a TilePartitioner from a Fortran namelist.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>namelist (dict): the Fortran namelist</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.TilePartitioner.on_tile_bottom">
+<code class="sig-name descname">on_tile_bottom</code><span class="sig-paren">(</span><em class="sig-param">rank: int</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/fv3util/partitioner.html#TilePartitioner.on_tile_bottom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TilePartitioner.on_tile_bottom" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.TilePartitioner.on_tile_left">
+<code class="sig-name descname">on_tile_left</code><span class="sig-paren">(</span><em class="sig-param">rank: int</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/fv3util/partitioner.html#TilePartitioner.on_tile_left"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TilePartitioner.on_tile_left" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.TilePartitioner.on_tile_right">
+<code class="sig-name descname">on_tile_right</code><span class="sig-paren">(</span><em class="sig-param">rank: int</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/fv3util/partitioner.html#TilePartitioner.on_tile_right"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TilePartitioner.on_tile_right" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.TilePartitioner.on_tile_top">
+<code class="sig-name descname">on_tile_top</code><span class="sig-paren">(</span><em class="sig-param">rank: int</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/fv3util/partitioner.html#TilePartitioner.on_tile_top"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TilePartitioner.on_tile_top" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.TilePartitioner.rotate_rank">
+<code class="sig-name descname">rotate_rank</code><span class="sig-paren">(</span><em class="sig-param">rank: int</em>, <em class="sig-param">n_clockwise_rotations: int</em><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/fv3util/partitioner.html#TilePartitioner.rotate_rank"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TilePartitioner.rotate_rank" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.TilePartitioner.subtile_extent">
+<code class="sig-name descname">subtile_extent</code><span class="sig-paren">(</span><em class="sig-param">tile_metadata: fv3util.quantity.QuantityMetadata</em><span class="sig-paren">)</span> &#x2192; Tuple[int, ...]<a class="reference internal" href="_modules/fv3util/partitioner.html#TilePartitioner.subtile_extent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TilePartitioner.subtile_extent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the shape of a single rank representation for the given dimensions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.TilePartitioner.subtile_index">
+<code class="sig-name descname">subtile_index</code><span class="sig-paren">(</span><em class="sig-param">rank: int</em><span class="sig-paren">)</span> &#x2192; Tuple[int, int]<a class="reference internal" href="_modules/fv3util/partitioner.html#TilePartitioner.subtile_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TilePartitioner.subtile_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the (y, x) subtile position of a given rank as an integer number of subtiles.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.TilePartitioner.subtile_slice">
+<code class="sig-name descname">subtile_slice</code><span class="sig-paren">(</span><em class="sig-param">rank: int</em>, <em class="sig-param">tile_metadata: fv3util.quantity.QuantityMetadata</em>, <em class="sig-param">overlap: bool = False</em><span class="sig-paren">)</span> &#x2192; Tuple[slice, slice]<a class="reference internal" href="_modules/fv3util/partitioner.html#TilePartitioner.subtile_slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TilePartitioner.subtile_slice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the subtile slice of a given rank on an array.</p>
+<dl>
+<dt>Args:</dt><dd><p>rank: the rank of the process
+tile_metadata: the metadata for a quantity on a tile
+overlap (optional): if True, for interface variables include the part</p>
+<blockquote>
+<div><p>of the array shared by adjacent ranks in both ranks. If False, ensure
+only one of those ranks (the greater rank) is assigned the overlapping
+section. Default is False.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>y_range: the y range of the array on the tile
+x_range: the x range of the array on the tile</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.TilePartitioner.tile_extent">
+<code class="sig-name descname">tile_extent</code><span class="sig-paren">(</span><em class="sig-param">rank_metadata: fv3util.quantity.QuantityMetadata</em><span class="sig-paren">)</span> &#x2192; Tuple[int, ...]<a class="reference internal" href="_modules/fv3util/partitioner.html#TilePartitioner.tile_extent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TilePartitioner.tile_extent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the shape of a full tile representation for the given dimensions.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>metadata: quantity metadata</p>
+</dd>
+<dt>Returns:</dt><dd><p>extent: shape of full tile representation</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.TilePartitioner.total_ranks">
+<em class="property">property </em><code class="sig-name descname">total_ranks</code><a class="headerlink" href="#fv3gfs.TilePartitioner.total_ranks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fv3gfs.CubedSphereCommunicator">
+<em class="property">class </em><code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">CubedSphereCommunicator</code><span class="sig-paren">(</span><em class="sig-param">comm</em>, <em class="sig-param">partitioner: fv3util.partitioner.CubedSpherePartitioner</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3util/communicator.html#CubedSphereCommunicator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.CubedSphereCommunicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">fv3util.communicator.Communicator</span></code></p>
+<p>Performs communications within a cubed sphere</p>
+<dl class="method">
+<dt id="fv3gfs.CubedSphereCommunicator.boundaries">
+<em class="property">property </em><code class="sig-name descname">boundaries</code><a class="headerlink" href="#fv3gfs.CubedSphereCommunicator.boundaries" title="Permalink to this definition">¶</a></dt>
+<dd><p>boundaries of this tile with neighboring tiles</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.CubedSphereCommunicator.finish_halo_update">
+<code class="sig-name descname">finish_halo_update</code><span class="sig-paren">(</span><em class="sig-param">quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">n_points: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3util/communicator.html#CubedSphereCommunicator.finish_halo_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.CubedSphereCommunicator.finish_halo_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Complete an asynchronous halo update of a quantity.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.CubedSphereCommunicator.start_halo_update">
+<code class="sig-name descname">start_halo_update</code><span class="sig-paren">(</span><em class="sig-param">quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">n_points: int</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3util/communicator.html#CubedSphereCommunicator.start_halo_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.CubedSphereCommunicator.start_halo_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initiate an asynchronous halo update of a quantity.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.CubedSphereCommunicator.tile">
+<em class="property">property </em><code class="sig-name descname">tile</code><a class="headerlink" href="#fv3gfs.CubedSphereCommunicator.tile" title="Permalink to this definition">¶</a></dt>
+<dd><p>communicator for within a tile</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fv3gfs.TileCommunicator">
+<em class="property">class </em><code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">TileCommunicator</code><span class="sig-paren">(</span><em class="sig-param">comm</em>, <em class="sig-param">partitioner: fv3util.partitioner.TilePartitioner</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3util/communicator.html#TileCommunicator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TileCommunicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">fv3util.communicator.Communicator</span></code></p>
+<p>Performs communications within a single tile or region of a tile</p>
+<dl class="method">
+<dt id="fv3gfs.TileCommunicator.scatter">
+<code class="sig-name descname">scatter</code><span class="sig-paren">(</span><em class="sig-param">metadata: fv3util.quantity.QuantityMetadata</em>, <em class="sig-param">send_quantity: fv3util.quantity.Quantity = None</em>, <em class="sig-param">recv_quantity: fv3util.quantity.Quantity = None</em><span class="sig-paren">)</span> &#x2192; fv3util.quantity.Quantity<a class="reference internal" href="_modules/fv3util/communicator.html#TileCommunicator.scatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TileCommunicator.scatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transfer a quantity from the tile master rank to all subtiles.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>metadata: the metadata of the quantity being transferred, used to</dt><dd><p>initialize the default recieve buffer</p>
+</dd>
+</dl>
+<p>send_quantity: quantity to send, only used on the tile master rank
+recv_quantity: if provided, assign received data into this Quantity.</p>
+</dd>
+<dt>Returns:</dt><dd><p>recv_quantity</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.TileCommunicator.scatter_state">
+<code class="sig-name descname">scatter_state</code><span class="sig-paren">(</span><em class="sig-param">tile_state: dict = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3util/communicator.html#TileCommunicator.scatter_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.TileCommunicator.scatter_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transfer a state dictionary from the tile master rank to all subtiles.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>tile_state: the model state to be sent containing the entire tile,</dt><dd><p>required only from the master rank</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>rank_state: the state corresponding to this rank’s subdomain</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fv3gfs.Communicator">
+<em class="property">class </em><code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">Communicator</code><span class="sig-paren">(</span><em class="sig-param">comm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3util/communicator.html#Communicator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.Communicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="fv3gfs.Communicator.rank">
+<em class="property">property </em><code class="sig-name descname">rank</code><a class="headerlink" href="#fv3gfs.Communicator.rank" title="Permalink to this definition">¶</a></dt>
+<dd><p>rank of the current process within this communicator</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fv3gfs.Quantity">
+<em class="property">class </em><code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">Quantity</code><span class="sig-paren">(</span><em class="sig-param">data, dims: Iterable[str], units: str, origin: Iterable[int] = None, extent: Iterable[int] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3util/quantity.html#Quantity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.Quantity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Data container for physical quantities.</p>
+<dl class="method">
+<dt id="fv3gfs.Quantity.attrs">
+<em class="property">property </em><code class="sig-name descname">attrs</code><a class="headerlink" href="#fv3gfs.Quantity.attrs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.Quantity.data">
+<em class="property">property </em><code class="sig-name descname">data</code><a class="headerlink" href="#fv3gfs.Quantity.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>the underlying array of data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.Quantity.data_array">
+<em class="property">property </em><code class="sig-name descname">data_array</code><a class="headerlink" href="#fv3gfs.Quantity.data_array" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.Quantity.dims">
+<em class="property">property </em><code class="sig-name descname">dims</code><a class="headerlink" href="#fv3gfs.Quantity.dims" title="Permalink to this definition">¶</a></dt>
+<dd><p>names of each dimension</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.Quantity.extent">
+<em class="property">property </em><code class="sig-name descname">extent</code><a class="headerlink" href="#fv3gfs.Quantity.extent" title="Permalink to this definition">¶</a></dt>
+<dd><p>the shape of the computational domain</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.Quantity.from_data_array">
+<em class="property">classmethod </em><code class="sig-name descname">from_data_array</code><span class="sig-paren">(</span><em class="sig-param">data_array: xarray.core.dataarray.DataArray</em>, <em class="sig-param">origin: Iterable[int] = None</em>, <em class="sig-param">extent: Iterable[int] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3util/quantity.html#Quantity.from_data_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.Quantity.from_data_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a Quantity from an xarray.DataArray.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>data_array
+origin: first point in data within the computational domain
+extent: number of points along each axis within the computational domain</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.Quantity.metadata">
+<em class="property">property </em><code class="sig-name descname">metadata</code><a class="headerlink" href="#fv3gfs.Quantity.metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.Quantity.np">
+<em class="property">property </em><code class="sig-name descname">np</code><a class="headerlink" href="#fv3gfs.Quantity.np" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.Quantity.origin">
+<em class="property">property </em><code class="sig-name descname">origin</code><a class="headerlink" href="#fv3gfs.Quantity.origin" title="Permalink to this definition">¶</a></dt>
+<dd><p>the start of the computational domain</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.Quantity.sel">
+<code class="sig-name descname">sel</code><span class="sig-paren">(</span><em class="sig-param">**kwargs: (&lt;class 'slice'&gt;</em>, <em class="sig-param">&lt;class 'int'&gt;)</em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<a class="reference internal" href="_modules/fv3util/quantity.html#Quantity.sel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.Quantity.sel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience method to perform indexing on <cite>view</cite> using dimension names
+without knowing dimension order.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p><a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs: slice/index to retrieve for a given dimension name</p>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>view_selection: an ndarray-like selection of the given indices</dt><dd><p>on <cite>self.view</cite></p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.Quantity.units">
+<em class="property">property </em><code class="sig-name descname">units</code><a class="headerlink" href="#fv3gfs.Quantity.units" title="Permalink to this definition">¶</a></dt>
+<dd><p>units of the quantity</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.Quantity.values">
+<em class="property">property </em><code class="sig-name descname">values</code><a class="headerlink" href="#fv3gfs.Quantity.values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.Quantity.view">
+<em class="property">property </em><code class="sig-name descname">view</code><a class="headerlink" href="#fv3gfs.Quantity.view" title="Permalink to this definition">¶</a></dt>
+<dd><p>a view into the computational domain of the underlying data</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="fv3gfs.UnitsError">
+<em class="property">exception </em><code class="sig-prename descclassname">fv3gfs.</code><code class="sig-name descname">UnitsError</code><a class="reference internal" href="_modules/fv3util/units.html#UnitsError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.UnitsError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="history.html" class="btn btn-neutral float-right" title="History" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="developers.html" class="btn btn-neutral float-left" title="Developers Notes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Vulcan Technologies, LLC
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
