@@ -58,5 +58,10 @@ Usage
 
 Example run scripts are included in [`examples/runfiles`](https://github.com/VulcanClimateModeling/fv3gfs/tree/master/sorc/fv3gfs.fd/cython_wrapper/examples/runfiles).
 These run scripts act as a drop-in replacement for `fv3.exe`, and get executed
-in the same way, using `mpirun`. They can be used through `fv3run`, as is done in
+in the same way, using `mpirun`:
+
+    mpirun -np 6 --oversubscribe --allow-run-as-root --mca btl_vader_single_copy_mechanism none python online_code.py
+
+Running these files requires them to be placed inside a valid run directory. This is
+done automatically if you run them using `fv3run`, as is done in
 the Makefile in that directory.
