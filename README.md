@@ -45,6 +45,10 @@ docker image. Inside the docker image, you can build or re-build the model with
 `make build` inside the `/fv3gfs-python` directory, and run the test suite with
 `make test`.
 
+Re-building the model inside the image is necessary since your local
+filesystem won't already have the build artifacts necessary to build
+the compiled wrapper.
+
 Building Docs
 -------------
 
