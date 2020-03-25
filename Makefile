@@ -35,6 +35,9 @@ BROWSER := python3 -c "$$BROWSER_PYSCRIPT"
 
 DOCKER_IMAGE?=us.gcr.io/vcm-ml/fv3gfs-python:latest
 
+PYTHON_FILES = $(shell git ls-files | grep -e 'py$$' | grep -v -e '__init__.py')
+PYTHON_INIT_FILES = $(shell git ls-files | grep '__init__.py')
+
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
@@ -72,8 +75,17 @@ public_examples:
 clean-examples:
 	$(MAKE) -C examples/runfiles clean
 
-lint: ## check style with flake8
-	flake8 fv3gfs tests
+lint:
+	black --diff --check $(PYTHON_FILES) $(PYTHON_INIT_FILES)
+	flake8 $(PYTHON_FILES)
+	# ignore unused import error in __init__.py files
+	flake8 --ignore=F401 $(PYTHON_INIT_FILES)
+	@echo "LINTING SUCCESSFUL"
+	$(MAKE) -C external/fv3util lint
+
+reformat:
+	black $(PYTHON_FILES) $(PYTHON_INIT_FILES)
+	$(MAKE) -C external/fv3util reformat
 
 test: ## run tests quickly with the default Python
 	bash tests/run_tests.sh

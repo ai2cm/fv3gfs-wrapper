@@ -2,6 +2,15 @@ version: 2.1
 orbs:
   gcp-gcr: circleci/gcp-gcr@0.6.1
 jobs:
+
+  lint:
+    docker:
+    - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run: sudo pip3 install black==19.10b0 flake8==3.7.8
+      - run: make lint
+
   test_python:
     docker:
       - image: circleci/python:3.7
@@ -111,12 +120,17 @@ workflows:
   version: 2
   tagged-build:
     jobs:
+      - lint:
+          filters:
+            tags:
+              only: /^v.*/
       - test_python:
           filters:
             tags:
               only: /^v.*/
       - build_default:
           requires:
+            - lint
             - test_python
           filters:
             tags:
