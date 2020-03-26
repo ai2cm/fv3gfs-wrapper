@@ -54,4 +54,4 @@ Example run scripts are included in [`examples`](https://github.com/VulcanClimat
 These run scripts act as a drop-in replacement for `fv3.exe`, and get executed
 in the same way, using `mpirun`.
 
-.. _documentation: https://https://vulcanclimatemodeling.github.io/fv3gfs-python/f12n7eq5xkoibbqp/index.html
+.. _documentation: https://vulcanclimatemodeling.github.io/fv3gfs-python/f12n7eq5xkoibbqp/index.html
