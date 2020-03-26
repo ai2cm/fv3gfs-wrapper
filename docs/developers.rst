@@ -43,3 +43,18 @@ automatically write getters and setters for each model variable. This allows
 :py:func:`fv3gfs.get_state` and :py:func:`fv3gfs.set_state` to interface with those
 variables in the Fortran model. Getting/setting new variables involves updating those
 properties (in their respective JSON files) and then rebuilding the wrapper.
+
+Docker build system
+-------------------
+
+`fv3gfs-python` depends on a number of docker build stages, and is itself used to
+build other images. To avoid these docs being out of date, you can see exactly which
+stages are depended on by reading `build_docker.sh`.
+
+Images built using a dockerfile under `lib/external` are provided by the fv3gfs-fortran
+repo. Compiled binaries from these images are copied into the fv3gfs-python image.
+
+Building using Docker is a little all-or-nothing. For example, to rebuild the image
+after making a small change to the Fortran code requires entirely re-building the
+Fortran model. This can be avoided to some degree by using `dev_docker.sh` to enter
+the image interactively.
