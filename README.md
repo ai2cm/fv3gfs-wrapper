@@ -5,7 +5,7 @@ FV3GFS
 fv3gfs-python (`import fv3gfs`), is a Python wrapper for the FV3GFS
 global climate model.
 
-See the documentation for more detailed instructions.
+See the documentation_ for more detailed instructions.
 
 Checking out
 ------------
@@ -53,3 +53,5 @@ Usage
 Example run scripts are included in [`examples`](https://github.com/VulcanClimateModeling/fv3gfs/tree/master/sorc/fv3gfs.fd/cython_wrapper/examples).
 These run scripts act as a drop-in replacement for `fv3.exe`, and get executed
 in the same way, using `mpirun`.
+
+.. _documentation: http://fv3gfs-python.github.io/f12n7eq5xkoibbqp/index.html

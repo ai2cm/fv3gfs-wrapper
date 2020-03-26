@@ -1,4 +1,6 @@
 .. highlight:: shell
+.. meta::
+   :robots: noindex, nofollow
 
 ================
 Developers Notes

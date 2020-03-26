@@ -132,7 +132,10 @@ jobs:
             git config user.name "ci-build"
       - run:
           name: Deploy docs to gh-pages branch
-          command: gh-pages --dist docs/_build/html
+          command: |
+            mkdir upload
+            mv docs/_build/html upload/f12n7eq5xkoibbqp
+            gh-pages --dist upload
 
 workflows:
   version: 2
