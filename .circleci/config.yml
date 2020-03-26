@@ -136,7 +136,7 @@ jobs:
             mkdir upload
             touch upload/.nojekyll
             mv docs/_build/html upload/f12n7eq5xkoibbqp
-            gh-pages --dist upload
+            gh-pages --dotfiles --dist upload
 
 workflows:
   version: 2
