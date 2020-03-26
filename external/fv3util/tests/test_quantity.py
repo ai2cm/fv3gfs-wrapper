@@ -115,12 +115,6 @@ def test_compute_view_edit_end_halo(quantity, extent_1d, n_halo, n_dims):
         quantity.view[(extent_1d,) * n_dims] = 1
         assert quantity.np.sum(quantity.data) == 1.0
         assert quantity.data[(n_halo + extent_1d,) * n_dims] == 1
-    # if n_dims != 1 or n_halo < 1:
-    #     pytest.skip()
-    # quantity.data[:] = 0.
-    # quantity.view[extent_1d] = 1
-    # assert quantity.data[n_halo + extent_1d] == 1
-    # assert quantity.np.sum(quantity.data) == 1.0
 
 
 def test_compute_view_edit_start_of_domain(quantity, extent_1d, n_halo, n_dims):

@@ -139,6 +139,48 @@ def get_quantity(dims, units, extent, n_halo, numpy):
     )
 
 
+def test_tile_gather_state(tile_quantity, scattered_quantities, communicator_list, time):
+    for communicator, rank_quantity in reversed(list(zip(communicator_list, scattered_quantities))):
+        state = {
+            'time': time,
+            'air_temperature': rank_quantity
+        }
+        out = communicator.gather_state(send_state=state)
+        if communicator.rank == 0:
+            result_state = out
+        else:
+            assert out is None
+    assert result_state['time'] == time
+    result = result_state['air_temperature']
+    assert result.dims == tile_quantity.dims
+    assert result.units == tile_quantity.units
+    assert result.extent == tile_quantity.extent
+    tile_quantity.np.testing.assert_array_equal(result.view[:], tile_quantity.view[:])
+
+
+def test_tile_gather_state_with_recv_state(tile_quantity, scattered_quantities, communicator_list, time):
+    recv_state = {
+        'time': time,
+        'air_temperature': copy.deepcopy(tile_quantity)
+    }
+    recv_state['air_temperature'].data[:] = -1
+    for communicator, rank_quantity in reversed(list(zip(communicator_list, scattered_quantities))):
+        state = {
+            'time': time,
+            'air_temperature': rank_quantity
+        }
+        if communicator.rank == 0:
+            communicator.gather_state(send_state=state, recv_state=recv_state)
+        else:
+            communicator.gather_state(send_state=state)
+    assert recv_state['time'] == time
+    result = recv_state['air_temperature']
+    assert result.dims == tile_quantity.dims
+    assert result.units == tile_quantity.units
+    assert result.extent == tile_quantity.extent
+    tile_quantity.np.testing.assert_array_equal(result.view[:], tile_quantity.view[:])
+
+
 def test_tile_gather_no_recv_quantity(tile_quantity, scattered_quantities, communicator_list):
     for communicator, rank_quantity in reversed(list(zip(communicator_list, scattered_quantities))):
         result = communicator.gather(send_quantity=rank_quantity)
@@ -183,16 +225,17 @@ def test_tile_scatter_with_recv_quantity(tile_quantity, scattered_quantities, co
 
 def test_tile_gather_with_recv_quantity(tile_quantity, scattered_quantities, communicator_list):
     recv_quantity = copy.deepcopy(tile_quantity)
+    recv_quantity.data[:] = -1
     for communicator, rank_quantity in reversed(list(zip(communicator_list, scattered_quantities))):
         if communicator.rank == 0:
             result = communicator.gather(send_quantity=rank_quantity, recv_quantity=recv_quantity)
         else:
             result = communicator.gather(send_quantity=rank_quantity)
             assert result is None
-    assert result.dims == tile_quantity.dims
-    assert result.units == tile_quantity.units
-    assert result.extent == tile_quantity.extent
-    tile_quantity.np.testing.assert_array_equal(result.view[:], tile_quantity.view[:])
+    assert recv_quantity.dims == tile_quantity.dims
+    assert recv_quantity.units == tile_quantity.units
+    assert recv_quantity.extent == tile_quantity.extent
+    tile_quantity.np.testing.assert_array_equal(recv_quantity.view[:], tile_quantity.view[:])
 
 
 def test_tile_scatter_state(tile_quantity, scattered_quantities, communicator_list, time):
@@ -203,7 +246,7 @@ def test_tile_scatter_state(tile_quantity, scattered_quantities, communicator_li
     result_list = []
     for communicator in communicator_list:
         if communicator.rank == 0:
-            result_list.append(communicator.scatter_state(tile_state=state))
+            result_list.append(communicator.scatter_state(send_state=state))
         else:
             result_list.append(communicator.scatter_state())
     for result_state, scattered in zip(result_list, scattered_quantities):
@@ -229,7 +272,7 @@ def test_tile_scatter_state_with_recv_state(tile_quantity, scattered_quantities,
             'air_temperature': recv,
         }
         if communicator.rank == 0:
-            result = communicator.scatter_state(tile_state=tile_state, recv_state=state)
+            result = communicator.scatter_state(send_state=tile_state, recv_state=state)
         else:
             result = communicator.scatter_state(recv_state=state)
         assert result['time'] == time

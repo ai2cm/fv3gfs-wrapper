@@ -2,8 +2,6 @@ import fv3util.rotate
 import pytest
 import numpy as np
 
-# rotate_vector_data(x_data, y_data, x_metadata, y_metadata, n_clockwise_rotations)
-
 
 @pytest.mark.parametrize(
     "start_data, n_clockwise_rotations, dims, target_data",

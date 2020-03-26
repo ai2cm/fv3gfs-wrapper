@@ -27,7 +27,7 @@ def rotate_scalar_data(data, dims, numpy, n_clockwise_rotations):
                 slice_list.append(slice(None, None, -1))
             else:
                 slice_list.append(slice(None, None))
-        data = data[slice_list]
+        data = data[tuple(slice_list)]
     return data
 
 
