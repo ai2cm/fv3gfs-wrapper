@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta content="noindex, nofollow" name="robots" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Usage &mdash; FV3GFS 0.3.1 documentation</title>
@@ -281,7 +282,7 @@ script with a general structure as follows:</p>
 <span class="n">fv3gfs</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
 <span class="n">restart_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
     <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
-    <span class="sa">f</span><span class="s1">&#39;RESTART/restart.rank</span><span class="si">{</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span><span class="si">}</span><span class="s1">.nc&#39;</span>
+    <span class="sa">f</span><span class="s1">&#39;RESTART/restart.rank{MPI.COMM_WORLD.Get_rank()}.nc&#39;</span>
 <span class="p">)</span>
 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">restart_filename</span><span class="p">):</span>
     <span class="n">restart_state</span> <span class="o">=</span> <span class="n">fv3gfs</span><span class="o">.</span><span class="n">read_state</span><span class="p">(</span><span class="n">restart_filename</span><span class="p">)</span>

@@ -5,10 +5,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta content="noindex, nofollow" name="robots" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; FV3GFS 0.3.1 documentation</title>
+  <title>Communication &mdash; FV3GFS 0.3.1 documentation</title>
   
 
   
@@ -35,8 +36,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Usage" href="usage.html" />
-    <link rel="prev" title="Readme" href="readme.html" /> 
+    <link rel="next" title="Developers Notes" href="developers.html" />
+    <link rel="prev" title="State" href="state.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -87,15 +88,10 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="readme.html">Readme</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#docker">Docker</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#test">Test</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="state.html">State</a></li>
-<li class="toctree-l1"><a class="reference internal" href="communication.html">Communication</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Communication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developers Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
@@ -144,13 +140,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Installation</li>
+      <li>Communication</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/communication.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -163,33 +159,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="docker">
-<h2>Docker<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h2>
-<p>Installation onto your host machine is currently only supported using Docker.
-If you would like to run this package on your host directly, please consult
-the Dockerfile for the build process and attempt to replicate it as closely
-as possible on your machine.</p>
-</div>
-<div class="section" id="build">
-<h2>Build<a class="headerlink" href="#build" title="Permalink to this headline">¶</a></h2>
-<p>The <cite>fv3gfs-python</cite> docker image can be build with:: console</p>
-<blockquote>
-<div><p>$ build_docker.sh</p>
-</div></blockquote>
-<p>By default this will produce an image <code class="docutils literal notranslate"><span class="pre">us.gcr.io/vcm-ml/fv3gfs-python:latest</span></code>. You can
-rename this image to whatever you like using <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">tag</span> <span class="pre">us.gcr.io/vcm-ml/fv3gfs-python:latest</span> <span class="pre">&lt;new_name&gt;</span></code>.</p>
-</div>
-<div class="section" id="test">
-<h2>Test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h2>
-<p>You can easily build the docker image and then run all tests using:: console</p>
-<blockquote>
-<div><p>$ test_docker.sh</p>
-</div></blockquote>
-<p>If you would like more fine-grained control over the build and test process, you can
-run tests directly. Read <code class="docutils literal notranslate"><span class="pre">test_docker.sh</span></code> for usage examples.</p>
-</div>
+  <div class="section" id="communication">
+<h1>Communication<a class="headerlink" href="#communication" title="Permalink to this headline">¶</a></h1>
+<p>As mentioned when discussing <a class="reference internal" href="state.html#state"><span class="std std-ref">State</span></a>, each process or “rank” in fv3gfs is responsible
+for a subset of the cubed sphere grid. In order to operate, the model needs to know
+how to partition that cubed sphere into parts for each rank, and to be able to
+communicate data between those ranks.</p>
+<p>Partitioning is managed by so-called “Partitioner” objects. The
+<code class="xref py py-class docutils literal notranslate"><span class="pre">fv3gfs.CubedSpherePartitoner</span></code> manages the entire cubed sphere, while the
+<a class="reference internal" href="api.html#fv3gfs.TilePartitioner" title="fv3gfs.TilePartitioner"><code class="xref py py-class docutils literal notranslate"><span class="pre">fv3gfs.TilePartitioner</span></code></a> manages one of the six faces of the cube, or a
+region on one of those faces. For communication, we similarly have
+<a class="reference internal" href="api.html#fv3gfs.CubedSphereCommunicator" title="fv3gfs.CubedSphereCommunicator"><code class="xref py py-class docutils literal notranslate"><span class="pre">fv3gfs.CubedSphereCommunicator</span></code></a> and <a class="reference internal" href="api.html#fv3gfs.TileCommunicator" title="fv3gfs.TileCommunicator"><code class="xref py py-class docutils literal notranslate"><span class="pre">fv3gfs.TileCommunicator</span></code></a>.
+Please see their API documentation for an up-to-date list of current communications
+routines.</p>
 </div>
 
 
@@ -200,10 +182,10 @@ run tests directly. Read <code class="docutils literal notranslate"><span class=
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="usage.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="developers.html" class="btn btn-neutral float-right" title="Developers Notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="readme.html" class="btn btn-neutral float-left" title="Readme" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="state.html" class="btn btn-neutral float-left" title="State" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

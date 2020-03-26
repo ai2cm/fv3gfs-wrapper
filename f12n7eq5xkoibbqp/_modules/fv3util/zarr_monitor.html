@@ -226,13 +226,13 @@
         <span class="n">extra_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_writers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_names</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;provided state has keys </span><span class="si">{</span><span class="n">extra_names</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;provided state has keys </span><span class="si">{extra_names}</span><span class="s2"> &quot;</span>
                 <span class="s2">&quot;that were not present in earlier states&quot;</span>
             <span class="p">)</span>
         <span class="n">missing_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_writers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_names</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;provided state is missing keys </span><span class="si">{</span><span class="n">missing_names</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;provided state is missing keys </span><span class="si">{missing_names}</span><span class="s2"> &quot;</span>
                 <span class="s2">&quot;that were present in earlier states&quot;</span>
             <span class="p">)</span>
 
@@ -337,7 +337,7 @@
         <span class="p">)</span>
 
         <span class="n">from_slice</span> <span class="o">=</span> <span class="n">_get_from_slice</span><span class="p">(</span><span class="n">target_slice</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;assigning data from subtile slice </span><span class="si">{</span><span class="n">from_slice</span><span class="si">}</span><span class="s1"> to target slice </span><span class="si">{</span><span class="n">target_slice</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;assigning data from subtile slice </span><span class="si">{from_slice}</span><span class="s1"> to target slice </span><span class="si">{target_slice}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">target_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">quantity</span><span class="o">.</span><span class="n">view</span><span class="p">[</span><span class="n">from_slice</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">i_time</span> <span class="o">+=</span> <span class="mi">1</span>
 
@@ -351,8 +351,8 @@
         <span class="n">new_attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_attrs</span><span class="p">(</span><span class="n">new_quantity</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span> <span class="o">!=</span> <span class="n">new_attrs</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;value for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> with attrs </span><span class="si">{</span><span class="n">new_attrs</span><span class="si">}</span><span class="s2"> &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;does not match previously stored attrs </span><span class="si">{</span><span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;value for </span><span class="si">{self.name}</span><span class="s2"> with attrs </span><span class="si">{new_attrs}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;does not match previously stored attrs {dict(self.array.attrs)}&quot;</span>
             <span class="p">)</span>
 
 
