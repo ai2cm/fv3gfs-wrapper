@@ -201,7 +201,7 @@
             <span class="k">return</span> <span class="n">cupy</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;quantity underlying data is of unexpected type </span><span class="si">{self.data_type}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;quantity underlying data is of unexpected type </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
 
@@ -322,9 +322,9 @@
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Quantity(</span><span class="se">\n</span><span class="s2">    data=</span><span class="se">\n</span><span class="si">{self.data}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    dims=</span><span class="si">{self.dims}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;    units=</span><span class="si">{self.units}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    origin=</span><span class="si">{self.origin}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;    extent=</span><span class="si">{self.extent}</span><span class="se">\n</span><span class="s2">)&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Quantity(</span><span class="se">\n</span><span class="s2">    data=</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    dims=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;    units=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">    origin=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;    extent=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">extent</span><span class="si">}</span><span class="se">\n</span><span class="s2">)&quot;</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="Quantity.sel"><a class="viewcode-back" href="../../api.html#fv3gfs.Quantity.sel">[docs]</a>    <span class="k">def</span> <span class="nf">sel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="p">(</span><span class="nb">slice</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>

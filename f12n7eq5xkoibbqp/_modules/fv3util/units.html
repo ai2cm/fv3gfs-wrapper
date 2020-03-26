@@ -159,7 +159,7 @@
 
 <span class="k">def</span> <span class="nf">ensure_equal_units</span><span class="p">(</span><span class="n">units1</span><span class="p">,</span> <span class="n">units2</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">units_are_equal</span><span class="p">(</span><span class="n">units1</span><span class="p">,</span> <span class="n">units2</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">UnitsError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;incompatible units </span><span class="si">{units1}</span><span class="s1"> and </span><span class="si">{units2}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">UnitsError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;incompatible units </span><span class="si">{</span><span class="n">units1</span><span class="si">}</span><span class="s1"> and </span><span class="si">{</span><span class="n">units2</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">units_are_equal</span><span class="p">(</span><span class="n">units1</span><span class="p">,</span> <span class="n">units2</span><span class="p">):</span>
