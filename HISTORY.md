@@ -28,6 +28,7 @@ Minor changes:
 - Removed the old  "integration" tests, as their functionality (at least what was enabled) is covered entirely by the newer "image" tests which are compared against the results from the pure-fortran repo.
 - Incremented fv3config commit to include fix to version string
 - Add getters/setters for temperature_after_physics, eastward_wind_after_physics, northward_wind_after_physics
+- Fixed a bug in `dev_docker.sh` where the Fortran sources weren't being bind-mounted, only the Python files
 
 0.3.1
 -----
