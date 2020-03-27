@@ -5,6 +5,13 @@ latest
 ------
 
 
+0.3.2
+-----
+
+Major changes:
+- Update fv3gfs-fortran submodule to df28fccc. Most important changes are introduction of `use_analysis_sst` and `do_gfdl_mp_in_physics` namelist options.
+
+
 0.3.1
 -----
 
