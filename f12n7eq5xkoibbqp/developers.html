@@ -96,6 +96,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#fv3util-package"><code class="docutils literal notranslate"><span class="pre">fv3util</span></code> Package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#templates">Templates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#properties-files">Properties Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#docker-build-system">Docker build system</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
@@ -197,6 +198,18 @@ automatically write getters and setters for each model variable. This allows
 <a class="reference internal" href="api.html#fv3gfs.get_state" title="fv3gfs.get_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.get_state()</span></code></a> and <a class="reference internal" href="api.html#fv3gfs.set_state" title="fv3gfs.set_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.set_state()</span></code></a> to interface with those
 variables in the Fortran model. Getting/setting new variables involves updating those
 properties (in their respective JSON files) and then rebuilding the wrapper.</p>
+</div>
+<div class="section" id="docker-build-system">
+<h2>Docker build system<a class="headerlink" href="#docker-build-system" title="Permalink to this headline">¶</a></h2>
+<p><cite>fv3gfs-python</cite> depends on a number of docker build stages, and is itself used to
+build other images. To avoid these docs being out of date, you can see exactly which
+stages are depended on by reading <cite>build_docker.sh</cite>.</p>
+<p>Images built using a dockerfile under <cite>lib/external</cite> are provided by the fv3gfs-fortran
+repo. Compiled binaries from these images are copied into the fv3gfs-python image.</p>
+<p>Building using Docker is a little all-or-nothing. For example, to rebuild the image
+after making a small change to the Fortran code requires entirely re-building the
+Fortran model. This can be avoided to some degree by using <cite>dev_docker.sh</cite> to enter
+the image interactively.</p>
 </div>
 </div>
 

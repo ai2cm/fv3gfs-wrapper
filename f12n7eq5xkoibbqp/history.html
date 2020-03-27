@@ -184,13 +184,17 @@
 - examples are updated for the new code and now run on CircleCI
 - gt4py is included in the <cite>fv3gfs-python</cite> image
 - <cite>Quantity.from_storage</cite> and <cite>Quantity.storage</cite> are removed - storages are treated the same as if they were numpy/cupy arrays. To retrieve the storage, use <cite>Quantity.data</cite> on a quantity that has been initialized from a storage object.
-- All tests using numpy arrays now also run using gt4py <cite>CPUStorage</cite> objects.</p>
+- All tests using numpy arrays now also run using gt4py <cite>CPUStorage</cite> objects.
+- Added <cite>compute_physics</cite> and <cite>apply_physics</cite> functions, which separately do the physics and apply the output of the physics routines to the atmospheric prognostic state.
+- Update Fortran sources. Major change is addition of <cite>use_analysis_sst</cite> namelist option.</p>
 <p>Minor changes:
 - Added C12 regression test for <cite>open_restart</cite>
 - added scipy and pytest-subtests to requirements and docker container
 - fixed docker container so that <cite>dev_docker.sh</cite> no longer overwrites ESMF and FMS installations
 - Removed the old  “integration” tests, as their functionality (at least what was enabled) is covered entirely by the newer “image” tests which are compared against the results from the pure-fortran repo.
-- Incremented fv3config commit to include fix to version string</p>
+- Incremented fv3config commit to include fix to version string
+- Add getters/setters for temperature_after_physics, eastward_wind_after_physics, northward_wind_after_physics
+- Fixed a bug in <cite>dev_docker.sh</cite> where the Fortran sources weren’t being bind-mounted, only the Python files</p>
 </div>
 <div class="section" id="id1">
 <h2>0.3.1<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
