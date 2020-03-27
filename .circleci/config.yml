@@ -81,6 +81,10 @@ jobs:
           command: |
             make public_examples
       - run:
+          name: "Build documentation"
+          command: |
+            make docs-docker
+      - run:
           name: "Enable Python 2 for google cloud tools"
           command: |
             pyenv global 2.7.12
@@ -106,6 +110,33 @@ jobs:
           when: on_fail
       - store_artifacts:
           path: ./tests/image_tests/output
+      - persist_to_workspace:
+          root: docs/_build
+          paths: html
+
+  docs_deploy:
+    docker:
+      - image: node:8.10.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: docs/_build
+      - add_ssh_keys:
+          fingerprints:
+            - "92:ab:f0:a2:9e:78:fa:5d:dc:c9:b2:38:9a:46:b1:ab"  # push fv3gfs-python
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install -g --silent gh-pages@2.0.1
+            git config user.email "ci-build@vulcan.com"
+            git config user.name "ci-build"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: |
+            mkdir upload
+            touch upload/.nojekyll
+            mv docs/_build/html upload/f12n7eq5xkoibbqp
+            gh-pages --dotfiles --dist upload
 
 workflows:
   version: 2
@@ -121,3 +152,9 @@ workflows:
           filters:
             tags:
               only: /^v.*/
+      - docs_deploy:
+          requires:
+            - build_default
+          filters:
+            branches:
+              only: master

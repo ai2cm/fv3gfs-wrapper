@@ -5,7 +5,8 @@ FV3GFS
 fv3gfs-python (`import fv3gfs`), is a Python wrapper for the FV3GFS
 global climate model.
 
-See the documentation for more detailed instructions.
+See the [documentation](https://vulcanclimatemodeling.github.io/fv3gfs-python/f12n7eq5xkoibbqp/index.html)
+for more detailed instructions.
 
 Checking out
 ------------
