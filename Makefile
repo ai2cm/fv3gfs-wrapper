@@ -3,7 +3,9 @@ SHELL = /bin/sh
 ifndef FV3GFS_BUILD_DIR
 	FV3GFS_BUILD_DIR=$(shell pwd)/lib/external/FV3/
 endif
-include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
+ifneq ("$(wildcard $(FV3GFS_BUILD_DIR)/conf/configure.fv3)","")
+	include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
+endif
 
 .PHONY: build clean clean-test clean-pyc clean-build clean-examples examples lint test coverage docs help docs-docker
 .DEFAULT_GOAL := help
