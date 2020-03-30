@@ -186,7 +186,12 @@
 - <cite>Quantity.from_storage</cite> and <cite>Quantity.storage</cite> are removed - storages are treated the same as if they were numpy/cupy arrays. To retrieve the storage, use <cite>Quantity.data</cite> on a quantity that has been initialized from a storage object.
 - All tests using numpy arrays now also run using gt4py <cite>CPUStorage</cite> objects.
 - Added <cite>compute_physics</cite> and <cite>apply_physics</cite> functions, which separately do the physics and apply the output of the physics routines to the atmospheric prognostic state.
-- Update Fortran sources. Major change is addition of <cite>use_analysis_sst</cite> namelist option.</p>
+- Update Fortran sources. Major change is addition of <cite>use_analysis_sst</cite> namelist option.
+- Tile gather operation is implemented in <cite>TileCommunicator.gather</cite>
+- vector halo updates are implemented in <cite>CubedSphereCommunicator.start_vector_halo_update</cite> and <cite>CubedSphereCommunicator.finish_vector_halo_update</cite>.
+- Interface-level halo updates were fixed to match fv3gfs behavior. The outermost values on interface level variables are in the compute domain on both ranks bordering it, and are not sent at all during halo update. Instead, the next three interior values are sent.
+- Added framework for testing MPI mock against mpi4py, with tests for Scatter, Gather, Send/Recv, and Isend/Irecv.
+- fv3config updated to latest master</p>
 <p>Minor changes:
 - Added C12 regression test for <cite>open_restart</cite>
 - added scipy and pytest-subtests to requirements and docker container
@@ -194,7 +199,10 @@
 - Removed the old  “integration” tests, as their functionality (at least what was enabled) is covered entirely by the newer “image” tests which are compared against the results from the pure-fortran repo.
 - Incremented fv3config commit to include fix to version string
 - Add getters/setters for temperature_after_physics, eastward_wind_after_physics, northward_wind_after_physics
-- Fixed a bug in <cite>dev_docker.sh</cite> where the Fortran sources weren’t being bind-mounted, only the Python files</p>
+- Fixed a bug in <cite>dev_docker.sh</cite> where the Fortran sources weren’t being bind-mounted, only the Python files
+- tests are added for scalar and vector rotation
+- concurrency issues in the MPI mock now raise a custom <cite>ConcurrencyError</cite>.
+- Fixed two counter-acting bugs: rotation now rotates in the correct direction, and halo updates now appropriately rotate arrays counter to the relative rotation of the axes on the two tiles, instead of in the same direction as that rotation</p>
 </div>
 <div class="section" id="id1">
 <h2>0.3.1<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
