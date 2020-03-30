@@ -1,3 +1,6 @@
+.. meta::
+   :robots: noindex, nofollow
+
 =====
 Usage
 =====
@@ -43,6 +46,12 @@ number of times the Fortran code itself would execute the main loop before exiti
 :py:func:`fv3gfs.cleanup` could be ommitted as far as memory cleanup is concerned, but it does write
 final restart output and should be included if you want to maintain the normal behavior you would get
 in the Fortran model.
+
+.. note::
+    The :py:func:`fv3gfs.step_physics` call can be separated into two calls, :py:func:`fv3gfs.compute_physics`
+    and :py:func:`fv3gfs.apply_physics` to allow modification of the model state in between these operations.
+    However care should be taken when doing this, because the physics and dynamics states are not
+    consistent with each other before :py:func:`fv3gfs.apply_physics` is called.
 
 Instead of using a Python script, it is also possible to get precisely the behavior of :code:`fv3.exe` using
 
