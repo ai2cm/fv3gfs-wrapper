@@ -28,6 +28,27 @@
         "dims": ["y", "x"]
     },
     {
+        "name": "longitude",
+        "fortran_name": "xlon",
+        "units": "radians",
+        "container": "Grid",
+        "dims": ["y", "x"]
+    },
+    {
+        "name": "latitude",
+        "fortran_name": "xlat",
+        "units": "radians",
+        "container": "Grid",
+        "dims": ["y", "x"]
+    },
+    {
+        "name": "area_of_grid_cell",
+        "fortran_name": "area",
+        "units": "m^2",
+        "container": "Grid",
+        "dims": ["y", "x"]
+    },
+    {
         "name": "total_sky_downward_shortwave_flux_at_surface",
         "fortran_name": "sfcfsw",
         "fortran_subname": "dnfxc",
