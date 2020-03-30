@@ -12,16 +12,15 @@ MPI.Finalize()
 
 
 class UsingMPITests(unittest.TestCase):
-
     def test_getters(self):
-        run_unittest_script(os.path.join(base_dir, 'test_getters.py'))
+        run_unittest_script(os.path.join(base_dir, "test_getters.py"))
 
     def test_setters(self):
-        run_unittest_script(os.path.join(base_dir, 'test_setters.py'))
+        run_unittest_script(os.path.join(base_dir, "test_setters.py"))
 
     def test_restart(self):
-        run_unittest_script(os.path.join(base_dir, 'test_restart.py'))
+        run_unittest_script(os.path.join(base_dir, "test_restart.py"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
