@@ -1,3 +1,6 @@
+.. meta::
+   :robots: noindex, nofollow
+
 .. _state-overview:
 =====
 State

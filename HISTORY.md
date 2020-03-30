@@ -18,6 +18,13 @@ Major changes:
 - gt4py is included in the `fv3gfs-python` image
 - `Quantity.from_storage` and `Quantity.storage` are removed - storages are treated the same as if they were numpy/cupy arrays. To retrieve the storage, use `Quantity.data` on a quantity that has been initialized from a storage object.
 - All tests using numpy arrays now also run using gt4py `CPUStorage` objects.
+- Added `compute_physics` and `apply_physics` functions, which separately do the physics and apply the output of the physics routines to the atmospheric prognostic state.
+- Update Fortran sources. Major change is addition of `use_analysis_sst` namelist option.
+- Tile gather operation is implemented in `TileCommunicator.gather`
+- vector halo updates are implemented in `CubedSphereCommunicator.start_vector_halo_update` and `CubedSphereCommunicator.finish_vector_halo_update`.
+- Interface-level halo updates were fixed to match fv3gfs behavior. The outermost values on interface level variables are in the compute domain on both ranks bordering it, and are not sent at all during halo update. Instead, the next three interior values are sent.
+- Added framework for testing MPI mock against mpi4py, with tests for Scatter, Gather, Send/Recv, and Isend/Irecv.
+- fv3config updated to latest master
 
 Minor changes:
 - Added C12 regression test for `open_restart`
@@ -25,6 +32,11 @@ Minor changes:
 - fixed docker container so that `dev_docker.sh` no longer overwrites ESMF and FMS installations
 - Removed the old  "integration" tests, as their functionality (at least what was enabled) is covered entirely by the newer "image" tests which are compared against the results from the pure-fortran repo.
 - Incremented fv3config commit to include fix to version string
+- Add getters/setters for temperature_after_physics, eastward_wind_after_physics, northward_wind_after_physics
+- Fixed a bug in `dev_docker.sh` where the Fortran sources weren't being bind-mounted, only the Python files
+- tests are added for scalar and vector rotation
+- concurrency issues in the MPI mock now raise a custom `ConcurrencyError`.
+- Fixed two counter-acting bugs: rotation now rotates in the correct direction, and halo updates now appropriately rotate arrays counter to the relative rotation of the axes on the two tiles, instead of in the same direction as that rotation
 
 0.3.1
 -----

@@ -1,3 +1,6 @@
+.. meta::
+   :robots: noindex, nofollow
+
 Welcome to FV3GFS's documentation!
 ======================================
 
