@@ -38,8 +38,8 @@ cdef extern:
     void get_num_cpld_calls(int *num_cpld_calls_out)
     void get_nz_soil_subroutine(int *nz_soil)
 {% for item in physics_2d_properties %}
-    void get_{{ item.fortran_name }}(REAL_t *{{ item.fortran_name }}_out)
-    void set_{{ item.fortran_name }}(REAL_t *{{ item.fortran_name }}_in)
+    void get_{{ item.fortran_name }}{% if "fortran_subname" in item %}_{{ item.fortran_subname }}{% endif %}(REAL_t *{{ item.fortran_name }}_out)
+    void set_{{ item.fortran_name }}{% if "fortran_subname" in item %}_{{ item.fortran_subname }}{% endif %}(REAL_t *{{ item.fortran_name }}_in)
 {% endfor %}
 {% for item in physics_3d_properties %}
     void get_{{ item.fortran_name }}(REAL_t *{{ item.fortran_name }}_out, int *nz)
@@ -184,7 +184,7 @@ cdef int set_2d_quantity(name, REAL_t[:, ::1] array) except -1:
 {% endfor %}
 {% for item in physics_2d_properties %}
     elif name == '{{ item.name }}':
-        set_{{ item.fortran_name }}(&array[0, 0])
+        set_{{ item.fortran_name }}{% if "fortran_subname" in item %}_{{ item.fortran_subname }}{% endif %}(&array[0, 0])
 {% endfor %}
     else:
         raise ValueError(f'no setter available for {name}')
@@ -227,7 +227,7 @@ def get_state(names):
 {% for item in physics_2d_properties %}
     if '{{ item.name }}' in input_names_set:
         array_2d = get_array_from_dims({{ item.dims | safe }})
-        get_{{ item.fortran_name }}(&array_2d[0, 0])
+        get_{{ item.fortran_name }}{% if "fortran_subname" in item %}_{{ item.fortran_subname }}{% endif %}(&array_2d[0, 0])
         return_dict['{{ item.name }}'] = fv3util.Quantity(
             np.asarray(array_2d),
             dims={{ item.dims | safe }},
