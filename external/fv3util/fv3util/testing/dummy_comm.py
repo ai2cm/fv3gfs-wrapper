@@ -101,11 +101,16 @@ class DummyComm:
 
     def Gather(self, sendbuf, recvbuf, root=0):
         gather_buffer = self._gather_buffer
-        if len(gather_buffer) == 0:
-            for i in range(self.total_ranks):
-                gather_buffer.append(None)
         gather_buffer[self.rank] = sendbuf
         if self.rank == root:
+            # ndarrays are finnicky, have to check for None like this:
+            if any(item is None for item in gather_buffer):
+                uncalled_ranks = [
+                    i for i, val in enumerate(gather_buffer) if val is None
+                ]
+                raise ConcurrencyError(
+                    f'gather called on master rank before ranks {uncalled_ranks}'
+                )
             for i, sendbuf in enumerate(gather_buffer):
                 recvbuf[i, :] = sendbuf
 
