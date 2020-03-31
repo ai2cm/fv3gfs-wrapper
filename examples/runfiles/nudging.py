@@ -5,18 +5,18 @@ import fv3gfs
 from mpi4py import MPI
 
 
-REFERENCE_DIR = 'gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/'
-TENDENCY_OUT_FILENAME = 'nudging_tendencies.nc'
+REFERENCE_DIR = "gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/"
+TENDENCY_OUT_FILENAME = "nudging_tendencies.nc"
 RUN_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 def get_timestep(config):
-    return timedelta(seconds=config['namelist']['coupler_nml']['dt_atmos'])
+    return timedelta(seconds=config["namelist"]["coupler_nml"]["dt_atmos"])
 
 
 def get_timescales_from_config(config):
     return_dict = {}
-    for name, hours in config['nudging']['timescale_hours'].items():
+    for name, hours in config["nudging"]["timescale_hours"].items():
         return_dict[name] = timedelta(hours=hours)
     return return_dict
 
@@ -38,10 +38,12 @@ def get_reference_state(time, communicator, only_names):
 
 
 def nudge_to_reference(state, communicator, timescales, timestep):
-    reference = get_reference_state(state['time'], communicator, only_names=timescales.keys())
+    reference = get_reference_state(
+        state["time"], communicator, only_names=timescales.keys()
+    )
     tendencies = fv3gfs.apply_nudging(state, reference, timescales, timestep)
-    tendencies = append_key_label(tendencies, '_tendency_due_to_nudging')
-    tendencies['time'] = state['time']
+    tendencies = append_key_label(tendencies, "_tendency_due_to_nudging")
+    tendencies["time"] = state["time"]
     return tendencies
 
 
@@ -52,15 +54,14 @@ def append_key_label(d, suffix):
     return return_dict
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     rank = MPI.COMM_WORLD.Get_rank()
     current_dir = os.getcwd()
-    with open('fv3config.yml', 'r') as config_file:
+    with open("fv3config.yml", "r") as config_file:
         config = yaml.safe_load(config_file)
     MPI.COMM_WORLD.barrier()  # wait for master rank to write run directory
     communicator = fv3gfs.CubedSphereCommunicator(
-        MPI.COMM_WORLD,
-        fv3gfs.CubedSpherePartitioner.from_namelist(config["namelist"])
+        MPI.COMM_WORLD, fv3gfs.CubedSpherePartitioner.from_namelist(config["namelist"])
     )
     nudging_timescales = get_timescales_from_config(config)
     timestep = get_timestep(config)
@@ -77,8 +78,10 @@ if __name__ == '__main__':
         fv3gfs.step_physics()
         fv3gfs.save_intermediate_restart_if_enabled()
 
-        state = fv3gfs.get_state(names=['time'] + list(nudging_timescales.keys()))
-        tendencies = nudge_to_reference(state, communicator, nudging_timescales, timestep)
+        state = fv3gfs.get_state(names=["time"] + list(nudging_timescales.keys()))
+        tendencies = nudge_to_reference(
+            state, communicator, nudging_timescales, timestep
+        )
         tendency_monitor.store(tendencies)
         fv3gfs.set_state(state)
     fv3gfs.cleanup()
