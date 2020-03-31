@@ -202,7 +202,10 @@
 - Fixed a bug in <cite>dev_docker.sh</cite> where the Fortran sources weren’t being bind-mounted, only the Python files
 - tests are added for scalar and vector rotation
 - concurrency issues in the MPI mock now raise a custom <cite>ConcurrencyError</cite>.
-- Fixed two counter-acting bugs: rotation now rotates in the correct direction, and halo updates now appropriately rotate arrays counter to the relative rotation of the axes on the two tiles, instead of in the same direction as that rotation</p>
+- Fixed two counter-acting bugs: rotation now rotates in the correct direction, and halo updates now appropriately rotate arrays counter to the relative rotation of the axes on the two tiles, instead of in the same direction as that rotation
+- Files are fixed to pass our style checks
+- CircleCI tests style checks, will only build image if linting passes (since it’s a long job). Pure python tests will run alongside linting tests (since they’re fast)
+- Makefile at top level only includes configure.fv3 if it exists, since it will not exist during linting tests</p>
 </div>
 <div class="section" id="id1">
 <h2>0.3.1<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
