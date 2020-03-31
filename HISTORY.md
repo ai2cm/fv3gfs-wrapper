@@ -37,6 +37,9 @@ Minor changes:
 - tests are added for scalar and vector rotation
 - concurrency issues in the MPI mock now raise a custom `ConcurrencyError`.
 - Fixed two counter-acting bugs: rotation now rotates in the correct direction, and halo updates now appropriately rotate arrays counter to the relative rotation of the axes on the two tiles, instead of in the same direction as that rotation
+- Files are fixed to pass our style checks
+- CircleCI tests style checks, will only build image if linting passes (since it's a long job). Pure python tests will run alongside linting tests (since they're fast)
+- Makefile at top level only includes configure.fv3 if it exists, since it will not exist during linting tests
 
 0.3.1
 -----
