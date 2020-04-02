@@ -64,7 +64,6 @@ class ZarrMonitor:
                 self._group,
                 name=key,
                 partitioner=self.partitioner,
-                time_chunk_size=self._time_chunk_size,
             )
             for key in set(state.keys()).difference(["time"])
         }
@@ -73,7 +72,6 @@ class ZarrMonitor:
             self._group,
             name="time",
             partitioner=self.partitioner,
-            time_chunk_size=self._time_chunk_size,
         )
 
     def _check_writers(self, state):
