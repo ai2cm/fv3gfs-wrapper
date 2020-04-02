@@ -3,6 +3,7 @@ History
 
 latest
 ------
+
 Major changes:
 - Added Quantity object to replace DataArray in the state dictionary. Quantity.view[:] provides something akin to DataArray.values, except that it may be a cupy or numpy array. Quantity.values is a read-only numpy array.
 - Partitioner has been replaced by TilePartitioner
@@ -22,6 +23,10 @@ Major changes:
 - Update Fortran sources. Major change is addition of `use_analysis_sst` namelist option.
 - getters/setters are added for longitude, latitude, gridcell area, and surface/top of atmosphere upward/downward shortwave/ longwave all-sky/clear-sky fluxes (for combinations which exist in the Fortran model).
 - Added a key "fortran_subname" to physics_properties which can currently only be used for 2D physics variables, to indicate the property name for variables stored in arrays of structs. A side-effect is that "fortran_name" is no longer unique for 2D physics variables, since a fortran struct array can contain multiple subname variables under a single fortran_name.
+- Tile gather operation is implemented in `TileCommunicator.gather`
+- vector halo updates are implemented in `CubedSphereCommunicator.start_vector_halo_update` and `CubedSphereCommunicator.finish_vector_halo_update`.
+- Interface-level halo updates were fixed to match fv3gfs behavior. The outermost values on interface level variables are in the compute domain on both ranks bordering it, and are not sent at all during halo update. Instead, the next three interior values are sent.
+- Added framework for testing MPI mock against mpi4py, with tests for Scatter, Gather, Send/Recv, and Isend/Irecv.
 
 Minor changes:
 - Added C12 regression test for `open_restart`
@@ -31,6 +36,12 @@ Minor changes:
 - Incremented fv3config commit to include fix to version string
 - Add getters/setters for temperature_after_physics, eastward_wind_after_physics, northward_wind_after_physics
 - Fixed a bug in `dev_docker.sh` where the Fortran sources weren't being bind-mounted, only the Python files
+- tests are added for scalar and vector rotation
+- concurrency issues in the MPI mock now raise a custom `ConcurrencyError`.
+- Fixed two counter-acting bugs: rotation now rotates in the correct direction, and halo updates now appropriately rotate arrays counter to the relative rotation of the axes on the two tiles, instead of in the same direction as that rotation
+- Files are fixed to pass our style checks
+- CircleCI tests style checks, will only build image if linting passes (since it's a long job). Pure python tests will run alongside linting tests (since they're fast)
+- Makefile at top level only includes configure.fv3 if it exists, since it will not exist during linting tests
 
 0.3.1
 -----

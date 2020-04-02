@@ -1,8 +1,6 @@
-import os
 from datetime import timedelta
 from mpi4py import MPI
 import fv3gfs
-import fv3config
 import yaml
 
 # This code shows an example where we relax specific humidity towards zero with a 7-day timescale.
@@ -21,13 +19,13 @@ import yaml
 # All together:
 # mpirun -n 6 --allow-run-as-root --oversubscribe --mca btl_vader_single_copy_mechanism none python3 online_code.py
 
-rundir_basename = 'rundir'
+rundir_basename = "rundir"
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     if rank == 0:  # only use filesystem on one rank
-        with open('fv3config.yml', 'r') as config_file:
+        with open("fv3config.yml", "r") as config_file:
             config = yaml.safe_load(config_file)
         config = comm.bcast(config)
     else:
@@ -35,7 +33,7 @@ if __name__ == '__main__':
 
     # Calculate factor for relaxing humidity to zero
     relaxation_rate = timedelta(days=7)
-    timestep = timedelta(seconds=config['namelist']['coupler_nml']['dt_atmos'])
+    timestep = timedelta(seconds=config["namelist"]["coupler_nml"]["dt_atmos"])
 
     fv3gfs.initialize()
     for i in range(fv3gfs.get_step_count()):
@@ -44,7 +42,11 @@ if __name__ == '__main__':
         fv3gfs.save_intermediate_restart_if_enabled()
 
         # dry out the model with the given relaxation rate
-        state = fv3gfs.get_state(names=['specific_humidity'])
-        state['specific_humidity'].view[:] -= state['specific_humidity'].view[:] * timestep.total_seconds() / relaxation_rate.total_seconds()
+        state = fv3gfs.get_state(names=["specific_humidity"])
+        state["specific_humidity"].view[:] -= (
+            state["specific_humidity"].view[:]
+            * timestep.total_seconds()
+            / relaxation_rate.total_seconds()
+        )
         fv3gfs.set_state(state)
     fv3gfs.cleanup()

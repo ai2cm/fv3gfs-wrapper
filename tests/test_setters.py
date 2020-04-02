@@ -1,10 +1,8 @@
 import unittest
-import json
 import os
 import shutil
 from copy import deepcopy
 import yaml
-import xarray as xr
 import numpy as np
 import fv3config
 import fv3gfs
@@ -16,15 +14,14 @@ test_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class SetterTests(unittest.TestCase):
-
     def __init__(self, *args, **kwargs):
         super(SetterTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.get_tracer_metadata()
         self.dynamics_data = {
-            entry['name']: entry for entry in fv3util.DYNAMICS_PROPERTIES
+            entry["name"]: entry for entry in fv3util.DYNAMICS_PROPERTIES
         }
         self.physics_data = {
-            entry['name']: entry for entry in fv3util.PHYSICS_PROPERTIES
+            entry["name"]: entry for entry in fv3util.PHYSICS_PROPERTIES
         }
 
     def setUp(self):
@@ -35,21 +32,22 @@ class SetterTests(unittest.TestCase):
 
     def test_dynamics_names_present(self):
         """Test that some small subset of dynamics names are in the data dictionary"""
-        for name in [
-                'x_wind', 'y_wind', 'vertical_wind',
-                'surface_geopotential']:
+        for name in ["x_wind", "y_wind", "vertical_wind", "surface_geopotential"]:
             self.assertIn(name, self.dynamics_data.keys())
 
     def test_physics_names_present(self):
         """Test that some small subset of physics names are in the data dictionary"""
         for name in [
-                'land_sea_mask', 'surface_temperature', 'surface_roughness',
-                'air_temperature_at_2m']:
+            "land_sea_mask",
+            "surface_temperature",
+            "surface_roughness",
+            "air_temperature_at_2m",
+        ]:
             self.assertIn(name, self.physics_data.keys())
 
     def test_set_then_get_cloud_amount(self):
         """Included because this is the last diagnostic tracer in memory"""
-        self._set_names_helper(['cloud_amount'])
+        self._set_names_helper(["cloud_amount"])
 
     def test_dynamics_names_one_at_a_time(self):
         for name in self.dynamics_data.keys():
@@ -69,7 +67,7 @@ class SetterTests(unittest.TestCase):
             MPI.COMM_WORLD.barrier()
 
     def test_set_then_get_air_temperature(self):
-        self._set_names_helper(['air_temperature'])
+        self._set_names_helper(["air_temperature"])
 
     def test_set_then_get_all_dynamics_names(self):
         self._set_names_helper(self.dynamics_data.keys())
@@ -82,24 +80,28 @@ class SetterTests(unittest.TestCase):
 
     def test_set_then_get_all_names(self):
         self._set_names_helper(
-            list(self.dynamics_data.keys()) +
-            list(self.physics_data.keys()) +
-            list(self.tracer_data.keys())
+            list(self.dynamics_data.keys())
+            + list(self.physics_data.keys())
+            + list(self.tracer_data.keys())
         )
 
     def test_set_then_get_only_some_names(self):
-        all_name_list = (list(
-            self.dynamics_data.keys()) +
-            list(self.physics_data.keys()) +
-            list(self.tracer_data.keys())
+        all_name_list = (
+            list(self.dynamics_data.keys())
+            + list(self.physics_data.keys())
+            + list(self.tracer_data.keys())
         )
         self._set_names_helper(all_name_list[::3])
 
     def test_set_non_existent_quantity(self):
         with self.assertRaises(ValueError):
-            fv3gfs.set_state({
-                'non_quantity': fv3util.Quantity(np.array([0.]), dims=['dim1'], units='')
-            })
+            fv3gfs.set_state(
+                {
+                    "non_quantity": fv3util.Quantity(
+                        np.array([0.0]), dims=["dim1"], units=""
+                    )
+                }
+            )
 
     def _set_names_helper(self, name_list):
         self._set_all_names_at_once_helper(name_list)
@@ -126,9 +128,7 @@ class SetterTests(unittest.TestCase):
             with self.subTest(replace_name):
                 quantity = deepcopy(old_state[replace_name])
                 quantity.view[:] = np.random.uniform(size=quantity.extent)
-                replace_state = {
-                    replace_name: quantity
-                }
+                replace_state = {replace_name: quantity}
                 fv3gfs.set_state(replace_state)
                 new_state = fv3gfs.get_state(names=name_list)
                 self._check_gotten_state(new_state, name_list)
@@ -151,11 +151,11 @@ class SetterTests(unittest.TestCase):
         self.assertTrue(np.all(quantity1.view[:] == quantity2.view[:]))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     rank = MPI.COMM_WORLD.Get_rank()
-    with open(os.path.join(test_dir, 'default_config.yml'), 'r') as f:
+    with open(os.path.join(test_dir, "default_config.yml"), "r") as f:
         config = yaml.safe_load(f)
-    rundir = os.path.join(test_dir, 'rundir')
+    rundir = os.path.join(test_dir, "rundir")
     if rank == 0:
         if os.path.isdir(rundir):
             shutil.rmtree(rundir)
@@ -168,9 +168,9 @@ if __name__ == '__main__':
             fv3gfs.initialize()
             MPI.COMM_WORLD.barrier()
         if rank != 0:
-            kwargs = {'verbosity': 0}
+            kwargs = {"verbosity": 0}
         else:
-            kwargs = {'verbosity': 2}
+            kwargs = {"verbosity": 2}
         unittest.main(**kwargs)
     finally:
         os.chdir(original_path)
