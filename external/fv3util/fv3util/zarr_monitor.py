@@ -62,13 +62,19 @@ class ZarrMonitor:
     def _init_writers(self, state):
         self._writers = {
             key: _ZarrVariableWriter(
-                self._comm, self._group, name=key, partitioner=self.partitioner,
+                self._comm,
+                self._group,
+                name=key,
+                partitioner=self.partitioner,
                 time_chunk_size=self._time_chunk_size,
             )
             for key in set(state.keys()).difference(["time"])
         }
         self._writers["time"] = _ZarrTimeWriter(
-            self._comm, self._group, name="time", partitioner=self.partitioner,
+            self._comm,
+            self._group,
+            name="time",
+            partitioner=self.partitioner,
             time_chunk_size=self._time_chunk_size,
         )
 
@@ -135,12 +141,15 @@ class _ZarrVariableWriter:
         self.sync_array()
 
     def _init_zarr_root(self, quantity):
-        tile_shape = self._partitioner.tile.tile_extent(
-            quantity.metadata
+        tile_shape = self._partitioner.tile.tile_extent(quantity.metadata)
+        chunks = self._prepend_chunks + array_chunks(
+            self._partitioner.layout, tile_shape, quantity.dims
         )
-        chunks = self._prepend_chunks + array_chunks(self._partitioner.layout, tile_shape, quantity.dims)
         self.array = self.group.create_dataset(
-            self.name, shape=self._prepend_shape + tile_shape, dtype=quantity.data.dtype, chunks=chunks
+            self.name,
+            shape=self._prepend_shape + tile_shape,
+            dtype=quantity.data.dtype,
+            chunks=chunks,
         )
 
     def sync_array(self):
@@ -153,9 +162,10 @@ class _ZarrVariableWriter:
             self._init_zarr(quantity)
 
         if self.i_time >= self.array.shape[0] and self.rank == 0:
-            new_shape = list(self._prepend_shape + self._partitioner.tile.tile_extent(
-                quantity.metadata
-            ))
+            new_shape = list(
+                self._prepend_shape
+                + self._partitioner.tile.tile_extent(quantity.metadata)
+            )
             new_shape[0] = self.i_time + 1
             self.array.resize(*new_shape)
             self._ensure_compatible_attrs(quantity)
@@ -214,7 +224,6 @@ def _get_from_slice(target_slice):
 
 
 class _ZarrTimeWriter(_ZarrVariableWriter):
-
     def __init__(self, *args, **kwargs):
         super(_ZarrTimeWriter, self).__init__(*args, **kwargs)
         self._prepend_shape = (1,)

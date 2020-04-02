@@ -208,34 +208,49 @@ def test_monitor_file_store_multi_rank_state(
     "layout, tile_array_shape, array_dims, target",
     [
         pytest.param(
-            (1, 1), (7, 6, 6), [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM], (7, 6, 6),
-            id="single_chunk_tile_3d"
+            (1, 1),
+            (7, 6, 6),
+            [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
+            (7, 6, 6),
+            id="single_chunk_tile_3d",
         ),
         pytest.param(
-            (1, 1), (6, 6), [fv3util.Y_DIM, fv3util.X_DIM], (6, 6),
-            id="single_chunk_tile_2d"
+            (1, 1),
+            (6, 6),
+            [fv3util.Y_DIM, fv3util.X_DIM],
+            (6, 6),
+            id="single_chunk_tile_2d",
+        ),
+        pytest.param((1, 1), (6,), [fv3util.Y_DIM], (6,), id="single_chunk_tile_1d"),
+        pytest.param(
+            (1, 1),
+            (7, 6, 6),
+            [fv3util.Z_DIM, fv3util.Y_INTERFACE_DIM, fv3util.X_INTERFACE_DIM],
+            (7, 5, 5),
+            id="single_chunk_tile_3d_interfaces",
         ),
         pytest.param(
-            (1, 1), (6,), [fv3util.Y_DIM], (6,),
-            id="single_chunk_tile_1d"
+            (2, 2),
+            (7, 6, 6),
+            [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
+            (7, 3, 3),
+            id="2_by_2_tile_3d",
         ),
         pytest.param(
-            (1, 1), (7, 6, 6), [fv3util.Z_DIM, fv3util.Y_INTERFACE_DIM, fv3util.X_INTERFACE_DIM], (7, 5, 5),
-            id="single_chunk_tile_3d_interfaces"
+            (2, 2),
+            (6, 16, 6),
+            [fv3util.Y_DIM, fv3util.Z_DIM, fv3util.X_DIM],
+            (3, 16, 3),
+            id="2_by_2_tile_3d_odd_dim_order",
         ),
         pytest.param(
-            (2, 2), (7, 6, 6), [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM], (7, 3, 3),
-            id="2_by_2_tile_3d"
+            (2, 2),
+            (7, 7, 7),
+            [fv3util.Z_DIM, fv3util.Y_INTERFACE_DIM, fv3util.X_INTERFACE_DIM],
+            (7, 3, 3),
+            id="2_by_2_tile_3d_interfaces",
         ),
-        pytest.param(
-            (2, 2), (6, 16, 6), [fv3util.Y_DIM, fv3util.Z_DIM, fv3util.X_DIM], (3, 16, 3),
-            id="2_by_2_tile_3d_odd_dim_order"
-        ),
-        pytest.param(
-            (2, 2), (7, 7, 7), [fv3util.Z_DIM, fv3util.Y_INTERFACE_DIM, fv3util.X_INTERFACE_DIM], (7, 3, 3),
-            id="2_by_2_tile_3d_interfaces"
-        ),
-    ]
+    ],
 )
 def test_array_chunks(layout, tile_array_shape, array_dims, target):
     result = fv3util.zarr_monitor.array_chunks(layout, tile_array_shape, array_dims)
