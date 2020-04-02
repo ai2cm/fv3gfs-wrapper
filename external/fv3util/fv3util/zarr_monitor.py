@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Tuple
 import logging
 import zarr
 import numpy as np
@@ -37,7 +37,6 @@ class ZarrMonitor:
         partitioner: CubedSpherePartitioner,
         mode: str = "w",
         mpi_comm=DummyComm(),
-        time_chunk_size=128,
     ):
         """Create a ZarrMonitor.
 
@@ -57,7 +56,6 @@ class ZarrMonitor:
         self._comm = mpi_comm
         self._writers = None
         self.partitioner = partitioner
-        self._time_chunk_size = time_chunk_size
 
     def _init_writers(self, state):
         self._writers = {
@@ -120,7 +118,7 @@ class _ZarrVariableWriter:
         self.array = None
 
         self._prepend_shape = (1, 6)
-        self._prepend_chunks = (time_chunk_size, 1)
+        self._prepend_chunks = (1, 1)
         self._y_chunks = partitioner.tile.layout[0]
         self._x_chunks = partitioner.tile.layout[1]
         self._PREPEND_DIMS = ("time", "tile")
@@ -204,7 +202,11 @@ class _ZarrVariableWriter:
             )
 
 
-def array_chunks(layout, tile_array_shape, array_dims):
+def array_chunks(
+    layout: Tuple[int, int],
+    tile_array_shape: Tuple[int, ...],
+    array_dims: Tuple[str, ...],
+):
     layout_by_dims = utils.list_by_dims(array_dims, layout, 1)
     chunks_list = []
     for extent, dim, n_ranks in zip(tile_array_shape, array_dims, layout_by_dims):
@@ -224,10 +226,13 @@ def _get_from_slice(target_slice):
 
 
 class _ZarrTimeWriter(_ZarrVariableWriter):
+
+    _TIME_CHUNK_SIZE = 1024
+
     def __init__(self, *args, **kwargs):
         super(_ZarrTimeWriter, self).__init__(*args, **kwargs)
         self._prepend_shape = (1,)
-        self._prepend_chunks = self._prepend_chunks[:1]
+        self._prepend_chunks = (self._TIME_CHUNK_SIZE,)
         self._PREPEND_DIMS = ("time",)
 
     def _init_zarr_root(self, array):
