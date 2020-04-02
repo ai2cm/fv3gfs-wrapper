@@ -17,7 +17,7 @@ contains
     end subroutine get_nz_soil_subroutine
 
 {% for item in physics_2d_properties %}
-    subroutine set_{{ item.fortran_name }}({{ item.fortran_name }}) bind(c)
+    subroutine set_{{ item.fortran_name }}{% if "fortran_subname" in item %}_{{ item.fortran_subname }}{% endif %}({{ item.fortran_name }}) bind(c)
         real(c_double), intent(in), dimension(i_start():i_end(), j_start():j_end()) :: {{ item.fortran_name }}
         integer :: blocks_per_MPI_domain, i, j, i_block, i_column
         blocks_per_MPI_domain = Atm_block%nblks
@@ -25,12 +25,16 @@ contains
             do i_column = 1, Atm_block%blksz(i_block) ! points per block
                 i = Atm_block%index(i_block)%ii(i_column)
                 j = Atm_block%index(i_block)%jj(i_column)
-                IPD_Data(i_block)%{{ item.container }}%{{ item.fortran_name }}(i_column) = {{ item.fortran_name }}(i, j)
+                {% if "fortran_subname" in item %}
+                    IPD_Data(i_block)%{{ item.container }}%{{ item.fortran_name }}(i_column)%{{ item.fortran_subname }} = {{ item.fortran_name }}(i, j)
+                {% else %}
+                    IPD_Data(i_block)%{{ item.container }}%{{ item.fortran_name }}(i_column) = {{ item.fortran_name }}(i, j)
+                {% endif %}
             enddo
         enddo
-    end subroutine set_{{ item.fortran_name }}
+    end subroutine set_{{ item.fortran_name }}{% if "fortran_subname" in item %}_{{ item.fortran_subname }}{% endif %}
 
-    subroutine get_{{ item.fortran_name }}({{ item.fortran_name }}_out) bind(c)
+    subroutine get_{{ item.fortran_name }}{% if "fortran_subname" in item %}_{{ item.fortran_subname }}{% endif %}({{ item.fortran_name }}_out) bind(c)
         real(c_double), intent(out), dimension(i_start():i_end(), j_start():j_end()) :: {{ item.fortran_name }}_out
         integer :: blocks_per_MPI_domain, i, j, i_block, i_column
         blocks_per_MPI_domain = Atm_block%nblks
@@ -38,10 +42,14 @@ contains
             do i_column = 1, Atm_block%blksz(i_block) ! points per block
                 i = Atm_block%index(i_block)%ii(i_column)
                 j = Atm_block%index(i_block)%jj(i_column)
-                {{ item.fortran_name }}_out(i, j) = IPD_Data(i_block)%{{ item.container }}%{{ item.fortran_name }}(i_column)
+                {% if "fortran_subname" in item %}
+                    {{ item.fortran_name }}_out(i, j) = IPD_Data(i_block)%{{ item.container }}%{{ item.fortran_name }}(i_column)%{{ item.fortran_subname }}
+                {% else %}
+                    {{ item.fortran_name }}_out(i, j) = IPD_Data(i_block)%{{ item.container }}%{{ item.fortran_name }}(i_column)
+                {% endif %}
             enddo
         enddo
-    end subroutine get_{{ item.fortran_name }}
+    end subroutine get_{{ item.fortran_name }}{% if "fortran_subname" in item %}_{{ item.fortran_subname }}{% endif %}
 {% endfor %}
 
 {% for item in physics_3d_properties %}
