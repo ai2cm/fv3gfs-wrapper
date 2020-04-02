@@ -3,6 +3,7 @@ History
 
 latest
 ------
+
 Major changes:
 - Added Quantity object to replace DataArray in the state dictionary. Quantity.view[:] provides something akin to DataArray.values, except that it may be a cupy or numpy array. Quantity.values is a read-only numpy array.
 - Partitioner has been replaced by TilePartitioner
@@ -25,6 +26,8 @@ Major changes:
 - Interface-level halo updates were fixed to match fv3gfs behavior. The outermost values on interface level variables are in the compute domain on both ranks bordering it, and are not sent at all during halo update. Instead, the next three interior values are sent.
 - Added framework for testing MPI mock against mpi4py, with tests for Scatter, Gather, Send/Recv, and Isend/Irecv.
 - fv3config updated to latest master
+- ZarrMonitor chunk size along the time dimension now defaults to 128 (instead of 1 for normal variables and 1024 for time), and can be set using a keyword argument
+- ZarrMonitor Chunk size along horizontal and vertical dimensions are now as intended, fixing a bug which set the chunk size for the first two dimensions to 1
 
 Minor changes:
 - Added C12 regression test for `open_restart`
@@ -40,6 +43,7 @@ Minor changes:
 - Files are fixed to pass our style checks
 - CircleCI tests style checks, will only build image if linting passes (since it's a long job). Pure python tests will run alongside linting tests (since they're fast)
 - Makefile at top level only includes configure.fv3 if it exists, since it will not exist during linting tests
+- Added tests for `array_chunks` routine used by ZarrMonitor.
 
 0.3.1
 -----
