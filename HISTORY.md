@@ -20,6 +20,8 @@ Major changes:
 - All tests using numpy arrays now also run using gt4py `CPUStorage` objects.
 - Added `compute_physics` and `apply_physics` functions, which separately do the physics and apply the output of the physics routines to the atmospheric prognostic state.
 - Update Fortran sources. Major change is addition of `use_analysis_sst` namelist option.
+- getters/setters are added for longitude, latitude, gridcell area, and surface/top of atmosphere upward/downward shortwave/ longwave all-sky/clear-sky fluxes (for combinations which exist in the Fortran model).
+- Added a key "fortran_subname" to physics_properties which can currently only be used for 2D physics variables, to indicate the property name for variables stored in arrays of structs. A side-effect is that "fortran_name" is no longer unique for 2D physics variables, since a fortran struct array can contain multiple subname variables under a single fortran_name.
 
 Minor changes:
 - Added C12 regression test for `open_restart`
