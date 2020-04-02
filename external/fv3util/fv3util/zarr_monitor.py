@@ -60,18 +60,12 @@ class ZarrMonitor:
     def _init_writers(self, state):
         self._writers = {
             key: _ZarrVariableWriter(
-                self._comm,
-                self._group,
-                name=key,
-                partitioner=self.partitioner,
+                self._comm, self._group, name=key, partitioner=self.partitioner,
             )
             for key in set(state.keys()).difference(["time"])
         }
         self._writers["time"] = _ZarrTimeWriter(
-            self._comm,
-            self._group,
-            name="time",
-            partitioner=self.partitioner,
+            self._comm, self._group, name="time", partitioner=self.partitioner,
         )
 
     def _check_writers(self, state):
