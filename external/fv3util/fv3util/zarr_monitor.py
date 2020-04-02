@@ -108,7 +108,7 @@ class ZarrMonitor:
 
 
 class _ZarrVariableWriter:
-    def __init__(self, comm, group, name, partitioner, time_chunk_size):
+    def __init__(self, comm, group, name, partitioner):
         self.i_time = 0
         self.comm = comm
         self.group = group
