@@ -135,18 +135,13 @@ class _ZarrVariableWriter:
         self.sync_array()
 
     def _init_zarr_root(self, quantity):
-        tile_shape = self._get_tile_shape(quantity)
-        chunks = self._prepend_chunks + array_chunks(self._partitioner.layout, tile_shape, quantity.dims)
-        print('SHAPES', tile_shape, chunks)
-        self.array = self.group.create_dataset(
-            self.name, shape=tile_shape, dtype=quantity.data.dtype, chunks=chunks
-        )
-
-    def _get_tile_shape(self, quantity):
-        return_value = (self.i_time + 1, 6) + self._partitioner.tile.tile_extent(
+        tile_shape = self._partitioner.tile.tile_extent(
             quantity.metadata
         )
-        return return_value
+        chunks = self._prepend_chunks + array_chunks(self._partitioner.layout, tile_shape, quantity.dims)
+        self.array = self.group.create_dataset(
+            self.name, shape=self._prepend_shape + tile_shape, dtype=quantity.data.dtype, chunks=chunks
+        )
 
     def sync_array(self):
         self.array = self.comm.bcast(self.array, root=0)
@@ -158,7 +153,10 @@ class _ZarrVariableWriter:
             self._init_zarr(quantity)
 
         if self.i_time >= self.array.shape[0] and self.rank == 0:
-            new_shape = self._get_tile_shape(quantity)
+            new_shape = list(self._prepend_shape + self._partitioner.tile.tile_extent(
+                quantity.metadata
+            ))
+            new_shape[0] = self.i_time + 1
             self.array.resize(*new_shape)
             self._ensure_compatible_attrs(quantity)
         self.sync_array()
