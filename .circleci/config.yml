@@ -85,7 +85,7 @@ jobs:
           name: "Compile model and perform model tests"
           command: |
             echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://gcr.io
-            DOCKER_BUILDKIT=1 BUILD_FROM_INTERMEDIATE=y test_docker.sh
+            DOCKER_BUILDKIT=1 BUILD_FROM_INTERMEDIATE=y ./test_docker.sh
       - run:
           name: "Run example runfiles"
           command: |
