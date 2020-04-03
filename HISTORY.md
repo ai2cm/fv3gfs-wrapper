@@ -27,6 +27,7 @@ Major changes:
 - vector halo updates are implemented in `CubedSphereCommunicator.start_vector_halo_update` and `CubedSphereCommunicator.finish_vector_halo_update`.
 - Interface-level halo updates were fixed to match fv3gfs behavior. The outermost values on interface level variables are in the compute domain on both ranks bordering it, and are not sent at all during halo update. Instead, the next three interior values are sent.
 - Added framework for testing MPI mock against mpi4py, with tests for Scatter, Gather, Send/Recv, and Isend/Irecv.
+- ZarrMonitor chunk size along horizontal and vertical dimensions are now as intended, fixing a bug which set the chunk size for the first two dimensions to 1
 
 Minor changes:
 - Added C12 regression test for `open_restart`
@@ -42,6 +43,7 @@ Minor changes:
 - Files are fixed to pass our style checks
 - CircleCI tests style checks, will only build image if linting passes (since it's a long job). Pure python tests will run alongside linting tests (since they're fast)
 - Makefile at top level only includes configure.fv3 if it exists, since it will not exist during linting tests
+- Added tests for `array_chunks` routine used by ZarrMonitor.
 
 0.3.1
 -----
