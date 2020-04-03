@@ -24,4 +24,4 @@ version, while "v1" is not and "0.3.0" is not.
 
 3. Run `git push origin --tags` to push all local tags to Github.
 
-Circle CI will automatically push a tagged image to GCR whe you pushing tags to master.
+Circle CI will automatically push a tagged image to GCR when you pushing tags to master.
