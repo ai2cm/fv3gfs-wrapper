@@ -1,3 +1,11 @@
+ARG FMS_IMAGE
+ARG ESMF_IMAGE
+ARG FORTRAN_ENV_IMAGE
+ARG DAWN_IMAGE=fv3gfs-dawn-build
+
+FROM $FMS_IMAGE AS fv3gfs-fms
+FROM $ESMF_IMAGE AS fv3gfs-esmf
+
 #-----------------------------------------------------------------------------
 FROM ubuntu:19.10 as fv3config-inputdata
 
@@ -16,7 +24,7 @@ RUN wget http://storage.googleapis.com/vcm-ml-public/2019-10-23-data-for-running
         /fv3config-cache/base_forcing
 
 #-----------------------------------------------------------------------------
-FROM fv3gfs-fortran-env as fv3gfs-python-env
+FROM $FORTRAN_ENV_IMAGE as fv3gfs-python-env
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
@@ -82,25 +90,38 @@ RUN cd /fv3gfs-python && \
 
 
 #-----------------------------------------------------------------------------
-FROM fv3gfs-serialbox AS gt4py-build
+FROM $FORTRAN_ENV_IMAGE AS fv3gfs-dawn-build
 
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
+    cmake \
+    libssl-dev \
+    libboost-all-dev \ 
+    clang \
+    clang-format \
+    clang-tidy \
     llvm-9-dev \
     libclang-9-dev \
     libpython3-dev \
     python3 \
-    python3-pip 
+    python3-pip \
+    python3-numpy \
+    python3-nose \
+    python3-sphinx
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 10
 
 # Disabling Dawn for now until the dycore is further along, as it takes forever to build
-# RUN pip install --no-cache-dir scikit-build && \
-#     git clone https://github.com/MeteoSwiss-APN/dawn.git /usr/src/dawn && \
-#     pip install --no-cache-dir /usr/src/dawn/dawn
-# RUN pip wheel /usr/src/dawn/dawn
+RUN pip install --no-cache-dir scikit-build && \
+    git clone https://github.com/MeteoSwiss-APN/dawn.git /usr/src/dawn && \
+    pip install --no-cache-dir /usr/src/dawn/dawn
+RUN pip wheel /usr/src/dawn/dawn
 RUN git clone --depth 1 -b fv3_validation https://github.com/eddie-c-davis/gt4py.git /usr/src/gt4py && \
     pip install --no-cache-dir -e /usr/src/gt4py && \
     cd /usr/src/gt4py && python -m gt4py.gt_src_manager install
+
+
+FROM $DAWN_IMAGE AS fv3gfs-dawn
 
 #-----------------------------------------------------------------------------
 FROM fv3gfs-python-env AS fv3gfs-python
@@ -145,11 +166,11 @@ COPY --from=fv3gfs-esmf /usr/local/esmf ${ESMF_DIR}
 COPY --from=fv3gfs-fms /FMS/libFMS/.libs/*.so* /lib64/
 COPY --from=fv3gfs-esmf /usr/local/esmf/lib/libO3/Linux.gfortran.64.mpiuni.default/*.so* /lib64/
 # Disabling Dawn for now until the dycore is further along, as it takes forever to build
-# COPY --from=gt4py-build /usr/src/dawn /usr/src/dawn
-# COPY --from=gt4py-build /dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
-COPY --from=gt4py-build /usr/src/gt4py /usr/src/gt4py
+COPY --from=fv3gfs-dawn /usr/src/dawn /usr/src/dawn
+COPY --from=fv3gfs-dawn /dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
+COPY --from=fv3gfs-dawn /usr/src/gt4py /usr/src/gt4py
 
-# RUN pip3 install --no-cache-dir /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
+RUN pip3 install --no-cache-dir /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
 RUN pip3 install --no-cache-dir /usr/src/gt4py
 
 COPY --from=fv3gfs-python-build /fv3gfs-python /fv3gfs-python

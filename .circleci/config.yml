@@ -84,7 +84,7 @@ jobs:
       - run: 
           name: "Compile model and perform model tests"
           command: |
-            bash test_docker.sh
+            DOCKER_BUILDKIT=1 BUILD_FROM_INTERMEDIATE=y test_docker.sh
       - run:
           name: "Run example runfiles"
           command: |
