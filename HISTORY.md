@@ -1,8 +1,8 @@
 History
 =======
 
-latest
-------
+v0.4.0 (2020-04-03)
+-------------------
 
 Major changes:
 - Added Quantity object to replace DataArray in the state dictionary. Quantity.view[:] provides something akin to DataArray.values, except that it may be a cupy or numpy array. Quantity.values is a read-only numpy array.
