@@ -192,7 +192,8 @@
 - Tile gather operation is implemented in <cite>TileCommunicator.gather</cite>
 - vector halo updates are implemented in <cite>CubedSphereCommunicator.start_vector_halo_update</cite> and <cite>CubedSphereCommunicator.finish_vector_halo_update</cite>.
 - Interface-level halo updates were fixed to match fv3gfs behavior. The outermost values on interface level variables are in the compute domain on both ranks bordering it, and are not sent at all during halo update. Instead, the next three interior values are sent.
-- Added framework for testing MPI mock against mpi4py, with tests for Scatter, Gather, Send/Recv, and Isend/Irecv.</p>
+- Added framework for testing MPI mock against mpi4py, with tests for Scatter, Gather, Send/Recv, and Isend/Irecv.
+- ZarrMonitor chunk size along horizontal and vertical dimensions are now as intended, fixing a bug which set the chunk size for the first two dimensions to 1</p>
 <p>Minor changes:
 - Added C12 regression test for <cite>open_restart</cite>
 - added scipy and pytest-subtests to requirements and docker container
@@ -206,7 +207,8 @@
 - Fixed two counter-acting bugs: rotation now rotates in the correct direction, and halo updates now appropriately rotate arrays counter to the relative rotation of the axes on the two tiles, instead of in the same direction as that rotation
 - Files are fixed to pass our style checks
 - CircleCI tests style checks, will only build image if linting passes (since it’s a long job). Pure python tests will run alongside linting tests (since they’re fast)
-- Makefile at top level only includes configure.fv3 if it exists, since it will not exist during linting tests</p>
+- Makefile at top level only includes configure.fv3 if it exists, since it will not exist during linting tests
+- Added tests for <cite>array_chunks</cite> routine used by ZarrMonitor.</p>
 </div>
 <div class="section" id="id1">
 <h2>0.3.1<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
