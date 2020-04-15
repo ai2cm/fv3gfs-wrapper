@@ -1,4 +1,5 @@
 from typing import Iterable, Hashable
+import functools
 from .quantity import Quantity
 from .partitioner import CubedSpherePartitioner, TilePartitioner
 from . import constants
@@ -24,6 +25,15 @@ def bcast_metadata_list(comm, quantity_list):
 
 def bcast_metadata(comm, array):
     return bcast_metadata_list(comm, [array])[0]
+
+
+@functools.lru_cache(maxsize=512)
+def get_buffer(allocator, shape, dtype):
+    """
+    Returns a communications buffer using an allocator.
+    Buffers will be re-used between subsequent calls.
+    """
+    return allocator(shape, dtype=dtype)
 
 
 class Communicator:
@@ -65,8 +75,10 @@ class TileCommunicator(Communicator):
             metadata = self.comm.bcast(None, root=constants.MASTER_RANK)
         shape = self.partitioner.subtile_extent(metadata)
         if self.rank == constants.MASTER_RANK:
-            sendbuf = metadata.np.empty(
-                (self.partitioner.total_ranks,) + shape, dtype=metadata.dtype
+            sendbuf = get_buffer(
+                metadata.np.empty,
+                (self.partitioner.total_ranks,) + shape,
+                dtype=metadata.dtype
             )
             for rank in range(0, self.partitioner.total_ranks):
                 subtile_slice = self.partitioner.subtile_slice(
@@ -98,8 +110,9 @@ class TileCommunicator(Communicator):
             recv_quantity
         """
         if self.rank == constants.MASTER_RANK:
-            recvbuf = send_quantity.np.empty(
-                [self.partitioner.total_ranks] + list(send_quantity.extent),
+            recvbuf = get_buffer(
+                send_quantity.np.empty,
+                (self.partitioner.total_ranks,) + tuple(send_quantity.extent),
                 dtype=send_quantity.data.dtype,
             )
             self.comm.Gather(send_quantity.view[:], recvbuf, root=constants.MASTER_RANK)
@@ -252,12 +265,10 @@ class CubedSphereCommunicator(Communicator):
             # n_clockwise_rotations times, due to the difference in axis orientation.\
             # Thus we rotate that number of times counterclockwise before sending,
             # to get the right final orientation
-            data = quantity.np.ascontiguousarray(
-                rotate_scalar_data(
-                    data, quantity.dims, quantity.np, -boundary.n_clockwise_rotations
-                )
+            data = rotate_scalar_data(
+                data, quantity.dims, quantity.np, -boundary.n_clockwise_rotations
             )
-            self.comm.Isend(data, dest=boundary.to_rank)
+            self._Send(quantity.np, data, dest=boundary.to_rank)
 
     def finish_halo_update(
         self, quantity: Quantity, n_points: int, tag: Hashable = None
@@ -265,6 +276,7 @@ class CubedSphereCommunicator(Communicator):
         """Complete an asynchronous halo update of a quantity."""
         for boundary_type, boundary in self.boundaries.items():
             dest_view = boundary.recv_view(quantity, n_points=n_points)
+            recvbuf = get_buffer(quantity.np.empty, dest_view.shape, dest_view.dtype)
             logger.debug(
                 "finish_halo_update: retrieving boundary_type=%s shape=%s from_rank=%s to_rank=%s",
                 boundary_type,
@@ -273,9 +285,10 @@ class CubedSphereCommunicator(Communicator):
                 self.rank,
             )
             if tag is None:
-                self.comm.Recv(dest_view, source=boundary.to_rank)
+                self._Recv(quantity.np, recvbuf, source=boundary.to_rank)
             else:
-                self.comm.Recv(dest_view, source=boundary.to_rank, tag=tag)
+                self._Recv(quantity.np, recvbuf, source=boundary.to_rank, tag=tag)
+            dest_view[:] = recvbuf
 
     def start_vector_halo_update(
         self,
@@ -310,11 +323,27 @@ class CubedSphereCommunicator(Communicator):
                 y_data.shape,
             )
             if tag is None:
-                self.comm.Isend(x_data, dest=boundary.to_rank)
-                self.comm.Isend(y_data, dest=boundary.to_rank)
+                self._Send(x_quantity.np, x_data, dest=boundary.to_rank)
+                self._Send(y_quantity.np, y_data, dest=boundary.to_rank)
             else:
-                self.comm.Isend(x_data, dest=boundary.to_rank, tag=tag)
-                self.comm.Isend(y_data, dest=boundary.to_rank, tag=tag)
+                self._Send(x_quantity.np, x_data, dest=boundary.to_rank, tag=tag)
+                self._Send(y_quantity.np, y_data, dest=boundary.to_rank, tag=tag)
+
+    def _Send(self, numpy, in_array, dest):
+        if in_array.data.contiguous:
+            self.comm.Send(in_array, dest=dest)
+        else:
+            sendbuf = get_buffer(numpy.empty, in_array.shape, in_array.dtype)
+            sendbuf[:] = in_array
+            self.comm.Send(sendbuf, dest=dest)
+
+    def _Recv(self, numpy, out_array, source):
+        if out_array.data.contiguous:
+            self.comm.Recv(out_array, source=source)
+        else:
+            recvbuf = get_buffer(numpy.empty, out_array.shape, out_array.dtype)
+            self.comm.Recv(recvbuf, source=source)
+            out_array[:] = recvbuf
 
     def finish_vector_halo_update(
         self,

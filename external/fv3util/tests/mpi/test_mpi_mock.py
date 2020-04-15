@@ -31,7 +31,7 @@ def return_constant(comm):
 
 
 @worker()
-def send_recv_worker(comm):
+def send_recv(comm):
     rank = comm.Get_rank()
     size = comm.Get_size()
     data = np.asarray([rank], dtype=np.int)
@@ -48,7 +48,85 @@ def send_recv_worker(comm):
 
 
 @worker()
-def scatter_worker(comm):
+def send_f_contiguous_buffer(comm):
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+    np.random.seed(rank)
+    data = np.random.uniform(size=[2, 3]).T
+
+    if rank < size - 1:
+        if isinstance(comm, fv3util.testing.DummyComm):
+            print(f"sending data from {rank} to {rank + 1}")
+        comm.Send(data, dest=rank + 1)
+    if rank > 0:
+        if isinstance(comm, fv3util.testing.DummyComm):
+            print(f"recieving data from {rank - 1} to {rank}")
+        comm.Recv(data, source=rank - 1)
+    return data
+
+
+@worker()
+def send_non_contiguous_buffer(comm):
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+    np.random.seed(rank)
+    data = np.random.uniform(size=[2, 3, 4]).transpose(2, 0, 1)
+    recv_buffer = np.zeros([4, 2, 3])
+
+    if rank < size - 1:
+        if isinstance(comm, fv3util.testing.DummyComm):
+            print(f"sending data from {rank} to {rank + 1}")
+        comm.Send(data, dest=rank + 1)
+    if rank > 0:
+        pass  # sends will raise exceptions, so we don't want to recv
+    return recv_buffer
+
+
+@worker()
+def send_subarray(comm):
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+    np.random.seed(rank)
+    data = np.random.uniform(size=[4, 4, 4])
+    recv_buffer = np.zeros([2, 2, 2])
+
+    if rank < size - 1:
+        if isinstance(comm, fv3util.testing.DummyComm):
+            print(f"sending data from {rank} to {rank + 1}")
+        comm.Send(data[1:-1, 1:-1, 1:-1], dest=rank + 1)
+    if rank > 0:
+        pass  # sends will raise exceptions, so we don't want to recv
+    return recv_buffer
+
+
+@worker()
+def recv_to_subarray(comm):
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+    np.random.seed(rank)
+    data = np.random.uniform(size=[2, 2, 2])
+    recv_buffer = np.zeros([4, 4, 4])
+    contiguous_recv_buffer = np.zeros([2, 2, 2])
+    return_value = recv_buffer
+
+    if rank < size - 1:
+        if isinstance(comm, fv3util.testing.DummyComm):
+            print(f"sending data from {rank} to {rank + 1}")
+        comm.Send(data, dest=rank + 1)
+    if rank > 0:
+        if isinstance(comm, fv3util.testing.DummyComm):
+            print(f"recieving data from {rank - 1} to {rank}")
+        try:
+            comm.Recv(recv_buffer[1:-1, 1:-1, 1:-1], source=rank - 1)
+        except Exception as err:
+            return_value = err
+        # must complete the MPI transaction for politeness to subsequent tests
+        comm.Recv(contiguous_recv_buffer, source=rank - 1)
+    return return_value
+
+
+@worker()
+def scatter(comm):
     rank = comm.Get_rank()
     size = comm.Get_size()
     recvbuf = np.array([-1])
@@ -62,7 +140,7 @@ def scatter_worker(comm):
 
 
 @worker(rank_order=lambda total_ranks: range(total_ranks - 1, -1, -1))
-def gather_worker(comm):
+def gather(comm):
     rank = comm.Get_rank()
     size = comm.Get_size()
     sendbuf = np.array([rank])
@@ -79,7 +157,7 @@ def gather_worker(comm):
 
 
 @worker()
-def isend_irecv_worker(comm):
+def isend_irecv(comm):
     rank = comm.Get_rank()
     size = comm.Get_size()
     data = np.asarray([rank], dtype=np.int)
@@ -114,7 +192,10 @@ def worker_function(request):
 
 def gather_decorator(worker_function):
     def wrapped(comm):
-        result = worker_function(comm)
+        try:
+            result = worker_function(comm)
+        except Exception as err:
+            result = err
         return comm.gather(result, root=0)
 
     return wrapped
@@ -154,7 +235,10 @@ def dummy_results(worker_function, dummy_list):
     result_list = [None] * len(dummy_list)
     for i in worker_function.rank_order(len(dummy_list)):
         comm = dummy_list[i]
-        result_list[i] = worker_function(comm)
+        try:
+            result_list[i] = worker_function(comm)
+        except Exception as err:
+            result_list[i] = err
     print("done getting dummy results")
     return result_list
 
@@ -165,4 +249,12 @@ def dummy_results(worker_function, dummy_list):
 def test_worker(comm, dummy_results, mpi_results):
     comm.barrier()  # synchronize the test "dots" across ranks
     if comm.Get_rank() == 0:
-        assert dummy_results == mpi_results
+        assert len(dummy_results) == len(mpi_results)
+        for dummy, mpi in zip(dummy_results, mpi_results):
+            if isinstance(mpi, np.ndarray):
+                np.testing.assert_array_equal(dummy, mpi)
+            elif isinstance(mpi, Exception):
+                assert type(dummy) == type(mpi)
+                assert dummy.args == mpi.args
+            else:
+                assert dummy == mpi

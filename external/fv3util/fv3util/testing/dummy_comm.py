@@ -1,5 +1,6 @@
 import logging
 import copy
+import numpy as np
 
 
 logger = logging.getLogger("fv3util")
@@ -121,12 +122,16 @@ class DummyComm:
                 recvbuf[i, :] = sendbuf
 
     def Send(self, sendbuf, dest):
+        if isinstance(sendbuf, np.ndarray) and not sendbuf.data.contiguous:
+            raise ValueError('ndarray is not contiguous')
         self._put_send_recv(sendbuf, dest)
 
     def Isend(self, sendbuf, dest):
         return self.Send(sendbuf, dest)
 
     def Recv(self, recvbuf, source):
+        if isinstance(recvbuf, np.ndarray) and not recvbuf.data.contiguous:
+            raise ValueError('ndarray is not contiguous')
         recvbuf[:] = self._get_send_recv(source)
 
     def Irecv(self, recvbuf, source):
