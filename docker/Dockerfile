@@ -120,7 +120,7 @@ RUN pip3 install --no-cache-dir \
     appdirs==1.4.3 \
     pyyaml==5.1.2 \
     google-cloud-storage==1.23.0 \
-    gcsfs==0.6.1 \
+    gcsfs==0.6.0 \
     fsspec==0.6.0 \
     kubernetes==10.0.1 \
     numcodecs==0.6.4 \
