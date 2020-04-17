@@ -2,6 +2,12 @@ History
 =======
 
 
+v0.3.5
+------
+
+Major changes:
+- Replaced latent and sensible heat fortran variable names with instantaneous versions instead of cumulative. Updated units of total_precipitation.
+
 v0.3.4
 ------
 
