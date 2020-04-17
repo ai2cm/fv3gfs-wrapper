@@ -5,6 +5,7 @@ from .partitioner import CubedSpherePartitioner, TilePartitioner
 from . import constants
 from .boundary import Boundary
 from .rotate import rotate_scalar_data, rotate_vector_data
+from .utils import is_contiguous
 import logging
 
 __all__ = ["TileCommunicator", "CubedSphereCommunicator"]
@@ -25,14 +26,6 @@ def bcast_metadata_list(comm, quantity_list):
 
 def bcast_metadata(comm, array):
     return bcast_metadata_list(comm, [array])[0]
-
-
-def is_contiguous(array):
-    try:
-        return array.data.contiguous
-    except AttributeError:
-        # gt4py storages use numpy arrays for .data attribute instead of memoryview
-        return array.data.data.contiguous
 
 
 @functools.lru_cache(maxsize=512)

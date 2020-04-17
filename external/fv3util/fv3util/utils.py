@@ -15,3 +15,11 @@ def list_by_dims(dims, horizontal_list, non_horizontal_value):
         else:
             return_list.append(non_horizontal_value)
     return tuple(return_list)
+
+
+def is_contiguous(array):
+    try:
+        return array.data.contiguous
+    except AttributeError:
+        # gt4py storages use numpy arrays for .data attribute instead of memoryview
+        return array.data.data.contiguous
