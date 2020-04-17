@@ -78,7 +78,7 @@ class TileCommunicator(Communicator):
             sendbuf = get_buffer(
                 metadata.np.empty,
                 (self.partitioner.total_ranks,) + shape,
-                dtype=metadata.dtype
+                dtype=metadata.dtype,
             )
             for rank in range(0, self.partitioner.total_ranks):
                 subtile_slice = self.partitioner.subtile_slice(
