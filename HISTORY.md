@@ -6,6 +6,8 @@ Latest
 
 Major changes:
 - Updated fv3gfs-fortran submodule to 31fc2ee. Important changes are addition of `do_gfdl_mp_in_physics` and `do_only_clearsky_rad` namelist parameters.
+Minor changs:
+- Replaced latent and sensible heat fortran variable names with instantaneous versions instead of cumulative. Updated units of total_precipitation.
 
 
 v0.4.0 (2020-04-03)
