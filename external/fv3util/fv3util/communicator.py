@@ -256,7 +256,7 @@ class CubedSphereCommunicator(Communicator):
         )
         self._tile_communicator = TileCommunicator(tile_comm, self.partitioner.tile)
 
-    def start_halo_update(self, quantity: Quantity, n_points: int):
+    def start_halo_update(self, quantity: Quantity, n_points: int, tag: Hashable = None):
         """Initiate an asynchronous halo update of a quantity."""
         if n_points == 0:
             raise ValueError("cannot perform a halo update on zero halo points")
@@ -271,7 +271,10 @@ class CubedSphereCommunicator(Communicator):
                     data, quantity.dims, quantity.np, -boundary.n_clockwise_rotations
                 )
             )  # don't use get_buffer here because we want buffers to be unique
-            self._Isend(quantity.np, data, dest=boundary.to_rank)
+            if tag is None:
+                self.comm.Isend(quantity.np, data, dest=boundary.to_rank)
+            else:
+                self.comm.Isend(quantity.np, data, dest=boundary.to_rank, tag=tag)
 
     def finish_halo_update(
         self, quantity: Quantity, n_points: int, tag: Hashable = None
@@ -317,6 +320,8 @@ class CubedSphereCommunicator(Communicator):
                 x_quantity.dims,
                 x_quantity.np,
             )
+            x_data = x_quantity.np.ascontiguousarray(x_data)
+            y_data = y_quantity.np.ascontiguousarray(y_data)
             logger.debug(
                 "%s %s %s %s %s",
                 boundary.from_rank,
@@ -326,11 +331,11 @@ class CubedSphereCommunicator(Communicator):
                 y_data.shape,
             )
             if tag is None:
-                self._Send(x_quantity.np, x_data, dest=boundary.to_rank)
-                self._Send(y_quantity.np, y_data, dest=boundary.to_rank)
+                self.comm.ISend(x_quantity.np, x_data, dest=boundary.to_rank)
+                self.comm.ISend(y_quantity.np, y_data, dest=boundary.to_rank)
             else:
-                self._Send(x_quantity.np, x_data, dest=boundary.to_rank, tag=tag)
-                self._Send(y_quantity.np, y_data, dest=boundary.to_rank, tag=tag)
+                self.comm.ISend(x_quantity.np, x_data, dest=boundary.to_rank, tag=tag)
+                self.comm.ISend(y_quantity.np, y_data, dest=boundary.to_rank, tag=tag)
 
     def _Send(self, numpy, in_array, dest):
         if is_contiguous(in_array):
