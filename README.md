@@ -30,6 +30,15 @@ in development mode with `pip install -e .`.
 
 This package only supports linux and Python 3.5 or greater.
 
+Building Docs
+-------------
+
+Once the docker image is built, the documentation can be built and shown using:
+
+    make docs-docker
+
+This will produce html documentation in `docs/html`.
+
 Iterative development
 ---------------------
 
@@ -49,15 +58,6 @@ docker image. Inside the docker image, you can build or re-build the model with
 Re-building the model inside the image is necessary since your local
 filesystem won't already have the build artifacts necessary to build
 the compiled wrapper.
-
-Building Docs
--------------
-
-Once the docker image is built, the documentation can be built and shown using:
-
-    make docs-docker
-
-This will produce html documentation in `docs/html`.
 
 Usage
 -----
