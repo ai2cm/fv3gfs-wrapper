@@ -27,6 +27,14 @@ def bcast_metadata(comm, array):
     return bcast_metadata_list(comm, [array])[0]
 
 
+def is_contiguous(array):
+    try:
+        return array.data.contiguous
+    except AttributeError:
+        # gt4py storages use numpy arrays for .data attribute instead of memoryview
+        return array.data.data.contiguous
+
+
 @functools.lru_cache(maxsize=512)
 def get_buffer(allocator, shape, dtype):
     """
@@ -330,7 +338,7 @@ class CubedSphereCommunicator(Communicator):
                 self._Send(y_quantity.np, y_data, dest=boundary.to_rank, tag=tag)
 
     def _Send(self, numpy, in_array, dest):
-        if in_array.data.contiguous:
+        if is_contiguous(in_array):
             self.comm.Send(in_array, dest=dest)
         else:
             sendbuf = get_buffer(numpy.empty, in_array.shape, in_array.dtype)
@@ -338,7 +346,7 @@ class CubedSphereCommunicator(Communicator):
             self.comm.Send(sendbuf, dest=dest)
 
     def _Recv(self, numpy, out_array, source):
-        if out_array.data.contiguous:
+        if is_contiguous(out_array):
             self.comm.Recv(out_array, source=source)
         else:
             recvbuf = get_buffer(numpy.empty, out_array.shape, out_array.dtype)
