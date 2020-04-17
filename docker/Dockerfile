@@ -111,7 +111,6 @@ RUN apt-get update && apt-get install -y \
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 10
 
-# Disabling Dawn for now until the dycore is further along, as it takes forever to build
 RUN pip install --no-cache-dir scikit-build && \
     git clone https://github.com/MeteoSwiss-APN/dawn.git /usr/src/dawn && \
     pip install --no-cache-dir /usr/src/dawn/dawn
