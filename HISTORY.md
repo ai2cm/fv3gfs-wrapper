@@ -1,8 +1,15 @@
 History
 =======
 
-latest
+Latest
 ------
+
+Major changes:
+- Updated fv3gfs-fortran submodule to 31fc2ee. Important changes are addition of `do_gfdl_mp_in_physics` and `do_only_clearsky_rad` namelist parameters.
+
+
+v0.4.0 (2020-04-03)
+-------------------
 
 Major changes:
 - Added Quantity object to replace DataArray in the state dictionary. Quantity.view[:] provides something akin to DataArray.values, except that it may be a cupy or numpy array. Quantity.values is a read-only numpy array.
