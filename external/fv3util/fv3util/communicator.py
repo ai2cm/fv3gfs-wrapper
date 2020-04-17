@@ -266,10 +266,12 @@ class CubedSphereCommunicator(Communicator):
             # n_clockwise_rotations times, due to the difference in axis orientation.\
             # Thus we rotate that number of times counterclockwise before sending,
             # to get the right final orientation
-            data = rotate_scalar_data(
-                data, quantity.dims, quantity.np, -boundary.n_clockwise_rotations
-            )
-            self._Send(quantity.np, data, dest=boundary.to_rank)
+            data = quantity.np.ascontiguousarray(
+                rotate_scalar_data(
+                    data, quantity.dims, quantity.np, -boundary.n_clockwise_rotations
+                )
+            )  # don't use get_buffer here because we want buffers to be unique
+            self._Isend(quantity.np, data, dest=boundary.to_rank)
 
     def finish_halo_update(
         self, quantity: Quantity, n_points: int, tag: Hashable = None
