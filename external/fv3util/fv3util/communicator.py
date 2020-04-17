@@ -272,9 +272,9 @@ class CubedSphereCommunicator(Communicator):
                 )
             )  # don't use get_buffer here because we want buffers to be unique
             if tag is None:
-                self.comm.Isend(quantity.np, data, dest=boundary.to_rank)
+                self.comm.Isend(data, dest=boundary.to_rank)
             else:
-                self.comm.Isend(quantity.np, data, dest=boundary.to_rank, tag=tag)
+                self.comm.Isend(data, dest=boundary.to_rank, tag=tag)
 
     def finish_halo_update(
         self, quantity: Quantity, n_points: int, tag: Hashable = None
@@ -331,11 +331,11 @@ class CubedSphereCommunicator(Communicator):
                 y_data.shape,
             )
             if tag is None:
-                self.comm.ISend(x_quantity.np, x_data, dest=boundary.to_rank)
-                self.comm.ISend(y_quantity.np, y_data, dest=boundary.to_rank)
+                self.comm.Isend(x_data, dest=boundary.to_rank)
+                self.comm.Isend(y_data, dest=boundary.to_rank)
             else:
-                self.comm.ISend(x_quantity.np, x_data, dest=boundary.to_rank, tag=tag)
-                self.comm.ISend(y_quantity.np, y_data, dest=boundary.to_rank, tag=tag)
+                self.comm.Isend(x_data, dest=boundary.to_rank, tag=tag)
+                self.comm.Isend(y_data, dest=boundary.to_rank, tag=tag)
 
     def _Send(self, numpy, in_array, dest):
         if is_contiguous(in_array):
