@@ -1,5 +1,4 @@
 import pytest
-import numpy as np
 import fv3util
 
 try:
@@ -31,10 +30,10 @@ def return_constant(comm):
 
 
 @worker()
-def send_recv(comm):
+def send_recv(comm, numpy):
     rank = comm.Get_rank()
     size = comm.Get_size()
-    data = np.asarray([rank], dtype=np.int)
+    data = numpy.asarray([rank], dtype=numpy.int)
 
     if rank < size - 1:
         if isinstance(comm, fv3util.testing.DummyComm):
@@ -48,11 +47,11 @@ def send_recv(comm):
 
 
 @worker()
-def send_f_contiguous_buffer(comm):
+def send_f_contiguous_buffer(comm, numpy):
     rank = comm.Get_rank()
     size = comm.Get_size()
-    np.random.seed(rank)
-    data = np.random.uniform(size=[2, 3]).T
+    numpy.random.seed(rank)
+    data = numpy.random.uniform(size=[2, 3]).T
 
     if rank < size - 1:
         if isinstance(comm, fv3util.testing.DummyComm):
@@ -66,12 +65,12 @@ def send_f_contiguous_buffer(comm):
 
 
 @worker()
-def send_non_contiguous_buffer(comm):
+def send_non_contiguous_buffer(comm, numpy):
     rank = comm.Get_rank()
     size = comm.Get_size()
-    np.random.seed(rank)
-    data = np.random.uniform(size=[2, 3, 4]).transpose(2, 0, 1)
-    recv_buffer = np.zeros([4, 2, 3])
+    numpy.random.seed(rank)
+    data = numpy.random.uniform(size=[2, 3, 4]).transpose(2, 0, 1)
+    recv_buffer = numpy.zeros([4, 2, 3])
 
     if rank < size - 1:
         if isinstance(comm, fv3util.testing.DummyComm):
@@ -83,12 +82,12 @@ def send_non_contiguous_buffer(comm):
 
 
 @worker()
-def send_subarray(comm):
+def send_subarray(comm, numpy):
     rank = comm.Get_rank()
     size = comm.Get_size()
-    np.random.seed(rank)
-    data = np.random.uniform(size=[4, 4, 4])
-    recv_buffer = np.zeros([2, 2, 2])
+    numpy.random.seed(rank)
+    data = numpy.random.uniform(size=[4, 4, 4])
+    recv_buffer = numpy.zeros([2, 2, 2])
 
     if rank < size - 1:
         if isinstance(comm, fv3util.testing.DummyComm):
@@ -100,13 +99,13 @@ def send_subarray(comm):
 
 
 @worker()
-def recv_to_subarray(comm):
+def recv_to_subarray(comm, numpy):
     rank = comm.Get_rank()
     size = comm.Get_size()
-    np.random.seed(rank)
-    data = np.random.uniform(size=[2, 2, 2])
-    recv_buffer = np.zeros([4, 4, 4])
-    contiguous_recv_buffer = np.zeros([2, 2, 2])
+    numpy.random.seed(rank)
+    data = numpy.random.uniform(size=[2, 2, 2])
+    recv_buffer = numpy.zeros([4, 4, 4])
+    contiguous_recv_buffer = numpy.zeros([2, 2, 2])
     return_value = recv_buffer
 
     if rank < size - 1:
@@ -126,12 +125,12 @@ def recv_to_subarray(comm):
 
 
 @worker()
-def scatter(comm):
+def scatter(comm, numpy):
     rank = comm.Get_rank()
     size = comm.Get_size()
-    recvbuf = np.array([-1])
+    recvbuf = numpy.array([-1])
     if rank == 0:
-        data = np.arange(size)[:, None]
+        data = numpy.arange(size)[:, None]
     else:
         data = None
     comm.Scatter(data, recvbuf)
@@ -140,27 +139,27 @@ def scatter(comm):
 
 
 @worker(rank_order=lambda total_ranks: range(total_ranks - 1, -1, -1))
-def gather(comm):
+def gather(comm, numpy):
     rank = comm.Get_rank()
     size = comm.Get_size()
-    sendbuf = np.array([rank])
+    sendbuf = numpy.array([rank])
     if rank == 0:
-        recvbuf = np.ones(size, dtype=sendbuf.dtype)[:, None] * -1
+        recvbuf = numpy.ones([size], dtype=sendbuf.dtype)[:, None] * -1
     else:
         recvbuf = None
     comm.Gather(sendbuf, recvbuf)
     if rank == 0:
-        assert np.all(recvbuf == np.arange(size)[:, None])
+        assert numpy.all(recvbuf == numpy.arange(size)[:, None])
         return list(recvbuf)
     else:
         return recvbuf
 
 
 @worker()
-def isend_irecv(comm):
+def isend_irecv(comm, numpy):
     rank = comm.Get_rank()
     size = comm.Get_size()
-    data = np.asarray([rank], dtype=np.int)
+    data = numpy.asarray([rank], dtype=numpy.int)
     if rank < size - 1:
         comm.Isend(data, dest=(rank + 1) % size)
     if rank > 0:
@@ -170,11 +169,11 @@ def isend_irecv(comm):
 
 
 @worker()
-def asynchronous_and_synchronous_send_recv(comm):
+def asynchronous_and_synchronous_send_recv(comm, numpy):
     rank = comm.Get_rank()
     size = comm.Get_size()
-    data_async = np.asarray([rank], dtype=np.int)
-    data_sync = np.asarray([-rank], dtype=np.int)
+    data_async = numpy.asarray([rank], dtype=numpy.int)
+    data_sync = numpy.asarray([-rank], dtype=numpy.int)
     if rank < size - 1:
         comm.Isend(data_async, dest=(rank + 1) % size)
         comm.Send(data_sync, dest=(rank + 1) % size)
@@ -191,9 +190,9 @@ def worker_function(request):
 
 
 def gather_decorator(worker_function):
-    def wrapped(comm):
+    def wrapped(comm, numpy):
         try:
-            result = worker_function(comm)
+            result = worker_function(comm, numpy)
         except Exception as err:
             result = err
         return comm.gather(result, root=0)
@@ -225,18 +224,18 @@ def comm(worker_function, total_ranks):
 
 
 @pytest.fixture
-def mpi_results(comm, worker_function):
-    return gather_decorator(worker_function)(comm)
+def mpi_results(comm, worker_function, numpy):
+    return gather_decorator(worker_function)(comm, numpy)
 
 
 @pytest.fixture
-def dummy_results(worker_function, dummy_list):
+def dummy_results(worker_function, dummy_list, numpy):
     print("Getting dummy results")
     result_list = [None] * len(dummy_list)
     for i in worker_function.rank_order(len(dummy_list)):
         comm = dummy_list[i]
         try:
-            result_list[i] = worker_function(comm)
+            result_list[i] = worker_function(comm, numpy)
         except Exception as err:
             result_list[i] = err
     print("done getting dummy results")
@@ -246,13 +245,13 @@ def dummy_results(worker_function, dummy_list):
 @pytest.mark.skipif(
     MPI is None, reason="mpi4py is not available or pytest was not run in parallel"
 )
-def test_worker(comm, dummy_results, mpi_results):
+def test_worker(comm, dummy_results, mpi_results, numpy):
     comm.barrier()  # synchronize the test "dots" across ranks
     if comm.Get_rank() == 0:
         assert len(dummy_results) == len(mpi_results)
         for dummy, mpi in zip(dummy_results, mpi_results):
-            if isinstance(mpi, np.ndarray):
-                np.testing.assert_array_equal(dummy, mpi)
+            if isinstance(mpi, numpy.ndarray):
+                numpy.testing.assert_array_equal(dummy, mpi)
             elif isinstance(mpi, Exception):
                 assert type(dummy) == type(mpi)
                 assert dummy.args == mpi.args
