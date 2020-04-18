@@ -109,13 +109,19 @@ class TileCommunicator(Communicator):
         Returns:
             recv_quantity
         """
+        sendbuf = get_buffer(
+            send_quantity.np.empty,
+            tuple(send_quantity.extent),
+            dtype=send_quantity.data.dtype,
+        )
+        sendbuf[:] = send_quantity.view[:]
         if self.rank == constants.MASTER_RANK:
             recvbuf = get_buffer(
                 send_quantity.np.empty,
                 (self.partitioner.total_ranks,) + tuple(send_quantity.extent),
                 dtype=send_quantity.data.dtype,
             )
-            self.comm.Gather(send_quantity.view[:], recvbuf, root=constants.MASTER_RANK)
+            self.comm.Gather(sendbuf[:], recvbuf[:], root=constants.MASTER_RANK)
             if recv_quantity is None:
                 tile_extent = self.partitioner.tile_extent(send_quantity.metadata)
                 recv_quantity = Quantity(
@@ -133,7 +139,7 @@ class TileCommunicator(Communicator):
             result = recv_quantity
         else:
             result = self.comm.Gather(
-                send_quantity.view[:], recvbuf=None, root=constants.MASTER_RANK
+                sendbuf[:], recvbuf=None, root=constants.MASTER_RANK
             )
         return result
 
