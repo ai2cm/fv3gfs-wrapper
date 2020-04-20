@@ -9,7 +9,7 @@ from Cython.Build import cythonize
 # This line only needed if building with NumPy in Cython file.
 from numpy import get_include
 
-PACKAGE_VERSION = '0.3.2'
+PACKAGE_VERSION = '0.3.3'
 
 fv3gfs_build_path_environ_name = 'FV3GFS_BUILD_DIR'
 make_command = os.environ.get('MAKE', 'make')
