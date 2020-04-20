@@ -54,6 +54,22 @@ Minor changes:
 - Makefile at top level only includes configure.fv3 if it exists, since it will not exist during linting tests
 - Added tests for `array_chunks` routine used by ZarrMonitor.
 
+v0.3.3
+------
+
+(changes made on v0.3 branch)
+
+Major changes:
+- Update fv3gfs-fortran submodule to 31fc2ee. Adds `do_only_clearsky_rad` namelist option.
+
+0.3.2
+-----
+
+(changes made on v0.3 branch)
+
+Major changes:
+- Update fv3gfs-fortran submodule to df28fccc. Most important changes are introduction of `use_analysis_sst` and `do_gfdl_mp_in_physics` namelist options.
+
 0.3.1
 -----
 
