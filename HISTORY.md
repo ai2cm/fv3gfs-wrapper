@@ -1,9 +1,11 @@
 History
 =======
 
-latest
+v0.3.3
 ------
 
+Major changes:
+- Update fv3gfs-fortran submodule to 31fc2ee. Adds `do_only_clearsky_rad` namelist option.
 
 0.3.2
 -----
