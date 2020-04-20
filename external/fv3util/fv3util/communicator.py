@@ -28,7 +28,7 @@ def bcast_metadata(comm, array):
     return bcast_metadata_list(comm, [array])[0]
 
 
-@functools.lru_cache(maxsize=512)
+# @functools.lru_cache(maxsize=512)
 def get_buffer(allocator, shape, dtype, tag=None):
     """
     Returns a communications buffer using an allocator.
@@ -96,7 +96,14 @@ class TileCommunicator(Communicator):
                 dims=metadata.dims,
                 units=metadata.units,
             )
-        self.comm.Scatter(sendbuf, recv_quantity.view[:], root=0)
+
+        recvbuf = get_buffer(
+            metadata.np.empty,
+            recv_quantity.view[:].shape,
+            dtype=metadata.dtype,
+        )
+        self.comm.Scatter(sendbuf, recvbuf, root=0)
+        recv_quantity.view[:] = recvbuf
         return recv_quantity
 
     def gather(
