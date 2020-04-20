@@ -100,6 +100,8 @@ class DummyComm:
         return
 
     def Scatter(self, sendbuf, recvbuf, root=0):
+        ensure_contiguous(sendbuf)
+        ensure_contiguous(recvbuf)
         if root != 0:
             raise NotImplementedError(
                 "DummyComm assumes ranks are called in order, so root must be the scatter source"
@@ -108,6 +110,8 @@ class DummyComm:
         recvbuf[:] = sendbuf[self.rank]
 
     def Gather(self, sendbuf, recvbuf, root=0):
+        ensure_contiguous(sendbuf)
+        ensure_contiguous(recvbuf)
         gather_buffer = self._gather_buffer
         gather_buffer[self.rank] = sendbuf
         if self.rank == root:
@@ -123,16 +127,14 @@ class DummyComm:
                 recvbuf[i, :] = sendbuf
 
     def Send(self, sendbuf, dest):
-        if isinstance(sendbuf, np.ndarray) and not is_contiguous(sendbuf):
-            raise ValueError("ndarray is not contiguous")
+        ensure_contiguous(sendbuf)
         self._put_send_recv(sendbuf, dest)
 
     def Isend(self, sendbuf, dest):
         return self.Send(sendbuf, dest)
 
     def Recv(self, recvbuf, source):
-        if isinstance(recvbuf, np.ndarray) and not is_contiguous(recvbuf):
-            raise ValueError("ndarray is not contiguous")
+        ensure_contiguous(recvbuf)
         recvbuf[:] = self._get_send_recv(source)
 
     def Irecv(self, recvbuf, source):
@@ -155,3 +157,8 @@ class DummyComm:
             comm.total_ranks = total_ranks
         self._split_comms[color].append(new_comm)
         return new_comm
+
+
+def ensure_contiguous(maybe_array):
+    if isinstance(maybe_array, np.ndarray) and not is_contiguous(maybe_array):
+        raise ValueError("ndarray is not contiguous")

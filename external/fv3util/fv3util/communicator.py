@@ -29,10 +29,12 @@ def bcast_metadata(comm, array):
 
 
 @functools.lru_cache(maxsize=512)
-def get_buffer(allocator, shape, dtype):
+def get_buffer(allocator, shape, dtype, tag=None):
     """
     Returns a communications buffer using an allocator.
     Buffers will be re-used between subsequent calls.
+
+    tag is a dummy argument to manage returning distinct cached buffers
     """
     return allocator(shape, dtype=dtype)
 
@@ -110,17 +112,22 @@ class TileCommunicator(Communicator):
         Returns:
             recv_quantity
         """
-        sendbuf = get_buffer(
-            send_quantity.np.empty,
-            tuple(send_quantity.extent),
-            dtype=send_quantity.data.dtype,
-        )
-        sendbuf[:] = send_quantity.view[:]
+        if not is_contiguous(send_quantity.view[:]):
+            sendbuf = get_buffer(
+                send_quantity.np.empty,
+                tuple(send_quantity.extent),
+                dtype=send_quantity.data.dtype,
+                tag="send"
+            )
+            sendbuf[:] = send_quantity.view[:]
+        else:
+            sendbuf = send_quantity.view[:]
         if self.rank == constants.MASTER_RANK:
             recvbuf = get_buffer(
                 send_quantity.np.empty,
                 (self.partitioner.total_ranks,) + tuple(send_quantity.extent),
                 dtype=send_quantity.data.dtype,
+                tag="recv"
             )
             self.comm.Gather(sendbuf[:], recvbuf[:], root=constants.MASTER_RANK)
             if recv_quantity is None:
