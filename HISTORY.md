@@ -1,6 +1,13 @@
 History
 =======
 
+
+v0.3.4
+------
+
+Major changes:
+- Update fv3gfs-fortran submodule to 42f2877a. Changes physical constants to be "GFS_PHYS" versions. Adds some preliminary online coarse-graining code.
+
 v0.3.3
 ------
 
