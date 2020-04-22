@@ -5,8 +5,12 @@ Latest
 ------
 
 Major changes:
-- Updated fv3gfs-fortran submodule to 31fc2ee. Important changes are addition of `do_gfdl_mp_in_physics` and `do_only_clearsky_rad` namelist parameters.
-Minor changs:
+- Updated fv3gfs-fortran submodule to 42f2877a. Important changes are:
+  - Addition of `do_gfdl_mp_in_physics` and `do_only_clearsky_rad` namelist parameters.
+  - Physical constants in model changed to `GFS_PHYS` versions.
+  - Preliminary online coarse-graining code infrastructure introduced.
+
+Minor changes:
 - Replaced latent and sensible heat fortran variable names with instantaneous versions instead of cumulative. Updated units of total_precipitation.
 
 
