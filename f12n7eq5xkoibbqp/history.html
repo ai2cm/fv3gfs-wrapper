@@ -96,11 +96,14 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">History</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#latest">Latest</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-4-0-2020-04-03">v0.4.0 (2020-04-03)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id1">0.3.1</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id2">0.3.0</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id3">0.2.1</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id4">0.2.0</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id5">0.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-3-4-2020-04-22">v0.3.4 (2020-04-22)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-3-3">v0.3.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-3-2">v0.3.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-3-1">v0.3.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-3-0">v0.3.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-2-1">v0.2.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-2-0">v0.2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-1-0">v0.1.0</a></li>
 </ul>
 </li>
 </ul>
@@ -225,8 +228,23 @@
 - Makefile at top level only includes configure.fv3 if it exists, since it will not exist during linting tests
 - Added tests for <cite>array_chunks</cite> routine used by ZarrMonitor.</p>
 </div>
-<div class="section" id="id1">
-<h2>0.3.1<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="v0-3-4-2020-04-22">
+<h2>v0.3.4 (2020-04-22)<a class="headerlink" href="#v0-3-4-2020-04-22" title="Permalink to this headline">¶</a></h2>
+<p>Major changes:
+- Update fv3gfs-fortran submodule to 42f2877a. Changes physical constants to be “GFS_PHYS” versions. Adds some preliminary online coarse-graining code.</p>
+</div>
+<div class="section" id="v0-3-3">
+<h2>v0.3.3<a class="headerlink" href="#v0-3-3" title="Permalink to this headline">¶</a></h2>
+<p>Major changes:
+- Update fv3gfs-fortran submodule to 31fc2ee. Adds <cite>do_only_clearsky_rad</cite> namelist option.</p>
+</div>
+<div class="section" id="v0-3-2">
+<h2>v0.3.2<a class="headerlink" href="#v0-3-2" title="Permalink to this headline">¶</a></h2>
+<p>Major changes:
+- Update fv3gfs-fortran submodule to df28fccc. Most important changes are introduction of <cite>use_analysis_sst</cite> and <cite>do_gfdl_mp_in_physics</cite> namelist options.</p>
+</div>
+<div class="section" id="v0-3-1">
+<h2>v0.3.1<a class="headerlink" href="#v0-3-1" title="Permalink to this headline">¶</a></h2>
 <p>Major changes:
 - In order to facilitate testing of pure python code, this PR splits code that has no dependencies on the Fortran wrapper into its own subpackage, <cite>fv3util</cite>. That code then gets imported and used by the <cite>fv3gfs</cite> python package.
 - Removed legacy restart loading code (<cite>load_fortran_restart_folder</cite>). This will be added back in a future PR with better logic for identifying dimensions in restart data, using the properties dictionaries.
@@ -250,8 +268,8 @@
 - Changed documentation theme to readthedocs theme
 - Added IDE directory to gitignore</p>
 </div>
-<div class="section" id="id2">
-<h2>0.3.0<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="v0-3-0">
+<h2>v0.3.0<a class="headerlink" href="#v0-3-0" title="Permalink to this headline">¶</a></h2>
 <p>Major changes:
 - Fortran sources are updated from the older fv3gfs repo to the newer fv3atm repo. Running the model is the same, but small changes to the repo require different namelist options when running the model, so configuration dictionaries will need to be updated accordingly.</p>
 <p>Minor changes:
@@ -264,20 +282,20 @@
 - Configuration dictionaries are explicitly specified for tests instead of using <cite>get_default_config</cite>.
 - Commented-out restart tests are re-introduced as fixing restarts on the new repo is a work in progress.</p>
 </div>
-<div class="section" id="id3">
-<h2>0.2.1<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="v0-2-1">
+<h2>v0.2.1<a class="headerlink" href="#v0-2-1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed Circle CI tagging logic</p></li>
 </ul>
 </div>
-<div class="section" id="id4">
-<h2>0.2.0<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="v0-2-0">
+<h2>v0.2.0<a class="headerlink" href="#v0-2-0" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Initial tagged release using public fv3gfs repository</p></li>
 </ul>
 </div>
-<div class="section" id="id5">
-<h2>0.1.0<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="v0-1-0">
+<h2>v0.1.0<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Initial release.</p></li>
 </ul>
