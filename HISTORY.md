@@ -1,6 +1,18 @@
 History
 =======
 
+latest
+------
+
+Major changes:
+- fv3config updated to 0.3.2
+
+Minor changes:
+- gcsfs updated to 0.6.0
+- added backoff to dockerfile, is a new requirement for fv3config
+- create empty outdir in dockerfile, required to allow run_docker to upload to a remote outdir
+- add .c files to `make clean` in `lib`. These are produced as build artifacts of cython.
+
 v0.4.0 (2020-04-03)
 -------------------
 
