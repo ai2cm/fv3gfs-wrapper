@@ -1,5 +1,5 @@
 from typing import Iterable, Hashable
-import functools
+# import functools  # TODO: fix get_buffer caching and re-enable
 from .quantity import Quantity
 from .partitioner import CubedSpherePartitioner, TilePartitioner
 from . import constants
@@ -98,9 +98,7 @@ class TileCommunicator(Communicator):
             )
 
         recvbuf = get_buffer(
-            metadata.np.empty,
-            recv_quantity.view[:].shape,
-            dtype=metadata.dtype,
+            metadata.np.empty, recv_quantity.view[:].shape, dtype=metadata.dtype,
         )
         self.comm.Scatter(sendbuf, recvbuf, root=0)
         recv_quantity.view[:] = recvbuf
@@ -124,7 +122,7 @@ class TileCommunicator(Communicator):
                 send_quantity.np.empty,
                 tuple(send_quantity.extent),
                 dtype=send_quantity.data.dtype,
-                tag="send"
+                tag="send",
             )
             sendbuf[:] = send_quantity.view[:]
         else:
@@ -134,7 +132,7 @@ class TileCommunicator(Communicator):
                 send_quantity.np.empty,
                 (self.partitioner.total_ranks,) + tuple(send_quantity.extent),
                 dtype=send_quantity.data.dtype,
-                tag="recv"
+                tag="recv",
             )
             self.comm.Gather(sendbuf[:], recvbuf[:], root=constants.MASTER_RANK)
             if recv_quantity is None:
@@ -276,7 +274,9 @@ class CubedSphereCommunicator(Communicator):
         )
         self._tile_communicator = TileCommunicator(tile_comm, self.partitioner.tile)
 
-    def start_halo_update(self, quantity: Quantity, n_points: int, tag: Hashable = None):
+    def start_halo_update(
+        self, quantity: Quantity, n_points: int, tag: Hashable = None
+    ):
         """Initiate an asynchronous halo update of a quantity."""
         if n_points == 0:
             raise ValueError("cannot perform a halo update on zero halo points")
