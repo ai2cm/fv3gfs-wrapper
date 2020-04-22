@@ -58,6 +58,14 @@ Minor changes:
 - Makefile at top level only includes configure.fv3 if it exists, since it will not exist during linting tests
 - Added tests for `array_chunks` routine used by ZarrMonitor.
 
+v0.3.4
+------
+
+(changes made on v0.3 branch)
+
+Major changes:
+- Update fv3gfs-fortran submodule to 42f2877a. Changes physical constants to be "GFS_PHYS" versions. Adds some preliminary online coarse-graining code.
+
 v0.3.3
 ------
 
