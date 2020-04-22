@@ -58,10 +58,8 @@ Minor changes:
 - Makefile at top level only includes configure.fv3 if it exists, since it will not exist during linting tests
 - Added tests for `array_chunks` routine used by ZarrMonitor.
 
-v0.3.4
-------
-
-(changes made on v0.3 branch)
+v0.3.4 (2020-04-22)
+-------------------
 
 Major changes:
 - Update fv3gfs-fortran submodule to 42f2877a. Changes physical constants to be "GFS_PHYS" versions. Adds some preliminary online coarse-graining code.
@@ -69,21 +67,17 @@ Major changes:
 v0.3.3
 ------
 
-(changes made on v0.3 branch)
-
 Major changes:
 - Update fv3gfs-fortran submodule to 31fc2ee. Adds `do_only_clearsky_rad` namelist option.
 
-0.3.2
------
-
-(changes made on v0.3 branch)
+v0.3.2
+------
 
 Major changes:
 - Update fv3gfs-fortran submodule to df28fccc. Most important changes are introduction of `use_analysis_sst` and `do_gfdl_mp_in_physics` namelist options.
 
-0.3.1
------
+v0.3.1
+------
 
 Major changes:
 - In order to facilitate testing of pure python code, this PR splits code that has no dependencies on the Fortran wrapper into its own subpackage, `fv3util`. That code then gets imported and used by the `fv3gfs` python package.
@@ -110,8 +104,8 @@ Minor changes:
 - Added IDE directory to gitignore
 
 
-0.3.0
------
+v0.3.0
+------
 
 Major changes:
 - Fortran sources are updated from the older fv3gfs repo to the newer fv3atm repo. Running the model is the same, but small changes to the repo require different namelist options when running the model, so configuration dictionaries will need to be updated accordingly.
@@ -127,20 +121,20 @@ Minor changes:
 - Commented-out restart tests are re-introduced as fixing restarts on the new repo is a work in progress.
 
 
-0.2.1
------
+v0.2.1
+------
 
 * Fixed Circle CI tagging logic
 
 
-0.2.0
------
+v0.2.0
+------
 
 * Initial tagged release using public fv3gfs repository
 
 
-0.1.0
------
+v0.1.0
+------
 
 * Initial release.
 
