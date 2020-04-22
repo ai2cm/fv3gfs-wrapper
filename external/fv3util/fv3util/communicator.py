@@ -1,4 +1,5 @@
 from typing import Iterable, Hashable
+
 # import functools  # TODO: fix get_buffer caching and re-enable
 from .quantity import Quantity
 from .partitioner import CubedSpherePartitioner, TilePartitioner
