@@ -266,9 +266,10 @@ class CubedSphereCommunicator(Communicator):
                 data, quantity.dims, quantity.np, -boundary.n_clockwise_rotations
             )
             if tag is None:
-                self._Isend(quantity.np, data, dest=boundary.to_rank)
+                req = self._Isend(quantity.np, data, dest=boundary.to_rank)
             else:
-                self._Isend(quantity.np, data, dest=boundary.to_rank, tag=tag)
+                req = self._Isend(quantity.np, data, dest=boundary.to_rank, tag=tag)
+        return req
 
     def finish_halo_update(
         self, quantity: Quantity, n_points: int, tag: Hashable = None

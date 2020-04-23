@@ -133,7 +133,10 @@ class DummyComm:
         self._put_send_recv(sendbuf, dest)
 
     def Isend(self, sendbuf, dest):
-        return self.Send(sendbuf, dest)
+        result = self.Send(sendbuf, dest)
+        def send():
+            return result
+        return AsyncResult(send)
 
     def Recv(self, recvbuf, source):
         ensure_contiguous(recvbuf)

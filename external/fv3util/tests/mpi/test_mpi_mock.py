@@ -161,7 +161,8 @@ def isend_irecv(comm, numpy):
     size = comm.Get_size()
     data = numpy.asarray([rank], dtype=numpy.int)
     if rank < size - 1:
-        comm.Isend(data, dest=(rank + 1) % size)
+        req = comm.Isend(data, dest=(rank + 1) % size)
+        req.wait()
     if rank > 0:
         req = comm.Irecv(data, source=(rank - 1) % size)
         req.wait()
@@ -175,7 +176,8 @@ def asynchronous_and_synchronous_send_recv(comm, numpy):
     data_async = numpy.asarray([rank], dtype=numpy.int)
     data_sync = numpy.asarray([-rank], dtype=numpy.int)
     if rank < size - 1:
-        comm.Isend(data_async, dest=(rank + 1) % size)
+        req = comm.Isend(data_async, dest=(rank + 1) % size)
+        req.wait()
         comm.Send(data_sync, dest=(rank + 1) % size)
     if rank > 0:
         comm.Recv(data_sync, source=(rank - 1) % size)

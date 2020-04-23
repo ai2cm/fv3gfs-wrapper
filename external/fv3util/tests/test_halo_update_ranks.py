@@ -117,7 +117,8 @@ def rank_quantity_list(total_ranks, numpy, dtype):
 @pytest.mark.filterwarnings("ignore:invalid value encountered in remainder")
 def test_correct_rank_layout(rank_quantity_list, communicator_list, subtests, numpy):
     for communicator, quantity in zip(communicator_list, rank_quantity_list):
-        communicator.start_halo_update(quantity, 1)
+        req = communicator.start_halo_update(quantity, 1)
+        req.wait()
     for communicator, quantity in zip(communicator_list, rank_quantity_list):
         communicator.finish_halo_update(quantity, 1)
     for rank, quantity in enumerate(rank_quantity_list):
