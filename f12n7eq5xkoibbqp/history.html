@@ -94,7 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developers Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">History</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#latest">Latest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#latest">latest</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-4-0-2020-04-03">v0.4.0 (2020-04-03)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-3-4-2020-04-22">v0.3.4 (2020-04-22)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-3-3">v0.3.3</a></li>
@@ -173,7 +173,7 @@
   <div class="section" id="history">
 <h1>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="latest">
-<h2>Latest<a class="headerlink" href="#latest" title="Permalink to this headline">¶</a></h2>
+<h2>latest<a class="headerlink" href="#latest" title="Permalink to this headline">¶</a></h2>
 <p>Major changes:
 - Updated fv3gfs-fortran submodule to 42f2877a. Important changes are:</p>
 <blockquote>
@@ -183,8 +183,15 @@
 <li><p>Preliminary online coarse-graining code infrastructure introduced.</p></li>
 </ul>
 </div></blockquote>
+<ul class="simple">
+<li><p>fv3config updated to 0.3.2</p></li>
+</ul>
 <p>Minor changes:
-- Replaced latent and sensible heat fortran variable names with instantaneous versions instead of cumulative. Updated units of total_precipitation.</p>
+- Replaced latent and sensible heat fortran variable names with instantaneous versions instead of cumulative. Updated units of total_precipitation.
+- gcsfs updated to 0.6.0
+- added backoff to dockerfile, is a new requirement for fv3config
+- create empty outdir in dockerfile, required to allow run_docker to upload to a remote outdir
+- add .c files to <cite>make clean</cite> in <cite>lib</cite>. These are produced as build artifacts of cython.</p>
 </div>
 <div class="section" id="v0-4-0-2020-04-03">
 <h2>v0.4.0 (2020-04-03)<a class="headerlink" href="#v0-4-0-2020-04-03" title="Permalink to this headline">¶</a></h2>
