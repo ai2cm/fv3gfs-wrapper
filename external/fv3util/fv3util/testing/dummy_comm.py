@@ -1,7 +1,6 @@
 import logging
 import copy
-import numpy as np
-from ..utils import is_contiguous
+from ..utils import ensure_contiguous
 
 
 logger = logging.getLogger("fv3util")
@@ -106,14 +105,17 @@ class DummyComm:
             raise NotImplementedError(
                 "DummyComm assumes ranks are called in order, so root must be the scatter source"
             )
-        sendbuf = self._get_buffer("scatter", sendbuf)
+        if sendbuf is not None:
+            sendbuf = self._get_buffer("scatter", sendbuf.copy())
+        else:
+            sendbuf = self._get_buffer("scatter", None)
         recvbuf[:] = sendbuf[self.rank]
 
     def Gather(self, sendbuf, recvbuf, root=0):
         ensure_contiguous(sendbuf)
         ensure_contiguous(recvbuf)
         gather_buffer = self._gather_buffer
-        gather_buffer[self.rank] = sendbuf
+        gather_buffer[self.rank] = sendbuf.copy()
         if self.rank == root:
             # ndarrays are finnicky, have to check for None like this:
             if any(item is None for item in gather_buffer):
@@ -157,8 +159,3 @@ class DummyComm:
             comm.total_ranks = total_ranks
         self._split_comms[color].append(new_comm)
         return new_comm
-
-
-def ensure_contiguous(maybe_array):
-    if isinstance(maybe_array, np.ndarray) and not is_contiguous(maybe_array):
-        raise ValueError("ndarray is not contiguous")

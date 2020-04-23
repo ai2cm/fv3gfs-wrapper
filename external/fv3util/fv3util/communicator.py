@@ -1,12 +1,10 @@
 from typing import Iterable, Hashable
-
-# import functools  # TODO: fix get_buffer caching and re-enable
 from .quantity import Quantity
 from .partitioner import CubedSpherePartitioner, TilePartitioner
 from . import constants
 from .boundary import Boundary
 from .rotate import rotate_scalar_data, rotate_vector_data
-from .utils import is_contiguous
+from .buffer import array_buffer, send_buffer, recv_buffer
 import logging
 
 __all__ = ["TileCommunicator", "CubedSphereCommunicator"]
@@ -29,17 +27,6 @@ def bcast_metadata(comm, array):
     return bcast_metadata_list(comm, [array])[0]
 
 
-# @functools.lru_cache(maxsize=512)
-def get_buffer(allocator, shape, dtype, tag=None):
-    """
-    Returns a communications buffer using an allocator.
-    Buffers will be re-used between subsequent calls.
-
-    tag is a dummy argument to manage returning distinct cached buffers
-    """
-    return allocator(shape, dtype=dtype)
-
-
 class Communicator:
     def __init__(self, comm):
         self.comm = comm
@@ -56,6 +43,14 @@ class TileCommunicator(Communicator):
     def __init__(self, comm, partitioner: TilePartitioner):
         self.partitioner = partitioner
         super(TileCommunicator, self).__init__(comm)
+
+    def _Scatter(self, numpy, sendbuf, recvbuf, **kwargs):
+        with send_buffer(numpy, sendbuf) as send, recv_buffer(numpy, recvbuf) as recv:
+            self.comm.Scatter(send, recv, **kwargs)
+
+    def _Gather(self, numpy, sendbuf, recvbuf, **kwargs):
+        with send_buffer(numpy, sendbuf) as send, recv_buffer(numpy, recvbuf) as recv:
+            self.comm.Gather(send, recv, **kwargs)
 
     def scatter(
         self, send_quantity: Quantity = None, recv_quantity: Quantity = None
@@ -78,31 +73,25 @@ class TileCommunicator(Communicator):
         else:
             metadata = self.comm.bcast(None, root=constants.MASTER_RANK)
         shape = self.partitioner.subtile_extent(metadata)
-        if self.rank == constants.MASTER_RANK:
-            sendbuf = get_buffer(
-                metadata.np.empty,
-                (self.partitioner.total_ranks,) + shape,
-                dtype=metadata.dtype,
-            )
-            for rank in range(0, self.partitioner.total_ranks):
-                subtile_slice = self.partitioner.subtile_slice(
-                    rank, tile_metadata=metadata, overlap=True,
-                )
-                sendbuf[rank, :] = send_quantity.view[subtile_slice]
-        else:
-            sendbuf = None
         if recv_quantity is None:
             recv_quantity = Quantity(
                 metadata.np.empty(shape, dtype=metadata.dtype),
                 dims=metadata.dims,
                 units=metadata.units,
             )
-
-        recvbuf = get_buffer(
-            metadata.np.empty, recv_quantity.view[:].shape, dtype=metadata.dtype,
-        )
-        self.comm.Scatter(sendbuf, recvbuf, root=0)
-        recv_quantity.view[:] = recvbuf
+        if self.rank == constants.MASTER_RANK:
+            with array_buffer(
+                    metadata.np.empty,
+                    (self.partitioner.total_ranks,) + shape,
+                    dtype=metadata.dtype) as sendbuf:
+                for rank in range(0, self.partitioner.total_ranks):
+                    subtile_slice = self.partitioner.subtile_slice(
+                        rank, tile_metadata=metadata, overlap=True,
+                    )
+                    sendbuf[rank, :] = send_quantity.view[subtile_slice]
+                self._Scatter(metadata.np, sendbuf, recv_quantity.view[:], root=constants.MASTER_RANK)
+        else:
+            self._Scatter(metadata.np, None, recv_quantity.view[:], root=constants.MASTER_RANK)
         return recv_quantity
 
     def gather(
@@ -118,43 +107,29 @@ class TileCommunicator(Communicator):
         Returns:
             recv_quantity
         """
-        if not is_contiguous(send_quantity.view[:]):
-            sendbuf = get_buffer(
-                send_quantity.np.empty,
-                tuple(send_quantity.extent),
-                dtype=send_quantity.data.dtype,
-                tag="send",
-            )
-            sendbuf[:] = send_quantity.view[:]
-        else:
-            sendbuf = send_quantity.view[:]
         if self.rank == constants.MASTER_RANK:
-            recvbuf = get_buffer(
-                send_quantity.np.empty,
-                (self.partitioner.total_ranks,) + tuple(send_quantity.extent),
-                dtype=send_quantity.data.dtype,
-                tag="recv",
-            )
-            self.comm.Gather(sendbuf[:], recvbuf[:], root=constants.MASTER_RANK)
-            if recv_quantity is None:
-                tile_extent = self.partitioner.tile_extent(send_quantity.metadata)
-                recv_quantity = Quantity(
-                    send_quantity.np.empty(tile_extent, dtype=send_quantity.data.dtype),
-                    dims=send_quantity.dims,
-                    units=send_quantity.units,
-                    origin=tuple([0 for dim in send_quantity.dims]),
-                    extent=tile_extent,
-                )
-            for rank in range(recvbuf.shape[0]):
-                to_slice = self.partitioner.subtile_slice(
-                    rank, recv_quantity.metadata, overlap=True
-                )
-                recv_quantity.view[to_slice] = recvbuf[rank, :]
-            result = recv_quantity
+            with array_buffer(
+                    send_quantity.np.empty,
+                    (self.partitioner.total_ranks,) + tuple(send_quantity.extent),
+                    dtype=send_quantity.data.dtype) as recvbuf:
+                self._Gather(send_quantity.np, send_quantity.view[:], recvbuf[:], root=constants.MASTER_RANK)
+                if recv_quantity is None:
+                    tile_extent = self.partitioner.tile_extent(send_quantity.metadata)
+                    recv_quantity = Quantity(
+                        send_quantity.np.empty(tile_extent, dtype=send_quantity.data.dtype),
+                        dims=send_quantity.dims,
+                        units=send_quantity.units,
+                        origin=tuple([0 for dim in send_quantity.dims]),
+                        extent=tile_extent,
+                    )
+                for rank in range(self.partitioner.total_ranks):
+                    to_slice = self.partitioner.subtile_slice(
+                        rank, recv_quantity.metadata, overlap=True
+                    )
+                    recv_quantity.view[to_slice] = recvbuf[rank, :]
+                result = recv_quantity
         else:
-            result = self.comm.Gather(
-                sendbuf[:], recvbuf=None, root=constants.MASTER_RANK
-            )
+            result = self._Gather(send_quantity.np, send_quantity.view[:], None, root=constants.MASTER_RANK)
         return result
 
     def gather_state(self, send_state: dict = None, recv_state: dict = None):
@@ -287,15 +262,13 @@ class CubedSphereCommunicator(Communicator):
             # n_clockwise_rotations times, due to the difference in axis orientation.\
             # Thus we rotate that number of times counterclockwise before sending,
             # to get the right final orientation
-            data = quantity.np.ascontiguousarray(
-                rotate_scalar_data(
-                    data, quantity.dims, quantity.np, -boundary.n_clockwise_rotations
-                )
-            )  # don't use get_buffer here because we want buffers to be unique
+            data = rotate_scalar_data(
+                data, quantity.dims, quantity.np, -boundary.n_clockwise_rotations
+            )
             if tag is None:
-                self.comm.Isend(data, dest=boundary.to_rank)
+                self._Isend(quantity.np, data, dest=boundary.to_rank)
             else:
-                self.comm.Isend(data, dest=boundary.to_rank, tag=tag)
+                self._Isend(quantity.np, data, dest=boundary.to_rank, tag=tag)
 
     def finish_halo_update(
         self, quantity: Quantity, n_points: int, tag: Hashable = None
@@ -303,7 +276,6 @@ class CubedSphereCommunicator(Communicator):
         """Complete an asynchronous halo update of a quantity."""
         for boundary_type, boundary in self.boundaries.items():
             dest_view = boundary.recv_view(quantity, n_points=n_points)
-            recvbuf = get_buffer(quantity.np.empty, dest_view.shape, dest_view.dtype)
             logger.debug(
                 "finish_halo_update: retrieving boundary_type=%s shape=%s from_rank=%s to_rank=%s",
                 boundary_type,
@@ -312,10 +284,9 @@ class CubedSphereCommunicator(Communicator):
                 self.rank,
             )
             if tag is None:
-                self._Recv(quantity.np, recvbuf, source=boundary.to_rank)
+                self._Recv(quantity.np, dest_view, source=boundary.to_rank)
             else:
-                self._Recv(quantity.np, recvbuf, source=boundary.to_rank, tag=tag)
-            dest_view[:] = recvbuf
+                self._Recv(quantity.np, dest_view, source=boundary.to_rank, tag=tag)
 
     def start_vector_halo_update(
         self,
@@ -341,8 +312,6 @@ class CubedSphereCommunicator(Communicator):
                 x_quantity.dims,
                 x_quantity.np,
             )
-            x_data = x_quantity.np.ascontiguousarray(x_data)
-            y_data = y_quantity.np.ascontiguousarray(y_data)
             logger.debug(
                 "%s %s %s %s %s",
                 boundary.from_rank,
@@ -352,27 +321,24 @@ class CubedSphereCommunicator(Communicator):
                 y_data.shape,
             )
             if tag is None:
-                self.comm.Isend(x_data, dest=boundary.to_rank)
-                self.comm.Isend(y_data, dest=boundary.to_rank)
+                self._Isend(x_quantity.np, x_data, dest=boundary.to_rank)
+                self._Isend(y_quantity.np, y_data, dest=boundary.to_rank)
             else:
-                self.comm.Isend(x_data, dest=boundary.to_rank, tag=tag)
-                self.comm.Isend(y_data, dest=boundary.to_rank, tag=tag)
+                self._Isend(x_quantity.np, x_data, dest=boundary.to_rank, tag=tag)
+                self._Isend(y_quantity.np, y_data, dest=boundary.to_rank, tag=tag)
 
-    def _Send(self, numpy, in_array, dest):
-        if is_contiguous(in_array):
-            self.comm.Send(in_array, dest=dest)
-        else:
-            sendbuf = get_buffer(numpy.empty, in_array.shape, in_array.dtype)
-            sendbuf[:] = in_array
-            self.comm.Send(sendbuf, dest=dest)
+    def _Isend(self, numpy, in_array, **kwargs):
+        # don't want to use a buffer here, because we leave this scope and can't close
+        # the context manager. might figure out a way to do it later
+        return self.comm.Isend(numpy.ascontiguousarray(in_array), **kwargs)
 
-    def _Recv(self, numpy, out_array, source):
-        if is_contiguous(out_array):
-            self.comm.Recv(out_array, source=source)
-        else:
-            recvbuf = get_buffer(numpy.empty, out_array.shape, out_array.dtype)
-            self.comm.Recv(recvbuf, source=source)
-            out_array[:] = recvbuf
+    def _Send(self, numpy, in_array, **kwargs):
+        with send_buffer(numpy, in_array) as sendbuf:
+            self.comm.Send(sendbuf, **kwargs)
+
+    def _Recv(self, numpy, out_array, **kwargs):
+        with recv_buffer(numpy, out_array) as recvbuf:
+            self.comm.Recv(recvbuf, **kwargs)
 
     def finish_vector_halo_update(
         self,
@@ -390,3 +356,23 @@ class CubedSphereCommunicator(Communicator):
             "finish_vector_halo_update: retrieving y quantity on rank=%i", self.rank
         )
         self.finish_halo_update(y_quantity, n_points, tag=tag)
+
+
+# def ensure_contiguous_args(send_or_recv_list):
+#     def decorator(func):
+#         def wrapper(numpy, *args, i_arg=0, **kwargs):
+#             if i_arg > len(send_or_recv_list):
+#                 result = func(*args, **kwargs)
+#             elif is_contiguous(args[i_arg]):
+#                 result = wrapper(numpy, *args, i_arg=i_arg + 1, **kwargs)
+#             else:
+#                 with buffer(numpy.empty, args[i].shape, args[i].dtype) as buf:
+#                     if send_or_recv == "send":
+#                         buf[:] = args[i]
+#                     result = wrapper(numpy, *args, i_arg=i_arg + 1, **kwargs)
+#                     if send_or_recv == "recv":
+#                         args[i][:] = buf
+#             return result
+#         wrapper.__name__ = func
+#         return wrapper
+#     return decorator
