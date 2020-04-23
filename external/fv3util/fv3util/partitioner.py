@@ -89,6 +89,12 @@ class TilePartitioner:
             tile_metadata.dims, tile_metadata.extent, self.layout
         )
 
+    def subtile_nx(self, nx):
+        return nx // self.layout[1]
+
+    def subtile_ny(self, ny):
+        return ny // self.layout[0]
+
     def subtile_slice(
         self, rank: int, tile_metadata: QuantityMetadata, overlap: bool = False
     ) -> Tuple[slice, slice]:
