@@ -112,7 +112,7 @@ class TileCommunicator(Communicator):
                     send_quantity.np.empty,
                     (self.partitioner.total_ranks,) + tuple(send_quantity.extent),
                     dtype=send_quantity.data.dtype) as recvbuf:
-                self._Gather(send_quantity.np, send_quantity.view[:], recvbuf[:], root=constants.MASTER_RANK)
+                self._Gather(send_quantity.np, send_quantity.view[:], recvbuf, root=constants.MASTER_RANK)
                 if recv_quantity is None:
                     tile_extent = self.partitioner.tile_extent(send_quantity.metadata)
                     recv_quantity = Quantity(
@@ -356,23 +356,3 @@ class CubedSphereCommunicator(Communicator):
             "finish_vector_halo_update: retrieving y quantity on rank=%i", self.rank
         )
         self.finish_halo_update(y_quantity, n_points, tag=tag)
-
-
-# def ensure_contiguous_args(send_or_recv_list):
-#     def decorator(func):
-#         def wrapper(numpy, *args, i_arg=0, **kwargs):
-#             if i_arg > len(send_or_recv_list):
-#                 result = func(*args, **kwargs)
-#             elif is_contiguous(args[i_arg]):
-#                 result = wrapper(numpy, *args, i_arg=i_arg + 1, **kwargs)
-#             else:
-#                 with buffer(numpy.empty, args[i].shape, args[i].dtype) as buf:
-#                     if send_or_recv == "send":
-#                         buf[:] = args[i]
-#                     result = wrapper(numpy, *args, i_arg=i_arg + 1, **kwargs)
-#                     if send_or_recv == "recv":
-#                         args[i][:] = buf
-#             return result
-#         wrapper.__name__ = func
-#         return wrapper
-#     return decorator
