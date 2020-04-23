@@ -134,8 +134,10 @@ class DummyComm:
 
     def Isend(self, sendbuf, dest):
         result = self.Send(sendbuf, dest)
+
         def send():
             return result
+
         return AsyncResult(send)
 
     def Recv(self, recvbuf, source):

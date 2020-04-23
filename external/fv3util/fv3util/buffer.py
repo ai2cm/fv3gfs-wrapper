@@ -15,15 +15,15 @@ def array_buffer(allocator, shape, dtype):
     key = (allocator, shape, dtype)
     if key in BUFFER_CACHE and len(BUFFER_CACHE[key]) > 0:
         array = BUFFER_CACHE[key].pop()
-        print('reusing array', array.data)
+        print("reusing array", array.data)
         yield array
     else:
         if key not in BUFFER_CACHE:
             BUFFER_CACHE[key] = []
         array = allocator(shape, dtype=dtype)
-        print('allocated array', array.data)
+        print("allocated array", array.data)
         yield array
-    print('array released', array.data)
+    print("array released", array.data)
     BUFFER_CACHE[key].append(array)
 
 

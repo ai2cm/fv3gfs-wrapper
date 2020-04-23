@@ -81,17 +81,25 @@ class TileCommunicator(Communicator):
             )
         if self.rank == constants.MASTER_RANK:
             with array_buffer(
-                    metadata.np.empty,
-                    (self.partitioner.total_ranks,) + shape,
-                    dtype=metadata.dtype) as sendbuf:
+                metadata.np.empty,
+                (self.partitioner.total_ranks,) + shape,
+                dtype=metadata.dtype,
+            ) as sendbuf:
                 for rank in range(0, self.partitioner.total_ranks):
                     subtile_slice = self.partitioner.subtile_slice(
                         rank, tile_metadata=metadata, overlap=True,
                     )
                     sendbuf[rank, :] = send_quantity.view[subtile_slice]
-                self._Scatter(metadata.np, sendbuf, recv_quantity.view[:], root=constants.MASTER_RANK)
+                self._Scatter(
+                    metadata.np,
+                    sendbuf,
+                    recv_quantity.view[:],
+                    root=constants.MASTER_RANK,
+                )
         else:
-            self._Scatter(metadata.np, None, recv_quantity.view[:], root=constants.MASTER_RANK)
+            self._Scatter(
+                metadata.np, None, recv_quantity.view[:], root=constants.MASTER_RANK
+            )
         return recv_quantity
 
     def gather(
@@ -109,14 +117,22 @@ class TileCommunicator(Communicator):
         """
         if self.rank == constants.MASTER_RANK:
             with array_buffer(
-                    send_quantity.np.empty,
-                    (self.partitioner.total_ranks,) + tuple(send_quantity.extent),
-                    dtype=send_quantity.data.dtype) as recvbuf:
-                self._Gather(send_quantity.np, send_quantity.view[:], recvbuf, root=constants.MASTER_RANK)
+                send_quantity.np.empty,
+                (self.partitioner.total_ranks,) + tuple(send_quantity.extent),
+                dtype=send_quantity.data.dtype,
+            ) as recvbuf:
+                self._Gather(
+                    send_quantity.np,
+                    send_quantity.view[:],
+                    recvbuf,
+                    root=constants.MASTER_RANK,
+                )
                 if recv_quantity is None:
                     tile_extent = self.partitioner.tile_extent(send_quantity.metadata)
                     recv_quantity = Quantity(
-                        send_quantity.np.empty(tile_extent, dtype=send_quantity.data.dtype),
+                        send_quantity.np.empty(
+                            tile_extent, dtype=send_quantity.data.dtype
+                        ),
                         dims=send_quantity.dims,
                         units=send_quantity.units,
                         origin=tuple([0 for dim in send_quantity.dims]),
@@ -129,7 +145,12 @@ class TileCommunicator(Communicator):
                     recv_quantity.view[to_slice] = recvbuf[rank, :]
                 result = recv_quantity
         else:
-            result = self._Gather(send_quantity.np, send_quantity.view[:], None, root=constants.MASTER_RANK)
+            result = self._Gather(
+                send_quantity.np,
+                send_quantity.view[:],
+                None,
+                root=constants.MASTER_RANK,
+            )
         return result
 
     def gather_state(self, send_state: dict = None, recv_state: dict = None):

@@ -26,9 +26,9 @@ def test_recvbuf_uses_buffer(numpy, non_contiguous_array):
     with recv_buffer(numpy, non_contiguous_array) as recvbuf:
         assert recvbuf is not non_contiguous_array
         assert recvbuf.data is not non_contiguous_array.data
-        recvbuf[:] = 0.
-        assert not numpy.all(non_contiguous_array == 0.)
-    assert numpy.all(non_contiguous_array == 0.)
+        recvbuf[:] = 0.0
+        assert not numpy.all(non_contiguous_array == 0.0)
+    assert numpy.all(non_contiguous_array == 0.0)
 
 
 def test_sendbuf_no_buffer(numpy, contiguous_array):
