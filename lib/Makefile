@@ -35,7 +35,7 @@ coupler_lib.o: coupler_lib.F90 fortran_libs
 
 clean:
 	@echo "Cleaning ... "
-	$(RM) -f *.o *.mod *.lst depend $(TEMPLATES)
+	$(RM) -f *.o *.mod *.lst *.c depend $(TEMPLATES)
 	$(RM) -rf tests/pytest/output/*
 	(cd external && make clean)
 
