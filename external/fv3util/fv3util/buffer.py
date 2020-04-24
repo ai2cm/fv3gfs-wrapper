@@ -7,10 +7,7 @@ BUFFER_CACHE = {}
 @contextlib.contextmanager
 def array_buffer(allocator, shape, dtype):
     """
-    Returns a communications buffer using an allocator.
-    Buffers will be re-used between subsequent calls.
-
-    tag is a dummy argument to manage returning distinct cached buffers
+    A context manager providing a contiguous array, which may be re-used between calls.
     """
     key = (allocator, shape, dtype)
     if key in BUFFER_CACHE and len(BUFFER_CACHE[key]) > 0:
@@ -29,6 +26,9 @@ def array_buffer(allocator, shape, dtype):
 
 @contextlib.contextmanager
 def send_buffer(numpy, array):
+    """A context manager ensuring that `array` is contiguous in a context where it is
+    being sent as data, copying into a recycled buffer array if necessary.
+    """
     if array is None or is_contiguous(array):
         yield array
     else:
@@ -39,6 +39,10 @@ def send_buffer(numpy, array):
 
 @contextlib.contextmanager
 def recv_buffer(numpy, array):
+    """A context manager ensuring that array is contiguous in a context where it is
+    being used to receive data, using a recycled buffer array and then copying the
+    result into array if necessary.
+    """
     if array is None or is_contiguous(array):
         yield array
     else:

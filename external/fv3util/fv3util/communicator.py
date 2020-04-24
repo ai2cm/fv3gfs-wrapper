@@ -272,7 +272,7 @@ class CubedSphereCommunicator(Communicator):
         self._tile_communicator = TileCommunicator(tile_comm, self.partitioner.tile)
 
     def start_halo_update(
-        self, quantity: Quantity, n_points: int, tag: Hashable = None
+        self, quantity: Quantity, n_points: int, tag: Hashable = 0
     ):
         """Initiate an asynchronous halo update of a quantity."""
         if n_points == 0:
@@ -286,14 +286,11 @@ class CubedSphereCommunicator(Communicator):
             data = rotate_scalar_data(
                 data, quantity.dims, quantity.np, -boundary.n_clockwise_rotations
             )
-            if tag is None:
-                req = self._Isend(quantity.np, data, dest=boundary.to_rank)
-            else:
-                req = self._Isend(quantity.np, data, dest=boundary.to_rank, tag=tag)
+            req = self._Isend(quantity.np, data, dest=boundary.to_rank, tag=tag)
         return req
 
     def finish_halo_update(
-        self, quantity: Quantity, n_points: int, tag: Hashable = None
+        self, quantity: Quantity, n_points: int, tag: Hashable = 0
     ):
         """Complete an asynchronous halo update of a quantity."""
         for boundary_type, boundary in self.boundaries.items():
@@ -305,17 +302,14 @@ class CubedSphereCommunicator(Communicator):
                 boundary.to_rank,
                 self.rank,
             )
-            if tag is None:
-                self._Recv(quantity.np, dest_view, source=boundary.to_rank)
-            else:
-                self._Recv(quantity.np, dest_view, source=boundary.to_rank, tag=tag)
+            self._Recv(quantity.np, dest_view, source=boundary.to_rank, tag=tag)
 
     def start_vector_halo_update(
         self,
         x_quantity: Quantity,
         y_quantity: Quantity,
         n_points: int,
-        tag: Hashable = None,
+        tag: Hashable = 0,
     ):
         """Initiate an asynchronous halo update of a horizontal vector quantity.
 
@@ -342,16 +336,13 @@ class CubedSphereCommunicator(Communicator):
                 x_data.shape,
                 y_data.shape,
             )
-            if tag is None:
-                self._Isend(x_quantity.np, x_data, dest=boundary.to_rank)
-                self._Isend(y_quantity.np, y_data, dest=boundary.to_rank)
-            else:
-                self._Isend(x_quantity.np, x_data, dest=boundary.to_rank, tag=tag)
-                self._Isend(y_quantity.np, y_data, dest=boundary.to_rank, tag=tag)
+            self._Isend(x_quantity.np, x_data, dest=boundary.to_rank, tag=tag)
+            self._Isend(y_quantity.np, y_data, dest=boundary.to_rank, tag=tag)
 
     def _Isend(self, numpy, in_array, **kwargs):
         # don't want to use a buffer here, because we leave this scope and can't close
         # the context manager. might figure out a way to do it later
+        if "tag" in kwargs and kwargs["tag"] is None: kwargs.pop("tag")
         return self.comm.Isend(numpy.ascontiguousarray(in_array), **kwargs)
 
     def _Send(self, numpy, in_array, **kwargs):
@@ -367,7 +358,7 @@ class CubedSphereCommunicator(Communicator):
         x_quantity: Quantity,
         y_quantity: Quantity,
         n_points: int,
-        tag: Hashable = None,
+        tag: Hashable = 0,
     ):
         """Complete an asynchronous halo update of a horizontal vector quantity."""
         logger.debug(

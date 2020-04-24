@@ -98,7 +98,7 @@ class DummyComm:
     def barrier(self):
         return
 
-    def Scatter(self, sendbuf, recvbuf, root=0):
+    def Scatter(self, sendbuf, recvbuf, root=0, **kwargs):
         ensure_contiguous(sendbuf)
         ensure_contiguous(recvbuf)
         if root != 0:
@@ -111,7 +111,7 @@ class DummyComm:
             sendbuf = self._get_buffer("scatter", None)
         recvbuf[:] = sendbuf[self.rank]
 
-    def Gather(self, sendbuf, recvbuf, root=0):
+    def Gather(self, sendbuf, recvbuf, root=0, **kwargs):
         ensure_contiguous(sendbuf)
         ensure_contiguous(recvbuf)
         gather_buffer = self._gather_buffer
@@ -128,11 +128,11 @@ class DummyComm:
             for i, sendbuf in enumerate(gather_buffer):
                 recvbuf[i, :] = sendbuf
 
-    def Send(self, sendbuf, dest):
+    def Send(self, sendbuf, dest, **kwargs):
         ensure_contiguous(sendbuf)
         self._put_send_recv(sendbuf, dest)
 
-    def Isend(self, sendbuf, dest):
+    def Isend(self, sendbuf, dest, **kwargs):
         result = self.Send(sendbuf, dest)
 
         def send():
@@ -140,11 +140,11 @@ class DummyComm:
 
         return AsyncResult(send)
 
-    def Recv(self, recvbuf, source):
+    def Recv(self, recvbuf, source, **kwargs):
         ensure_contiguous(recvbuf)
         recvbuf[:] = self._get_send_recv(source)
 
-    def Irecv(self, recvbuf, source):
+    def Irecv(self, recvbuf, source, **kwargs):
         def receive():
             return self.Recv(recvbuf, source)
 
