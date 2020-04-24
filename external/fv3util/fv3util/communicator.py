@@ -271,9 +271,7 @@ class CubedSphereCommunicator(Communicator):
         )
         self._tile_communicator = TileCommunicator(tile_comm, self.partitioner.tile)
 
-    def start_halo_update(
-        self, quantity: Quantity, n_points: int, tag: Hashable = 0
-    ):
+    def start_halo_update(self, quantity: Quantity, n_points: int, tag: Hashable = 0):
         """Initiate an asynchronous halo update of a quantity."""
         if n_points == 0:
             raise ValueError("cannot perform a halo update on zero halo points")
@@ -289,9 +287,7 @@ class CubedSphereCommunicator(Communicator):
             req = self._Isend(quantity.np, data, dest=boundary.to_rank, tag=tag)
         return req
 
-    def finish_halo_update(
-        self, quantity: Quantity, n_points: int, tag: Hashable = 0
-    ):
+    def finish_halo_update(self, quantity: Quantity, n_points: int, tag: Hashable = 0):
         """Complete an asynchronous halo update of a quantity."""
         for boundary_type, boundary in self.boundaries.items():
             dest_view = boundary.recv_view(quantity, n_points=n_points)
@@ -342,7 +338,8 @@ class CubedSphereCommunicator(Communicator):
     def _Isend(self, numpy, in_array, **kwargs):
         # don't want to use a buffer here, because we leave this scope and can't close
         # the context manager. might figure out a way to do it later
-        if "tag" in kwargs and kwargs["tag"] is None: kwargs.pop("tag")
+        if "tag" in kwargs and kwargs["tag"] is None:
+            kwargs.pop("tag")
         return self.comm.Isend(numpy.ascontiguousarray(in_array), **kwargs)
 
     def _Send(self, numpy, in_array, **kwargs):
