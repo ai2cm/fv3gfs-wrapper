@@ -10,6 +10,7 @@ Major changes:
   - Physical constants in model changed to `GFS_PHYS` versions.
   - Preliminary online coarse-graining code infrastructure introduced.
 - fv3config updated to 0.3.2
+- DummyComm now refuses to accept non-contiguous buffers, the same as mpi4py
 
 Minor changes:
 - Replaced latent and sensible heat fortran variable names with instantaneous versions instead of cumulative. Updated units of total_precipitation.
