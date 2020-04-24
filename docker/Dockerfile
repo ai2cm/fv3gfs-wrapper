@@ -140,7 +140,7 @@ RUN pip3 install --no-cache-dir \
     appdirs==1.4.3 \
     pyyaml==5.1.2 \
     google-cloud-storage==1.23.0 \
-    gcsfs==0.4.0 \
+    gcsfs==0.6.0 \
     fsspec==0.6.0 \
     kubernetes==10.0.1 \
     numcodecs==0.6.4 \
@@ -152,7 +152,8 @@ RUN pip3 install --no-cache-dir \
     toolz==0.10.0 \
     scipy==1.3.1 \
     sphinx==2.2.0 \
-    sphinx_rtd_theme && \
+    sphinx_rtd_theme \
+    backoff==1.10 &&\
     apt-get update && \
     apt-get install -y --no-install-recommends \
     wget \
@@ -188,7 +189,9 @@ RUN pip3 install --no-cache-dir -e \
 COPY --from=fv3config-inputdata /fv3config-cache $FV3CONFIG_CACHE_DIR/fv3config-cache
 
 RUN chmod -R 777 $FV3CONFIG_CACHE_DIR && \
-    echo "ulimit -s unlimited" >> /etc/bash.bashrc
+    echo "ulimit -s unlimited" >> /etc/bash.bashrc && \
+    mkdir /outdir && \
+    chmod -R 777 /outdir
 
 # interactive shell by default
 CMD ["bash"]
