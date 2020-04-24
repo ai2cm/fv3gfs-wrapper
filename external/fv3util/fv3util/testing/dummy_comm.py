@@ -106,7 +106,7 @@ class DummyComm:
                 "DummyComm assumes ranks are called in order, so root must be the scatter source"
             )
         if sendbuf is not None:
-            sendbuf = self._get_buffer("scatter", sendbuf.copy())
+            sendbuf = self._get_buffer("scatter", copy.deepcopy(sendbuf))
         else:
             sendbuf = self._get_buffer("scatter", None)
         recvbuf[:] = sendbuf[self.rank]
@@ -115,7 +115,7 @@ class DummyComm:
         ensure_contiguous(sendbuf)
         ensure_contiguous(recvbuf)
         gather_buffer = self._gather_buffer
-        gather_buffer[self.rank] = sendbuf.copy()
+        gather_buffer[self.rank] = copy.deepcopy(sendbuf)
         if self.rank == root:
             # ndarrays are finnicky, have to check for None like this:
             if any(item is None for item in gather_buffer):
