@@ -97,6 +97,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#templates">Templates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#properties-files">Properties Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#docker-build-system">Docker build system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#intermediate-docker-images">Intermediate docker images</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
@@ -210,6 +211,31 @@ repo. Compiled binaries from these images are copied into the fv3gfs-python imag
 after making a small change to the Fortran code requires entirely re-building the
 Fortran model. This can be avoided to some degree by using <cite>dev_docker.sh</cite> to enter
 the image interactively.</p>
+</div>
+<div class="section" id="intermediate-docker-images">
+<h2>Intermediate docker images<a class="headerlink" href="#intermediate-docker-images" title="Permalink to this headline">¶</a></h2>
+<p>For certain dependencies, images are pre-generated and pulled from GCR by default.
+This prevents having to re-build dependencies which rarely change. As of writing there
+is no versioning on these dependencies.</p>
+<p>To perform a default fv3gfs-python build which pulls images from GCR, in the root directory run:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ make build-docker
+</pre></div>
+</div>
+<p>To rebuild the intermediate images locally, run:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nv">BUILD_FROM_INTERMEDIATE</span><span class="o">=</span>n make -C docker build_deps
+</pre></div>
+</div>
+<p>To push built images to GCR:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ make -C docker push_deps
+</pre></div>
+</div>
+<p>To perform a fv3gfs-python build while building all steps locally, run:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nv">BUILD_FROM_INTERMEDIATE</span><span class="o">=</span>n make -C docker build
+</pre></div>
+</div>
+<p>Building all steps locally takes longer, but will ensure all built steps are consistent.
+This is required in order to create builds which depend on older versions of the
+dependencies included in intermediate images.</p>
 </div>
 </div>
 

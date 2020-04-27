@@ -91,8 +91,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#fv3gfs">FV3GFS</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#checking-out">Checking out</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#iterative-development">Iterative development</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#building-docs">Building Docs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#iterative-development">Iterative development</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
 </ul>
 </li>
@@ -196,6 +196,14 @@ from cached images, if you allow caching on your system.</p>
 in development mode with <cite>pip install -e .</cite>.</p>
 <p>This package only supports linux and Python 3.5 or greater.</p>
 </div>
+<div class="section" id="building-docs">
+<h3>Building Docs<a class="headerlink" href="#building-docs" title="Permalink to this headline">¶</a></h3>
+<p>Once the docker image is built, the documentation can be built and shown using:</p>
+<blockquote>
+<div><p>make docs-docker</p>
+</div></blockquote>
+<p>This will produce html documentation in <cite>docs/html</cite>.</p>
+</div>
 <div class="section" id="iterative-development">
 <h3>Iterative development<a class="headerlink" href="#iterative-development" title="Permalink to this headline">¶</a></h3>
 <p>When making changes to the Fortran source code, you may want to rebuild just part of
@@ -212,14 +220,6 @@ docker image. Inside the docker image, you can build or re-build the model with
 <p>Re-building the model inside the image is necessary since your local
 filesystem won’t already have the build artifacts necessary to build
 the compiled wrapper.</p>
-</div>
-<div class="section" id="building-docs">
-<h3>Building Docs<a class="headerlink" href="#building-docs" title="Permalink to this headline">¶</a></h3>
-<p>Once the docker image is built, the documentation can be built and shown using:</p>
-<blockquote>
-<div><p>make docs-docker</p>
-</div></blockquote>
-<p>This will produce html documentation in <cite>docs/html</cite>.</p>
 </div>
 <div class="section" id="usage">
 <h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>

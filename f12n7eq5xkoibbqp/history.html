@@ -185,6 +185,8 @@
 </div></blockquote>
 <ul class="simple">
 <li><p>fv3config updated to 0.3.2</p></li>
+<li><p>Added a Makefile for building docker images in docker/Makefile</p></li>
+<li><p>build_docker.sh and CircleCI will by default pull intermediate build dependency images instead of rebuilding them. These can be rebuilt manually using the Makefile in <cite>docker</cite>.</p></li>
 <li><p>DummyComm now refuses to accept non-contiguous buffers, the same as mpi4py</p></li>
 </ul>
 <p>Minor changes:
