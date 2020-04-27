@@ -10,6 +10,8 @@ Major changes:
   - Physical constants in model changed to `GFS_PHYS` versions.
   - Preliminary online coarse-graining code infrastructure introduced.
 - fv3config updated to 0.3.2
+- Added a Makefile for building docker images in docker/Makefile
+- build_docker.sh and CircleCI will by default pull intermediate build dependency images instead of rebuilding them. These can be rebuilt manually using the Makefile in `docker`.
 - DummyComm now refuses to accept non-contiguous buffers, the same as mpi4py
 
 Minor changes:

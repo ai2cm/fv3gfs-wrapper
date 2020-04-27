@@ -46,6 +46,7 @@ jobs:
   build_default:
     machine:
       docker_layer_caching: true
+      image: ubuntu-1604:201903-01
     environment:
       GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-python
       GOOGLE_APPLICATION_CREDENTIALS: /tmp/key.json
@@ -84,7 +85,8 @@ jobs:
       - run: 
           name: "Compile model and perform model tests"
           command: |
-            bash test_docker.sh
+            echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://us.gcr.io
+            DOCKER_BUILDKIT=1 BUILD_FROM_INTERMEDIATE=y bash test_docker.sh
       - run:
           name: "Run example runfiles"
           command: |
