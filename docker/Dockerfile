@@ -165,7 +165,6 @@ COPY --from=fv3gfs-fms /FMS $FMS_DIR
 COPY --from=fv3gfs-esmf /usr/local/esmf ${ESMF_DIR}
 COPY --from=fv3gfs-fms /FMS/libFMS/.libs/*.so* /lib64/
 COPY --from=fv3gfs-esmf /usr/local/esmf/lib/libO3/Linux.gfortran.64.mpiuni.default/*.so* /lib64/
-# Disabling Dawn for now until the dycore is further along, as it takes forever to build
 COPY --from=fv3gfs-dawn /usr/src/dawn /usr/src/dawn
 COPY --from=fv3gfs-dawn /dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
 COPY --from=fv3gfs-dawn /usr/src/gt4py /usr/src/gt4py
