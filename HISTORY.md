@@ -12,6 +12,7 @@ Major changes:
 - fv3config updated to 0.3.2
 - Added a Makefile for building docker images in docker/Makefile
 - build_docker.sh and CircleCI will by default pull intermediate build dependency images instead of rebuilding them. These can be rebuilt manually using the Makefile in `docker`.
+- DummyComm now refuses to accept non-contiguous buffers, the same as mpi4py
 
 Minor changes:
 - Replaced latent and sensible heat fortran variable names with instantaneous versions instead of cumulative. Updated units of total_precipitation.
