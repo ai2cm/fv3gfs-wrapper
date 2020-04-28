@@ -1,8 +1,8 @@
 History
 =======
 
-latest
-------
+v0.4.1 (2020-04-27)
+-------------------
 
 Major changes:
 - Updated fv3gfs-fortran submodule to 42f2877a. Important changes are:
