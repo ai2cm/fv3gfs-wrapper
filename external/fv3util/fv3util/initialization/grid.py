@@ -6,7 +6,7 @@ from ..partitioner import TilePartitioner
 
 
 @dataclasses.dataclass
-class Grid:
+class DimensionSizer:
 
     nx: int
     ny: int
