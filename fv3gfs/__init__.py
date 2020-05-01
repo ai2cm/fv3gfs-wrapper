@@ -15,6 +15,10 @@ from fv3util import (
     Y_DIM, Y_INTERFACE_DIM, Z_DIM, Z_INTERFACE_DIM, UnitsError
 )
 
+# noah: I am not sure if this is the top-level interface we want to provide
+# or maybe we could just implement this as a default?
+from ._logging import capture_fv3gfs_functions
+
 
 __all__ = [
     'initialize', 'step', 'step_dynamics', 'step_physics', 'save_intermediate_restart_if_enabled',
