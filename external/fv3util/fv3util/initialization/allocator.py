@@ -10,8 +10,10 @@ except ImportError:
 
 def _wrap_storage_call(function, backend):
     def wrapped(shape, dtype=float):
-        if backend == 'numpy' and dtype == int:
-            raise AssertionError(f"calling {function} with args {backend, [0] * len(shape), shape, dtype}")
+        if backend == "numpy" and dtype == int:
+            raise AssertionError(
+                f"calling {function} with args {backend, [0] * len(shape), shape, dtype}"
+            )
         return function(backend, [0] * len(shape), shape, dtype)
 
     wrapped.__name__ = function.__name__
