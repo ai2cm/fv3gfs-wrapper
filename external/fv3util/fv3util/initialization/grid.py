@@ -6,7 +6,7 @@ from ..partitioner import TilePartitioner
 
 
 @dataclasses.dataclass
-class DimensionSizer:
+class GridSizer:
 
     nx: int
     ny: int
@@ -23,30 +23,49 @@ class DimensionSizer:
         raise NotImplementedError()
 
 
-class SubtileDimensionSizer(DimensionSizer):
+class SubtileGridSizer(GridSizer):
 
     @classmethod
-    def from_tile_params(
+    def _from_tile_params(
         cls,
         nx_tile: int,
         ny_tile: int,
         nz: int,
         n_halo,
-        layout: Tuple[int, int],
         extra_dim_lengths: Dict[str, int],
+        layout: Tuple[int, int],
+        tile_partitioner: TilePartitioner = None,
+        tile_rank: int = 0,
     ):
-        partitioner = TilePartitioner(layout)
-        nx = partitioner.subtile_nx(nx_tile)
-        ny = partitioner.subtile_ny(ny_tile)
+        if tile_partitioner is None:
+            tile_partitioner = TilePartitioner(layout)
+        y_slice, x_slice = tile_partitioner.subtile_slice(
+            tile_rank,
+            [constants.Y_DIM, constants.X_DIM],
+            [ny_tile, nx_tile],
+            overlap=True
+        )
+        nx = x_slice.stop - x_slice.start
+        ny = y_slice.stop - y_slice.start
         return cls(nx, ny, nz, extra_dim_lengths)
 
     @classmethod
-    def from_namelist(cls, namelist):
+    def from_namelist(cls, namelist: dict, tile_partitioner: TilePartitioner = None, tile_rank: int = 0):
+        """Create a SubtileGridSizer from a Fortran namelist.
+        
+        Args:
+            namelist: A namelist for the fv3gfs fortran model
+            tile_partitioner (optional): a partitioner to use for segmenting the tile.
+                By default, a TilePartitioner is used.
+            tile_rank (optional): current rank on tile. Default is 0. Only matters if
+                different ranks have different domain shapes. If tile_partitioner
+                is a TilePartitioner, this argument does not matter.
+        """
+        layout = namelist["fv_core_nml"]["layout"]
         nx_tile = namelist["fv_core_nml"]["npx"] - 1
         ny_tile = namelist["fv_core_nml"]["npy"] - 1
         nz = namelist["fv_core_nml"]["npz"]  # this one is already on mid-levels
-        layout = namelist["fv_core_nml"]["layout"]
-        return cls.from_tile_params(nx_tile, ny_tile, nz, N_HALO, layout, {})
+        return cls._from_tile_params(nx_tile, ny_tile, nz, N_HALO, {}, layout, tile_partitioner, tile_rank)
 
     @property
     def dim_extents(self) -> Dict[str, int]:

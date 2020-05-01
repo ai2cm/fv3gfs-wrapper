@@ -28,7 +28,7 @@ def ny(ny_tile, layout):
     return ny_tile / layout[0]
 
 
-@pytest.fixture(params=[(1, 1), (2, 2), (4, 4)])
+@pytest.fixture(params=[(1, 1), (3, 3)])
 def layout(request):
     return request.param
 
@@ -54,11 +54,11 @@ def namelist(nx_tile, ny_tile, nz, layout):
 @pytest.fixture(params=["from_namelist", "from_tile_params"])
 def sizer(request, nx_tile, ny_tile, nz, layout, namelist, extra_dimension_lengths):
     if request.param == "from_tile_params":
-        sizer = fv3util.SubtileDimensionSizer.from_tile_params(
-            nx_tile, ny_tile, nz, fv3util.N_HALO, layout, extra_dimension_lengths
+        sizer = fv3util.SubtileGridSizer._from_tile_params(
+            nx_tile, ny_tile, nz, fv3util.N_HALO, extra_dimension_lengths, layout,
         )
     elif request.param == "from_namelist":
-        sizer = fv3util.SubtileDimensionSizer.from_namelist(namelist)
+        sizer = fv3util.SubtileGridSizer.from_namelist(namelist)
     else:
         raise NotImplementedError()
     return sizer

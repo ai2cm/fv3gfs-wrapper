@@ -1,6 +1,6 @@
 from typing import Iterable, Callable
 from ..quantity import Quantity
-from .grid import SubtileDimensionSizer
+from .grid import SubtileGridSizer
 
 try:
     import gt4py
@@ -24,11 +24,11 @@ class StorageNumpy:
 
 
 class Allocator:
-    def __init__(self, grid: SubtileDimensionSizer, numpy):
+    def __init__(self, grid: SubtileGridSizer, numpy):
         self.grid = grid
         self.numpy = numpy
 
-    def from_backend(cls, grid: SubtileDimensionSizer, backend: str):
+    def from_backend(cls, grid: SubtileGridSizer, backend: str):
         numpy = StorageNumpy(backend)
         return cls(grid, numpy)
 

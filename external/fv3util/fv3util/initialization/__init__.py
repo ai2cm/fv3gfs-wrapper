@@ -1,2 +1,2 @@
 from .allocator import Allocator
-from .grid import SubtileDimensionSizer, DimensionSizer
+from .grid import SubtileGridSizer, GridSizer

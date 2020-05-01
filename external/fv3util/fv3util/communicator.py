@@ -70,7 +70,7 @@ class TileCommunicator(Communicator):
             )
             for rank in range(0, self.partitioner.total_ranks):
                 subtile_slice = self.partitioner.subtile_slice(
-                    rank, tile_metadata=metadata, overlap=True,
+                    rank, tile_dims=metadata.dims, tile_extent=metadata.extent, overlap=True,
                 )
                 sendbuf[rank, :] = send_quantity.view[subtile_slice]
         else:
@@ -114,7 +114,7 @@ class TileCommunicator(Communicator):
                 )
             for rank in range(recvbuf.shape[0]):
                 to_slice = self.partitioner.subtile_slice(
-                    rank, recv_quantity.metadata, overlap=True
+                    rank, tile_dims=recv_quantity.dims, tile_extent=recv_quantity.extent, overlap=True
                 )
                 recv_quantity.view[to_slice] = recvbuf[rank, :]
             result = recv_quantity

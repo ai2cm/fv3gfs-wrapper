@@ -40,6 +40,6 @@ from .units import ensure_equal_units, units_are_equal, UnitsError
 from .communicator import TileCommunicator, CubedSphereCommunicator, Communicator
 from ._xarray import to_dataset
 from . import testing
-from .initialization import SubtileDimensionSizer, Allocator
+from .initialization import SubtileGridSizer, Allocator
 
 __version__ = "0.4.0"
