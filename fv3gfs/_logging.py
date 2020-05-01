@@ -1,11 +1,21 @@
 import sys
 from fv3util import capture_stream
+import logging
+
+logger = logging.getLogger(__file__)
+
+
+def _log_bytes(b):
+    for line in b.decode("UTF-8").split("\n"):
+        logger.debug(line)
 
 
 def _captured_stream(func):
     def myfunc(*args, **kwargs):
-        with capture_stream(sys.stdout):
-            return func(*args, **kwargs)
+        with capture_stream(sys.stdout) as out_io:
+            out = func(*args, **kwargs)
+        _log_bytes(out_io.getvalue())
+        return out
 
     return myfunc
 
