@@ -12,6 +12,7 @@ from .partitioner import (
     get_tile_number,
 )
 from .constants import (
+    MASTER_RANK,
     X_DIM,
     X_INTERFACE_DIM,
     Y_DIM,
@@ -42,4 +43,4 @@ from ._xarray import to_dataset
 from . import testing
 from .initialization import SubtileGridSizer, QuantityFactory
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"

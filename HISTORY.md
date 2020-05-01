@@ -1,18 +1,25 @@
 History
 =======
 
-Latest
-------
+v0.4.1 (2020-04-27)
+-------------------
 
 Major changes:
 - Updated fv3gfs-fortran submodule to 42f2877a. Important changes are:
   - Addition of `do_gfdl_mp_in_physics` and `do_only_clearsky_rad` namelist parameters.
   - Physical constants in model changed to `GFS_PHYS` versions.
   - Preliminary online coarse-graining code infrastructure introduced.
+- fv3config updated to 0.3.2
+- Added a Makefile for building docker images in docker/Makefile
+- build_docker.sh and CircleCI will by default pull intermediate build dependency images instead of rebuilding them. These can be rebuilt manually using the Makefile in `docker`.
+- DummyComm now refuses to accept non-contiguous buffers, the same as mpi4py
 
 Minor changes:
 - Replaced latent and sensible heat fortran variable names with instantaneous versions instead of cumulative. Updated units of total_precipitation.
-
+- gcsfs updated to 0.6.0
+- added backoff to dockerfile, is a new requirement for fv3config
+- create empty outdir in dockerfile, required to allow run_docker to upload to a remote outdir
+- add .c files to `make clean` in `lib`. These are produced as build artifacts of cython.
 
 v0.4.0 (2020-04-03)
 -------------------
@@ -58,8 +65,26 @@ Minor changes:
 - Makefile at top level only includes configure.fv3 if it exists, since it will not exist during linting tests
 - Added tests for `array_chunks` routine used by ZarrMonitor.
 
-0.3.1
------
+v0.3.4 (2020-04-22)
+-------------------
+
+Major changes:
+- Update fv3gfs-fortran submodule to 42f2877a. Changes physical constants to be "GFS_PHYS" versions. Adds some preliminary online coarse-graining code.
+
+v0.3.3
+------
+
+Major changes:
+- Update fv3gfs-fortran submodule to 31fc2ee. Adds `do_only_clearsky_rad` namelist option.
+
+v0.3.2
+------
+
+Major changes:
+- Update fv3gfs-fortran submodule to df28fccc. Most important changes are introduction of `use_analysis_sst` and `do_gfdl_mp_in_physics` namelist options.
+
+v0.3.1
+------
 
 Major changes:
 - In order to facilitate testing of pure python code, this PR splits code that has no dependencies on the Fortran wrapper into its own subpackage, `fv3util`. That code then gets imported and used by the `fv3gfs` python package.
@@ -85,9 +110,8 @@ Minor changes:
 - Changed documentation theme to readthedocs theme
 - Added IDE directory to gitignore
 
-
-0.3.0
------
+v0.3.0
+------
 
 Major changes:
 - Fortran sources are updated from the older fv3gfs repo to the newer fv3atm repo. Running the model is the same, but small changes to the repo require different namelist options when running the model, so configuration dictionaries will need to be updated accordingly.
@@ -102,21 +126,17 @@ Minor changes:
 - Configuration dictionaries are explicitly specified for tests instead of using `get_default_config`.
 - Commented-out restart tests are re-introduced as fixing restarts on the new repo is a work in progress.
 
-
-0.2.1
------
+v0.2.1
+------
 
 * Fixed Circle CI tagging logic
 
-
-0.2.0
------
+v0.2.0
+------
 
 * Initial tagged release using public fv3gfs repository
 
-
-0.1.0
------
+v0.1.0
+------
 
 * Initial release.
-

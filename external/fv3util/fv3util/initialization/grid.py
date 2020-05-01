@@ -47,7 +47,7 @@ class SubtileGridSizer(GridSizer):
         )
         nx = x_slice.stop - x_slice.start
         ny = y_slice.stop - y_slice.start
-        return cls(nx, ny, nz, extra_dim_lengths)
+        return cls(nx, ny, nz, n_halo, extra_dim_lengths)
 
     @classmethod
     def from_namelist(
@@ -91,7 +91,7 @@ class SubtileGridSizer(GridSizer):
 
     def get_origin(self, dims: Tuple[str, ...]) -> Tuple[int, ...]:
         return_list = [
-            N_HALO if dim in constants.HORIZONTAL_DIMS else 0 for dim in dims
+            self.n_halo if dim in constants.HORIZONTAL_DIMS else 0 for dim in dims
         ]
         return tuple(return_list)
 
@@ -104,10 +104,10 @@ class SubtileGridSizer(GridSizer):
         # must pad non-interface variables to have the same shape as interface variables
         shape_dict.update(
             {
-                constants.X_DIM: self.nx + 1 + 2 * N_HALO,
-                constants.X_INTERFACE_DIM: self.nx + 1 + 2 * N_HALO,
-                constants.Y_DIM: self.ny + 1 + 2 * N_HALO,
-                constants.Y_INTERFACE_DIM: self.ny + 1 + 2 * N_HALO,
+                constants.X_DIM: self.nx + 1 + 2 * self.n_halo,
+                constants.X_INTERFACE_DIM: self.nx + 1 + 2 * self.n_halo,
+                constants.Y_DIM: self.ny + 1 + 2 * self.n_halo,
+                constants.Y_INTERFACE_DIM: self.ny + 1 + 2 * self.n_halo,
                 constants.Z_DIM: self.nz + 1,
                 constants.Z_INTERFACE_DIM: self.nz + 1,
             }
