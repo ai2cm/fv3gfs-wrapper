@@ -23,7 +23,7 @@ class DimensionSizer:
         raise NotImplementedError()
 
 
-class SubtileGrid(Grid):
+class SubtileDimensionSizer(DimensionSizer):
 
     @classmethod
     def from_tile_params(
@@ -31,6 +31,7 @@ class SubtileGrid(Grid):
         nx_tile: int,
         ny_tile: int,
         nz: int,
+        n_halo,
         layout: Tuple[int, int],
         extra_dim_lengths: Dict[str, int],
     ):
@@ -70,7 +71,7 @@ class SubtileGrid(Grid):
 
     def get_extent(self, dims: Tuple[str, ...]) -> Tuple[int, ...]:
         extents = self.dim_extents
-        return tuple(extents[dim] for dim in self.dims)
+        return tuple(extents[dim] for dim in dims)
 
     def get_shape(self, dims: Tuple[str, ...]) -> Tuple[int, ...]:
         shape_dict = self.extra_dim_lengths.copy()
@@ -81,8 +82,8 @@ class SubtileGrid(Grid):
                 constants.X_INTERFACE_DIM: self.nx + 1 + 2 * N_HALO,
                 constants.Y_DIM: self.ny + 1 + 2 * N_HALO,
                 constants.Y_INTERFACE_DIM: self.ny + 1 + 2 * N_HALO,
-                constants.Z_DIM: self.nz + 1 + 2 * N_HALO,
-                constants.Z_INTERFACE_DIM: self.nz + 1 + 2 * N_HALO,
+                constants.Z_DIM: self.nz + 1,
+                constants.Z_INTERFACE_DIM: self.nz + 1,
             }
         )
-        return tuple(shape_dict[dim] for dim in self.dims)
+        return tuple(shape_dict[dim] for dim in dims)

@@ -1,0 +1,104 @@
+import pytest
+import fv3util
+from collections import namedtuple
+
+
+@pytest.fixture(params=[48, 96])
+def nx_tile(request):
+    return request.param
+
+
+@pytest.fixture(params=[48, 96])
+def ny_tile(request):
+    return request.param
+
+
+@pytest.fixture(params=[60, 80])
+def nz(request):
+    return request.param
+
+
+@pytest.fixture
+def nx(nx_tile, layout):
+    return nx_tile / layout[1]
+
+
+@pytest.fixture
+def ny(ny_tile, layout):
+    return ny_tile / layout[0]
+
+
+@pytest.fixture(params=[(1, 1), (2, 2), (4, 4)])
+def layout(request):
+    return request.param
+
+
+@pytest.fixture
+def extra_dimension_lengths():
+    return {}
+
+
+@pytest.fixture
+def namelist(nx_tile, ny_tile, nz, layout):
+    namelist = {
+        "fv_core_nml": {
+            "npx": nx_tile + 1,
+            "npy": ny_tile + 1,
+            "npz": nz,
+            "layout": layout
+        }
+    }
+    return namelist
+
+
+@pytest.fixture(params=["from_namelist", "from_tile_params"])
+def sizer(request, nx_tile, ny_tile, nz, layout, namelist, extra_dimension_lengths):
+    if request.param == "from_tile_params":
+        sizer = fv3util.SubtileDimensionSizer.from_tile_params(
+            nx_tile, ny_tile, nz, fv3util.N_HALO, layout, extra_dimension_lengths
+        )
+    elif request.param == "from_namelist":
+        sizer = fv3util.SubtileDimensionSizer.from_namelist(namelist)
+    else:
+        raise NotImplementedError()
+    return sizer
+
+
+DimCase = namedtuple("DimCase", ["dims", "origin", "extent", "shape"])
+
+
+@pytest.fixture(
+    params=["x_only", "x_interface_only", "y_only", "y_interface_only", "z_only", "z_interface_only", "x_y", "z_y_x"]
+)
+def dim_case(request, nx, ny, nz):
+    if request.param == "x_only":
+        return DimCase([fv3util.X_DIM], (fv3util.N_HALO,), (nx,), (2 * fv3util.N_HALO + nx + 1,))
+    elif request.param == "x_interface_only":
+        return DimCase([fv3util.X_INTERFACE_DIM], (fv3util.N_HALO,), (nx + 1,), (2 * fv3util.N_HALO + nx + 1,))
+    elif request.param == "y_only":
+        return DimCase([fv3util.Y_DIM], (fv3util.N_HALO,), (ny,), (2 * fv3util.N_HALO + ny + 1,))
+    elif request.param == "y_interface_only":
+        return DimCase([fv3util.Y_INTERFACE_DIM], (fv3util.N_HALO,), (ny + 1,), (2 * fv3util.N_HALO + ny + 1,))
+    elif request.param == "z_only":
+        return DimCase([fv3util.Z_DIM], (0,), (nz,), (nz + 1,))
+    elif request.param == "z_interface_only":
+        return DimCase([fv3util.Z_INTERFACE_DIM], (0,), (nz + 1,), (nz + 1,))
+    elif request.param == "x_y":
+        return DimCase([fv3util.X_DIM, fv3util.Y_DIM], (fv3util.N_HALO, fv3util.N_HALO), (nx, ny), (2 * fv3util.N_HALO + nx + 1, 2 * fv3util.N_HALO + ny + 1))
+    elif request.param == "z_y_x":
+        return DimCase([fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM], (0, fv3util.N_HALO, fv3util.N_HALO), (nz, ny, nx), (nz + 1, 2 * fv3util.N_HALO + ny + 1, 2 * fv3util.N_HALO + nx + 1))
+
+
+def test_subtile_dimension_sizer_origin(sizer, dim_case):
+    result = sizer.get_origin(dim_case.dims)
+    assert result == dim_case.origin
+
+
+def test_subtile_dimension_sizer_extent(sizer, dim_case):
+    result = sizer.get_extent(dim_case.dims)
+    assert result == dim_case.extent
+
+
+def test_subtile_dimension_sizer_shape(sizer, dim_case):
+    result = sizer.get_shape(dim_case.dims)
+    assert result == dim_case.shape
