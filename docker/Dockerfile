@@ -1,3 +1,11 @@
+ARG FMS_IMAGE
+ARG ESMF_IMAGE
+ARG FORTRAN_ENV_IMAGE
+ARG DAWN_IMAGE=fv3gfs-dawn-build
+
+FROM $FMS_IMAGE AS fv3gfs-fms
+FROM $ESMF_IMAGE AS fv3gfs-esmf
+
 #-----------------------------------------------------------------------------
 FROM ubuntu:19.10 as fv3config-inputdata
 
@@ -16,7 +24,7 @@ RUN wget http://storage.googleapis.com/vcm-ml-public/2019-10-23-data-for-running
         /fv3config-cache/base_forcing
 
 #-----------------------------------------------------------------------------
-FROM fv3gfs-fortran-env as fv3gfs-python-env
+FROM $FORTRAN_ENV_IMAGE as fv3gfs-python-env
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
@@ -82,25 +90,37 @@ RUN cd /fv3gfs-python && \
 
 
 #-----------------------------------------------------------------------------
-FROM fv3gfs-serialbox AS gt4py-build
+FROM $FORTRAN_ENV_IMAGE AS fv3gfs-dawn-build
 
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
+    cmake \
+    libssl-dev \
+    libboost-all-dev \ 
+    clang \
+    clang-format \
+    clang-tidy \
     llvm-9-dev \
     libclang-9-dev \
     libpython3-dev \
     python3 \
-    python3-pip 
+    python3-pip \
+    python3-numpy \
+    python3-nose \
+    python3-sphinx
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 10
 
-# Disabling Dawn for now until the dycore is further along, as it takes forever to build
-# RUN pip install --no-cache-dir scikit-build && \
-#     git clone https://github.com/MeteoSwiss-APN/dawn.git /usr/src/dawn && \
-#     pip install --no-cache-dir /usr/src/dawn/dawn
-# RUN pip wheel /usr/src/dawn/dawn
+RUN pip install --no-cache-dir scikit-build && \
+    git clone https://github.com/MeteoSwiss-APN/dawn.git /usr/src/dawn && \
+    pip install --no-cache-dir /usr/src/dawn/dawn
+RUN pip wheel /usr/src/dawn/dawn
 RUN git clone --depth 1 -b fv3_validation https://github.com/eddie-c-davis/gt4py.git /usr/src/gt4py && \
     pip install --no-cache-dir -e /usr/src/gt4py && \
     cd /usr/src/gt4py && python -m gt4py.gt_src_manager install
+
+
+FROM $DAWN_IMAGE AS fv3gfs-dawn
 
 #-----------------------------------------------------------------------------
 FROM fv3gfs-python-env AS fv3gfs-python
@@ -120,7 +140,7 @@ RUN pip3 install --no-cache-dir \
     appdirs==1.4.3 \
     pyyaml==5.1.2 \
     google-cloud-storage==1.23.0 \
-    gcsfs==0.4.0 \
+    gcsfs==0.6.0 \
     fsspec==0.6.0 \
     kubernetes==10.0.1 \
     numcodecs==0.6.4 \
@@ -132,7 +152,8 @@ RUN pip3 install --no-cache-dir \
     toolz==0.10.0 \
     scipy==1.3.1 \
     sphinx==2.2.0 \
-    sphinx_rtd_theme && \
+    sphinx_rtd_theme \
+    backoff==1.10 &&\
     apt-get update && \
     apt-get install -y --no-install-recommends \
     wget \
@@ -144,12 +165,11 @@ COPY --from=fv3gfs-fms /FMS $FMS_DIR
 COPY --from=fv3gfs-esmf /usr/local/esmf ${ESMF_DIR}
 COPY --from=fv3gfs-fms /FMS/libFMS/.libs/*.so* /lib64/
 COPY --from=fv3gfs-esmf /usr/local/esmf/lib/libO3/Linux.gfortran.64.mpiuni.default/*.so* /lib64/
-# Disabling Dawn for now until the dycore is further along, as it takes forever to build
-# COPY --from=gt4py-build /usr/src/dawn /usr/src/dawn
-# COPY --from=gt4py-build /dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
-COPY --from=gt4py-build /usr/src/gt4py /usr/src/gt4py
+COPY --from=fv3gfs-dawn /usr/src/dawn /usr/src/dawn
+COPY --from=fv3gfs-dawn /dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
+COPY --from=fv3gfs-dawn /usr/src/gt4py /usr/src/gt4py
 
-# RUN pip3 install --no-cache-dir /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
+RUN pip3 install --no-cache-dir /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
 RUN pip3 install --no-cache-dir /usr/src/gt4py
 
 COPY --from=fv3gfs-python-build /fv3gfs-python /fv3gfs-python
@@ -168,7 +188,9 @@ RUN pip3 install --no-cache-dir -e \
 COPY --from=fv3config-inputdata /fv3config-cache $FV3CONFIG_CACHE_DIR/fv3config-cache
 
 RUN chmod -R 777 $FV3CONFIG_CACHE_DIR && \
-    echo "ulimit -s unlimited" >> /etc/bash.bashrc
+    echo "ulimit -s unlimited" >> /etc/bash.bashrc && \
+    mkdir /outdir && \
+    chmod -R 777 /outdir
 
 # interactive shell by default
 CMD ["bash"]
