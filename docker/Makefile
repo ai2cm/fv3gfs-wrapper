@@ -28,7 +28,7 @@ DAWN_BUILD_ARGS = --build-arg FMS_IMAGE=$(FMS_IMAGE) --build-arg ESMF_IMAGE=$(ES
 all: build_deps build
 
 build:
-	docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-build -t $(FORTRAN_IMAGE) $(FORTRAN_ROOT)
+	COMPILED_IMAGE=$(FORTRAN_IMAGE) COMPILE_TARGET=fv3gfs-build $(MAKE) -C ../lib/external build
 	docker build -f $(DOCKERFILE) -t $(FV3GFS_PYTHON_IMAGE) $(FV3GFS_PYTHON_BUILD_ARGS) .. --target fv3gfs-python
 
 build_deps:
