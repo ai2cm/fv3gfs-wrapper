@@ -54,4 +54,3 @@ class QuantityFactory:
             origin=origin,
             extent=extent,
         )
- 

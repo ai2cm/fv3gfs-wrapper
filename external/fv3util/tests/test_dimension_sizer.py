@@ -34,7 +34,8 @@ def layout(request):
 
 
 @pytest.fixture
-def extra_dimension_lengths():    return {}
+def extra_dimension_lengths():
+    return {}
 
 
 @pytest.fixture
@@ -44,7 +45,7 @@ def namelist(nx_tile, ny_tile, nz, layout):
             "npx": nx_tile + 1,
             "npy": ny_tile + 1,
             "npz": nz,
-            "layout": layout
+            "layout": layout,
         }
     }
     return namelist
@@ -77,25 +78,58 @@ DimCase = namedtuple("DimCase", ["dims", "origin", "extent", "shape"])
 
 
 @pytest.fixture(
-    params=["x_only", "x_interface_only", "y_only", "y_interface_only", "z_only", "z_interface_only", "x_y", "z_y_x"]
+    params=[
+        "x_only",
+        "x_interface_only",
+        "y_only",
+        "y_interface_only",
+        "z_only",
+        "z_interface_only",
+        "x_y",
+        "z_y_x",
+    ]
 )
 def dim_case(request, nx, ny, nz):
     if request.param == "x_only":
-        return DimCase((fv3util.X_DIM,), (fv3util.N_HALO,), (nx,), (2 * fv3util.N_HALO + nx + 1,))
+        return DimCase(
+            (fv3util.X_DIM,), (fv3util.N_HALO,), (nx,), (2 * fv3util.N_HALO + nx + 1,)
+        )
     elif request.param == "x_interface_only":
-        return DimCase((fv3util.X_INTERFACE_DIM,), (fv3util.N_HALO,), (nx + 1,), (2 * fv3util.N_HALO + nx + 1,))
+        return DimCase(
+            (fv3util.X_INTERFACE_DIM,),
+            (fv3util.N_HALO,),
+            (nx + 1,),
+            (2 * fv3util.N_HALO + nx + 1,),
+        )
     elif request.param == "y_only":
-        return DimCase((fv3util.Y_DIM,), (fv3util.N_HALO,), (ny,), (2 * fv3util.N_HALO + ny + 1,))
+        return DimCase(
+            (fv3util.Y_DIM,), (fv3util.N_HALO,), (ny,), (2 * fv3util.N_HALO + ny + 1,)
+        )
     elif request.param == "y_interface_only":
-        return DimCase((fv3util.Y_INTERFACE_DIM,), (fv3util.N_HALO,), (ny + 1,), (2 * fv3util.N_HALO + ny + 1,))
+        return DimCase(
+            (fv3util.Y_INTERFACE_DIM,),
+            (fv3util.N_HALO,),
+            (ny + 1,),
+            (2 * fv3util.N_HALO + ny + 1,),
+        )
     elif request.param == "z_only":
         return DimCase((fv3util.Z_DIM,), (0,), (nz,), (nz + 1,))
     elif request.param == "z_interface_only":
         return DimCase((fv3util.Z_INTERFACE_DIM,), (0,), (nz + 1,), (nz + 1,))
     elif request.param == "x_y":
-        return DimCase((fv3util.X_DIM, fv3util.Y_DIM,), (fv3util.N_HALO, fv3util.N_HALO), (nx, ny), (2 * fv3util.N_HALO + nx + 1, 2 * fv3util.N_HALO + ny + 1))
+        return DimCase(
+            (fv3util.X_DIM, fv3util.Y_DIM,),
+            (fv3util.N_HALO, fv3util.N_HALO),
+            (nx, ny),
+            (2 * fv3util.N_HALO + nx + 1, 2 * fv3util.N_HALO + ny + 1),
+        )
     elif request.param == "z_y_x":
-        return DimCase((fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM,), (0, fv3util.N_HALO, fv3util.N_HALO), (nz, ny, nx), (nz + 1, 2 * fv3util.N_HALO + ny + 1, 2 * fv3util.N_HALO + nx + 1))
+        return DimCase(
+            (fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM,),
+            (0, fv3util.N_HALO, fv3util.N_HALO),
+            (nz, ny, nx),
+            (nz + 1, 2 * fv3util.N_HALO + ny + 1, 2 * fv3util.N_HALO + nx + 1),
+        )
 
 
 def test_subtile_dimension_sizer_origin(sizer, dim_case):
@@ -121,7 +155,7 @@ def test_allocator_zeros(numpy, sizer, dim_case, units, dtype):
     assert quantity.origin == dim_case.origin
     assert quantity.extent == dim_case.extent
     assert quantity.data.shape == dim_case.shape
-    numpy.testing.assert_array_equal(quantity.data, 0.)
+    numpy.testing.assert_array_equal(quantity.data, 0.0)
 
 
 def test_allocator_ones(numpy, sizer, dim_case, units, dtype):
@@ -132,7 +166,7 @@ def test_allocator_ones(numpy, sizer, dim_case, units, dtype):
     assert quantity.origin == dim_case.origin
     assert quantity.extent == dim_case.extent
     assert quantity.data.shape == dim_case.shape
-    numpy.testing.assert_array_equal(quantity.data, 1.)
+    numpy.testing.assert_array_equal(quantity.data, 1.0)
 
 
 def test_allocator_empty(numpy, sizer, dim_case, units, dtype):

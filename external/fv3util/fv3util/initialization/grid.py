@@ -25,7 +25,6 @@ class GridSizer:
 
 
 class SubtileGridSizer(GridSizer):
-
     @classmethod
     def _from_tile_params(
         cls,
@@ -44,14 +43,19 @@ class SubtileGridSizer(GridSizer):
             tile_rank,
             [constants.Y_DIM, constants.X_DIM],
             [ny_tile, nx_tile],
-            overlap=True
+            overlap=True,
         )
         nx = x_slice.stop - x_slice.start
         ny = y_slice.stop - y_slice.start
         return cls(nx, ny, nz, extra_dim_lengths)
 
     @classmethod
-    def from_namelist(cls, namelist: dict, tile_partitioner: TilePartitioner = None, tile_rank: int = 0):
+    def from_namelist(
+        cls,
+        namelist: dict,
+        tile_partitioner: TilePartitioner = None,
+        tile_rank: int = 0,
+    ):
         """Create a SubtileGridSizer from a Fortran namelist.
         
         Args:
@@ -66,7 +70,9 @@ class SubtileGridSizer(GridSizer):
         nx_tile = namelist["fv_core_nml"]["npx"] - 1
         ny_tile = namelist["fv_core_nml"]["npy"] - 1
         nz = namelist["fv_core_nml"]["npz"]  # this one is already on mid-levels
-        return cls._from_tile_params(nx_tile, ny_tile, nz, N_HALO, {}, layout, tile_partitioner, tile_rank)
+        return cls._from_tile_params(
+            nx_tile, ny_tile, nz, N_HALO, {}, layout, tile_partitioner, tile_rank
+        )
 
     @property
     def dim_extents(self) -> Dict[str, int]:
