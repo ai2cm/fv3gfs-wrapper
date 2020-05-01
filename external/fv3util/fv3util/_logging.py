@@ -1,7 +1,6 @@
 import logging
 import contextlib
 import tempfile
-import sys
 import os
 
 

@@ -1,4 +1,6 @@
 from fv3util import capture_stream
+import logging
+import sys
 
 
 def test_capture_stream():
