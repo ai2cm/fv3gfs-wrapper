@@ -1,32 +1,33 @@
 import sys
 from fv3util import capture_stream
 import logging
+from functools import wraps
+from mpi4py import MPI
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(f"fv3gfs({MPI.COMM_WORLD.rank})")
 
 
 def _log_bytes(b):
     for line in b.decode("UTF-8").split("\n"):
-        logger.debug(line)
+        if "WARNING" in line:
+            logger.warn(line)
+        elif "NOTE" in line:
+            logger.info(line)
+        elif "FATAL" in line:
+            logger.critical(line)
+        elif line == "":
+            pass
+        else:
+            logger.debug(line)
 
 
 def _captured_stream(func):
+    @wraps(func)
     def myfunc(*args, **kwargs):
-        with capture_stream(sys.stdout) as out_io:
+        with capture_stream(sys.stdout) as out_io, capture_stream(sys.stderr) as err_io:
             out = func(*args, **kwargs)
         _log_bytes(out_io.getvalue())
+        _log_bytes(err_io.getvalue())
         return out
 
     return myfunc
-
-
-def capture_fv3gfs_functions():
-    """Surpress stderr and stdout from all fv3gfs functions
-    
-    The streams from this variables will be re-emited as `DEBUG` level logging
-    statements, which can be controlled using typical python `logging`.
-    """
-    import fv3gfs  # noqa
-
-    for func in ["step_dynamics", "step_physics", "initialize", "cleanup"]:
-        setattr(fv3gfs, func, _captured_stream(getattr(fv3gfs, func)))

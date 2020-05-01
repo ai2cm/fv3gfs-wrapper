@@ -1,3 +1,5 @@
+import sys
+
 from ._wrapper import (
     initialize,
     step,
@@ -43,10 +45,12 @@ from fv3util import (
     UnitsError,
 )
 
-# noah: I am not sure if this is the top-level interface we want to provide
-# or maybe we could just implement this as a default?
-from ._logging import capture_fv3gfs_functions
-
+# capture stderr and stdout of fortran code
+from ._logging import _captured_stream
+for func in ["step_dynamics", "step_physics", "initialize", "cleanup"]:
+    # get handle to current module
+    self = sys.modules[__name__]
+    setattr(self, func, _captured_stream(getattr(self, func)))
 
 __all__ = [
     "initialize",
