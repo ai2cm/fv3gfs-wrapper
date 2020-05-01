@@ -46,9 +46,23 @@ cdef extern:
     void set_{{ item.fortran_name }}(REAL_t *{{ item.fortran_name }}_in, int *nz)
 {% endfor %}
 
+cdef get_quantity_factory():
+    cdef int nx, ny, nz, nz_soil
+    get_centered_grid_dimensions(&nx, &ny, &nz)
+    get_nz_soil_subroutine(&nz_soil)
+    sizer = fv3util.SubtileGridSizer(
+        nx,
+        ny,
+        nz,
+        n_halo=0,  # default getters/setters do not include halo points
+        extra_dim_lengths: {
+            fv3util.Z_SOIL_DIM: nz_soil,
+        },
+    )
+    return fv3util.QuantityFactory(sizer, np)
 
 
-cpdef get_n_ghost_cells():
+cpdef int get_n_ghost_cells():
     """Return the number of ghost cells used by the Fortran dynamical core."""
     cdef int n_ghost
     get_n_ghost_cells_subroutine(&n_ghost)
@@ -205,6 +219,18 @@ cdef int set_1d_quantity(name, REAL_t[::1] array) except -1:
     return 0
 
 
+def update_from_fortran(state):
+    """
+    Takes in a state dictionary. Updates its values in-place with their fortran counterpart.
+
+    Does not update halo points.
+
+    Arguments:
+        state: a state dictionary
+    """
+    raise NotImplementedError()
+
+
 def get_state(names):
     """
     Returns a dictionary whose keys are quantity long names (with underscores instead of spaces)
@@ -220,6 +246,7 @@ def get_state(names):
     cdef int nz, i_tracer
     cdef set input_names_set, processed_names_set
     input_names_set = set(names)
+    allocator = get_quantity_factory()
 
     if 'time' in input_names_set:
         return_dict['time'] = get_time()

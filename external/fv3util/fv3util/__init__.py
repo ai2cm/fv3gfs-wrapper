@@ -19,6 +19,7 @@ from .constants import (
     Y_INTERFACE_DIM,
     Z_DIM,
     Z_INTERFACE_DIM,
+    Z_SOIL_DIM,
     X_DIMS,
     Y_DIMS,
     HORIZONTAL_DIMS,
@@ -41,6 +42,6 @@ from .units import ensure_equal_units, units_are_equal, UnitsError
 from .communicator import TileCommunicator, CubedSphereCommunicator, Communicator
 from ._xarray import to_dataset
 from . import testing
-from .initialization import SubtileGridSizer, QuantityFactory
+from .initialization import SubtileGridSizer, GridSizer, QuantityFactory
 
 __version__ = "0.4.1"

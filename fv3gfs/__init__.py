@@ -41,6 +41,9 @@ from fv3util import (
     Z_DIM,
     Z_INTERFACE_DIM,
     UnitsError,
+    QuantityFactory,
+    SubtileGridSizer,
+    GridSizer,
 )
 
 

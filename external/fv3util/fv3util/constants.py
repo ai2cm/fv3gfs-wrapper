@@ -5,6 +5,7 @@ Y_DIM = "y"
 Y_INTERFACE_DIM = "y_interface"
 Z_DIM = "z"
 Z_INTERFACE_DIM = "z_interface"
+Z_SOIL_DIM = "z_soil"
 X_DIMS = (X_DIM, X_INTERFACE_DIM)
 Y_DIMS = (Y_DIM, Y_INTERFACE_DIM)
 HORIZONTAL_DIMS = X_DIMS + Y_DIMS
