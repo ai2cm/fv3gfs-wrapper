@@ -23,7 +23,7 @@ class StorageNumpy:
         self.ones = _wrap_storage_call(gt4py.storage.ones, backend)
 
 
-class Allocator:
+class QuantityFactory:
     def __init__(self, grid: SubtileGridSizer, numpy):
         self.grid = grid
         self.numpy = numpy

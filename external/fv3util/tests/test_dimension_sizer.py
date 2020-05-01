@@ -34,8 +34,7 @@ def layout(request):
 
 
 @pytest.fixture
-def extra_dimension_lengths():
-    return {}
+def extra_dimension_lengths():    return {}
 
 
 @pytest.fixture
@@ -115,7 +114,7 @@ def test_subtile_dimension_sizer_shape(sizer, dim_case):
 
 
 def test_allocator_zeros(numpy, sizer, dim_case, units, dtype):
-    allocator = fv3util.Allocator(sizer, numpy)
+    allocator = fv3util.QuantityFactory(sizer, numpy)
     quantity = allocator.zeros(dim_case.dims, units, dtype=dtype)
     assert quantity.units == units
     assert quantity.dims == dim_case.dims
@@ -126,7 +125,7 @@ def test_allocator_zeros(numpy, sizer, dim_case, units, dtype):
 
 
 def test_allocator_ones(numpy, sizer, dim_case, units, dtype):
-    allocator = fv3util.Allocator(sizer, numpy)
+    allocator = fv3util.QuantityFactory(sizer, numpy)
     quantity = allocator.ones(dim_case.dims, units, dtype=dtype)
     assert quantity.units == units
     assert quantity.dims == dim_case.dims
@@ -137,7 +136,7 @@ def test_allocator_ones(numpy, sizer, dim_case, units, dtype):
 
 
 def test_allocator_empty(numpy, sizer, dim_case, units, dtype):
-    allocator = fv3util.Allocator(sizer, numpy)
+    allocator = fv3util.QuantityFactory(sizer, numpy)
     quantity = allocator.empty(dim_case.dims, units, dtype=dtype)
     assert quantity.units == units
     assert quantity.dims == dim_case.dims

@@ -11,6 +11,7 @@ class GridSizer:
     nx: int
     ny: int
     nz: int
+    n_halo: int
     extra_dim_lengths: Dict[str, int]
 
     def get_origin(self, dims: Tuple[str, ...]) -> Tuple[int, ...]:
