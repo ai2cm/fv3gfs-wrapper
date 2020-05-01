@@ -64,6 +64,16 @@ def sizer(request, nx_tile, ny_tile, nz, layout, namelist, extra_dimension_lengt
     return sizer
 
 
+@pytest.fixture
+def units():
+    return "units_placeholder"
+
+
+@pytest.fixture(params=[float, int])
+def dtype(request):
+    return request.param
+
+
 DimCase = namedtuple("DimCase", ["dims", "origin", "extent", "shape"])
 
 
@@ -72,21 +82,21 @@ DimCase = namedtuple("DimCase", ["dims", "origin", "extent", "shape"])
 )
 def dim_case(request, nx, ny, nz):
     if request.param == "x_only":
-        return DimCase([fv3util.X_DIM], (fv3util.N_HALO,), (nx,), (2 * fv3util.N_HALO + nx + 1,))
+        return DimCase((fv3util.X_DIM,), (fv3util.N_HALO,), (nx,), (2 * fv3util.N_HALO + nx + 1,))
     elif request.param == "x_interface_only":
-        return DimCase([fv3util.X_INTERFACE_DIM], (fv3util.N_HALO,), (nx + 1,), (2 * fv3util.N_HALO + nx + 1,))
+        return DimCase((fv3util.X_INTERFACE_DIM,), (fv3util.N_HALO,), (nx + 1,), (2 * fv3util.N_HALO + nx + 1,))
     elif request.param == "y_only":
-        return DimCase([fv3util.Y_DIM], (fv3util.N_HALO,), (ny,), (2 * fv3util.N_HALO + ny + 1,))
+        return DimCase((fv3util.Y_DIM,), (fv3util.N_HALO,), (ny,), (2 * fv3util.N_HALO + ny + 1,))
     elif request.param == "y_interface_only":
-        return DimCase([fv3util.Y_INTERFACE_DIM], (fv3util.N_HALO,), (ny + 1,), (2 * fv3util.N_HALO + ny + 1,))
+        return DimCase((fv3util.Y_INTERFACE_DIM,), (fv3util.N_HALO,), (ny + 1,), (2 * fv3util.N_HALO + ny + 1,))
     elif request.param == "z_only":
-        return DimCase([fv3util.Z_DIM], (0,), (nz,), (nz + 1,))
+        return DimCase((fv3util.Z_DIM,), (0,), (nz,), (nz + 1,))
     elif request.param == "z_interface_only":
-        return DimCase([fv3util.Z_INTERFACE_DIM], (0,), (nz + 1,), (nz + 1,))
+        return DimCase((fv3util.Z_INTERFACE_DIM,), (0,), (nz + 1,), (nz + 1,))
     elif request.param == "x_y":
-        return DimCase([fv3util.X_DIM, fv3util.Y_DIM], (fv3util.N_HALO, fv3util.N_HALO), (nx, ny), (2 * fv3util.N_HALO + nx + 1, 2 * fv3util.N_HALO + ny + 1))
+        return DimCase((fv3util.X_DIM, fv3util.Y_DIM,), (fv3util.N_HALO, fv3util.N_HALO), (nx, ny), (2 * fv3util.N_HALO + nx + 1, 2 * fv3util.N_HALO + ny + 1))
     elif request.param == "z_y_x":
-        return DimCase([fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM], (0, fv3util.N_HALO, fv3util.N_HALO), (nz, ny, nx), (nz + 1, 2 * fv3util.N_HALO + ny + 1, 2 * fv3util.N_HALO + nx + 1))
+        return DimCase((fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM,), (0, fv3util.N_HALO, fv3util.N_HALO), (nz, ny, nx), (nz + 1, 2 * fv3util.N_HALO + ny + 1, 2 * fv3util.N_HALO + nx + 1))
 
 
 def test_subtile_dimension_sizer_origin(sizer, dim_case):
@@ -102,3 +112,35 @@ def test_subtile_dimension_sizer_extent(sizer, dim_case):
 def test_subtile_dimension_sizer_shape(sizer, dim_case):
     result = sizer.get_shape(dim_case.dims)
     assert result == dim_case.shape
+
+
+def test_allocator_zeros(numpy, sizer, dim_case, units, dtype):
+    allocator = fv3util.Allocator(sizer, numpy)
+    quantity = allocator.zeros(dim_case.dims, units, dtype=dtype)
+    assert quantity.units == units
+    assert quantity.dims == dim_case.dims
+    assert quantity.origin == dim_case.origin
+    assert quantity.extent == dim_case.extent
+    assert quantity.data.shape == dim_case.shape
+    numpy.testing.assert_array_equal(quantity.data, 0.)
+
+
+def test_allocator_ones(numpy, sizer, dim_case, units, dtype):
+    allocator = fv3util.Allocator(sizer, numpy)
+    quantity = allocator.ones(dim_case.dims, units, dtype=dtype)
+    assert quantity.units == units
+    assert quantity.dims == dim_case.dims
+    assert quantity.origin == dim_case.origin
+    assert quantity.extent == dim_case.extent
+    assert quantity.data.shape == dim_case.shape
+    numpy.testing.assert_array_equal(quantity.data, 1.)
+
+
+def test_allocator_empty(numpy, sizer, dim_case, units, dtype):
+    allocator = fv3util.Allocator(sizer, numpy)
+    quantity = allocator.empty(dim_case.dims, units, dtype=dtype)
+    assert quantity.units == units
+    assert quantity.dims == dim_case.dims
+    assert quantity.origin == dim_case.origin
+    assert quantity.extent == dim_case.extent
+    assert quantity.data.shape == dim_case.shape
