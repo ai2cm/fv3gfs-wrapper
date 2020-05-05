@@ -40,6 +40,7 @@ from fv3util import (
     Y_INTERFACE_DIM,
     Z_DIM,
     Z_INTERFACE_DIM,
+    N_HALO_FORTRAN,
     UnitsError,
     QuantityFactory,
     SubtileGridSizer,

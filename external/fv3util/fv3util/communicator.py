@@ -45,11 +45,11 @@ class TileCommunicator(Communicator):
         super(TileCommunicator, self).__init__(comm)
 
     def _Scatter(self, numpy, sendbuf, recvbuf, **kwargs):
-        with send_buffer(numpy, sendbuf) as send, recv_buffer(numpy, recvbuf) as recv:
+        with send_buffer(numpy.empty, sendbuf) as send, recv_buffer(numpy.empty, recvbuf) as recv:
             self.comm.Scatter(send, recv, **kwargs)
 
     def _Gather(self, numpy, sendbuf, recvbuf, **kwargs):
-        with send_buffer(numpy, sendbuf) as send, recv_buffer(numpy, recvbuf) as recv:
+        with send_buffer(numpy.empty, sendbuf) as send, recv_buffer(numpy.empty, recvbuf) as recv:
             self.comm.Gather(send, recv, **kwargs)
 
     def scatter(
@@ -349,11 +349,11 @@ class CubedSphereCommunicator(Communicator):
         return self.comm.Isend(numpy.ascontiguousarray(in_array), **kwargs)
 
     def _Send(self, numpy, in_array, **kwargs):
-        with send_buffer(numpy, in_array) as sendbuf:
+        with send_buffer(numpy.empty, in_array) as sendbuf:
             self.comm.Send(sendbuf, **kwargs)
 
     def _Recv(self, numpy, out_array, **kwargs):
-        with recv_buffer(numpy, out_array) as recvbuf:
+        with recv_buffer(numpy.empty, out_array) as recvbuf:
             self.comm.Recv(recvbuf, **kwargs)
 
     def finish_vector_halo_update(

@@ -35,7 +35,7 @@ from .constants import (
     EDGE_BOUNDARY_TYPES,
     CORNER_BOUNDARY_TYPES,
     BOUNDARY_TYPES,
-    N_HALO,
+    N_HALO_FORTRAN,
 )
 from .quantity import Quantity, QuantityMetadata
 from .units import ensure_equal_units, units_are_equal, UnitsError
@@ -43,5 +43,6 @@ from .communicator import TileCommunicator, CubedSphereCommunicator, Communicato
 from ._xarray import to_dataset
 from . import testing
 from .initialization import SubtileGridSizer, GridSizer, QuantityFactory
+from .buffer import array_buffer, send_buffer, recv_buffer
 
 __version__ = "0.4.1"
