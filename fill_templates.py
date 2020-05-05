@@ -30,7 +30,7 @@ if __name__ == "__main__":
     setup_dir = os.path.dirname(os.path.abspath(__file__))
     template_dir = os.path.join(setup_dir, "templates")
     template_loader = jinja2.FileSystemLoader(searchpath=template_dir)
-    template_env = jinja2.Environment(loader=template_loader, autoescape=True)
+    template_env = jinja2.Environment(loader=template_loader, autoescape=True, trim_blocks=True, lstrip_blocks=True)
 
     physics_data = json.load(
         open(os.path.join(PROPERTIES_DIR, "physics_properties.json"))

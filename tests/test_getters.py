@@ -56,8 +56,8 @@ class GetterTests(unittest.TestCase):
         self.assertIsInstance(quantity, fv3util.Quantity)
 
         self.assertEqual(quantity.units, "degK")
-        self.assertTrue(np.all(quantity.values > 150.0))
-        self.assertTrue(np.all(quantity.values < 400.0))
+        self.assertTrue(quantity.np.all(quantity.view[:] > 150.0))
+        self.assertTrue(quantity.np.all(quantity.view[:] < 400.0))
 
     def test_get_surface_geopotential(self):
         """This is a special test because it's the only 2D dynamics variable."""

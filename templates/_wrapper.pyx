@@ -54,8 +54,8 @@ cdef get_quantity_factory():
         nx,
         ny,
         nz,
-        n_halo=0,  # default getters/setters do not include halo points
-        extra_dim_lengths: {
+        n_halo=fv3util.N_HALO_FORTRAN,
+        extra_dim_lengths={
             fv3util.Z_SOIL_DIM: nz_soil,
         },
     )
@@ -83,31 +83,6 @@ def get_dimension_lengths():
     get_centered_grid_dimensions(&nx, &ny, &nz)
     get_nz_soil_subroutine(&nz_soil)
     return {'nx': nx, 'ny': ny, 'nz': nz, 'nz_soil': nz_soil}
-
-
-def get_array_from_dims(dim_name_list):
-    """Given a list of dimension names, return an empty array of dtype `_wrapper.real_type`."""
-    cdef int nx, ny, nz, nz_soil
-    get_centered_grid_dimensions(&nx, &ny, &nz)
-    get_nz_soil_subroutine(&nz_soil)
-
-    shape_list = []
-    for dim_name in dim_name_list:
-        if dim_name == 'x':
-            shape_list.append(nx)
-        elif dim_name == 'x_interface':
-            shape_list.append(nx+1)
-        elif dim_name == 'y':
-            shape_list.append(ny)
-        elif dim_name == 'y_interface':
-            shape_list.append(ny+1)
-        elif dim_name == 'z':
-            shape_list.append(nz)
-        elif dim_name == 'z_soil':
-            shape_list.append(nz_soil)
-        else:
-            raise ValueError(f'{dim_name} is not a valid dimension name')
-    return np.empty(shape_list, dtype=real_type)
 
 
 def set_time(time):
@@ -219,109 +194,92 @@ cdef int set_1d_quantity(name, REAL_t[::1] array) except -1:
     return 0
 
 
-def update_from_fortran(state):
-    """
-    Takes in a state dictionary. Updates its values in-place with their fortran counterpart.
-
-    Does not update halo points.
-
-    Arguments:
-        state: a state dictionary
-    """
-    raise NotImplementedError()
+def _get_quantity(state, name, allocator, dims, units, dtype):
+    if name not in state:
+        state[name] = allocator.empty(dims, units, dtype=dtype)
+    return state[name]
 
 
-def get_state(names):
+def get_state(names, state=None, allocator=None):
     """
     Returns a dictionary whose keys are quantity long names (with underscores instead of spaces)
     and values are DataArrays containing that quantity's data.
 
+    Does not copy halo values, regardless of whether the halo is allocated.
+
     Arguments:
         names (list of str, optional): A list of names to get.
+        state (dict, optional): If given, update this state in-place with any retrieved
+            quantities, and update any pre-existing quantities in-place with Fortran
+            values.
+        allocator (fv3util.QuantityFactory, optional): if given, use this to construct
+            quantities. Otherwise use a QuantityFactory which uses the dimensions
+            from the Fortran model with 3 allocated halo points.
+
+    Returns:
+        state (dict): state if given, otherwise a constructed state dictionary
     """
-    cdef dict return_dict = {}
+    if state is None:
+        state = {}
     cdef REAL_t[::1] array_1d
     cdef REAL_t[:, ::1] array_2d
     cdef REAL_t[:, :, ::1] array_3d
     cdef int nz, i_tracer
     cdef set input_names_set, processed_names_set
     input_names_set = set(names)
-    allocator = get_quantity_factory()
+    if allocator is None:
+        allocator = get_quantity_factory()
 
     if 'time' in input_names_set:
-        return_dict['time'] = get_time()
+        state['time'] = get_time()
 
 {% for item in physics_2d_properties %}
     if '{{ item.name }}' in input_names_set:
-        array_2d = get_array_from_dims({{ item.dims | safe }})
-        get_{{ item.fortran_name }}{% if "fortran_subname" in item %}_{{ item.fortran_subname }}{% endif %}(&array_2d[0, 0])
-        return_dict['{{ item.name }}'] = fv3util.Quantity(
-            np.asarray(array_2d),
-            dims={{ item.dims | safe }},
-            units="{{ item.units }}"
-        )
+        quantity = _get_quantity(state, "{{ item.name }}", allocator, {{ item.dims | safe }}, "{{ item.units }}", dtype=real_type)
+        with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_2d:
+            get_{{ item.fortran_name }}{% if "fortran_subname" in item %}_{{ item.fortran_subname }}{% endif %}(&array_2d[0, 0])
 {% endfor %}
 
 {% for item in physics_3d_properties %}
     if '{{ item.name }}' in input_names_set:
-        array_3d = get_array_from_dims({{ item.dims | safe }})
-        nz = array_3d.shape[0]
-        get_{{ item.fortran_name }}(&array_3d[0, 0, 0], &nz)
-        return_dict['{{ item.name }}'] = fv3util.Quantity(
-            np.asarray(array_3d),
-            dims={{ item.dims | safe }},
-            units="{{ item.units }}"
-        )
+        quantity = _get_quantity(state, "{{ item.name }}", allocator, {{ item.dims | safe }}, "{{ item.units }}", dtype=real_type)
+        with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_3d:
+            nz = array_3d.shape[0]
+            get_{{ item.fortran_name }}{% if "fortran_subname" in item %}_{{ item.fortran_subname }}{% endif %}(&array_3d[0, 0, 0], &nz)
 {% endfor %}
 
 {% for item in dynamics_properties %}
     {% if item.dims|length == 3 %}
     if '{{ item.name }}' in input_names_set:
-        array_3d = get_array_from_dims({{ item.dims | safe }})
-        get_{{ item.fortran_name }}(&array_3d[0, 0, 0])
-        return_dict['{{ item.name }}'] = fv3util.Quantity(
-            np.asarray(array_3d),
-            dims={{ item.dims | safe }},
-            units="{{ item.units }}"
-        )
+        quantity = _get_quantity(state, "{{ item.name }}", allocator, {{ item.dims | safe }}, "{{ item.units }}", dtype=real_type)
+        with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_3d:
+            get_{{ item.fortran_name }}(&array_3d[0, 0, 0])
     {% elif item.dims|length == 2 %}
     if '{{ item.name }}' in input_names_set:
-        array_2d = get_array_from_dims({{ item.dims | safe }})
-        get_{{ item.fortran_name }}(&array_2d[0, 0])
-        return_dict['{{ item.name }}'] = fv3util.Quantity(
-            np.asarray(array_2d),
-            dims={{ item.dims | safe }},
-            units="{{ item.units }}"
-        )
+        quantity = _get_quantity(state, "{{ item.name }}", allocator, {{ item.dims | safe }}, "{{ item.units }}", dtype=real_type)
+        with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_2d:
+            get_{{ item.fortran_name }}(&array_2d[0, 0])
     {% elif item.dims|length == 1 %}
     if '{{ item.name }}' in input_names_set:
-        array_1d = get_array_from_dims({{ item.dims | safe }})
-        get_{{ item.fortran_name }}(&array_1d[0])
-        return_dict['{{ item.name }}'] = fv3util.Quantity(
-            np.asarray(array_1d),
-            dims={{ item.dims | safe }},
-            units="{{ item.units }}"
-        )
+        quantity = _get_quantity(state, "{{ item.name }}", allocator, {{ item.dims | safe }}, "{{ item.units }}", dtype=real_type)
+        with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_1d:
+            get_{{ item.fortran_name }}(&array_1d[0])
     {% endif %}
 {% endfor %}
 
     for tracer_name, tracer_data in get_tracer_metadata().items():
+        i_tracer = tracer_data['i_tracer']
         if (tracer_name in input_names_set):
-            i_tracer = tracer_data['i_tracer']
-            array_3d = get_array_from_dims(['z', 'y', 'x'])
-            get_tracer(&i_tracer, &array_3d[0, 0, 0])
-            return_dict[tracer_name] = fv3util.Quantity(
-                np.asarray(array_3d),
-                dims=[fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
-                units=tracer_data['units']
-            )
+            quantity = _get_quantity(state, tracer_name, allocator, [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM], tracer_data["units"], dtype=real_type)
+            with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_3d:
+                get_tracer(&i_tracer, &array_3d[0, 0, 0])
 
     for name in names:
-        if name not in return_dict:
+        if name not in state:
             raise fv3util.InvalidQuantityError(
                 f'Quantity {name} does not exist - is there a typo?'
             )
-    return return_dict
+    return state
 
 
 cpdef dict get_tracer_metadata():
