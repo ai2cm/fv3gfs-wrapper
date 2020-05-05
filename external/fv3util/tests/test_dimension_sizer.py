@@ -55,7 +55,7 @@ def namelist(nx_tile, ny_tile, nz, layout):
 def sizer(request, nx_tile, ny_tile, nz, layout, namelist, extra_dimension_lengths):
     if request.param == "from_tile_params":
         sizer = fv3util.SubtileGridSizer._from_tile_params(
-            nx_tile, ny_tile, nz, fv3util.N_HALO, extra_dimension_lengths, layout,
+            nx_tile, ny_tile, nz, fv3util.N_HALO_FORTRAN, extra_dimension_lengths, layout,
         )
     elif request.param == "from_namelist":
         sizer = fv3util.SubtileGridSizer.from_namelist(namelist)
@@ -92,25 +92,25 @@ DimCase = namedtuple("DimCase", ["dims", "origin", "extent", "shape"])
 def dim_case(request, nx, ny, nz):
     if request.param == "x_only":
         return DimCase(
-            (fv3util.X_DIM,), (fv3util.N_HALO,), (nx,), (2 * fv3util.N_HALO + nx + 1,)
+            (fv3util.X_DIM,), (fv3util.N_HALO_FORTRAN,), (nx,), (2 * fv3util.N_HALO_FORTRAN + nx + 1,)
         )
     elif request.param == "x_interface_only":
         return DimCase(
             (fv3util.X_INTERFACE_DIM,),
-            (fv3util.N_HALO,),
+            (fv3util.N_HALO_FORTRAN,),
             (nx + 1,),
-            (2 * fv3util.N_HALO + nx + 1,),
+            (2 * fv3util.N_HALO_FORTRAN + nx + 1,),
         )
     elif request.param == "y_only":
         return DimCase(
-            (fv3util.Y_DIM,), (fv3util.N_HALO,), (ny,), (2 * fv3util.N_HALO + ny + 1,)
+            (fv3util.Y_DIM,), (fv3util.N_HALO_FORTRAN,), (ny,), (2 * fv3util.N_HALO_FORTRAN + ny + 1,)
         )
     elif request.param == "y_interface_only":
         return DimCase(
             (fv3util.Y_INTERFACE_DIM,),
-            (fv3util.N_HALO,),
+            (fv3util.N_HALO_FORTRAN,),
             (ny + 1,),
-            (2 * fv3util.N_HALO + ny + 1,),
+            (2 * fv3util.N_HALO_FORTRAN + ny + 1,),
         )
     elif request.param == "z_only":
         return DimCase((fv3util.Z_DIM,), (0,), (nz,), (nz + 1,))
@@ -119,16 +119,16 @@ def dim_case(request, nx, ny, nz):
     elif request.param == "x_y":
         return DimCase(
             (fv3util.X_DIM, fv3util.Y_DIM,),
-            (fv3util.N_HALO, fv3util.N_HALO),
+            (fv3util.N_HALO_FORTRAN, fv3util.N_HALO_FORTRAN),
             (nx, ny),
-            (2 * fv3util.N_HALO + nx + 1, 2 * fv3util.N_HALO + ny + 1),
+            (2 * fv3util.N_HALO_FORTRAN + nx + 1, 2 * fv3util.N_HALO_FORTRAN + ny + 1),
         )
     elif request.param == "z_y_x":
         return DimCase(
             (fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM,),
-            (0, fv3util.N_HALO, fv3util.N_HALO),
+            (0, fv3util.N_HALO_FORTRAN, fv3util.N_HALO_FORTRAN),
             (nz, ny, nx),
-            (nz + 1, 2 * fv3util.N_HALO + ny + 1, 2 * fv3util.N_HALO + nx + 1),
+            (nz + 1, 2 * fv3util.N_HALO_FORTRAN + ny + 1, 2 * fv3util.N_HALO_FORTRAN + nx + 1),
         )
 
 
