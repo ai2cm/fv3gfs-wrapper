@@ -71,7 +71,14 @@ class SubtileGridSizer(GridSizer):
         ny_tile = namelist["fv_core_nml"]["npy"] - 1
         nz = namelist["fv_core_nml"]["npz"]  # this one is already on mid-levels
         return cls._from_tile_params(
-            nx_tile, ny_tile, nz, N_HALO_FORTRAN, {}, layout, tile_partitioner, tile_rank
+            nx_tile,
+            ny_tile,
+            nz,
+            N_HALO_FORTRAN,
+            {},
+            layout,
+            tile_partitioner,
+            tile_rank,
         )
 
     @property
