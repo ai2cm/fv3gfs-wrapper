@@ -1,6 +1,6 @@
 from typing import Iterable, Callable
 from ..quantity import Quantity
-from .grid import SubtileGridSizer
+from ._sizer import SubtileGridSizer
 
 try:
     import gt4py
@@ -24,29 +24,29 @@ class StorageNumpy:
 
 
 class QuantityFactory:
-    def __init__(self, grid: SubtileGridSizer, numpy):
-        self.grid = grid
-        self.numpy = numpy
+    def __init__(self, sizer: SubtileGridSizer, numpy):
+        self._sizer = sizer
+        self._numpy = numpy
 
-    def from_backend(cls, grid: SubtileGridSizer, backend: str):
+    def from_backend(cls, _sizer: SubtileGridSizer, backend: str):
         numpy = StorageNumpy(backend)
-        return cls(grid, numpy)
+        return cls(_sizer, numpy)
 
     def empty(self, dims: Iterable[str], units: str, dtype: type = float):
-        return self._allocate(self.numpy.empty, dims, units, dtype)
+        return self._allocate(self._numpy.empty, dims, units, dtype)
 
     def zeros(self, dims: Iterable[str], units: str, dtype: type = float):
-        return self._allocate(self.numpy.zeros, dims, units, dtype)
+        return self._allocate(self._numpy.zeros, dims, units, dtype)
 
     def ones(self, dims: Iterable[str], units: str, dtype: type = float):
-        return self._allocate(self.numpy.ones, dims, units, dtype)
+        return self._allocate(self._numpy.ones, dims, units, dtype)
 
     def _allocate(
         self, allocator: Callable, dims: Iterable[str], units: str, dtype: type = float
     ):
-        origin = self.grid.get_origin(dims)
-        extent = self.grid.get_extent(dims)
-        shape = self.grid.get_shape(dims)
+        origin = self._sizer.get_origin(dims)
+        extent = self._sizer.get_extent(dims)
+        shape = self._sizer.get_shape(dims)
         return Quantity(
             allocator(shape, dtype=dtype),
             dims=dims,
