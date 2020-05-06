@@ -1,6 +1,6 @@
 from typing import Iterable, Callable
 from ..quantity import Quantity
-from ._sizer import SubtileGridSizer
+from .sizer import SubtileGridSizer
 
 try:
     import gt4py
