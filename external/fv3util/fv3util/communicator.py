@@ -37,6 +37,16 @@ class Communicator:
         return self.comm.Get_rank()
 
 
+class RequestCollection:
+
+    def __init__(self, *requests):
+        self._requests = requests
+
+    def wait(self):
+        for request in self._requests:
+            request.wait()
+
+
 class TileCommunicator(Communicator):
     """Performs communications within a single tile or region of a tile"""
 
@@ -332,8 +342,9 @@ class CubedSphereCommunicator(Communicator):
                 x_data.shape,
                 y_data.shape,
             )
-            self._Isend(x_quantity.np, x_data, dest=boundary.to_rank, tag=tag)
-            self._Isend(y_quantity.np, y_data, dest=boundary.to_rank, tag=tag)
+            req1 = self._Isend(x_quantity.np, x_data, dest=boundary.to_rank, tag=tag)
+            req2 = self._Isend(y_quantity.np, y_data, dest=boundary.to_rank, tag=tag)
+            return RequestCollection(req1, req2)
 
     def _Isend(self, numpy, in_array, **kwargs):
         # don't want to use a buffer here, because we leave this scope and can't close

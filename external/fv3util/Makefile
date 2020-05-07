@@ -39,6 +39,9 @@ coverage: ## check code coverage quickly with the default Python
 test: ## run tests quickly with the default Python
 	pytest tests
 
+test_mpi:
+	mpirun -n 6 --allow-run-as-root --mca btl_vader_single_copy_mechanism none --oversubscribe pytest tests/mpi
+
 lint:
 	black --diff --check $(PYTHON_FILES) $(PYTHON_INIT_FILES)
 	flake8 $(PYTHON_FILES)

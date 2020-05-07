@@ -1,6 +1,7 @@
 import pytest
 import fv3util
 import copy
+from mpi_comm import MPI
 
 
 @pytest.fixture
@@ -8,9 +9,15 @@ def dtype(numpy):
     return numpy.float64
 
 
-@pytest.fixture(params=[(1, 1), (3, 3)])
-def layout(request):
-    return request.param
+@pytest.fixture
+def layout():
+    if MPI is not None:
+        size = MPI.COMM_WORLD.Get_size()
+        ranks_per_tile = size // 6
+        ranks_per_edge = int(ranks_per_tile ** 0.5)
+        return (ranks_per_edge, ranks_per_edge)
+    else:
+        return (1, 1)
 
 
 @pytest.fixture
@@ -144,19 +151,11 @@ def extent(n_points, dims, nz, ny, nx):
 
 
 @pytest.fixture()
-def communicator_list(cube_partitioner):
-    shared_buffer = {}
-    return_list = []
-    for rank in range(cube_partitioner.total_ranks):
-        return_list.append(
-            fv3util.CubedSphereCommunicator(
-                comm=fv3util.testing.DummyComm(
-                    rank=rank, total_ranks=total_ranks, buffer_dict=shared_buffer
-                ),
-                partitioner=cube_partitioner,
-            )
-        )
-    return return_list
+def communicator(cube_partitioner):
+    return fv3util.CubedSphereCommunicator(
+        comm=MPI.COMM_WORLD,
+        partitioner=cube_partitioner,
+    )
 
 
 @pytest.fixture
@@ -232,40 +231,40 @@ def boundary_dict(ranks_per_tile):
 
 
 @pytest.fixture
-def depth_quantity_list(
-    total_ranks, dims, units, origin, extent, shape, numpy, dtype, n_points
+def depth_quantity(
+    dims, units, origin, extent, shape, numpy, dtype, n_points
 ):
     """A list of quantities whose value indicates the distance from the computational
     domain boundary."""
-    return_list = []
-    for rank in range(total_ranks):
-        data = numpy.zeros(shape, dtype=dtype) + numpy.nan
-        for n_inside in range(max(n_points, max(extent) // 2), -1, -1):
-            for i, dim in enumerate(dims):
-                if (n_inside <= extent[i] // 2) and (dim in fv3util.HORIZONTAL_DIMS):
-                    pos = [slice(None, None)] * len(dims)
-                    pos[i] = origin[i] + n_inside
-                    data[tuple(pos)] = n_inside
-                    pos[i] = origin[i] + extent[i] - 1 - n_inside
-                    data[tuple(pos)] = n_inside
-        for n_outside in range(1, n_points + 1):
-            for i, dim in enumerate(dims):
-                if dim in fv3util.HORIZONTAL_DIMS:
-                    pos = [slice(None, None)] * len(dims)
-                    pos[i] = origin[i] - n_outside
-                    data[tuple(pos)] = numpy.nan
-                    pos[i] = origin[i] + extent[i] + n_outside - 1
-                    data[tuple(pos)] = numpy.nan
-        quantity = fv3util.Quantity(
-            data, dims=dims, units=units, origin=origin, extent=extent,
-        )
-        return_list.append(quantity)
-    return return_list
+    data = numpy.zeros(shape, dtype=dtype) + numpy.nan
+    for n_inside in range(max(n_points, max(extent) // 2), -1, -1):
+        for i, dim in enumerate(dims):
+            if (n_inside <= extent[i] // 2) and (dim in fv3util.HORIZONTAL_DIMS):
+                pos = [slice(None, None)] * len(dims)
+                pos[i] = origin[i] + n_inside
+                data[tuple(pos)] = n_inside
+                pos[i] = origin[i] + extent[i] - 1 - n_inside
+                data[tuple(pos)] = n_inside
+    for n_outside in range(1, n_points + 1):
+        for i, dim in enumerate(dims):
+            if dim in fv3util.HORIZONTAL_DIMS:
+                pos = [slice(None, None)] * len(dims)
+                pos[i] = origin[i] - n_outside
+                data[tuple(pos)] = numpy.nan
+                pos[i] = origin[i] + extent[i] + n_outside - 1
+                data[tuple(pos)] = numpy.nan
+    quantity = fv3util.Quantity(
+        data, dims=dims, units=units, origin=origin, extent=extent,
+    )
+    return quantity
 
 
+@pytest.mark.skipif(
+    MPI is None, reason="mpi4py is not available or pytest was not run in parallel"
+)
 def test_depth_halo_update(
-    depth_quantity_list,
-    communicator_list,
+    depth_quantity,
+    communicator,
     n_points_update,
     n_points,
     numpy,
@@ -274,54 +273,47 @@ def test_depth_halo_update(
     ranks_per_tile,
 ):
     """test that written values have the correct orientation"""
-    sample_quantity = depth_quantity_list[0]
-    y_dim, x_dim = get_horizontal_dims(sample_quantity.dims)
-    y_index = sample_quantity.dims.index(y_dim)
-    x_index = sample_quantity.dims.index(x_dim)
-    y_extent = sample_quantity.extent[y_index]
-    x_extent = sample_quantity.extent[x_index]
-    req_list = []
+    y_dim, x_dim = get_horizontal_dims(depth_quantity.dims)
+    y_index = depth_quantity.dims.index(y_dim)
+    x_index = depth_quantity.dims.index(x_dim)
+    y_extent = depth_quantity.extent[y_index]
+    x_extent = depth_quantity.extent[x_index]
+    quantity = depth_quantity
     if 0 < n_points_update <= n_points:
-        for communicator, quantity in zip(communicator_list, depth_quantity_list):
-            req = communicator.start_halo_update(quantity, n_points_update)
-            req_list.append(req)
-        for communicator, quantity in zip(communicator_list, depth_quantity_list):
-            communicator.finish_halo_update(quantity, n_points_update)
-        for req in req_list:
-            req.wait()
-        for rank, quantity in enumerate(depth_quantity_list):
-            with subtests.test(rank=rank, quantity=quantity):
-                for dim, extent in ((y_dim, y_extent), (x_dim, x_extent)):
-                    assert numpy.all(quantity.sel(**{dim: -1}) <= 1)
-                    assert numpy.all(quantity.sel(**{dim: extent}) <= 1)
-                    if n_points_update >= 2:
-                        assert numpy.all(quantity.sel(**{dim: -2}) <= 2)
-                        assert numpy.all(quantity.sel(**{dim: extent + 1}) <= 2)
-                    if n_points_update >= 3:
-                        assert numpy.all(quantity.sel(**{dim: -3}) <= 3)
-                        assert numpy.all(quantity.sel(**{dim: extent + 2}) <= 3)
-                    if n_points_update > 3:
-                        raise NotImplementedError(n_points_update)
+        req = communicator.start_halo_update(quantity, n_points_update)
+        communicator.finish_halo_update(quantity, n_points_update)
+        req.wait()
+        for dim, extent in ((y_dim, y_extent), (x_dim, x_extent)):
+            assert numpy.all(quantity.sel(**{dim: -1}) <= 1)
+            assert numpy.all(quantity.sel(**{dim: extent}) <= 1)
+            if n_points_update >= 2:
+                assert numpy.all(quantity.sel(**{dim: -2}) <= 2)
+                assert numpy.all(quantity.sel(**{dim: extent + 1}) <= 2)
+            if n_points_update >= 3:
+                assert numpy.all(quantity.sel(**{dim: -3}) <= 3)
+                assert numpy.all(quantity.sel(**{dim: extent + 2}) <= 3)
+            if n_points_update > 3:
+                raise NotImplementedError(n_points_update)
 
 
 @pytest.fixture
-def zeros_quantity_list(total_ranks, dims, units, origin, extent, shape, numpy, dtype):
+def zeros_quantity(dims, units, origin, extent, shape, numpy, dtype):
     """A list of quantities whose values are 0 in the computational domain and 1
     outside of it."""
-    return_list = []
-    for rank in range(total_ranks):
-        data = numpy.ones(shape, dtype=dtype)
-        quantity = fv3util.Quantity(
-            data, dims=dims, units=units, origin=origin, extent=extent,
-        )
-        quantity.view[:] = 0.0
-        return_list.append(quantity)
-    return return_list
+    data = numpy.ones(shape, dtype=dtype)
+    quantity = fv3util.Quantity(
+        data, dims=dims, units=units, origin=origin, extent=extent,
+    )
+    quantity.view[:] = 0.0
+    return quantity
 
 
+@pytest.mark.skipif(
+    MPI is None, reason="mpi4py is not available or pytest was not run in parallel"
+)
 def test_zeros_halo_update(
-    zeros_quantity_list,
-    communicator_list,
+    zeros_quantity,
+    communicator,
     n_points_update,
     n_points,
     numpy,
@@ -330,84 +322,75 @@ def test_zeros_halo_update(
     ranks_per_tile,
 ):
     """test that zeros from adjacent domains get written over ones on local halo"""
-    req_list = []
+    quantity = zeros_quantity
     if 0 < n_points_update <= n_points:
-        for communicator, quantity in zip(communicator_list, zeros_quantity_list):
-            req = communicator.start_halo_update(quantity, n_points_update)
-            req_list.append(req)
-        for communicator, quantity in zip(communicator_list, zeros_quantity_list):
-            communicator.finish_halo_update(quantity, n_points_update)
-        for req in req_list:
-            req.wait()
-        for rank, quantity in enumerate(zeros_quantity_list):
-            boundaries = boundary_dict[rank % ranks_per_tile]
-            for boundary in boundaries:
-                boundary_slice = fv3util.boundary._get_boundary_slice(
-                    quantity.dims,
-                    quantity.origin,
-                    quantity.extent,
-                    boundary,
-                    n_points_update,
-                    interior=False,
+        req = communicator.start_halo_update(quantity, n_points_update)
+        communicator.finish_halo_update(quantity, n_points_update)
+        req.wait()
+        boundaries = boundary_dict[communicator.rank % ranks_per_tile]
+        for boundary in boundaries:
+            boundary_slice = fv3util.boundary._get_boundary_slice(
+                quantity.dims,
+                quantity.origin,
+                quantity.extent,
+                boundary,
+                n_points_update,
+                interior=False,
+            )
+            with subtests.test(
+                quantity=quantity,
+                rank=communicator.rank,
+                boundary=boundary,
+                boundary_slice=boundary_slice,
+            ):
+                numpy.testing.assert_array_equal(
+                    quantity.data[tuple(boundary_slice)], 0.0
                 )
-                with subtests.test(
-                    quantity=quantity,
-                    rank=rank,
-                    boundary=boundary,
-                    boundary_slice=boundary_slice,
-                ):
+
+
+@pytest.mark.skipif(
+    MPI is None, reason="mpi4py is not available or pytest was not run in parallel"
+)
+def test_zeros_vector_halo_update(
+    zeros_quantity,
+    communicator,
+    n_points_update,
+    n_points,
+    numpy,
+    subtests,
+    boundary_dict,
+    ranks_per_tile,
+):
+    """test that zeros from adjacent domains get written over ones on local halo"""
+    x_quantity = zeros_quantity
+    y_quantity = copy.deepcopy(x_quantity)
+    if 0 < n_points_update <= n_points:
+        communicator.start_vector_halo_update(
+            y_quantity, x_quantity, n_points_update
+        )
+        communicator.finish_vector_halo_update(
+            y_quantity, x_quantity, n_points_update
+        )
+        boundaries = boundary_dict[communicator.rank % ranks_per_tile]
+        for boundary in boundaries:
+            boundary_slice = fv3util.boundary._get_boundary_slice(
+                x_quantity.dims,
+                x_quantity.origin,
+                x_quantity.extent,
+                boundary,
+                n_points_update,
+                interior=False,
+            )
+            with subtests.test(
+                x_quantity=x_quantity,
+                rank=communicator.rank,
+                boundary=boundary,
+                boundary_slice=boundary_slice,
+            ):
+                for quantity in y_quantity, x_quantity:
                     numpy.testing.assert_array_equal(
                         quantity.data[tuple(boundary_slice)], 0.0
                     )
-
-
-def test_zeros_vector_halo_update(
-    zeros_quantity_list,
-    communicator_list,
-    n_points_update,
-    n_points,
-    numpy,
-    subtests,
-    boundary_dict,
-    ranks_per_tile,
-):
-    """test that zeros from adjacent domains get written over ones on local halo"""
-    x_list = zeros_quantity_list
-    y_list = copy.deepcopy(x_list)
-    if 0 < n_points_update <= n_points:
-        for communicator, y_quantity, x_quantity in zip(
-            communicator_list, y_list, x_list
-        ):
-            communicator.start_vector_halo_update(
-                y_quantity, x_quantity, n_points_update
-            )
-        for communicator, y_quantity, x_quantity in zip(
-            communicator_list, y_list, x_list
-        ):
-            communicator.finish_vector_halo_update(
-                y_quantity, x_quantity, n_points_update
-            )
-        for rank, (y_quantity, x_quantity) in enumerate(zip(y_list, x_list)):
-            boundaries = boundary_dict[rank % ranks_per_tile]
-            for boundary in boundaries:
-                boundary_slice = fv3util.boundary._get_boundary_slice(
-                    x_quantity.dims,
-                    x_quantity.origin,
-                    x_quantity.extent,
-                    boundary,
-                    n_points_update,
-                    interior=False,
-                )
-                with subtests.test(
-                    x_quantity=x_quantity,
-                    rank=rank,
-                    boundary=boundary,
-                    boundary_slice=boundary_slice,
-                ):
-                    for quantity in y_quantity, x_quantity:
-                        numpy.testing.assert_array_equal(
-                            quantity.data[tuple(boundary_slice)], 0.0
-                        )
 
 
 def get_horizontal_dims(dims):
