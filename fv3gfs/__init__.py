@@ -1,5 +1,3 @@
-import sys
-
 from ._wrapper import (
     initialize,
     step,
@@ -45,21 +43,6 @@ from fv3util import (
     UnitsError,
 )
 
-from ._logging import capture_fortran_output, show_fortran_output, _captured_stream
-
-# wrap the loud fortran functions with a decorator that can optionally
-# capture their output
-for func in ["step_dynamics", "step_physics", "initialize", "cleanup"]:
-    # get handle to current module
-    self = sys.modules[__name__]
-    setattr(self, func, _captured_stream(getattr(self, func)))
-
-# Fortran output should be captured by default
-# for very low-level debugging, the user can call show_fortran_output
-capture_fortran_output()
-
-
-# this
 
 __all__ = [
     "initialize",
