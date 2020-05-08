@@ -375,9 +375,11 @@ def test_zeros_vector_halo_update(
         for communicator, y_quantity, x_quantity in zip(
             communicator_list, y_list, x_list
         ):
-            req_list.append(communicator.start_vector_halo_update(
-                y_quantity, x_quantity, n_points_update
-            ))
+            req_list.append(
+                communicator.start_vector_halo_update(
+                    y_quantity, x_quantity, n_points_update
+                )
+            )
         for req in req_list:
             req.wait()
         for rank, (y_quantity, x_quantity) in enumerate(zip(y_list, x_list)):
