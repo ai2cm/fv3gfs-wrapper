@@ -29,7 +29,7 @@ def send_buffer(numpy, array):
     if array is None or is_c_contiguous(array):
         yield array
     else:
-        with array_buffer(numpy.zeros, array.shape, array.dtype) as sendbuf:
+        with array_buffer(numpy.empty, array.shape, array.dtype) as sendbuf:
             sendbuf[:] = array
             yield sendbuf
 
@@ -43,6 +43,6 @@ def recv_buffer(numpy, array):
     if array is None or is_c_contiguous(array):
         yield array
     else:
-        with array_buffer(numpy.zeros, array.shape, array.dtype) as recvbuf:
+        with array_buffer(numpy.empty, array.shape, array.dtype) as recvbuf:
             yield recvbuf
             array[:] = recvbuf
