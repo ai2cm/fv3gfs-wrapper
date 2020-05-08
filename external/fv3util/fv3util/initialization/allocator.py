@@ -9,15 +9,21 @@ except ImportError:
 
 
 def _wrap_storage_call(function, backend):
-    def wrapped(shape, dtype=float):
-        return function(backend, [0] * len(shape), shape, dtype)
+    def wrapped(shape, dtype=float, **kwargs):
+        return function(backend, [0] * len(shape), shape, dtype, **kwargs)
 
     wrapped.__name__ = function.__name__
     return wrapped
 
 
 class StorageNumpy:
-    def __init__(self, backend):
+    def __init__(self, backend: str):
+        """Initialize an object which behaves like the numpy module, but uses
+        gt4py storage objects for zeros, ones, and empty.
+
+        Args:
+            backend: gt4py backend
+        """
         self.empty = _wrap_storage_call(gt4py.storage.empty, backend)
         self.zeros = _wrap_storage_call(gt4py.storage.zeros, backend)
         self.ones = _wrap_storage_call(gt4py.storage.ones, backend)
@@ -28,9 +34,15 @@ class QuantityFactory:
         self._sizer = sizer
         self._numpy = numpy
 
-    def from_backend(cls, _sizer: SubtileGridSizer, backend: str):
+    def from_backend(cls, sizer: SubtileGridSizer, backend: str):
+        """Initialize a QuantityFactory to use a specific gt4py backend.
+
+        Args:
+            sizer: object which determines array sizes
+            backend: gt4py backend
+        """
         numpy = StorageNumpy(backend)
-        return cls(_sizer, numpy)
+        return cls(sizer, numpy)
 
     def empty(self, dims: Iterable[str], units: str, dtype: type = float):
         return self._allocate(self._numpy.empty, dims, units, dtype)
@@ -48,7 +60,7 @@ class QuantityFactory:
         extent = self._sizer.get_extent(dims)
         shape = self._sizer.get_shape(dims)
         return Quantity(
-            allocator(shape, dtype=dtype),
+            allocator(shape, dtype=dtype, default_origin=origin),
             dims=dims,
             units=units,
             origin=origin,
