@@ -1,6 +1,6 @@
 import dataclasses
 from typing import Tuple, Dict
-from ..constants import N_HALO_FORTRAN
+from ..constants import N_HALO_DEFAULT
 from .. import constants
 from ..partitioner import TilePartitioner
 
@@ -74,7 +74,7 @@ class SubtileGridSizer(GridSizer):
             nx_tile,
             ny_tile,
             nz,
-            N_HALO_FORTRAN,
+            N_HALO_DEFAULT,
             {},
             layout,
             tile_partitioner,

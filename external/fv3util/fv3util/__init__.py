@@ -34,7 +34,7 @@ from .constants import (
     EDGE_BOUNDARY_TYPES,
     CORNER_BOUNDARY_TYPES,
     BOUNDARY_TYPES,
-    N_HALO_FORTRAN,
+    N_HALO_DEFAULT,
 )
 from .quantity import Quantity, QuantityMetadata
 from .units import ensure_equal_units, units_are_equal, UnitsError
