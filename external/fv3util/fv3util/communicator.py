@@ -7,7 +7,12 @@ from .rotate import rotate_scalar_data, rotate_vector_data
 from .buffer import array_buffer, send_buffer, recv_buffer
 import logging
 
-__all__ = ["TileCommunicator", "CubedSphereCommunicator", "Communicator", "HaloUpdateRequest"]
+__all__ = [
+    "TileCommunicator",
+    "CubedSphereCommunicator",
+    "Communicator",
+    "HaloUpdateRequest",
+]
 
 logger = logging.getLogger("fv3util")
 
