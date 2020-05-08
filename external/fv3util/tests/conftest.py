@@ -12,7 +12,7 @@ except ImportError:
     cupy = None
 
 
-@pytest.fixture(params=["numpy", "cupy", "gt4py_numpy", "gt4py_cupy"])
+@pytest.fixture(params=["numpy", "cupy"])#, "gt4py_numpy", "gt4py_cupy"])
 def backend(request):
     if cupy is None and request.param.endswith("cupy"):
         pytest.skip("cupy is not available for GPU backend")

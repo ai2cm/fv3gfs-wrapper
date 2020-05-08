@@ -1,5 +1,5 @@
 import contextlib
-from .utils import is_contiguous
+from .utils import is_c_contiguous
 
 BUFFER_CACHE = {}
 
@@ -26,10 +26,10 @@ def send_buffer(numpy, array):
     """A context manager ensuring that `array` is contiguous in a context where it is
     being sent as data, copying into a recycled buffer array if necessary.
     """
-    if array is None or is_contiguous(array):
+    if array is None or is_c_contiguous(array):
         yield array
     else:
-        with array_buffer(numpy.empty, array.shape, array.dtype) as sendbuf:
+        with array_buffer(numpy.zeros, array.shape, array.dtype) as sendbuf:
             sendbuf[:] = array
             yield sendbuf
 
@@ -40,9 +40,9 @@ def recv_buffer(numpy, array):
     being used to receive data, using a recycled buffer array and then copying the
     result into array if necessary.
     """
-    if array is None or is_contiguous(array):
+    if array is None or is_c_contiguous(array):
         yield array
     else:
-        with array_buffer(numpy.empty, array.shape, array.dtype) as recvbuf:
+        with array_buffer(numpy.zeros, array.shape, array.dtype) as recvbuf:
             yield recvbuf
             array[:] = recvbuf

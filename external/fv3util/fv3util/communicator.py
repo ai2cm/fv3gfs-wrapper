@@ -37,13 +37,25 @@ class Communicator:
         return self.comm.Get_rank()
 
 
-class RequestCollection:
+class FunctionRequest:
 
-    def __init__(self, *requests):
-        self._requests = requests
+    def __init__(self, function):
+        self._function = function
 
     def wait(self):
-        for request in self._requests:
+        self._function()
+
+
+class HaloUpdateRequest:
+
+    def __init__(self, send_requests, recv_requests):
+        self._send_requests = send_requests
+        self._recv_requests = recv_requests
+
+    def wait(self):
+        for request in self._recv_requests:
+            request.wait()
+        for request in self._send_requests:
             request.wait()
 
 
@@ -281,10 +293,19 @@ class CubedSphereCommunicator(Communicator):
         )
         self._tile_communicator = TileCommunicator(tile_comm, self.partitioner.tile)
 
-    def start_halo_update(self, quantity: Quantity, n_points: int, tag: Hashable = 0):
-        """Initiate an asynchronous halo update of a quantity."""
+    def halo_update(self, quantity: Quantity, n_points: int):
+        req = self.start_halo_update(quantity, n_points)
+        req.wait()
+
+    def start_halo_update(self, quantity: Quantity, n_points: int):
         if n_points == 0:
             raise ValueError("cannot perform a halo update on zero halo points")
+        send_requests = self._Isend_halos(quantity, n_points)
+        recv_requests = self._Irecv_halos(quantity, n_points)
+        return HaloUpdateRequest(send_requests, recv_requests)
+
+    def _Isend_halos(self, quantity: Quantity, n_points: int):
+        send_requests = []
         for boundary_type, boundary in self.boundaries.items():
             data = boundary.send_view(quantity, n_points=n_points)
             # sending data across the boundary will rotate the data
@@ -294,11 +315,11 @@ class CubedSphereCommunicator(Communicator):
             data = rotate_scalar_data(
                 data, quantity.dims, quantity.np, -boundary.n_clockwise_rotations
             )
-            req = self._Isend(quantity.np, data, dest=boundary.to_rank, tag=tag)
-        return req
+            send_requests.append(self._Isend(quantity.np, data, dest=boundary.to_rank))
+        return send_requests
 
-    def finish_halo_update(self, quantity: Quantity, n_points: int, tag: Hashable = 0):
-        """Complete an asynchronous halo update of a quantity."""
+    def _Irecv_halos(self, quantity: Quantity, n_points: int):
+        recv_requests = []
         for boundary_type, boundary in self.boundaries.items():
             dest_view = boundary.recv_view(quantity, n_points=n_points)
             logger.debug(
@@ -308,14 +329,30 @@ class CubedSphereCommunicator(Communicator):
                 boundary.to_rank,
                 self.rank,
             )
-            self._Recv(quantity.np, dest_view, source=boundary.to_rank, tag=tag)
+            recv_requests.append(self._Irecv(quantity.np, dest_view, source=boundary.to_rank))
+        return recv_requests
+
+    def finish_halo_update(self, quantity: Quantity, n_points: int):
+        """Complete an asynchronous halo update of a quantity."""
+        raise NotImplementedError(
+            "finish_halo_update has been removed, use .wait() on the request object "
+            "returned by start_halo_update"
+        )
+
+    def vector_halo_update(
+        self,
+        x_quantity: Quantity,
+        y_quantity: Quantity,
+        n_points: int,
+    ):
+        req = self.start_vector_halo_update(x_quantity, y_quantity, n_points)
+        req.wait()
 
     def start_vector_halo_update(
         self,
         x_quantity: Quantity,
         y_quantity: Quantity,
         n_points: int,
-        tag: Hashable = 0,
     ):
         """Initiate an asynchronous halo update of a horizontal vector quantity.
 
@@ -323,6 +360,13 @@ class CubedSphereCommunicator(Communicator):
         """
         if n_points == 0:
             raise ValueError("cannot perform a halo update on zero halo points")
+        send_requests = self._Isend_vector_halos(x_quantity, y_quantity, n_points)
+        recv_requests = self._Irecv_halos(x_quantity, n_points)
+        recv_requests.extend(self._Irecv_halos(y_quantity, n_points))
+        return HaloUpdateRequest(send_requests, recv_requests)
+
+    def _Isend_vector_halos(self, x_quantity, y_quantity, n_points):
+        send_requests = []
         for boundary_type, boundary in self.boundaries.items():
             x_data = boundary.send_view(x_quantity, n_points=n_points)
             y_data = boundary.send_view(y_quantity, n_points=n_points)
@@ -342,38 +386,40 @@ class CubedSphereCommunicator(Communicator):
                 x_data.shape,
                 y_data.shape,
             )
-            req1 = self._Isend(x_quantity.np, x_data, dest=boundary.to_rank, tag=tag)
-            req2 = self._Isend(y_quantity.np, y_data, dest=boundary.to_rank, tag=tag)
-            return RequestCollection(req1, req2)
+            send_requests.append(self._Isend(x_quantity.np, x_data, dest=boundary.to_rank))
+            send_requests.append(self._Isend(y_quantity.np, y_data, dest=boundary.to_rank))
+        return send_requests
 
     def _Isend(self, numpy, in_array, **kwargs):
         # don't want to use a buffer here, because we leave this scope and can't close
         # the context manager. might figure out a way to do it later
-        if "tag" in kwargs and kwargs["tag"] is None:
-            kwargs.pop("tag")
-        return self.comm.Isend(numpy.ascontiguousarray(in_array), **kwargs)
+        array = numpy.ascontiguousarray(in_array)
+        return self.comm.Isend(array, **kwargs)
 
     def _Send(self, numpy, in_array, **kwargs):
         with send_buffer(numpy, in_array) as sendbuf:
+            # assert is_c_contiguous(sendbuf)
             self.comm.Send(sendbuf, **kwargs)
+            # assert numpy.sum(numpy.isnan(sendbuf) == 0)
 
     def _Recv(self, numpy, out_array, **kwargs):
         with recv_buffer(numpy, out_array) as recvbuf:
             self.comm.Recv(recvbuf, **kwargs)
+
+    def _Irecv(self, numpy, out_array, **kwargs):
+        def recv():
+            with recv_buffer(numpy, out_array) as recvbuf:
+                self.comm.Recv(recvbuf, **kwargs)
+        return FunctionRequest(recv)
 
     def finish_vector_halo_update(
         self,
         x_quantity: Quantity,
         y_quantity: Quantity,
         n_points: int,
-        tag: Hashable = 0,
     ):
         """Complete an asynchronous halo update of a horizontal vector quantity."""
-        logger.debug(
-            "finish_vector_halo_update: retrieving x quantity on rank=%i", self.rank
+        raise NotImplementedError(
+            "finish_vector_halo_update has been removed, use .wait() on the request object "
+            "returned by start_vector_halo_update"
         )
-        self.finish_halo_update(x_quantity, n_points, tag=tag)
-        logger.debug(
-            "finish_vector_halo_update: retrieving y quantity on rank=%i", self.rank
-        )
-        self.finish_halo_update(y_quantity, n_points, tag=tag)
