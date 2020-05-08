@@ -1,4 +1,4 @@
-from typing import Iterable, Hashable
+from typing import Iterable
 from .quantity import Quantity
 from .partitioner import CubedSpherePartitioner, TilePartitioner
 from . import constants
