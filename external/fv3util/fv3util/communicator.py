@@ -7,7 +7,7 @@ from .rotate import rotate_scalar_data, rotate_vector_data
 from .buffer import array_buffer, send_buffer, recv_buffer
 import logging
 
-__all__ = ["TileCommunicator", "CubedSphereCommunicator"]
+__all__ = ["TileCommunicator", "CubedSphereCommunicator", "Communicator", "HaloUpdateRequest"]
 
 logger = logging.getLogger("fv3util")
 
@@ -46,6 +46,8 @@ class FunctionRequest:
 
 
 class HaloUpdateRequest:
+    """asynchronous request object for halo updates"""
+
     def __init__(self, send_requests, recv_requests):
         self._send_requests = send_requests
         self._recv_requests = recv_requests
@@ -302,7 +304,7 @@ class CubedSphereCommunicator(Communicator):
         req.wait()
 
     def start_halo_update(self, quantity: Quantity, n_points: int) -> HaloUpdateRequest:
-        """Begin an asynchronous halo update on a quantity.
+        """Start an asynchronous halo update on a quantity.
 
         Args:
             quantity: the quantity to be updated
@@ -372,7 +374,7 @@ class CubedSphereCommunicator(Communicator):
     def start_vector_halo_update(
         self, x_quantity: Quantity, y_quantity: Quantity, n_points: int,
     ) -> HaloUpdateRequest:
-        """Initiate an asynchronous halo update of a horizontal vector quantity.
+        """Start an asynchronous halo update of a horizontal vector quantity.
 
         Assumes the x and y dimension indices are the same between the two quantities.
 
@@ -437,6 +439,9 @@ class CubedSphereCommunicator(Communicator):
             self.comm.Recv(recvbuf, **kwargs)
 
     def _Irecv(self, numpy, out_array, **kwargs):
+        # we can't perform a true Irecv because we need to receive the data into a
+        # buffer and then copy that buffer into the output array. Instead we will
+        # just do a Recv() when wait is called.
         def recv():
             with recv_buffer(numpy, out_array) as recvbuf:
                 self.comm.Recv(recvbuf, **kwargs)

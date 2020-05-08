@@ -37,7 +37,7 @@ from .constants import (
 )
 from .quantity import Quantity, QuantityMetadata
 from .units import ensure_equal_units, units_are_equal, UnitsError
-from .communicator import TileCommunicator, CubedSphereCommunicator, Communicator
+from .communicator import TileCommunicator, CubedSphereCommunicator, Communicator, HaloUpdateRequest
 from ._xarray import to_dataset
 from . import testing
 
