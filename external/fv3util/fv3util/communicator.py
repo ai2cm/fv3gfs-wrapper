@@ -294,10 +294,25 @@ class CubedSphereCommunicator(Communicator):
         self._tile_communicator = TileCommunicator(tile_comm, self.partitioner.tile)
 
     def halo_update(self, quantity: Quantity, n_points: int):
+        """Perform a halo update on a quantity.
+
+        Args:
+            quantity: the quantity to be updated
+            n_points: how many halo points to update, starting from the interior
+        """
         req = self.start_halo_update(quantity, n_points)
         req.wait()
 
-    def start_halo_update(self, quantity: Quantity, n_points: int):
+    def start_halo_update(self, quantity: Quantity, n_points: int) -> HaloUpdateRequest:
+        """Begin an asynchronous halo update on a quantity.
+
+        Args:
+            quantity: the quantity to be updated
+            n_points: how many halo points to update, starting from the interior
+
+        Returns:
+            request: an asynchronous request object with a .wait() method
+        """
         if n_points == 0:
             raise ValueError("cannot perform a halo update on zero halo points")
         send_requests = self._Isend_halos(quantity, n_points)
@@ -333,7 +348,7 @@ class CubedSphereCommunicator(Communicator):
         return recv_requests
 
     def finish_halo_update(self, quantity: Quantity, n_points: int):
-        """Complete an asynchronous halo update of a quantity."""
+        """Deprecated, do not use."""
         raise NotImplementedError(
             "finish_halo_update has been removed, use .wait() on the request object "
             "returned by start_halo_update"
@@ -345,6 +360,15 @@ class CubedSphereCommunicator(Communicator):
         y_quantity: Quantity,
         n_points: int,
     ):
+        """Perform a halo update of a horizontal vector quantity.
+
+        Assumes the x and y dimension indices are the same between the two quantities.
+
+        Args:
+            x_quantity: the x-component quantity to be halo updated
+            y_quantity: the y-component quantity to be halo updated
+            n_points: how many halo points to update, starting at the interior
+        """
         req = self.start_vector_halo_update(x_quantity, y_quantity, n_points)
         req.wait()
 
@@ -353,10 +377,18 @@ class CubedSphereCommunicator(Communicator):
         x_quantity: Quantity,
         y_quantity: Quantity,
         n_points: int,
-    ):
+    ) -> HaloUpdateRequest:
         """Initiate an asynchronous halo update of a horizontal vector quantity.
 
         Assumes the x and y dimension indices are the same between the two quantities.
+
+        Args:
+            x_quantity: the x-component quantity to be halo updated
+            y_quantity: the y-component quantity to be halo updated
+            n_points: how many halo points to update, starting at the interior
+
+        Returns:
+            request: an asynchronous request object with a .wait() method
         """
         if n_points == 0:
             raise ValueError("cannot perform a halo update on zero halo points")
@@ -418,7 +450,7 @@ class CubedSphereCommunicator(Communicator):
         y_quantity: Quantity,
         n_points: int,
     ):
-        """Complete an asynchronous halo update of a horizontal vector quantity."""
+        """Deprecated, do not use."""
         raise NotImplementedError(
             "finish_vector_halo_update has been removed, use .wait() on the request object "
             "returned by start_vector_halo_update"
