@@ -155,8 +155,7 @@ def extent(n_points, dims, nz, ny, nx):
 @pytest.fixture()
 def communicator(cube_partitioner):
     return fv3util.CubedSphereCommunicator(
-        comm=MPI.COMM_WORLD,
-        partitioner=cube_partitioner,
+        comm=MPI.COMM_WORLD, partitioner=cube_partitioner,
     )
 
 
@@ -363,9 +362,7 @@ def test_zeros_vector_halo_update(
     x_quantity = zeros_quantity
     y_quantity = copy.deepcopy(x_quantity)
     if 0 < n_points_update <= n_points:
-        communicator.vector_halo_update(
-            y_quantity, x_quantity, n_points_update
-        )
+        communicator.vector_halo_update(y_quantity, x_quantity, n_points_update)
         boundaries = boundary_dict[communicator.rank % ranks_per_tile]
         for boundary in boundaries:
             boundary_slice = fv3util.boundary._get_boundary_slice(

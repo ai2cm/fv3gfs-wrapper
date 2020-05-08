@@ -38,7 +38,6 @@ class Communicator:
 
 
 class FunctionRequest:
-
     def __init__(self, function):
         self._function = function
 
@@ -47,7 +46,6 @@ class FunctionRequest:
 
 
 class HaloUpdateRequest:
-
     def __init__(self, send_requests, recv_requests):
         self._send_requests = send_requests
         self._recv_requests = recv_requests
@@ -344,7 +342,9 @@ class CubedSphereCommunicator(Communicator):
                 boundary.to_rank,
                 self.rank,
             )
-            recv_requests.append(self._Irecv(quantity.np, dest_view, source=boundary.to_rank))
+            recv_requests.append(
+                self._Irecv(quantity.np, dest_view, source=boundary.to_rank)
+            )
         return recv_requests
 
     def finish_halo_update(self, quantity: Quantity, n_points: int):
@@ -355,10 +355,7 @@ class CubedSphereCommunicator(Communicator):
         )
 
     def vector_halo_update(
-        self,
-        x_quantity: Quantity,
-        y_quantity: Quantity,
-        n_points: int,
+        self, x_quantity: Quantity, y_quantity: Quantity, n_points: int,
     ):
         """Perform a halo update of a horizontal vector quantity.
 
@@ -373,10 +370,7 @@ class CubedSphereCommunicator(Communicator):
         req.wait()
 
     def start_vector_halo_update(
-        self,
-        x_quantity: Quantity,
-        y_quantity: Quantity,
-        n_points: int,
+        self, x_quantity: Quantity, y_quantity: Quantity, n_points: int,
     ) -> HaloUpdateRequest:
         """Initiate an asynchronous halo update of a horizontal vector quantity.
 
@@ -418,8 +412,12 @@ class CubedSphereCommunicator(Communicator):
                 x_data.shape,
                 y_data.shape,
             )
-            send_requests.append(self._Isend(x_quantity.np, x_data, dest=boundary.to_rank))
-            send_requests.append(self._Isend(y_quantity.np, y_data, dest=boundary.to_rank))
+            send_requests.append(
+                self._Isend(x_quantity.np, x_data, dest=boundary.to_rank)
+            )
+            send_requests.append(
+                self._Isend(y_quantity.np, y_data, dest=boundary.to_rank)
+            )
         return send_requests
 
     def _Isend(self, numpy, in_array, **kwargs):
@@ -442,13 +440,11 @@ class CubedSphereCommunicator(Communicator):
         def recv():
             with recv_buffer(numpy, out_array) as recvbuf:
                 self.comm.Recv(recvbuf, **kwargs)
+
         return FunctionRequest(recv)
 
     def finish_vector_halo_update(
-        self,
-        x_quantity: Quantity,
-        y_quantity: Quantity,
-        n_points: int,
+        self, x_quantity: Quantity, y_quantity: Quantity, n_points: int,
     ):
         """Deprecated, do not use."""
         raise NotImplementedError(
