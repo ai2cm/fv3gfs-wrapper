@@ -507,8 +507,18 @@ rank: the processor rank</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="fv3gfs.TilePartitioner.subtile_nx">
+<code class="sig-name descname">subtile_nx</code><span class="sig-paren">(</span><em class="sig-param">nx</em><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.TilePartitioner.subtile_nx" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.TilePartitioner.subtile_ny">
+<code class="sig-name descname">subtile_ny</code><span class="sig-paren">(</span><em class="sig-param">ny</em><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.TilePartitioner.subtile_ny" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="fv3gfs.TilePartitioner.subtile_slice">
-<code class="sig-name descname">subtile_slice</code><span class="sig-paren">(</span><em class="sig-param">rank: int</em>, <em class="sig-param">tile_metadata: fv3util.quantity.QuantityMetadata</em>, <em class="sig-param">overlap: bool = False</em><span class="sig-paren">)</span> &#x2192; Tuple[slice, slice]<a class="headerlink" href="#fv3gfs.TilePartitioner.subtile_slice" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">subtile_slice</code><span class="sig-paren">(</span><em class="sig-param">rank: int, tile_dims: Iterable[str], tile_extent: Iterable[int], overlap: bool = False</em><span class="sig-paren">)</span> &#x2192; Tuple[slice, slice]<a class="headerlink" href="#fv3gfs.TilePartitioner.subtile_slice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the subtile slice of a given rank on an array.</p>
 <dl>
 <dt>Args:</dt><dd><p>rank: the rank of the process

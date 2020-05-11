@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developers Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#latest">latest</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-4-1-2020-04-27">v0.4.1 (2020-04-27)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-4-0-2020-04-03">v0.4.0 (2020-04-03)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-3-4-2020-04-22">v0.3.4 (2020-04-22)</a></li>
@@ -172,6 +173,16 @@
             
   <div class="section" id="history">
 <h1>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="latest">
+<h2>latest<a class="headerlink" href="#latest" title="Permalink to this headline">¶</a></h2>
+<p>Breaking changes:
+- Signature of <cite>TilePartitioner.subtile_slice</cite> has changed to avoid needing to construct a metadata object in order to use two of its attributes. Instead, those attributes (tile_dims and tile_extent) are directly passed.</p>
+<p>Major changes:
+- Add QuantityFactory class which creates Quantity objects from dimensionality, units, and dtype
+- Add SubtileGridSizer class which determines the origin, extent, and shape of data to be allocated for a given dimension name. This class is used by QuantityFactory to determine the shape of storages to allocate.</p>
+<p>Minor changes:
+- Fixed a bug in building from cached intermediate images where the fv3gfs-fortran image would not use the cached ESMF and FMS images</p>
+</div>
 <div class="section" id="v0-4-1-2020-04-27">
 <h2>v0.4.1 (2020-04-27)<a class="headerlink" href="#v0-4-1-2020-04-27" title="Permalink to this headline">¶</a></h2>
 <p>Major changes:
