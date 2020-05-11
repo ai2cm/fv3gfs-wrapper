@@ -435,9 +435,7 @@ class CubedSphereCommunicator(Communicator):
 
     def _Send(self, numpy, in_array, **kwargs):
         with send_buffer(numpy, in_array) as sendbuf:
-            # assert is_c_contiguous(sendbuf)
             self.comm.Send(sendbuf, **kwargs)
-            # assert numpy.sum(numpy.isnan(sendbuf) == 0)
 
     def _Recv(self, numpy, out_array, **kwargs):
         with recv_buffer(numpy, out_array) as recvbuf:

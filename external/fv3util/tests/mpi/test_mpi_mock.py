@@ -5,6 +5,8 @@ from mpi_comm import MPI
 
 worker_function_list = []
 
+MAX_WORKER_ITERATIONS = 16
+
 
 def worker(rank_order=range):
     def decorator(func):
@@ -271,17 +273,21 @@ def dummy_results(worker_function, dummy_list, numpy):
     print("Getting dummy results")
     result_list = [None] * len(dummy_list)
     done = False
+    iter_count = 0
     while not done:
+        iter_count += 1
         done = True
         for i in worker_function.rank_order(len(dummy_list)):
             comm = dummy_list[i]
             try:
                 result_list[i] = worker_function(comm, numpy)
-            except fv3util.testing.ConcurrencyError:
-                done = False
+            except fv3util.testing.ConcurrencyError as err:
+                if iter_count >= MAX_WORKER_ITERATIONS:
+                    result_list[i] = err
+                else:
+                    done = False
             except Exception as err:
                 result_list[i] = err
-    print("done getting dummy results")
     return result_list
 
 
