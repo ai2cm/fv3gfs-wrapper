@@ -235,7 +235,7 @@ def boundary_dict(ranks_per_tile):
 def depth_quantity(
     dims, units, origin, extent, shape, numpy, dtype, n_points, n_buffer
 ):
-    """A list of quantities whose value indicates the distance from the computational
+    """A quantity whose value indicates the distance from the computational
     domain boundary."""
     data = numpy.zeros(shape, dtype=dtype) + numpy.nan
     for n_inside in range(max(n_points, max(extent) // 2), -1, -1):
