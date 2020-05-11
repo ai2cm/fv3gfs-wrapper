@@ -1,6 +1,20 @@
 History
 =======
 
+latest
+------
+
+Breaking changes:
+- Signature of `TilePartitioner.subtile_slice` has changed to avoid needing to construct a metadata object in order to use two of its attributes. Instead, those attributes (tile_dims and tile_extent) are directly passed.
+
+Major changes:
+- Add QuantityFactory class which creates Quantity objects from dimensionality, units, and dtype
+- Add SubtileGridSizer class which determines the origin, extent, and shape of data to be allocated for a given dimension name. This class is used by QuantityFactory to determine the shape of storages to allocate.
+
+Minor changes:
+- Fixed a bug in building from cached intermediate images where the fv3gfs-fortran image would not use the cached ESMF and FMS images
+
+
 v0.4.1 (2020-04-27)
 -------------------
 
