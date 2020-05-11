@@ -10,6 +10,11 @@ Breaking changes:
 Major changes:
 - Add QuantityFactory class which creates Quantity objects from dimensionality, units, and dtype
 - Add SubtileGridSizer class which determines the origin, extent, and shape of data to be allocated for a given dimension name. This class is used by QuantityFactory to determine the shape of storages to allocate.
+- Updated fv3gfs-fortran submodule to c0d11c6a. Import changes are:
+  - Sfcprop%tprcp is set to zero on init when dycore=True
+  - Add option to restart model from lat/lon A-grid horizontal winds
+  - Fix issue where physics diagnostics were accumulating when output interval equaled physics timestep
+  - Add functionality to do online coarse-graining of restart files on model levels
 
 Minor changes:
 - Fixed a bug in building from cached intermediate images where the fv3gfs-fortran image would not use the cached ESMF and FMS images
