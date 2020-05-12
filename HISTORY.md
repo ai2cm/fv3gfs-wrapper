@@ -4,6 +4,10 @@ History
 latest
 ------
 
+
+v0.4.2 (2020-05-12)
+-------------------
+
 Breaking changes:
 - Signature of `TilePartitioner.subtile_slice` has changed to avoid needing to construct a metadata object in order to use two of its attributes. Instead, those attributes (tile_dims and tile_extent) are directly passed.
 - `finish_halo_update` and `finish_vector_halo_update` are now disabled and will raise `NotImplementedError`.
