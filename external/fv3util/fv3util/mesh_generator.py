@@ -58,7 +58,7 @@ class MeshGenerator:
         assert name[0] == "c", "Only cubed-sphere grids supported"
         grid_type = 0
         ntiles = 6
-        npx = npy = int(name[1:])
+        npx = npy = int(name[1:]) + 1
         ng = N_HALO_DEFAULT
         return cls(grid_type, [npx, npy], ntiles, ng)
 
