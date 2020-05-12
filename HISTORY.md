@@ -8,6 +8,7 @@ Breaking changes:
 - Signature of `TilePartitioner.subtile_slice` has changed to avoid needing to construct a metadata object in order to use two of its attributes. Instead, those attributes (tile_dims and tile_extent) are directly passed.
 
 Major changes:
+- Add functionality to get `surface_precipitation_rate` in `get_state`. Equal to `total_precipitation` divided by the physics timestep.
 - Add QuantityFactory class which creates Quantity objects from dimensionality, units, and dtype
 - Add SubtileGridSizer class which determines the origin, extent, and shape of data to be allocated for a given dimension name. This class is used by QuantityFactory to determine the shape of storages to allocate.
 

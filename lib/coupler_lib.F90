@@ -227,6 +227,11 @@ contains
         call get_date(Time_atmos, year, month, day, hour, minute, second)
     end subroutine get_time
 
+    subroutine get_physics_timestep_subroutine(physics_timestep) bind(c)
+        integer, intent(out) :: physics_timestep
+        physics_timestep = dt_atmos
+    end subroutine get_physics_timestep_subroutine
+
 
 !#######################################################################
 
