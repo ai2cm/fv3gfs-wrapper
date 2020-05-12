@@ -31,6 +31,7 @@ relative_fv3gfs_build_filenames = [
     "cpl/libfv3cpl.a",
     "ipd/libipd.a",
     "atmos_cubed_sphere/libfv3core.a",
+    "coarse_graining/libfv3coarse_graining.a",
     "io/libfv3io.a",
     "gfsphysics/libgfsphys.a",
     "../stochastic_physics/libstochastic_physics.a",

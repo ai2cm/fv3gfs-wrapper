@@ -6,14 +6,30 @@ latest
 
 Breaking changes:
 - Signature of `TilePartitioner.subtile_slice` has changed to avoid needing to construct a metadata object in order to use two of its attributes. Instead, those attributes (tile_dims and tile_extent) are directly passed.
+- `finish_halo_update` and `finish_vector_halo_update` are now disabled and will raise `NotImplementedError`.
 
 Major changes:
 - Add functionality to get `surface_precipitation_rate` in `get_state`. Equal to `total_precipitation` divided by the physics timestep.
 - Add QuantityFactory class which creates Quantity objects from dimensionality, units, and dtype
 - Add SubtileGridSizer class which determines the origin, extent, and shape of data to be allocated for a given dimension name. This class is used by QuantityFactory to determine the shape of storages to allocate.
+- added `make test_mpi` directive to fv3util which runs mpi tests using mpirun, added this to test_docker
+- buffers will be created for any data which is not c-contiguous, to avoid transposing data during MPI transport
+- `start_halo_update` now returns a "request" object which must be completed with `.wait()`
+- `halo_update` is added which performs a blocking halo update
+- `start_vector_halo_update` now returns a "request" object which must be completed with `.wait()`
+- `vector_halo_update` is added which performs a blocking vector halo update
+- Updated fv3gfs-fortran submodule to c0d11c6a. Important changes are:
+  - Sfcprop%tprcp is set to zero on init when dycore=True
+  - Add option (`restart_from_agrid_winds` in `fv_core_nml`) to restart model from lat/lon A-grid horizontal winds
+  - Fix issue where physics diagnostics were accumulating when output interval equaled physics timestep
+  - Add functionality (`write_coarse_restart_files` in `fv_core_nml`) to do online coarse-graining of restart files on model levels
 
 Minor changes:
 - Fixed a bug in building from cached intermediate images where the fv3gfs-fortran image would not use the cached ESMF and FMS images
+- removed tags from halo update routines, as they are not yet necessary for use cases we've created and were not being properly treated
+- tests are refactored to use new halo update interfaces
+- added some mpi communicator tests which use more realistically large amounts of data
+- Corrected units for total_precipitation variable
 
 
 v0.4.1 (2020-04-27)
