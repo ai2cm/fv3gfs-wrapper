@@ -18,6 +18,7 @@ Major changes:
 
 Minor changes:
 - Fixed a bug in building from cached intermediate images where the fv3gfs-fortran image would not use the cached ESMF and FMS images
+- Corrected units for total_precipitation variable
 
 
 v0.4.1 (2020-04-27)
