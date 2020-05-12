@@ -110,16 +110,18 @@ class MeshGenerator:
         #       this will result in the corner close to the east coast of China
         for n in range(0, ntiles):
             for j in range(0, npy):
-                for i in range(0, npx):
-                    if shift_fac > 1.0e-4:
-                        grid_global[ng + i, ng + j, 0, n] -= np.pi / shift_fac
-                    if grid_global[ng + i, ng + j, 0, n] < 0.0:
-                        grid_global[ng + i, ng + j, 0, n] += 2.0 * np.pi
-                    if np.abs(grid_global[ng + i, ng + j, 0, n]) < 1.0e-10:
-                        grid_global[ng + i, ng + j, 0, n] = 0.0
-                    if np.abs(grid_global[ng + i, ng + j, 1, n]) < 1.0e-10:
-                        grid_global[ng + i, ng + j, 1, n] = 0.0
-        
+                if shift_fac > 1.0e-4:
+                    grid_global[ng:ng + npx, ng + j, 0, n] -= np.pi / shift_fac
+                np.where(grid_global[ng:ng + npx, ng + j, 0, n] < 0.0,
+                    grid_global[ng:ng + npx, ng + j, 0, n] + 2.0 * np.pi,
+                    grid_global[ng:ng + npx, ng + j, 0, n])
+                np.where(np.abs(grid_global[ng:ng + npx, ng + j, 0, n]) < 1.0e-10,
+                    0.0,
+                    np.abs(grid_global[ng:ng + npx, ng + j, 0, n]))
+                np.where(np.abs(grid_global[ng:ng + npx, ng + j, 1, n]) < 1.0e-10,
+                    0.0,
+                    np.abs(grid_global[ng:ng + npx, ng + j, 1, n]))
+
         grid_global[ng, ng:npy+ng, :, 1] = grid_global[npx-1+ng, ng:npy+ng, :, 0]
         grid_global[ng, ng:npy+ng, :, 2] = grid_global[npx+ng-1:ng-1:-1, npy-1+ng, : ,0]
         grid_global[ng:npx+ng, npy-1+ng, :, 4] = grid_global[ng, npy+ng-1:ng-1:-1, :, 0]
@@ -172,59 +174,58 @@ class MeshGenerator:
 
         for nreg in range(1, ntiles):
             for j in range(0, npy):
-                for i in range(0, npx):
-                    x1 = grid_global[ng + i, ng + j, 0, 0]
-                    y1 = grid_global[ng + i, ng + j, 1, 0]
-                    z1 = self.RADIUS
+                x1 = grid_global[ng:ng + npx, ng + j, 0, 0]
+                y1 = grid_global[ng:ng + npx, ng + j, 1, 0]
+                z1 = self.RADIUS + 0.0 * x1
 
-                    if nreg == 1:
-                        ang = -90.0
-                        x2, y2, z2 = self.__rot_3d(3, [x1, y1, z1], ang, degrees=True, convert=True)
-                    elif nreg == 2:
-                        ang = -90.0
-                        x2, y2, z2 = self.__rot_3d(3, [x1, y1, z1], ang, degrees=True, convert=True)
-                        ang = 90.0
-                        x2, y2, z2 = self.__rot_3d(1, [x2, y2, z2], ang, degrees=True, convert=True)
-                        # force North Pole and dateline/Greenwich-Meridian consistency
-                        if npx % 2 != 0:
-                            if i == (npx - 1) // 2 and i == j:
-                                x2 = 0.0
-                                y2 = np.pi / 2.0
-                            if j == (npy - 1) // 2 and i < (npx - 1) // 2:
-                                x2 = 0.0
-                            if j == (npy - 1) // 2 and i > (npx - 1) // 2:
-                                x2 = np.pi
-                    elif nreg == 3:
-                        ang = -180.0
-                        x2, y2, z2 = self.__rot_3d(3, [x1, y1, z1], ang, degrees=True, convert=True)
-                        ang = 90.0
-                        x2, y2, z2 = self.__rot_3d(1, [x2, y2, z2], ang, degrees=True, convert=True)
-                        # force dateline/Greenwich-Meridian consistency
-                        if npx % 2 != 0:
-                            if j == (npy - 1) // 2:
-                                x2 = np.pi
-                    elif nreg == 4:
-                        ang = 90.0
-                        x2, y2, z2 = self.__rot_3d(3, [x1, y1, z1], ang, degrees=True, convert=True)
-                        ang = 90.0
-                        x2, y2, z2 = self.__rot_3d(2, [x2, y2, z2], ang, degrees=True, convert=True)
-                    elif nreg == 5:
-                        ang = 90.0
-                        x2, y2, z2 = self.__rot_3d(2, [x1, y1, z1], ang, degrees=True, convert=True)
-                        ang = 0.0
-                        x2, y2, z2 = self.__rot_3d(3, [x2, y2, z2], ang, degrees=True, convert=True)
-                        # force South Pole and dateline/Greenwich-Meridian consistency
-                        if npx % 2 != 0:
-                            if i == (npx - 1) // 2 and i == j:
-                                x2 = 0.0
-                                y2 = -np.pi / 2.0
-                            if i == (npx - 1) // 2 and j > (npy - 1) // 2:
-                                x2 = 0.0
-                            if i == (npx - 1) // 2 and j < (npy - 1) // 2:
-                                x2 = np.pi
-                    
-                    grid_global[ng + i, ng + j, 0, nreg] = x2
-                    grid_global[ng + i, ng + j, 1, nreg] = y2
+                if nreg == 1:
+                    ang = -90.0
+                    x2, y2, z2 = self.__rot_3d(3, [x1, y1, z1], ang, degrees=True, convert=True)
+                elif nreg == 2:
+                    ang = -90.0
+                    x2, y2, z2 = self.__rot_3d(3, [x1, y1, z1], ang, degrees=True, convert=True)
+                    ang = 90.0
+                    x2, y2, z2 = self.__rot_3d(1, [x2, y2, z2], ang, degrees=True, convert=True)
+                    # force North Pole and dateline/Greenwich-Meridian consistency
+                    if npx % 2 != 0:
+                        if i == (npx - 1) // 2 and i == j:
+                            x2[:] = 0.0
+                            y2[:] = np.pi / 2.0
+                        if j == (npy - 1) // 2 and i < (npx - 1) // 2:
+                            x2[:] = 0.0
+                        if j == (npy - 1) // 2 and i > (npx - 1) // 2:
+                            x2[:] = np.pi
+                elif nreg == 3:
+                    ang = -180.0
+                    x2, y2, z2 = self.__rot_3d(3, [x1, y1, z1], ang, degrees=True, convert=True)
+                    ang = 90.0
+                    x2, y2, z2 = self.__rot_3d(1, [x2, y2, z2], ang, degrees=True, convert=True)
+                    # force dateline/Greenwich-Meridian consistency
+                    if npx % 2 != 0:
+                        if j == (npy - 1) // 2:
+                            x2[:] = np.pi
+                elif nreg == 4:
+                    ang = 90.0
+                    x2, y2, z2 = self.__rot_3d(3, [x1, y1, z1], ang, degrees=True, convert=True)
+                    ang = 90.0
+                    x2, y2, z2 = self.__rot_3d(2, [x2, y2, z2], ang, degrees=True, convert=True)
+                elif nreg == 5:
+                    ang = 90.0
+                    x2, y2, z2 = self.__rot_3d(2, [x1, y1, z1], ang, degrees=True, convert=True)
+                    ang = 0.0
+                    x2, y2, z2 = self.__rot_3d(3, [x2, y2, z2], ang, degrees=True, convert=True)
+                    # force South Pole and dateline/Greenwich-Meridian consistency
+                    if npx % 2 != 0:
+                        if i == (npx - 1) // 2 and i == j:
+                            x2[:] = 0.0
+                            y2[:] = -np.pi / 2.0
+                        if i == (npx - 1) // 2 and j > (npy - 1) // 2:
+                            x2[:] = 0.0
+                        if i == (npx - 1) // 2 and j < (npy - 1) // 2:
+                            x2[:] = np.pi
+                
+                grid_global[ng:ng + npx, ng + j, 0, nreg] = x2
+                grid_global[ng:ng + npx, ng + j, 1, nreg] = y2
     
         return grid_global
 
@@ -276,10 +277,7 @@ class MeshGenerator:
     def __cartesian_to_spherical(self, p):
         x, y, z = p
         r = np.sqrt(x*x + y*y + z*z)
-        if np.abs(x) + np.abs(y) < 1.0e-10:
-            lon = 0.0
-        else:
-            lon = np.arctan2(y,x)
+        lon = np.where(np.abs(x) + np.abs(y) < 1.0e-10, 0.0, np.arctan2(y, x))
         if self.RIGHT_HAND:
             lat = np.arcsin(z/r)
         else:
@@ -341,16 +339,13 @@ class MeshGenerator:
             pp[1, i, j] = -pp[1, i, j] * rsq3 / pp[0, i, j]
             pp[2, i, j] = -pp[2, i, j] * rsq3 / pp[0, i, j]
         
-        for j in range(0, im+1):
-            for i in range(0, im+1):
-                pp[0, i, j] = -rsq3
+        pp[0, 0:im+1, 0:im+1] = -rsq3
 
         for j in range(1, im+1):
-            for i in range(1, im+1):
-                # copy y-z face of the cube along j=0
-                pp[1, i, j] = pp[1, i, 0]
-                # copy along i=0
-                pp[2, i, j] = pp[2, 0, j]
+            # copy y-z face of the cube along j=0
+            pp[1, 1:im+1, j] = pp[1, 1:im+1, 0]
+            # copy along i=0
+            pp[2, 1:im+1, j] = pp[2, 0, j]
 
         pp, lon, lat = self.__cart_to_latlon( im+1, pp, lon, lat)
 
@@ -365,30 +360,26 @@ class MeshGenerator:
     def __symm_ed(self, im, lon, lat):
 
         for j in range(1, im+1):
-            for i in range(1, im):
-                lon[i, j] = lon[i, 0]
+            lon[1:im, j] = lon[1:im, 0]
 
         # make grid symmetrical to i = im/2
         for j in range(0, im+1):
-            for i in range(0, im//2):
-                ip = im - i
-                avg = 0.5 * (lon[i, j] - lon[ip, j])
-                lon[i, j] = avg + np.pi
-                lon[ip, j] = np.pi - avg
-                avg = 0.5 * (lat[i, j] + lat[ip, j])
-                lat[i, j] = avg
-                lat[ip, j] = avg
+            avg = 0.5 * (lon[0:im//2, j] - lon[im:im-im//2:-1, j])
+            lon[0:im//2, j] = avg + np.pi
+            lon[im:im-im//2:-1, j] = np.pi - avg
+            avg = 0.5 * (lat[0:im//2, j] + lat[im:im-im//2:-1, j])
+            lat[0:im//2, j] = avg
+            lat[im:im-im//2:-1, j] = avg
        
         # make grid symmetrical to j = im/2
         for j in range(0, im // 2):
             jp = im - j
-            for i in range(1, im):
-                avg = 0.5 * (lon[i, j] + lon[i, jp])
-                lon[i, j] = avg
-                lon[i, jp] = avg
-                avg = 0.5 * (lat[i, j] - lat[i, jp])
-                lat[i, j] = avg
-                lat[i, jp] = -avg
+            avg = 0.5 * (lon[0:im, j] + lon[0:im, jp])
+            lon[0:im, j] = avg
+            lon[0:im, jp] = avg
+            avg = 0.5 * (lat[0:im, j] - lat[0:im, jp])
+            lat[0:im, j] = avg
+            lat[0:im, jp] = -avg
 
         return lon, lat
 
@@ -427,8 +418,8 @@ class MeshGenerator:
 
         esl = 1.0e-10
 
-        for i in range(im):
-            for j in range(im):
+        for j in range(im):
+            for i in range(im):
                 p = q[:, i, j]
                 dist = np.sqrt(p[0]**2 + p[1]**2 + p[2]**2)
                 p = p / dist
