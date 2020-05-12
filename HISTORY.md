@@ -17,12 +17,18 @@ Major changes:
 - `halo_update` is added which performs a blocking halo update
 - `start_vector_halo_update` now returns a "request" object which must be completed with `.wait()`
 - `vector_halo_update` is added which performs a blocking vector halo update
+- Updated fv3gfs-fortran submodule to c0d11c6a. Important changes are:
+  - Sfcprop%tprcp is set to zero on init when dycore=True
+  - Add option (`restart_from_agrid_winds` in `fv_core_nml`) to restart model from lat/lon A-grid horizontal winds
+  - Fix issue where physics diagnostics were accumulating when output interval equaled physics timestep
+  - Add functionality (`write_coarse_restart_files` in `fv_core_nml`) to do online coarse-graining of restart files on model levels
 
 Minor changes:
 - Fixed a bug in building from cached intermediate images where the fv3gfs-fortran image would not use the cached ESMF and FMS images
 - removed tags from halo update routines, as they are not yet necessary for use cases we've created and were not being properly treated
 - tests are refactored to use new halo update interfaces
 - added some mpi communicator tests which use more realistically large amounts of data
+- Corrected units for total_precipitation variable
 
 
 v0.4.1 (2020-04-27)
