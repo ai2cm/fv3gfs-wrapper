@@ -43,5 +43,6 @@ from ._xarray import to_dataset
 from ._capture_stream import capture_stream
 from . import testing
 from .initialization import SubtileGridSizer, QuantityFactory
+from .mesh_generator import MeshGenerator
 
 __version__ = "0.4.1"
