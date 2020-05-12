@@ -9,6 +9,7 @@ Breaking changes:
 - `finish_halo_update` and `finish_vector_halo_update` are now disabled and will raise `NotImplementedError`.
 
 Major changes:
+- Add functionality to get `surface_precipitation_rate` in `get_state`. Equal to `total_precipitation` divided by the physics timestep.
 - Add QuantityFactory class which creates Quantity objects from dimensionality, units, and dtype
 - Add SubtileGridSizer class which determines the origin, extent, and shape of data to be allocated for a given dimension name. This class is used by QuantityFactory to determine the shape of storages to allocate.
 - added `make test_mpi` directive to fv3util which runs mpi tests using mpirun, added this to test_docker
