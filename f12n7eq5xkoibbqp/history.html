@@ -179,6 +179,7 @@
 - Signature of <cite>TilePartitioner.subtile_slice</cite> has changed to avoid needing to construct a metadata object in order to use two of its attributes. Instead, those attributes (tile_dims and tile_extent) are directly passed.
 - <cite>finish_halo_update</cite> and <cite>finish_vector_halo_update</cite> are now disabled and will raise <cite>NotImplementedError</cite>.</p>
 <p>Major changes:
+- Add functionality to get <cite>surface_precipitation_rate</cite> in <cite>get_state</cite>. Equal to <cite>total_precipitation</cite> divided by the physics timestep.
 - Add QuantityFactory class which creates Quantity objects from dimensionality, units, and dtype
 - Add SubtileGridSizer class which determines the origin, extent, and shape of data to be allocated for a given dimension name. This class is used by QuantityFactory to determine the shape of storages to allocate.
 - added <cite>make test_mpi</cite> directive to fv3util which runs mpi tests using mpirun, added this to test_docker
