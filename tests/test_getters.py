@@ -84,6 +84,14 @@ class GetterTests(unittest.TestCase):
     def test_get_surface_precipitation_rate(self):
         """Special test since this quantity is not in physics_properties.json file"""
         self._get_names_helper(["surface_precipitation_rate"])
+        state = fv3gfs.get_state(
+            names=["total_precipitation", "surface_precipitation_rate"]
+        )
+        total_precip = state["total_precipitation"]
+        precip_rate = state["surface_precipitation_rate"]
+        dt = config["namelist"]["coupler_nml"]["dt_atmos"]
+        np.testing.assert_allclose(total_precip.view[:] / dt, precip_rate.view[:])
+        self.assertEqual(precip_rate.units, "m/s")
 
     def test_get_hybrid_a_coordinate(self):
         self._get_names_helper(["atmosphere_hybrid_a_coordinate"])
