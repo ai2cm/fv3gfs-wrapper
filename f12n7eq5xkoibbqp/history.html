@@ -186,12 +186,22 @@
 - <cite>start_halo_update</cite> now returns a “request” object which must be completed with <cite>.wait()</cite>
 - <cite>halo_update</cite> is added which performs a blocking halo update
 - <cite>start_vector_halo_update</cite> now returns a “request” object which must be completed with <cite>.wait()</cite>
-- <cite>vector_halo_update</cite> is added which performs a blocking vector halo update</p>
+- <cite>vector_halo_update</cite> is added which performs a blocking vector halo update
+- Updated fv3gfs-fortran submodule to c0d11c6a. Important changes are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Sfcprop%tprcp is set to zero on init when dycore=True</p></li>
+<li><p>Add option (<cite>restart_from_agrid_winds</cite> in <cite>fv_core_nml</cite>) to restart model from lat/lon A-grid horizontal winds</p></li>
+<li><p>Fix issue where physics diagnostics were accumulating when output interval equaled physics timestep</p></li>
+<li><p>Add functionality (<cite>write_coarse_restart_files</cite> in <cite>fv_core_nml</cite>) to do online coarse-graining of restart files on model levels</p></li>
+</ul>
+</div></blockquote>
 <p>Minor changes:
 - Fixed a bug in building from cached intermediate images where the fv3gfs-fortran image would not use the cached ESMF and FMS images
 - removed tags from halo update routines, as they are not yet necessary for use cases we’ve created and were not being properly treated
 - tests are refactored to use new halo update interfaces
-- added some mpi communicator tests which use more realistically large amounts of data</p>
+- added some mpi communicator tests which use more realistically large amounts of data
+- Corrected units for total_precipitation variable</p>
 </div>
 <div class="section" id="v0-4-1-2020-04-27">
 <h2>v0.4.1 (2020-04-27)<a class="headerlink" href="#v0-4-1-2020-04-27" title="Permalink to this headline">¶</a></h2>
