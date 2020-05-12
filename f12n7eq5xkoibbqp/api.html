@@ -568,33 +568,72 @@ x_range: the x range of the array on the tile</p>
 
 <dl class="method">
 <dt id="fv3gfs.CubedSphereCommunicator.finish_halo_update">
-<code class="sig-name descname">finish_halo_update</code><span class="sig-paren">(</span><em class="sig-param">quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">n_points: int</em>, <em class="sig-param">tag: Hashable = 0</em><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.CubedSphereCommunicator.finish_halo_update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Complete an asynchronous halo update of a quantity.</p>
+<code class="sig-name descname">finish_halo_update</code><span class="sig-paren">(</span><em class="sig-param">quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">n_points: int</em><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.CubedSphereCommunicator.finish_halo_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated, do not use.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fv3gfs.CubedSphereCommunicator.finish_vector_halo_update">
-<code class="sig-name descname">finish_vector_halo_update</code><span class="sig-paren">(</span><em class="sig-param">x_quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">y_quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">n_points: int</em>, <em class="sig-param">tag: Hashable = 0</em><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.CubedSphereCommunicator.finish_vector_halo_update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Complete an asynchronous halo update of a horizontal vector quantity.</p>
+<code class="sig-name descname">finish_vector_halo_update</code><span class="sig-paren">(</span><em class="sig-param">x_quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">y_quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">n_points: int</em><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.CubedSphereCommunicator.finish_vector_halo_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated, do not use.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.CubedSphereCommunicator.halo_update">
+<code class="sig-name descname">halo_update</code><span class="sig-paren">(</span><em class="sig-param">quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">n_points: int</em><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.CubedSphereCommunicator.halo_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a halo update on a quantity.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>quantity: the quantity to be updated
+n_points: how many halo points to update, starting from the interior</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fv3gfs.CubedSphereCommunicator.start_halo_update">
-<code class="sig-name descname">start_halo_update</code><span class="sig-paren">(</span><em class="sig-param">quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">n_points: int</em>, <em class="sig-param">tag: Hashable = 0</em><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.CubedSphereCommunicator.start_halo_update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initiate an asynchronous halo update of a quantity.</p>
+<code class="sig-name descname">start_halo_update</code><span class="sig-paren">(</span><em class="sig-param">quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">n_points: int</em><span class="sig-paren">)</span> &#x2192; fv3util.communicator.HaloUpdateRequest<a class="headerlink" href="#fv3gfs.CubedSphereCommunicator.start_halo_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start an asynchronous halo update on a quantity.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>quantity: the quantity to be updated
+n_points: how many halo points to update, starting from the interior</p>
+</dd>
+<dt>Returns:</dt><dd><p>request: an asynchronous request object with a .wait() method</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fv3gfs.CubedSphereCommunicator.start_vector_halo_update">
-<code class="sig-name descname">start_vector_halo_update</code><span class="sig-paren">(</span><em class="sig-param">x_quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">y_quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">n_points: int</em>, <em class="sig-param">tag: Hashable = 0</em><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.CubedSphereCommunicator.start_vector_halo_update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initiate an asynchronous halo update of a horizontal vector quantity.</p>
+<code class="sig-name descname">start_vector_halo_update</code><span class="sig-paren">(</span><em class="sig-param">x_quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">y_quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">n_points: int</em><span class="sig-paren">)</span> &#x2192; fv3util.communicator.HaloUpdateRequest<a class="headerlink" href="#fv3gfs.CubedSphereCommunicator.start_vector_halo_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start an asynchronous halo update of a horizontal vector quantity.</p>
 <p>Assumes the x and y dimension indices are the same between the two quantities.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x_quantity: the x-component quantity to be halo updated
+y_quantity: the y-component quantity to be halo updated
+n_points: how many halo points to update, starting at the interior</p>
+</dd>
+<dt>Returns:</dt><dd><p>request: an asynchronous request object with a .wait() method</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fv3gfs.CubedSphereCommunicator.tile">
 <em class="property">property </em><code class="sig-name descname">tile</code><a class="headerlink" href="#fv3gfs.CubedSphereCommunicator.tile" title="Permalink to this definition">¶</a></dt>
 <dd><p>communicator for within a tile</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.CubedSphereCommunicator.vector_halo_update">
+<code class="sig-name descname">vector_halo_update</code><span class="sig-paren">(</span><em class="sig-param">x_quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">y_quantity: fv3util.quantity.Quantity</em>, <em class="sig-param">n_points: int</em><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.CubedSphereCommunicator.vector_halo_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a halo update of a horizontal vector quantity.</p>
+<p>Assumes the x and y dimension indices are the same between the two quantities.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x_quantity: the x-component quantity to be halo updated
+y_quantity: the y-component quantity to be halo updated
+n_points: how many halo points to update, starting at the interior</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
