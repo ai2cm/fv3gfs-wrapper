@@ -81,6 +81,10 @@ class GetterTests(unittest.TestCase):
         """Included because this caused a segfault at some point, as a diagnostic tracer."""
         self._get_names_helper(["cloud_amount"])
 
+    def test_get_surface_precipitation_rate(self):
+        """Special test since this quantity is not in physics_properties.json file"""
+        self._get_names_helper(["surface_precipitation_rate"])
+
     def test_get_hybrid_a_coordinate(self):
         self._get_names_helper(["atmosphere_hybrid_a_coordinate"])
 
