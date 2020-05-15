@@ -88,10 +88,12 @@ class GetterTests(unittest.TestCase):
         state = fv3gfs.get_state(
             names=["total_precipitation", "surface_precipitation_rate"]
         )
-        total_precip = state["total_precipitation"].view[:]
-        precip_rate = state["surface_precipitation_rate"].view[:]
+        total_precip = state["total_precipitation"]
+        precip_rate = state["surface_precipitation_rate"]
         dt = config["namelist"]["coupler_nml"]["dt_atmos"]
-        np.testing.assert_allclose(MM_PER_M * total_precip / dt, precip_rate)
+        np.testing.assert_allclose(
+            MM_PER_M * total_precip.view[:] / dt, precip_rate.view[:]
+        )
         self.assertEqual(precip_rate.units, "mm/s")
 
     def test_get_hybrid_a_coordinate(self):
