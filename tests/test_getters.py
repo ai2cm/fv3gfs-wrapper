@@ -8,9 +8,9 @@ import fv3gfs
 import fv3util
 from mpi4py import MPI
 from util import redirect_stdout
-from fv3gfs._wrapper import MM_PER_M
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
+MM_PER_M = 1000
 
 
 class GetterTests(unittest.TestCase):
