@@ -3,6 +3,11 @@ History
 
 latest
 ------
+
+
+v0.4.3 (2020-05-15)
+-------------------
+
 Major changes:
 - Change units of `surface_precipitation_rate` output from m/s to mm/s.
 
