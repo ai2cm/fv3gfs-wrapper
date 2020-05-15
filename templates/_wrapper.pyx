@@ -10,6 +10,7 @@ from datetime import datetime
 ctypedef cnp.double_t REAL_t
 real_type = np.float64
 SURFACE_PRECIPITATION_RATE = 'surface_precipitation_rate'
+MM_PER_M = 1000
 
 cdef extern:
     void initialize_subroutine(int *comm)
@@ -296,9 +297,9 @@ def get_state(names):
         get_physics_timestep_subroutine(&dt_physics)
         get_tprcp(&array_2d[0, 0])
         return_dict[SURFACE_PRECIPITATION_RATE] = fv3util.Quantity(
-            np.asarray(array_2d) / dt_physics,
+            MM_PER_M * np.asarray(array_2d) / dt_physics,
             dims=[fv3util.Y_DIM, fv3util.X_DIM],
-            units='m/s'
+            units='mm/s'
         )
 
     for name in names:
