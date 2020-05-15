@@ -8,6 +8,7 @@ import fv3gfs
 import fv3util
 from mpi4py import MPI
 from util import redirect_stdout
+from fv3gfs._wrapper import MM_PER_M
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -87,11 +88,11 @@ class GetterTests(unittest.TestCase):
         state = fv3gfs.get_state(
             names=["total_precipitation", "surface_precipitation_rate"]
         )
-        total_precip = state["total_precipitation"]
-        precip_rate = state["surface_precipitation_rate"]
+        total_precip = state["total_precipitation"].view[:]
+        precip_rate = state["surface_precipitation_rate"].view[:]
         dt = config["namelist"]["coupler_nml"]["dt_atmos"]
-        np.testing.assert_allclose(total_precip.view[:] / dt, precip_rate.view[:])
-        self.assertEqual(precip_rate.units, "m/s")
+        np.testing.assert_allclose(MM_PER_M * total_precip / dt, precip_rate)
+        self.assertEqual(precip_rate.units, "mm/s")
 
     def test_get_hybrid_a_coordinate(self):
         self._get_names_helper(["atmosphere_hybrid_a_coordinate"])
