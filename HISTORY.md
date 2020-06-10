@@ -4,6 +4,8 @@ History
 latest
 ------
 
+- fixed bug in fv3util setup.py which prevented `python setup.py install` from copying submodules
+
 
 v0.4.3 (2020-05-15)
 -------------------
