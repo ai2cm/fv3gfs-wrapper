@@ -118,6 +118,7 @@ def scattered_quantities(tile_quantity, layout, n_rank_halo, numpy):
             n_rank_halo,
             numpy,
         )
+        print(subtile_quantity.metadata, subtile_view.shape, subtile_slice)
         subtile_quantity.view[:] = subtile_view
         return_list.append(subtile_quantity)
     return return_list
