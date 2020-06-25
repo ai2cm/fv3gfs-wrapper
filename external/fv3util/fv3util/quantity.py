@@ -4,6 +4,8 @@ import dataclasses
 import numpy as np
 import xarray as xr
 
+from . import constants
+
 try:
     import cupy
 except ImportError:
@@ -115,6 +117,10 @@ class Quantity:
     Data container for physical quantities.
     """
 
+    STORAGE_N_HALO = 3
+    STORAGE_SHAPE = (55, 55, 64)  # hack for now
+    STORAGE_BACKEND = "numpy"
+
     def __init__(
         self,
         data,
@@ -201,6 +207,31 @@ class Quantity:
                 on `self.view`
         """
         return self.view[tuple(kwargs.get(dim, slice(None, None)) for dim in self.dims)]
+
+    @property
+    def storage(self):
+        if gt4py is None:
+            raise ImportError("gt4py is not installed")
+        else:
+            storage = gt4py.storage.zeros(
+                self.STORAGE_BACKEND,
+                default_origin=(0, 0, 0),
+                shape=self.STORAGE_SHAPE,
+                dtype=self.data.dtype
+            )
+            # right now this assumes underlying data already has the correct storage
+            # shape. If this isn't true, ValueErrors will happen.
+            # ValueErrors may also be caused by setting incorrect dimension names
+            # in a properties dictionary
+            if self.dims == ("x", "z_interface", "y"):
+                storage[:] = self.data.transpose(2, 0, 1)
+            elif len(self.dims) == 2:  # assume 2d horizontal
+                storage[:, :, -1] = self.data
+            elif len(self.dims) == 1:  # assume 1d vertical
+                storage[:] = self.data[None, None, :]
+            else:
+                storage[:] = self.data
+            return storage
 
     @property
     def metadata(self) -> QuantityMetadata:
