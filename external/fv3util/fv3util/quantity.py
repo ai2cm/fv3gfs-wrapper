@@ -217,7 +217,7 @@ class Quantity:
                 self.STORAGE_BACKEND,
                 default_origin=(0, 0, 0),
                 shape=self.STORAGE_SHAPE,
-                dtype=self.data.dtype
+                dtype=self.data.dtype,
             )
             # right now this assumes underlying data already has the correct storage
             # shape. If this isn't true, ValueErrors will happen.
