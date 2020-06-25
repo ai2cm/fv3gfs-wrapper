@@ -73,7 +73,7 @@ class ArrayView:
             raise NotImplementedError("ArrayView not available for 0-dimensional quantities")
         if len(index) > len(self._data.shape):
             raise IndexError(
-                f"too many indices (len(index)) for array with "
+                f"too many indices ({len(index)}) for array with "
                 f"{len(self._data.shape)} axes"
             )
         for entry in index:
