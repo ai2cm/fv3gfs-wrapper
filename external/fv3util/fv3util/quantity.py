@@ -211,25 +211,7 @@ class Quantity:
         if gt4py is None:
             raise ImportError("gt4py is not installed")
         else:
-            storage = gt4py.storage.zeros(
-                self.STORAGE_BACKEND,
-                default_origin=(0, 0, 0),
-                shape=self.STORAGE_SHAPE,
-                dtype=self.data.dtype,
-            )
-            # right now this assumes underlying data already has the correct storage
-            # shape. If this isn't true, ValueErrors will happen.
-            # ValueErrors may also be caused by setting incorrect dimension names
-            # in a properties dictionary
-            if self.dims == ("x", "z_interface", "y"):
-                storage[:] = self.data.transpose(2, 0, 1)
-            elif len(self.dims) == 2:  # assume 2d horizontal
-                storage[:, :, -1] = self.data
-            elif len(self.dims) == 1:  # assume 1d vertical
-                storage[:] = self.data[None, None, :]
-            else:
-                storage[:] = self.data
-            return storage
+            return self.data
 
     @property
     def metadata(self) -> QuantityMetadata:
