@@ -4,6 +4,7 @@ History
 latest
 ------
 
+- added `storage` property to Quantity, implemented as short-term solution with a hard-coded shape
 - fixed bug in fv3util setup.py which prevented `python setup.py install` from copying submodules
 
 
