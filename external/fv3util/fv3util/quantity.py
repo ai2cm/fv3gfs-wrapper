@@ -4,8 +4,6 @@ import dataclasses
 import numpy as np
 import xarray as xr
 
-from . import constants
-
 try:
     import cupy
 except ImportError:
