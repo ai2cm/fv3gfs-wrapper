@@ -4,7 +4,7 @@ History
 latest
 ------
 
-- added `storage` property to Quantity, implemented as short-term solution with a hard-coded shape
+- added `storage` property to Quantity, implemented as short-term shortcut to .data until gt4py GDP-3 is implemented
 - fixed bug in fv3util setup.py which prevented `python setup.py install` from copying submodules
 
 
