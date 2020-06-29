@@ -115,10 +115,6 @@ class Quantity:
     Data container for physical quantities.
     """
 
-    STORAGE_N_HALO = 3
-    STORAGE_SHAPE = (55, 55, 64)  # hack for now
-    STORAGE_BACKEND = "numpy"
-
     def __init__(
         self,
         data,
