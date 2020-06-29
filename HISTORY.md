@@ -6,6 +6,7 @@ latest
 
 - added `storage` property to Quantity, implemented as short-term shortcut to .data until gt4py GDP-3 is implemented
 - fixed bug in fv3util setup.py which prevented `python setup.py install` from copying submodules
+- fixed bug in dockerfile where gs://vcm-fv3config data was downloaded to incorrect location
 
 
 v0.4.3 (2020-05-15)
