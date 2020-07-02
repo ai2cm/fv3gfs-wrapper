@@ -92,6 +92,8 @@ def get_array_from_dims(dim_name_list):
             shape_list.append(ny+1)
         elif dim_name == 'z':
             shape_list.append(nz)
+        elif dim_name == 'z_interface':
+            shape_list.append(nz+1)
         elif dim_name == 'z_soil':
             shape_list.append(nz_soil)
         else:
