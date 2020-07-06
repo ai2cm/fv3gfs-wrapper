@@ -9,6 +9,8 @@ from datetime import datetime
 
 ctypedef cnp.double_t REAL_t
 real_type = np.float64
+SURFACE_PRECIPITATION_RATE = 'surface_precipitation_rate'
+MM_PER_M = 1000
 
 cdef extern:
     void initialize_subroutine(int *comm)
@@ -21,6 +23,7 @@ cdef extern:
     void save_intermediate_restart_subroutine()
     void initialize_time_subroutine(int *year, int *month, int *day, int *hour, int *minute, int *second)
     void get_time_subroutine(int *year, int *month, int *day, int *hour, int *minute, int *second)
+    void get_physics_timestep_subroutine(int *physics_timestep)
     void get_centered_grid_dimensions(int *nx, int *ny, int *nz)
     void get_n_ghost_cells_subroutine(int *n_ghost)
     void get_u(REAL_t *u_out)
@@ -224,7 +227,7 @@ def get_state(names, state=None, allocator=None):
     cdef REAL_t[::1] array_1d
     cdef REAL_t[:, ::1] array_2d
     cdef REAL_t[:, :, ::1] array_3d
-    cdef int nz, i_tracer
+    cdef int nz, i_tracer, dt_physics
     cdef set input_names_set, processed_names_set
     input_names_set = set(names)
     if allocator is None:
@@ -273,6 +276,16 @@ def get_state(names, state=None, allocator=None):
             quantity = _get_quantity(state, tracer_name, allocator, [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM], tracer_data["units"], dtype=real_type)
             with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_3d:
                 get_tracer(&i_tracer, &array_3d[0, 0, 0])
+
+    if SURFACE_PRECIPITATION_RATE in input_names_set:
+        array_2d = get_array_from_dims(['y', 'x'])
+        get_physics_timestep_subroutine(&dt_physics)
+        get_tprcp(&array_2d[0, 0])
+        return_dict[SURFACE_PRECIPITATION_RATE] = fv3util.Quantity(
+            MM_PER_M * np.asarray(array_2d) / dt_physics,
+            dims=[fv3util.Y_DIM, fv3util.X_DIM],
+            units='mm/s'
+        )
 
     for name in names:
         if name not in state:

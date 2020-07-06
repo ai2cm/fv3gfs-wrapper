@@ -10,6 +10,7 @@ from mpi4py import MPI
 from util import redirect_stdout
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
+MM_PER_M = 1000
 
 
 class GetterTests(unittest.TestCase):
@@ -80,6 +81,20 @@ class GetterTests(unittest.TestCase):
     def test_get_cloud_amount(self):
         """Included because this caused a segfault at some point, as a diagnostic tracer."""
         self._get_names_helper(["cloud_amount"])
+
+    def test_get_surface_precipitation_rate(self):
+        """Special test since this quantity is not in physics_properties.json file"""
+        self._get_names_helper(["surface_precipitation_rate"])
+        state = fv3gfs.get_state(
+            names=["total_precipitation", "surface_precipitation_rate"]
+        )
+        total_precip = state["total_precipitation"]
+        precip_rate = state["surface_precipitation_rate"]
+        dt = config["namelist"]["coupler_nml"]["dt_atmos"]
+        np.testing.assert_allclose(
+            MM_PER_M * total_precip.view[:] / dt, precip_rate.view[:]
+        )
+        self.assertEqual(precip_rate.units, "mm/s")
 
     def test_get_hybrid_a_coordinate(self):
         self._get_names_helper(["atmosphere_hybrid_a_coordinate"])

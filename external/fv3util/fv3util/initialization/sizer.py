@@ -1,6 +1,6 @@
 import dataclasses
 from typing import Tuple, Dict
-from ..constants import N_HALO_FORTRAN
+from ..constants import N_HALO_DEFAULT
 from .. import constants
 from ..partitioner import TilePartitioner
 
@@ -9,10 +9,15 @@ from ..partitioner import TilePartitioner
 class GridSizer:
 
     nx: int
+    """length of the x compute dimension"""
     ny: int
+    """length of the y compute dimension"""
     nz: int
+    """length of the z compute dimension"""
     n_halo: int
+    """number of horizontal halo points"""
     extra_dim_lengths: Dict[str, int]
+    """lengths of any non-x/y/z dimensions, such as land or radiation dimensions"""
 
     def get_origin(self, dims: Tuple[str, ...]) -> Tuple[int, ...]:
         raise NotImplementedError()
@@ -31,12 +36,26 @@ class SubtileGridSizer(GridSizer):
         nx_tile: int,
         ny_tile: int,
         nz: int,
-        n_halo,
+        n_halo: int,
         extra_dim_lengths: Dict[str, int],
         layout: Tuple[int, int],
         tile_partitioner: TilePartitioner = None,
         tile_rank: int = 0,
     ):
+        """Create a SubtileGridSizer from parameters about the full tile.
+
+        Args:
+            nx_tile: number of x cell centers on the tile
+            ny_tile: number of y cell centers on the tile
+            nz: number of vertical levels
+            n_halo: number of halo points
+            extra_dim_lengths: lengths of any non-x/y/z dimensions,
+                such as land or radiation dimensions
+            layout: (y, x) number of ranks along tile edges
+            tile_partitioner (optional): partitioner object for the tile. By default, a
+                TilePartitioner is created with the given layout
+            tile_rank (optional): rank of this subtile.
+        """
         if tile_partitioner is None:
             tile_partitioner = TilePartitioner(layout)
         y_slice, x_slice = tile_partitioner.subtile_slice(
@@ -67,14 +86,15 @@ class SubtileGridSizer(GridSizer):
                 is a TilePartitioner, this argument does not matter.
         """
         layout = namelist["fv_core_nml"]["layout"]
+        # npx and npy in the namelist are cell centers, but npz is mid levels
         nx_tile = namelist["fv_core_nml"]["npx"] - 1
         ny_tile = namelist["fv_core_nml"]["npy"] - 1
-        nz = namelist["fv_core_nml"]["npz"]  # this one is already on mid-levels
+        nz = namelist["fv_core_nml"]["npz"]
         return cls._from_tile_params(
             nx_tile,
             ny_tile,
             nz,
-            N_HALO_FORTRAN,
+            N_HALO_DEFAULT,
             {},
             layout,
             tile_partitioner,

@@ -1,7 +1,7 @@
 from typing import Callable, Iterable
 from numpy import ndarray
 import contextlib
-from .utils import is_contiguous
+from .utils import is_c_contiguous
 
 BUFFER_CACHE = {}
 
@@ -46,7 +46,7 @@ def send_buffer(allocator: Callable, array: ndarray):
         buffer_array: if array is non-contiguous, a contiguous buffer array containing
             the data from array. Otherwise, yields array.
     """
-    if array is None or is_contiguous(array):
+    if array is None or is_c_contiguous(array):
         yield array
     else:
         with array_buffer(allocator, array.shape, array.dtype) as sendbuf:
@@ -68,7 +68,7 @@ def recv_buffer(allocator: Callable, array: ndarray):
         buffer_array: if array is non-contiguous, a contiguous buffer array which is
             copied into array when the context is exited. Otherwise, yields array.
     """
-    if array is None or is_contiguous(array):
+    if array is None or is_c_contiguous(array):
         yield array
     else:
         with array_buffer(allocator, array.shape, array.dtype) as recvbuf:
