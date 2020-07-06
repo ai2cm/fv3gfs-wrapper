@@ -21,7 +21,7 @@ def open_restart(
     communicator: CubedSphereCommunicator,
     label: str = "",
     only_names: Iterable[str] = None,
-    to_state: dict = None
+    to_state: dict = None,
 ):
     """Load restart files output by the Fortran model into a state dictionary.
 

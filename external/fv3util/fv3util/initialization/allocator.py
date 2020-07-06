@@ -17,7 +17,6 @@ def _wrap_storage_call(function, backend):
 
 
 class StorageNumpy:
-
     def __init__(self, backend: str):
         """Initialize an object which behaves like the numpy module, but uses
         gt4py storage objects for zeros, ones, and empty.
@@ -31,7 +30,6 @@ class StorageNumpy:
 
 
 class QuantityFactory:
-
     def __init__(self, sizer: SubtileGridSizer, numpy):
         self._sizer = sizer
         self._numpy = numpy

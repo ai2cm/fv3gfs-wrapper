@@ -225,7 +225,7 @@ class Quantity:
     def values(self) -> np.ndarray:
         warnings.warn(
             "values exists only for backwards-compatibility with DataArray and will be removed, use .view[:] instead",
-            warnings.DeprecationWarning
+            warnings.DeprecationWarning,
         )
         return_array = np.asarray(self._view[:])
         return_array.flags.writeable = False

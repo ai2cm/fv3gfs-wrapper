@@ -72,11 +72,15 @@ class TileCommunicator(Communicator):
         super(TileCommunicator, self).__init__(comm)
 
     def _Scatter(self, numpy, sendbuf, recvbuf, **kwargs):
-        with send_buffer(numpy.empty, sendbuf) as send, recv_buffer(numpy.empty, recvbuf) as recv:
+        with send_buffer(numpy.empty, sendbuf) as send, recv_buffer(
+            numpy.empty, recvbuf
+        ) as recv:
             self.comm.Scatter(send, recv, **kwargs)
 
     def _Gather(self, numpy, sendbuf, recvbuf, **kwargs):
-        with send_buffer(numpy.empty, sendbuf) as send, recv_buffer(numpy.empty, recvbuf) as recv:
+        with send_buffer(numpy.empty, sendbuf) as send, recv_buffer(
+            numpy.empty, recvbuf
+        ) as recv:
             self.comm.Gather(send, recv, **kwargs)
 
     def scatter(
