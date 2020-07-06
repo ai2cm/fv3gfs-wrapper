@@ -278,14 +278,11 @@ def get_state(names, state=None, allocator=None):
                 get_tracer(&i_tracer, &array_3d[0, 0, 0])
 
     if SURFACE_PRECIPITATION_RATE in input_names_set:
-        array_2d = get_array_from_dims(['y', 'x'])
+        quantity = _get_quantity(state, SURFACE_PRECIPITATION_RATE, allocator, [fv3util.Y_DIM, fv3util.X_DIM], "mm/s", dtype=real_type)
         get_physics_timestep_subroutine(&dt_physics)
-        get_tprcp(&array_2d[0, 0])
-        return_dict[SURFACE_PRECIPITATION_RATE] = fv3util.Quantity(
-            MM_PER_M * np.asarray(array_2d) / dt_physics,
-            dims=[fv3util.Y_DIM, fv3util.X_DIM],
-            units='mm/s'
-        )
+        with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_2d:
+            get_tprcp(&array_2d[0, 0])
+            array_2d *= MM_PER_M / dt_physics
 
     for name in names:
         if name not in state:

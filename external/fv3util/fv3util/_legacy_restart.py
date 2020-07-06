@@ -51,7 +51,7 @@ def open_restart(
     if to_state is None:
         state = communicator.tile.scatter_state(state)
     else:
-        state = communicator.tile.scatter_state(state, recv_state=to_s)
+        state = communicator.tile.scatter_state(state, recv_state=to_state)
     return state
 
 

@@ -452,7 +452,7 @@ class CubedSphereCommunicator(Communicator):
         # buffer and then copy that buffer into the output array. Instead we will
         # just do a Recv() when wait is called.
         def recv():
-            with recv_buffer(numpy, out_array) as recvbuf:
+            with recv_buffer(numpy.empty, out_array) as recvbuf:
                 self.comm.Recv(recvbuf, **kwargs)
 
         return FunctionRequest(recv)
