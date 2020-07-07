@@ -61,7 +61,7 @@ def recv_buffer(allocator: Callable, array: ndarray):
     result into array if necessary.
 
     Args:
-        numpy: a module behaving like numpy
+        allocator: a function behaving like numpy.empty
         array: a possibly non-contiguous array for which to provide a buffer
 
     Yields:
