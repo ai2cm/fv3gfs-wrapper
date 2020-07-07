@@ -93,7 +93,7 @@ def test_open_c12_restart_empty_to_state_without_crashing(layout):
 
 
 @pytest.mark.parametrize("layout", [(1, 1), (3, 3)])
-def test_open_c12_restart_empty_to_state_without_crashing(layout):
+def test_open_c12_restart_to_allocated_state_without_crashing(layout):
     total_ranks = layout[0] * layout[1]
     ny = 12 / layout[0]
     nx = 12 / layout[1]
