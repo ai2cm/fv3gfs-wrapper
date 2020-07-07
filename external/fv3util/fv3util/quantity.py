@@ -227,7 +227,7 @@ class Quantity:
             "values exists only for backwards-compatibility with DataArray and will be removed, use .view[:] instead",
             DeprecationWarning,
         )
-        return_array = np.asarray(self._view[:])
+        return_array = np.asarray(self.view[:])
         return_array.flags.writeable = False
         return return_array
 
