@@ -57,7 +57,7 @@ cdef get_quantity_factory():
         nx,
         ny,
         nz,
-        n_halo=fv3util.N_HALO_FORTRAN,
+        n_halo=fv3util.N_HALO_DEFAULT,
         extra_dim_lengths={
             fv3util.Z_SOIL_DIM: nz_soil,
         },
@@ -282,7 +282,7 @@ def get_state(names, state=None, allocator=None):
         get_physics_timestep_subroutine(&dt_physics)
         with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_2d:
             get_tprcp(&array_2d[0, 0])
-            array_2d *= MM_PER_M / dt_physics
+        quantity.view[:] *= MM_PER_M / dt_physics
 
     for name in names:
         if name not in state:
