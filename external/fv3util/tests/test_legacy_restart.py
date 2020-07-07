@@ -70,7 +70,7 @@ def test_open_c12_restart_empty_to_state_without_crashing(layout):
         fv3util.open_restart(
             os.path.join(DATA_DIRECTORY, "c12_restart"),
             communicator,
-            to_state=state_list[-1]
+            to_state=state_list[-1],
         )
     for state in state_list:
         assert "time" in state.keys()
@@ -118,9 +118,7 @@ def test_open_c12_restart_empty_to_state_without_crashing(layout):
                 value.view[:] = np.nan
     for state, communicator in zip(state_list, communicator_list):
         fv3util.open_restart(
-            os.path.join(DATA_DIRECTORY, "c12_restart"),
-            communicator,
-            to_state=state
+            os.path.join(DATA_DIRECTORY, "c12_restart"), communicator, to_state=state
         )
 
     for state in state_list:
