@@ -16,7 +16,7 @@ RUN wget http://storage.googleapis.com/vcm-ml-public/2019-10-23-data-for-running
     tar -xf /2019-10-23-data-for-running-fv3gfs.tar.gz --directory / && \
     mv /2019-10-23-data-for-running-fv3gfs /fv3config-cache && \
     mkdir -p /fv3config-cache/gs/vcm-fv3config && \
-    gsutil -m cp -r gs://vcm-fv3config/ /fv3config-cache/gs/vcm-fv3config && \
+    gsutil -m cp -r gs://vcm-fv3config/ /fv3config-cache/gs && \
     rm -rf /fv3config-cache/gs/vcm-fv3config/data/base_forcing/v1.0 \
         /fv3config-cache/gs/vcm-fv3config/data/orographic_data/v1.0/C384 \
         /fv3config-cache/gs/vcm-fv3config/data/orographic_data/v1.0/C96 \

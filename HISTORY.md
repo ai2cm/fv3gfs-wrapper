@@ -9,10 +9,12 @@ Breaking changes:
 
 Major changes:
 - To achieve this, `get_state` and `open_restart` have been modified so they can optionally accept a target state dictionary in which to insert variables. `get_state` also can take in an allocator, which manages initialization concerns like halo allocation or the use of storages instead of numpy arrays.
+- added `storage` property to Quantity, implemented as short-term shortcut to .data until gt4py GDP-3 is implemented
 
 Minor changes:
 - Internally, get_state uses the new QuantityFactory class to initialize quantities
 - fixed bug in fv3util setup.py which prevented `python setup.py install` from copying submodules
+- fixed bug in dockerfile where gs://vcm-fv3config data was downloaded to incorrect location
 
 Deprecations:
 - `Quantity.values` is deprecated

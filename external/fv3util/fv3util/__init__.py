@@ -22,6 +22,7 @@ from .constants import (
     Z_SOIL_DIM,
     X_DIMS,
     Y_DIMS,
+    Z_DIMS,
     HORIZONTAL_DIMS,
     INTERFACE_DIMS,
     WEST,
