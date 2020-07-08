@@ -203,7 +203,7 @@ def _get_quantity(state, name, allocator, dims, units, dtype):
     return state[name]
 
 
-def get_state(names, state=None, allocator=None):
+def get_state(names, dict state=None, allocator=None):
     """
     Returns a dictionary whose keys are quantity long names (with underscores instead of spaces)
     and values are DataArrays containing that quantity's data.
