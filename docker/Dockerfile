@@ -13,7 +13,7 @@ RUN apt-get update && \
     apt-get install -y python3 python3-pip wget && \
     pip3 install --no-cache-dir gsutil
 RUN mkdir -p /fv3config-cache/gs/vcm-fv3config && \
-    gsutil -m cp -r gs://vcm-fv3config/ /fv3config-cache/gs/vcm-fv3config && \
+    gsutil -m cp -r gs://vcm-fv3config/ /fv3config-cache/gs && \
     rm -rf /fv3config-cache/gs/vcm-fv3config/data/base_forcing/v1.0 \
         /fv3config-cache/gs/vcm-fv3config/data/orographic_data/v1.0/C384 \
         /fv3config-cache/gs/vcm-fv3config/data/orographic_data/v1.0/C96 \
