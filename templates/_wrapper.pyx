@@ -206,7 +206,7 @@ def _get_quantity(state, name, allocator, dims, units, dtype):
 def get_state(names, state=None, allocator=None):
     """
     Returns a dictionary whose keys are quantity long names (with underscores instead of spaces)
-    and values are DataArrays containing that quantity's data.
+    and values are Quantities containing that quantity's data.
 
     Does not copy halo values, regardless of whether the halo is allocated.
 
