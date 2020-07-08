@@ -2,7 +2,7 @@ data_table: default
 diag_table: default
 experiment_name: default_experiment
 forcing: gs://vcm-fv3config/data/base_forcing/v1.1
-initial_conditions: gfs_example
+initial_conditions: gs://vcm-fv3config/data/initial_conditions/gfs_c12_example/v1.0
 namelist:
   amip_interp_nml:
     data_set: reynolds_oi
@@ -135,8 +135,8 @@ namelist:
     nggps_ic: true
     no_dycore: false
     nord: 2
-    npx: 49
-    npy: 49
+    npx: 13
+    npy: 13
     npz: 63
     ntiles: 6
     nudge: false

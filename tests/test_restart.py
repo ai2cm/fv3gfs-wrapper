@@ -81,7 +81,7 @@ class TracerMetadataTests(unittest.TestCase):
 if __name__ == "__main__":
     with open(os.path.join(test_dir, "default_config.yml"), "r") as f:
         config = yaml.safe_load(f)
-    config["initial_conditions"] = "restart_example"
+    config["initial_conditions"] = "gs://vcm-fv3config/data/initial_conditions/c12_restart_initial_conditions/v1.0"
     config["namelist"]["fv_core_nml"]["external_ic"] = False
     config["namelist"]["fv_core_nml"]["nggps_ic"] = False
     config["namelist"]["fv_core_nml"]["make_nh"] = False
