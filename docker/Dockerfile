@@ -12,10 +12,7 @@ FROM ubuntu:19.10 as fv3config-inputdata
 RUN apt-get update && \
     apt-get install -y python3 python3-pip wget && \
     pip3 install --no-cache-dir gsutil
-RUN wget http://storage.googleapis.com/vcm-ml-public/2019-10-23-data-for-running-fv3gfs.tar.gz && \
-    tar -xf /2019-10-23-data-for-running-fv3gfs.tar.gz --directory / && \
-    mv /2019-10-23-data-for-running-fv3gfs /fv3config-cache && \
-    mkdir -p /fv3config-cache/gs/vcm-fv3config && \
+RUN mkdir -p /fv3config-cache/gs/vcm-fv3config && \
     gsutil -m cp -r gs://vcm-fv3config/ /fv3config-cache/gs/vcm-fv3config && \
     rm -rf /fv3config-cache/gs/vcm-fv3config/data/base_forcing/v1.0 \
         /fv3config-cache/gs/vcm-fv3config/data/orographic_data/v1.0/C384 \
@@ -153,7 +150,7 @@ RUN pip3 install --no-cache-dir \
     scipy==1.3.1 \
     sphinx==2.2.0 \
     sphinx_rtd_theme \
-    backoff==1.10 &&\
+    backoff==1.10 && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
     wget \
