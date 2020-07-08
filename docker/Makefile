@@ -1,15 +1,22 @@
-GCR_URL ?= us.gcr.io/vcm-ml
+GCR_URL ?=
 TARGET ?= fv3gfs-python
 TAG_NAME ?= latest
-DOCKERFILE ?= Dockerfile
 FORTRAN_ROOT ?= ../lib/external
-FORTRAN_DOCKERFILE ?= $(FORTRAN_ROOT)/docker/Dockerfile
 BUILD_FROM_INTERMEDIATE ?= n
 
-FV3GFS_PYTHON_IMAGE = $(GCR_URL)/$(TARGET):$(TAG_NAME)
-FMS_IMAGE ?= $(GCR_URL)/fms-build
-ESMF_IMAGE ?= $(GCR_URL)/esmf-build
-DAWN_IMAGE ?= $(GCR_URL)/dawn-build
+BUILD_HPC ?= n
+ifeq ($(BUILD_HPC),y)
+	DOCKERFILE ?= Dockerfile.hpc
+	FORTRAN_DOCKERFILE ?= $(FORTRAN_ROOT)/docker/Dockerfile.gnu8_mpich314_cuda101
+else
+	DOCKERFILE ?= Dockerfile
+	FORTRAN_DOCKERFILE ?= $(FORTRAN_ROOT)/docker/Dockerfile
+endif
+
+FV3GFS_PYTHON_IMAGE = $(GCR_URL)$(TARGET):$(TAG_NAME)
+FMS_IMAGE ?= $(GCR_URL)fms-build
+ESMF_IMAGE ?= $(GCR_URL)esmf-build
+DAWN_IMAGE ?= $(GCR_URL)dawn-build
 
 FORTRAN_IMAGE = fv3gfs-fortran-build
 
@@ -25,7 +32,8 @@ RUNDIR_HOST=$(shell pwd)/rundir
 FV3GFS_PYTHON_BUILD_ARGS = --build-arg FMS_IMAGE=$(FMS_IMAGE) --build-arg ESMF_IMAGE=$(ESMF_IMAGE) --build-arg DAWN_IMAGE=$(DAWN_IMAGE) --build-arg FORTRAN_ENV_IMAGE=$(FORTRAN_IMAGE)
 DAWN_BUILD_ARGS = --build-arg FMS_IMAGE=$(FMS_IMAGE) --build-arg ESMF_IMAGE=$(ESMF_IMAGE) --build-arg FORTRAN_ENV_IMAGE=$(FORTRAN_IMAGE)
 
-all: build_deps build
+#all: build_deps build
+all: build_deps 
 
 build:
 	COMPILED_IMAGE=$(FORTRAN_IMAGE) COMPILE_TARGET=fv3gfs-build $(MAKE) -C ../lib/external build
@@ -35,9 +43,9 @@ build_deps:
 ifeq ($(BUILD_FROM_INTERMEDIATE),y)
 		$(MAKE) pull_deps
 else
-		docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-fms -t $(FMS_IMAGE) $(FORTRAN_ROOT)
-		docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-esmf -t $(ESMF_IMAGE) $(FORTRAN_ROOT)
-		docker build -f $(DOCKERFILE) --target fv3gfs-dawn -t $(DAWN_IMAGE) $(DAWN_BUILD_ARGS) .
+		DOCKER_BUILDKIT=1 docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-fms -t $(FMS_IMAGE) $(FORTRAN_ROOT)
+		DOCKER_BUILDKIT=1 docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-esmf -t $(ESMF_IMAGE) $(FORTRAN_ROOT)
+		DOCKER_BUILDKIT=1 docker build -f $(DOCKERFILE) --target fv3gfs-dawn -t $(DAWN_IMAGE) $(DAWN_BUILD_ARGS) .
 endif
 
 build_dawn:

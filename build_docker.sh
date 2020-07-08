@@ -2,4 +2,4 @@
 
 set -e
 
-BUILD_FROM_INTERMEDIATE=y make -C docker
+BUILD_FROM_INTERMEDIATE=n BUILD_HPC=y make -C docker
