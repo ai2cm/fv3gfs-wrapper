@@ -3,7 +3,7 @@ import fv3config
 import uuid
 
 
-OUTDIR = "gs://vcm-ml-data/fv3gfs-python-kubernetes-example/"
+OUTDIR = "gs://vcm-ml-scratch/fv3gfs-python-kubernetes-example/"
 CONFIG_LOCATION = "gs://vcm-fv3config/config/yaml/default/v0.3/fv3config.yml"
 DOCKER_IMAGE = "us.gcr.io/vcm-ml/fv3gfs-python"
 
