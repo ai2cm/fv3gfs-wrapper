@@ -4,6 +4,8 @@ History
 latest
 ------
 
+Major changes:
+- fv3config is updated to v0.4.0, "default" data options for initial conditions and forcings, as well as functions get_default_config and ensure_data_is_downloaded have been removed
 - added `storage` property to Quantity, implemented as short-term shortcut to .data until gt4py GDP-3 is implemented
 - fixed bug in fv3util setup.py which prevented `python setup.py install` from copying submodules
 - fixed bug in dockerfile where gs://vcm-fv3config data was downloaded to incorrect location
