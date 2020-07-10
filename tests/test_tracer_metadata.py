@@ -5,9 +5,7 @@ import yaml
 from mpi4py import MPI
 import fv3config
 import fv3gfs
-import fv3util
 from util import redirect_stdout
-from datetime import datetime
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 rundir = os.path.join(test_dir, "rundir")
