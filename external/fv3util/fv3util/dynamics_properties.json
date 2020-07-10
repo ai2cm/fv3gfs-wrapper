@@ -26,7 +26,7 @@
     {
         "name": "accumulated_x_courant_number",
         "fortran_name": "cx",
-        "units": "unknown",
+        "units": "",
         "dims": ["z", "y", "x"]
     },
     {
@@ -36,13 +36,13 @@
         "dims": ["z", "y", "x"]
     },
     {
-        "name": "x_wind_on_a_grid",
+        "name": "eastward_wind",
         "fortran_name": "ua",
         "units": "m/s",
         "dims": ["z", "y", "x"]
     },
     {
-        "name": "y_wind_on_a_grid",
+        "name": "northward_wind",
         "fortran_name": "va",
         "units": "m/s",
         "dims": ["z", "y", "x"]
