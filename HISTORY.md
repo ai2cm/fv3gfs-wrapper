@@ -5,6 +5,7 @@ latest
 ------
 
 Breaking changes:
+- fixed a bug where atmosphere hybrid coordinates were incorrectly marked as cell center variables, and were missing one point
 - `send_buffer` and `recv_buffer` are modified to take in a `callable`, which is more easily serialized than a `numpy`-like module (necessary because we serialize the arguments to re-use buffers), and allows custom specification of the initialization if zeros are needed instead of empty.
 
 Major changes:
