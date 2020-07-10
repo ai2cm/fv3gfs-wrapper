@@ -18,8 +18,8 @@ class UsingMPITests(unittest.TestCase):
     def test_setters(self):
         run_unittest_script(os.path.join(base_dir, "test_setters.py"))
 
-    def test_restart(self):
-        run_unittest_script(os.path.join(base_dir, "test_restart.py"))
+    def test_tracer_metadata(self):
+        run_unittest_script(os.path.join(base_dir, "test_tracer_metadata.py"))
 
 
 if __name__ == "__main__":
