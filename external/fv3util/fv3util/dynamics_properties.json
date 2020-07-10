@@ -153,7 +153,7 @@
         "dims": ["z_interface", "y", "x"]
     },
     {
-        "name": "finite_volume_mean_pressure_raised_to_power_of_kappa",
+        "name": "layer_mean_pressure_raised_to_power_of_kappa",
         "fortran_name": "pkz",
         "units": "unknown",
         "dims": ["z", "y", "x"]
