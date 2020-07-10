@@ -199,7 +199,7 @@ Analysis codes can similarly pass tracer properties into fv3util. This is requir
 for example, to load restart data that includes tracers.</p>
 <p>While building the model, these properties are used by the Jinja templates to
 automatically write getters and setters for each model variable. This allows
-<a class="reference internal" href="api.html#fv3gfs.get_state" title="fv3gfs.get_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.get_state()</span></code></a> and <a class="reference internal" href="api.html#fv3gfs.set_state" title="fv3gfs.set_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.set_state()</span></code></a> to interface with those
+<code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.get_state()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.set_state()</span></code> to interface with those
 variables in the Fortran model. Getting/setting new variables involves updating those
 properties (in their respective JSON files) and then rebuilding the wrapper.</p>
 </div>

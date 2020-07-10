@@ -172,16 +172,16 @@
 <h2>Getting/setting state<a class="headerlink" href="#getting-setting-state" title="Permalink to this headline">¶</a></h2>
 <p>In addition to just running the model the same as in Fortran, the Python wrapper allows you to interact
 with the model state while it is still running.
-This is done through <a class="reference internal" href="api.html#fv3gfs.get_state" title="fv3gfs.get_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.get_state()</span></code></a> and <a class="reference internal" href="api.html#fv3gfs.set_state" title="fv3gfs.set_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.set_state()</span></code></a>.
+This is done through <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.get_state()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.set_state()</span></code>.
 The getters will return Quantity objects which nominally have units information, but these aren’t guaranteed
 to be accurate and in some cases are indicated as missing.</p>
 <p>An example which gets and sets the model state to damp moisture is present in the examples folder of this repo.</p>
-<p>You should also keep in mind that the arrays used by <a class="reference internal" href="api.html#fv3gfs.get_state" title="fv3gfs.get_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.get_state()</span></code></a> and <a class="reference internal" href="api.html#fv3gfs.set_state" title="fv3gfs.set_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.set_state()</span></code></a>
+<p>You should also keep in mind that the arrays used by <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.get_state()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.set_state()</span></code>
 are domain-decomposed fields (as opposed to global fields).</p>
 </div>
 <div class="section" id="quantity">
 <h2>Quantity<a class="headerlink" href="#quantity" title="Permalink to this headline">¶</a></h2>
-<p>Data in <code class="docutils literal notranslate"><span class="pre">fv3gfs-python</span></code> is managed using a container type called <a class="reference internal" href="api.html#fv3gfs.Quantity" title="fv3gfs.Quantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">fv3gfs.Quantity</span></code></a>.
+<p>Data in <code class="docutils literal notranslate"><span class="pre">fv3gfs-python</span></code> is managed using a container type called <code class="xref py py-class docutils literal notranslate"><span class="pre">fv3gfs.Quantity</span></code>.
 This stores metadata such as dimensions and units (in <code class="docutils literal notranslate"><span class="pre">quantity.dims</span></code> and <code class="docutils literal notranslate"><span class="pre">quantity.units</span></code>),
 and manages the “computational domain” of the data.</p>
 <p>When running a model on multiple
@@ -204,7 +204,7 @@ If you are interested in learning more, look up the “Ghost Cell Pattern” or
 <p>Depending on optimization choices, it may also make sense to include
 filler data which serves only to align the computational domain into blocks within
 memory.</p>
-<p>If all of that sounded confusing, we agree! That’s why <a class="reference internal" href="api.html#fv3gfs.Quantity" title="fv3gfs.Quantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">fv3gfs.Quantity</span></code></a>
+<p>If all of that sounded confusing, we agree! That’s why <code class="xref py py-class docutils literal notranslate"><span class="pre">fv3gfs.Quantity</span></code>
 abstracts away as much of this information as possible. If you perform indexing on the
 <code class="docutils literal notranslate"><span class="pre">view</span></code> attribute of quantity, the index will be applied within the computational
 domain:</p>

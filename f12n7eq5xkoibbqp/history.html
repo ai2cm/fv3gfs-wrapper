@@ -180,10 +180,18 @@
 <h1>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="latest">
 <h2>latest<a class="headerlink" href="#latest" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>fixed bug in fv3util setup.py which prevented <cite>python setup.py install</cite> from copying submodules</p></li>
-<li><p>fixed bug in dockerfile where gs://vcm-fv3config data was downloaded to incorrect location</p></li>
-</ul>
+<p>Breaking changes:
+- <cite>send_buffer</cite> and <cite>recv_buffer</cite> are modified to take in a <cite>callable</cite>, which is more easily serialized than a <cite>numpy</cite>-like module (necessary because we serialize the arguments to re-use buffers), and allows custom specification of the initialization if zeros are needed instead of empty.</p>
+<p>Major changes:
+- fv3config is updated to v0.4.0, “default” data options for initial conditions and forcings, as well as functions get_default_config and ensure_data_is_downloaded have been removed
+- <cite>get_state</cite> and <cite>open_restart</cite> have been modified so they can optionally accept a target state dictionary in which to insert variables. <cite>get_state</cite> also can take in an allocator, which manages initialization concerns like halo allocation or the use of storages instead of numpy arrays.
+- added <cite>storage</cite> property to Quantity, implemented as short-term shortcut to .data until gt4py GDP-3 is implemented</p>
+<p>Minor changes:
+- Internally, get_state uses the new QuantityFactory class to initialize quantities
+- fixed bug in fv3util setup.py which prevented <cite>python setup.py install</cite> from copying submodules
+- fixed bug in dockerfile where gs://vcm-fv3config data was downloaded to incorrect location</p>
+<p>Deprecations:
+- <cite>Quantity.values</cite> is deprecated</p>
 </div>
 <div class="section" id="v0-4-3-2020-05-15">
 <h2>v0.4.3 (2020-05-15)<a class="headerlink" href="#v0-4-3-2020-05-15" title="Permalink to this headline">¶</a></h2>
