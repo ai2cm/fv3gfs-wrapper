@@ -134,6 +134,12 @@ class SetterTests(unittest.TestCase):
                 self._check_gotten_state(new_state, name_list)
                 for name, new_quantity in new_state.items():
                     if name == replace_name:
+                        self.assertFalse(
+                            new_quantity.np.all(
+                                new_quantity.view[:] == old_state[name].view[:]
+                            ),
+                            "quantity has not changed",
+                        )
                         self.assert_values_equal(new_quantity, replace_state[name])
                     else:
                         self.assert_values_equal(new_quantity, old_state[name])
@@ -148,7 +154,7 @@ class SetterTests(unittest.TestCase):
         self.assertEqual(len(name_list), len(state.keys()))
 
     def assert_values_equal(self, quantity1, quantity2):
-        self.assertTrue(np.all(quantity1.view[:] == quantity2.view[:]))
+        self.assertTrue(quantity1.np.all(quantity1.view[:] == quantity2.view[:]))
 
 
 if __name__ == "__main__":

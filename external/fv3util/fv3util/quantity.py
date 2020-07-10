@@ -1,5 +1,6 @@
 from typing import Tuple, Iterable, Dict
 from types import ModuleType
+import warnings
 import dataclasses
 import numpy as np
 import xarray as xr
@@ -203,6 +204,13 @@ class Quantity:
         return self.view[tuple(kwargs.get(dim, slice(None, None)) for dim in self.dims)]
 
     @property
+    def storage(self):
+        if gt4py is None:
+            raise ImportError("gt4py is not installed")
+        else:
+            return self.data
+
+    @property
     def metadata(self) -> QuantityMetadata:
         return self._metadata
 
@@ -222,7 +230,11 @@ class Quantity:
 
     @property
     def values(self) -> np.ndarray:
-        return_array = np.asarray(self._data)
+        warnings.warn(
+            "values exists only for backwards-compatibility with DataArray and will be removed, use .view[:] instead",
+            DeprecationWarning,
+        )
+        return_array = np.asarray(self.view[:])
         return_array.flags.writeable = False
         return return_array
 
