@@ -7,35 +7,10 @@ import fv3config
 import fv3gfs
 import fv3util
 from util import redirect_stdout
+from datetime import datetime
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 rundir = os.path.join(test_dir, "rundir")
-
-
-class RestartTests(unittest.TestCase):
-    def __init__(self, *args, **kwargs):
-        super(RestartTests, self).__init__(*args, **kwargs)
-        self.tracer_data = fv3gfs.get_tracer_metadata()
-        self.dynamics_data = {
-            entry["name"]: entry for entry in fv3util.DYNAMICS_PROPERTIES
-        }
-        self.physics_data = {
-            entry["name"]: entry for entry in fv3util.PHYSICS_PROPERTIES
-        }
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        MPI.COMM_WORLD.barrier()
-
-    # def test_load_fortran_restart_folder_no_raising(self):
-    #     restart.load_fortran_restart_folder(os.path.join(rundir, 'INPUT'))
-
-    # def test_load_fortran_restart_folder_has_time(self):
-    #     state = restart.load_fortran_restart_folder(os.path.join(rundir, 'INPUT'))
-    #     self.assertIn('time', state)
-    #     self.assertIsInstance(state['time'], datetime)
 
 
 class TracerMetadataTests(unittest.TestCase):
