@@ -19,11 +19,23 @@ This package uses submodules. After you check out the repository, you must run
 Installation
 ------------
 
-The Docker image can be built using `build_docker.sh`, or built and then
-tested using `test_docker.sh` (which will use the existing build if present).
-The first time you build, both ESMF and FMS will be
-built, taking up quite a lot of time. On subsequent builds, these may be retrieved
-from cached images, if you allow caching on your system.
+The Docker image can be built using the `build_docker.sh` script.  This script 
+contains two input variables:
+
+BUILD_HPC: The resulting Docker container will be built so that it can be ran on large 
+clusters and supercomputers.  Valid values are 'gnu' and 'intel', referring to the 
+compilers used to build the Docker container.  Setting this variable will result in
+a substantially longer build time.  This option is not needed to build a Docker 
+container that can be used on a local workstation or in a cloud VM instance. Default
+value is 'n'.
+
+BUILD_FROM_INTERMEDIATE: If set to 'y', existing Docker containers for the ESMF library,
+FMS library, FV3GFS-fortran and fv3gfs-python builds will be downloaded from Vulcan 
+Climate's Google Container Repository.  Set to 'n' if you wish to perform a new clean 
+build.  Default value is 'n'.
+
+Built Docker onatiners can be tested using `test_docker.sh` (which will use the existing 
+build if present).
 
 On a host, the package can be built using `make build`, and then installed
 in development mode with `pip install -e .`.
