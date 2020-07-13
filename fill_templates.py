@@ -12,6 +12,7 @@ dim_ranges = {
     "y": "j_start():j_end()",
     "y_interface": "j_start():j_end()+1",
     "z": "1:nz()",
+    "z_interface": "1:nz()+1",
 }
 
 all_templates = ("physics_data.F90", "_wrapper.pyx", "dynamics_data.F90")
