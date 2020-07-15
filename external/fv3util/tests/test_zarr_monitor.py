@@ -272,4 +272,6 @@ def test_zarr_monitor_open_zarr_without_nans(cube_partitioner, numpy):
     number_of_null = dataset["var"].isnull().sum().item()
     total_size = dataset["var"].size
 
-    assert number_of_null == 0, f"Number of nulls {number_of_null}. Size of data {total_size}"
+    assert (
+        number_of_null == 0
+    ), f"Number of nulls {number_of_null}. Size of data {total_size}"
