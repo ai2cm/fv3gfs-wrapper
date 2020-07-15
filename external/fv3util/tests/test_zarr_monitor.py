@@ -257,7 +257,17 @@ def test_array_chunks(layout, tile_array_shape, array_dims, target):
     assert result == target
 
 
-def test_open_zarr_without_nans(cube_partitioner, numpy, backend):
+def _assert_no_nulls(dataset: xr.Dataset):
+    number_of_null = dataset["var"].isnull().sum().item()
+    total_size = dataset["var"].size
+
+    assert (
+        number_of_null == 0
+    ), f"Number of nulls {number_of_null}. Size of data {total_size}"
+
+
+@pytest.mark.parametrize('mask_and_scale', [True, False])
+def test_open_zarr_without_nans(cube_partitioner, numpy, backend, mask_and_scale):
 
     store = {}
 
@@ -267,11 +277,5 @@ def test_open_zarr_without_nans(cube_partitioner, numpy, backend):
     monitor.store({"var": zero_quantity})
 
     # open w/o dask using chunks=None
-    dataset = xr.open_zarr(store, chunks=None)
-
-    number_of_null = dataset["var"].isnull().sum().item()
-    total_size = dataset["var"].size
-
-    assert (
-        number_of_null == 0
-    ), f"Number of nulls {number_of_null}. Size of data {total_size}"
+    dataset = xr.open_zarr(store, chunks=None, mask_and_scale=mask_and_scale)
+    _assert_no_nulls(dataset)
