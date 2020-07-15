@@ -140,6 +140,7 @@ class _ZarrVariableWriter:
             shape=self._prepend_shape + tile_shape,
             dtype=quantity.data.dtype,
             chunks=chunks,
+            fill_value=None,
         )
 
     def sync_array(self):

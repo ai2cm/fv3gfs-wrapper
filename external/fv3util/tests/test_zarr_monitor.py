@@ -257,17 +257,17 @@ def test_array_chunks(layout, tile_array_shape, array_dims, target):
     assert result == target
 
 
-def test_zarr_monitor_open_zarr_without_nans(tmpdir,  cube_partitioner, numpy):
+def test_zarr_monitor_open_zarr_without_nans(cube_partitioner, numpy):
 
-    path = str(tmpdir)
+    store = {}
 
     # initialize store
-    monitor = fv3util.ZarrMonitor(path, cube_partitioner)
+    monitor = fv3util.ZarrMonitor(store, cube_partitioner)
     zero_quantity = fv3util.Quantity(numpy.zeros([10, 10]), dims=("y", "x"), units="m")
     monitor.store({"var": zero_quantity})
 
     # open w/o dask using chunks=None
-    dataset = xr.open_zarr(path, chunks=None)
+    dataset = xr.open_zarr(store, chunks=None)
 
     number_of_null = dataset["var"].isnull().sum().item()
     total_size = dataset["var"].size
