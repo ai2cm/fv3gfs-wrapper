@@ -17,21 +17,24 @@ ESMF_TARGET=fv3gfs-esmf
 FV3_TARGET=fv3gfs-build
 SETUP_NAME=setup.py_orig
 
+MPI_TYPE ?= openmpi
 HPC_BUILD ?= n
 ifeq ($(HPC_BUILD),gnu)
 	DOCKERFILE = Dockerfile.hpc
-	FMS_TARGET = fms-bld
 	ESMF_TARGET = esmf-bld
-	FV3_TARGET = fv3-bld
+	FMS_TARGET = fms-bld
 	FORTRAN_DOCKERFILE = docker/Dockerfile.gnu8_mpich314_cuda101
+	FV3_TARGET = fv3-bld
+	MPI_TYPE=mpich
         SETUP_NAME=setup.py_hpc_gnu
 endif
 ifeq ($(HPC_BUILD),intel)
 	DOCKERFILE ?= Dockerfile.hpc
-	FMS_TARGET = fms-bld
 	ESMF_TARGET = esmf-bld
-	FV3_TARGET = fv3-bld
+	FMS_TARGET = fms-bld
 	FORTRAN_DOCKERFILE ?= docker/Dockerfile.intel2021_mpich314_nocuda
+	FV3_TARGET = fv3-bld
+	MPI_TYPE=mpich
         SETUP_NAME=setup.py_hpc_intel
 endif
 
@@ -46,23 +49,25 @@ EXPERIMENT ?= new
 RUNDIR_CONTAINER=/rundir
 RUNDIR_HOST=$(shell pwd)/rundir
 
-FV3GFS_PYTHON_BUILD_ARGS = --build-arg FMS_IMAGE=$(FMS_IMAGE) --build-arg ESMF_IMAGE=$(ESMF_IMAGE) --build-arg DAWN_IMAGE=$(DAWN_IMAGE) --build-arg FORTRAN_ENV_IMAGE=$(FORTRAN_IMAGE)
+FV3GFS_PYTHON_BUILD_ARGS = --build-arg FMS_IMAGE=$(FMS_IMAGE) --build-arg ESMF_IMAGE=$(ESMF_IMAGE) --build-arg DAWN_IMAGE=$(DAWN_IMAGE) --build-arg FORTRAN_ENV_IMAGE=$(FORTRAN_IMAGE) --build-arg MPI=$(MPI_TYPE)
 DAWN_BUILD_ARGS = --build-arg FMS_IMAGE=$(FMS_IMAGE) --build-arg ESMF_IMAGE=$(ESMF_IMAGE) --build-arg FORTRAN_ENV_IMAGE=$(FORTRAN_IMAGE)
 
+ifneq ($(HPC_BUILD),n)
 all: build_deps build
+else
+all: build
+endif
 
+#	cd .. && cp $(SETUP_NAME) setup.py 
 build:
 	DOCKERFILE=$(FORTRAN_DOCKERFILE) COMPILED_IMAGE=$(FORTRAN_IMAGE) COMPILE_TARGET=$(FV3_TARGET) $(MAKE) -C ../lib/external build
-	cd .. && cp $(SETUP_NAME) setup.py  && tar cf fv3gfs-python.tar *   
+	cd .. && tar cf fv3gfs-python.tar *   
 	DOCKER_BUILDKIT=1 docker build -f $(DOCKERFILE) -t $(FV3GFS_PYTHON_IMAGE) $(FV3GFS_PYTHON_BUILD_ARGS) --target fv3gfs-python ..
 
 build_deps:
 	DOCKER_BUILDKIT=1 docker build -f $(FORTRAN_ROOT)/$(FORTRAN_DOCKERFILE) --target $(FMS_TARGET) -t $(FMS_IMAGE) $(FORTRAN_ROOT)
 	DOCKER_BUILDKIT=1 docker build -f $(FORTRAN_ROOT)/$(FORTRAN_DOCKERFILE) --target $(ESMF_TARGET) -t $(ESMF_IMAGE) $(FORTRAN_ROOT)
 	DOCKER_BUILDKIT=1 docker build -f $(DOCKERFILE) --target fv3gfs-dawn -t $(DAWN_IMAGE) .
-ifneq ($(HPC_BUILD),n)
-	DOCKER_BUILDKIT=1 docker build -f $(DOCKERFILE) --target fv3gfs-gt4py -t $(GT4PY_IMAGE) .
-endif
 
 push_deps:
 	docker push $(FMS_IMAGE)

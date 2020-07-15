@@ -11,9 +11,9 @@ RUN apt-get update && \
     update-alternatives --install /usr/bin/python python /usr/bin/python3 10 && \
     update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 10
 
-RUN git clone -b v8.0.0b3 --depth 1 https://github.com/cupy/cupy.git && \
-    cd cupy && pip3 install . && \
-    cd / 
+#RUN git clone -b v8.0.0b3 --depth 1 https://github.com/cupy/cupy.git && \
+#    cd cupy && pip3 install . && \
+#    cd / 
 
 RUN git clone --depth 1 -b fv3_validation https://github.com/eddie-c-davis/gt4py.git /usr/src/gt4py && \
     pip install --no-cache-dir -e /usr/src/gt4py[cuda101] && \
@@ -37,16 +37,14 @@ RUN cd /usr/local && \
     tar xzf boost_1_73_0.tar.gz && rm boost_1_73_0.tar.gz && \
     cd boost_1_73_0 && cp -r boost /usr/include/
 
-RUN wget https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3.tar.gz && \
-    tar xzf cmake-3.17.3.tar.gz && \
+RUN mkdir /myapps && cd /myapps && \
+    wget https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3.tar.gz && \
+    tar xzf cmake-3.17.3.tar.gz && rm cmake-3.17.3.tar.gz && \
     cd cmake-3.17.3 && \
-    ./bootstrap && make -j4 && make install && \
-    cd ..
+    ./bootstrap -- -DCMAKE_BUILD_TYPE:STRING=Release && make -j4 && make install 
 
 RUN git clone https://github.com/MeteoSwiss-APN/dawn.git /usr/src/dawn && \
     pip install --no-cache-dir /usr/src/dawn/dawn
-#RUN pip wheel /usr/src/dawn/dawn && \
-#    cd / && cp dawn*.whl /usr/src/dawn/
 
 ##
 ## Stage 3 - Build the python wrapper to FV3
@@ -56,12 +54,14 @@ FROM fv3gfs-fortran-build:latest AS fv3gfs-python
 
 COPY fv3gfs-python.tar /fv3gfs-python/
 COPY --from=fv3gfs-dawn /usr/src/dawn/ /usr/src/dawn/
+COPY --from=fv3gfs-dawn /myapps/cmake-3.17.3/ /myapps/cmake-3.17.3/
 COPY --from=fv3gfs-gt4py /usr/src/gt4py /usr/src/gt4py
 
 ENV FV3CONFIG_CACHE_DIR=/inputdata NCEPLIBS_DIR=/myapps/ncep NETCDF_DIR=/usr \
     FMS_DIR=/myapps/fms FMS_LIB=/myapps/fms/lib \ 
     ESMF_DIR=/myapps/esmf ESMF_INC="-I/myapps/esmf/include" ESMF_LIB=/myapps/esmf/lib \
-    LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ESMF_LIB}:${FMS_LIB}
+    LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ESMF_LIB}:${FMS_LIB}:/myapps/cmake-3.17.3/lib:/usr/lib \
+    PATH=/myapps/cmake-3.17.3/bin:${PATH}
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -70,7 +70,7 @@ RUN apt-get update && \
         python3-pytest \
         python3-numpy-dbg \
         nano curl netcdf-bin && \
-    pip3 install --no-cache-dir gsutil \
+    pip3 install --no-cache-dir gsutil dataclasses \
         jinja2==2.10.3 \
         xarray==0.13.0 \
         netcdf4==1.4.2 \
@@ -109,27 +109,19 @@ RUN cp /myapps/fms/lib/*.so* /lib64/ && \
     cp /myapps/esmf/lib/*.so* /lib64/ && \
     cd /fv3gfs-python && tar xf fv3gfs-python.tar && \
     cp lib/external/FV3/conf/configure.fv3.linux_gnu lib/external/FV3/conf/configure.fv3 && \
-    cd lib && make -j8
- 
-RUN mkdir -p /opt/NCEPlibs/lib && \
-    cd /myapps/ncep/lib && cp *.a /opt/NCEPlibs/lib/ && \ 
+    cd lib && make -j8 && \
+    mkdir -p /opt/NCEPlibs/lib && \
+    cd /myapps/ncep/lib && cp *.a /opt/NCEPlibs/lib/ && \
+    export MPI="mpich" && \
     cd /fv3gfs-python && make build
-
-RUN wget https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3.tar.gz && \
-    tar xzf cmake-3.17.3.tar.gz && \
-    cd cmake-3.17.3 && \
-    ./bootstrap && make -j4 && make install && \
-    cd ..
 
 RUN pip3 wheel /usr/src/dawn/dawn && \
     cd / && cp dawn*.whl /usr/src/dawn/ && \
-    pip3 install --no-cache-dir /usr/src/dawn/dawn4py-*-linux_x86_64.whl /usr/src/gt4py 
-
-#RUN pip3 install --no-cache-dir -e /fv3gfs-python/external/fv3config \
-#                                -e /fv3gfs-python/external/fv3util 
-#
-#RUN pip3 install --no-cache-dir -e /fv3gfs-python
-#RUN pip3 install --no-cache-dir pytest-subtests  
+    pip3 install --no-cache-dir /usr/src/dawn/dawn4py-*-linux_x86_64.whl /usr/src/gt4py && \
+    pip3 install --no-cache-dir -e /fv3gfs-python/external/fv3config \
+                                -e /fv3gfs-python/external/fv3util && \ 
+    pip3 install --no-cache-dir -e /fv3gfs-python && \
+    pip3 install --no-cache-dir pytest-subtests  
 
 RUN wget http://storage.googleapis.com/vcm-ml-public/2019-10-23-data-for-running-fv3gfs.tar.gz && \
     tar -xf /2019-10-23-data-for-running-fv3gfs.tar.gz --directory / && \
