@@ -266,7 +266,7 @@ def _assert_no_nulls(dataset: xr.Dataset):
     ), f"Number of nulls {number_of_null}. Size of data {total_size}"
 
 
-@pytest.mark.parametrize('mask_and_scale', [True, False])
+@pytest.mark.parametrize("mask_and_scale", [True, False])
 def test_open_zarr_without_nans(cube_partitioner, numpy, backend, mask_and_scale):
 
     store = {}
