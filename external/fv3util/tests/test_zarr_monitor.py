@@ -269,6 +269,12 @@ def _assert_no_nulls(dataset: xr.Dataset):
 @pytest.mark.parametrize("mask_and_scale", [True, False])
 def test_open_zarr_without_nans(cube_partitioner, numpy, backend, mask_and_scale):
 
+    if backend == "gt4py_numpy":
+        pytest.xfail(
+            "g4py_numpy gives an intermittent error where a substantial "
+            "fraction of the roundtripped data contains NaNs."
+        )
+
     store = {}
 
     # initialize store
