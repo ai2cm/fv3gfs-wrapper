@@ -257,10 +257,7 @@ def test_array_chunks(layout, tile_array_shape, array_dims, target):
     assert result == target
 
 
-def test_zarr_monitor_open_zarr_without_nans(cube_partitioner, numpy, backend):
-
-    # if backend == "gt4py_numpy":
-    #     pytest.xfail()
+def test_open_zarr_without_nans(cube_partitioner, numpy, backend):
 
     store = {}
 
