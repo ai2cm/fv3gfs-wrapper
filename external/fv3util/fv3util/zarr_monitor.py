@@ -177,7 +177,9 @@ class _ZarrVariableWriter:
         logger.debug(
             f"assigning data from subtile slice {from_slice} to target slice {target_slice}"
         )
-        self.array[target_slice] = quantity.view[from_slice]
+        print(quantity.view[:].shape, from_slice, target_slice)
+        self.array[target_slice] = np.asarray(quantity.view[:])[from_slice]
+        print(self.array)
         self.i_time += 1
 
     def _get_attrs(self, quantity):
