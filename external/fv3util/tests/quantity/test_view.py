@@ -16,7 +16,7 @@ def quantity(request):
     [
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -40,7 +40,7 @@ def quantity(request):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -52,7 +52,7 @@ def quantity(request):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -64,7 +64,7 @@ def quantity(request):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -76,7 +76,7 @@ def quantity(request):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -168,11 +168,77 @@ def test_west(quantity, view_slice, reference):
 
 
 @pytest.mark.parametrize(
+    "quantity",
+    [
+        fv3util.Quantity(
+            np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
+            dims=[fv3util.X_DIM, fv3util.Y_DIM],
+            units="m",
+            origin=(1, 1),
+            extent=(1, 1),
+        )
+    ],
+)
+@pytest.mark.parametrize(
+    "view_name",
+    [
+        "east",
+        "west",
+        "north",
+        "south",
+        "northeast",
+        "northwest",
+        "southeast",
+        "southwest",
+        "interior",
+    ],
+)
+def test_many_indices_raises(quantity, view_name):
+    view = getattr(quantity.view, view_name)
+    index = tuple([0] * (len(quantity.dims) + 1))
+    with pytest.raises(IndexError):
+        view[index]
+
+
+@pytest.mark.parametrize(
+    "quantity",
+    [
+        fv3util.Quantity(
+            np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
+            dims=[fv3util.X_DIM, fv3util.Y_DIM],
+            units="m",
+            origin=(1, 1),
+            extent=(1, 1),
+        )
+    ],
+)
+@pytest.mark.parametrize(
+    "view_name",
+    [
+        "east",
+        "west",
+        "north",
+        "south",
+        "northeast",
+        "northwest",
+        "southeast",
+        "southwest",
+        "interior",
+    ],
+)
+def test_many_slices_raises(quantity, view_name):
+    view = getattr(quantity.view, view_name)
+    index = tuple([slice(0, 1)] * (len(quantity.dims) + 1))
+    with pytest.raises(IndexError):
+        view[index]
+
+
+@pytest.mark.parametrize(
     "quantity, view_slice, reference",
     [
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -196,7 +262,7 @@ def test_west(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -208,7 +274,7 @@ def test_west(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -220,7 +286,7 @@ def test_west(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -232,7 +298,7 @@ def test_west(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -328,7 +394,7 @@ def test_east(quantity, view_slice, reference):
     [
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.Y_DIM, fv3util.X_DIM],
                 units="m",
                 origin=(1, 1),
@@ -364,7 +430,7 @@ def test_east(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.Y_DIM, fv3util.X_DIM],
                 units="m",
                 origin=(1, 1),
@@ -376,7 +442,7 @@ def test_east(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.Y_DIM, fv3util.X_DIM],
                 units="m",
                 origin=(1, 1),
@@ -388,7 +454,7 @@ def test_east(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.Y_DIM, fv3util.X_DIM],
                 units="m",
                 origin=(1, 1),
@@ -400,7 +466,7 @@ def test_east(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.Y_DIM, fv3util.X_DIM],
                 units="m",
                 origin=(1, 1),
@@ -496,7 +562,7 @@ def test_south(quantity, view_slice, reference):
     [
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.Y_DIM, fv3util.X_DIM],
                 units="m",
                 origin=(1, 1),
@@ -532,7 +598,7 @@ def test_south(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.Y_DIM, fv3util.X_DIM],
                 units="m",
                 origin=(1, 1),
@@ -544,7 +610,7 @@ def test_south(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.Y_DIM, fv3util.X_DIM],
                 units="m",
                 origin=(1, 1),
@@ -556,7 +622,7 @@ def test_south(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.Y_DIM, fv3util.X_DIM],
                 units="m",
                 origin=(1, 1),
@@ -568,7 +634,7 @@ def test_south(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.Y_DIM, fv3util.X_DIM],
                 units="m",
                 origin=(1, 1),
@@ -664,7 +730,7 @@ def test_north(quantity, view_slice, reference):
     [
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -676,7 +742,7 @@ def test_north(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -688,7 +754,7 @@ def test_north(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -700,7 +766,7 @@ def test_north(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -712,7 +778,7 @@ def test_north(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -768,7 +834,7 @@ def test_southwest(quantity, view_slice, reference):
     [
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -780,7 +846,7 @@ def test_southwest(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -792,7 +858,7 @@ def test_southwest(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -804,7 +870,7 @@ def test_southwest(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -816,7 +882,7 @@ def test_southwest(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -872,7 +938,7 @@ def test_southeast(quantity, view_slice, reference):
     [
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.Y_DIM, fv3util.X_DIM],
                 units="m",
                 origin=(1, 1),
@@ -884,7 +950,7 @@ def test_southeast(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.Y_DIM, fv3util.X_DIM],
                 units="m",
                 origin=(1, 1),
@@ -896,7 +962,7 @@ def test_southeast(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.Y_DIM, fv3util.X_DIM],
                 units="m",
                 origin=(1, 1),
@@ -908,7 +974,7 @@ def test_southeast(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.Y_DIM, fv3util.X_DIM],
                 units="m",
                 origin=(1, 1),
@@ -920,7 +986,7 @@ def test_southeast(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.Y_DIM, fv3util.X_DIM],
                 units="m",
                 origin=(1, 1),
@@ -976,7 +1042,7 @@ def test_northwest(quantity, view_slice, reference):
     [
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -988,7 +1054,7 @@ def test_northwest(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -1000,7 +1066,7 @@ def test_northwest(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -1012,7 +1078,7 @@ def test_northwest(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -1024,7 +1090,7 @@ def test_northwest(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -1080,7 +1146,7 @@ def test_northeast(quantity, view_slice, reference):
     [
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -1092,7 +1158,7 @@ def test_northeast(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
@@ -1104,14 +1170,14 @@ def test_northeast(quantity, view_slice, reference):
         ),
         pytest.param(
             fv3util.Quantity(
-                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+                np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
                 dims=[fv3util.X_DIM, fv3util.Y_DIM],
                 units="m",
                 origin=(1, 1),
                 extent=(1, 1),
             ),
             (slice(-1, 1), slice(-1, 1)),
-            np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8],]),
+            np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]),
             id="3_by_3_with_halo",
         ),
         pytest.param(

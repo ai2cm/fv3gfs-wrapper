@@ -75,6 +75,11 @@ class BoundaryArrayView:
         self._data[self._get_array_index(index)] = value
 
     def _get_array_index(self, index):
+        if len(index) > len(self._dims):
+            raise IndexError(
+                f"{len(index)} is too many indices for a "
+                f"{len(self._dims)}-dimensional quantity"
+            )
         return shift_boundary_slice_tuple(
             self._dims, self._origin, self._extent, self._boundary_type, index
         )
@@ -130,6 +135,11 @@ class BoundedArrayView:
         self._data[self._get_compute_index(index)] = value
 
     def _get_compute_index(self, index):
+        if len(index) > len(self.dims):
+            raise IndexError(
+                f"{len(index)} is too many indices for a "
+                f"{len(self.dims)}-dimensional quantity"
+            )
         if not isinstance(index, (tuple, list)):
             index = (index,)
         index = fill_index(index, len(self._data.shape))
@@ -196,6 +206,19 @@ def ensure_int_tuple(arg, arg_name):
     return tuple(return_list)
 
 
+def _validate_quantity_property_lengths(shape, dims, origin, extent):
+    n_dims = len(shape)
+    for var, desc in (
+        (dims, "dimension names"),
+        (origin, "origins"),
+        (extent, "extents"),
+    ):
+        if len(var) != n_dims:
+            raise ValueError(
+                f"received {len(var)} {desc} for {n_dims} dimensions: {var}"
+            )
+
+
 class Quantity:
     """
     Data container for physical quantities.
@@ -229,6 +252,7 @@ class Quantity:
             extent = tuple(length - start for length, start in zip(data.shape, origin))
         else:
             extent = tuple(extent)
+        _validate_quantity_property_lengths(data.shape, dims, origin, extent)
         self._metadata = QuantityMetadata(
             origin=ensure_int_tuple(origin, "origin"),
             extent=ensure_int_tuple(extent, "extent"),

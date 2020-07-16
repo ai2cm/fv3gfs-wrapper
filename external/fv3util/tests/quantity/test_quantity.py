@@ -4,9 +4,6 @@ import fv3util
 import fv3util.quantity
 
 
-# add tests that you get an exception with dims, origin, or extent of the wrong length
-
-
 @pytest.fixture(params=["empty", "one", "five"])
 def extent_1d(request, backend, n_halo):
     if request.param == "empty":
@@ -64,6 +61,41 @@ def data(n_halo, extent_1d, n_dims, numpy, dtype):
 @pytest.fixture
 def quantity(data, origin, extent, dims, units):
     return fv3util.Quantity(data, origin=origin, extent=extent, dims=dims, units=units)
+
+
+def test_smaller_data_raises(data, origin, extent, dims, units):
+    if len(data.shape) > 1:
+        print(data, data.shape, dims, origin, extent)
+        try:
+            small_data = data[0]
+        except IndexError:
+            pass
+        else:
+            with pytest.raises(ValueError):
+                fv3util.Quantity(
+                    small_data, origin=origin, extent=extent, dims=dims, units=units
+                )
+
+
+def test_smaller_dims_raises(data, origin, extent, dims, units):
+    with pytest.raises(ValueError):
+        fv3util.Quantity(
+            data, origin=origin, extent=extent, dims=dims[:-1], units=units
+        )
+
+
+def test_smaller_origin_raises(data, origin, extent, dims, units):
+    with pytest.raises(ValueError):
+        fv3util.Quantity(
+            data, origin=origin[:-1], extent=extent, dims=dims, units=units
+        )
+
+
+def test_smaller_extent_raises(data, origin, extent, dims, units):
+    with pytest.raises(ValueError):
+        fv3util.Quantity(
+            data, origin=origin, extent=extent[:-1], dims=dims, units=units
+        )
 
 
 def test_data_change_affects_quantity(data, quantity, numpy):

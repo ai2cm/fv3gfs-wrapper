@@ -4,13 +4,10 @@ import functools
 
 def shift_boundary_slice_tuple(dims, origin, extent, boundary_type, slice_tuple):
     slice_list = []
-    print(dims, origin, extent, slice_tuple)
     for dim, entry, origin_1d, extent_1d in zip(dims, slice_tuple, origin, extent):
-        print(dim, entry, origin_1d, extent_1d)
         slice_list.append(
             _shift_boundary_slice(dim, origin_1d, extent_1d, boundary_type, entry)
         )
-    print(slice_list)
     return tuple(slice_list)
 
 
