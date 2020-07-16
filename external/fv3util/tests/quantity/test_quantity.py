@@ -4,6 +4,9 @@ import fv3util
 import fv3util.quantity
 
 
+# add tests that you get an exception with dims, origin, or extent of the wrong length
+
+
 @pytest.fixture(params=["empty", "one", "five"])
 def extent_1d(request, backend, n_halo):
     if request.param == "empty":

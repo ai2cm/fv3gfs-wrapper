@@ -4,9 +4,12 @@ import functools
 
 def shift_boundary_slice_tuple(dims, origin, extent, boundary_type, slice_tuple):
     slice_list = []
-    print(slice_tuple)
+    print(dims, origin, extent, slice_tuple)
     for dim, entry, origin_1d, extent_1d in zip(dims, slice_tuple, origin, extent):
-        slice_list.append(_shift_boundary_slice(dim, origin_1d, extent_1d, boundary_type, entry))
+        print(dim, entry, origin_1d, extent_1d)
+        slice_list.append(
+            _shift_boundary_slice(dim, origin_1d, extent_1d, boundary_type, entry)
+        )
     print(slice_list)
     return tuple(slice_list)
 
@@ -22,30 +25,34 @@ def bound_default_slice(slice_in, start=None, stop=None):
 def _shift_boundary_slice(dim, origin, extent, boundary_type, slice_object):
     """A special case of _get_boundary_slice where one edge must be an interior or
     exterior halo point."""
-    offset = _get_offset(boundary_type, dim, origin, extent)
+    start_offset, stop_offset = _get_offset(boundary_type, dim, origin, extent)
     if isinstance(slice_object, slice):
         if slice_object.start is not None:
-            print(slice_object.start, offset, origin)
-            start = slice_object.start + offset
+            start = slice_object.start + start_offset
         else:
             start = slice_object.start
         if slice_object.stop is not None:
-            stop = slice_object.stop + offset
+            stop = slice_object.stop + stop_offset
         else:
             stop = slice_object.stop
-        return bound_default_slice(slice(start, stop, slice_object.step), origin, origin + extent)
+        return bound_default_slice(
+            slice(start, stop, slice_object.step), origin, origin + extent
+        )
     else:
-        return slice_object + offset  # usually an integer
+        return slice_object + start_offset  # usually an integer
 
 
 def _get_offset(boundary_type, dim, origin, extent):
-    boundary_at_start = boundary_at_start_of_dim(boundary_type, dim)
-    if boundary_at_start is None:  # default is to index within compute domain
-        return origin
-    elif boundary_at_start:
-        return origin
+    if boundary_type is constants.INTERIOR:
+        return origin, origin + extent
     else:
-        return origin + extent
+        boundary_at_start = boundary_at_start_of_dim(boundary_type, dim)
+        if boundary_at_start is None:  # default is to index within compute domain
+            return origin, origin
+        elif boundary_at_start:
+            return origin, origin
+        else:
+            return origin + extent, origin + extent
 
 
 @functools.lru_cache(maxsize=None)
@@ -88,36 +95,24 @@ def boundary_at_start_of_dim(boundary: int, dim: str) -> bool:
 
 
 BOUNDARY_AT_START_OF_DIM_MAPPING = {
-    constants.WEST: {
-        constants.X_DIM: True,
-        constants.X_INTERFACE_DIM: True,
-    },
-    constants.EAST: {
-        constants.X_DIM: False,
-        constants.X_INTERFACE_DIM: False,
-    },
-    constants.SOUTH: {
-        constants.Y_DIM: True,
-        constants.Y_INTERFACE_DIM: True,
-    },
-    constants.NORTH: {
-        constants.Y_DIM: False,
-        constants.Y_INTERFACE_DIM: False,
-    },
+    constants.WEST: {constants.X_DIM: True, constants.X_INTERFACE_DIM: True,},
+    constants.EAST: {constants.X_DIM: False, constants.X_INTERFACE_DIM: False,},
+    constants.SOUTH: {constants.Y_DIM: True, constants.Y_INTERFACE_DIM: True,},
+    constants.NORTH: {constants.Y_DIM: False, constants.Y_INTERFACE_DIM: False,},
 }
 BOUNDARY_AT_START_OF_DIM_MAPPING[constants.NORTHWEST] = {
     **BOUNDARY_AT_START_OF_DIM_MAPPING[constants.NORTH],
-    **BOUNDARY_AT_START_OF_DIM_MAPPING[constants.WEST]
+    **BOUNDARY_AT_START_OF_DIM_MAPPING[constants.WEST],
 }
 BOUNDARY_AT_START_OF_DIM_MAPPING[constants.NORTHEAST] = {
     **BOUNDARY_AT_START_OF_DIM_MAPPING[constants.NORTH],
-    **BOUNDARY_AT_START_OF_DIM_MAPPING[constants.EAST]
+    **BOUNDARY_AT_START_OF_DIM_MAPPING[constants.EAST],
 }
 BOUNDARY_AT_START_OF_DIM_MAPPING[constants.SOUTHWEST] = {
     **BOUNDARY_AT_START_OF_DIM_MAPPING[constants.SOUTH],
-    **BOUNDARY_AT_START_OF_DIM_MAPPING[constants.WEST]
+    **BOUNDARY_AT_START_OF_DIM_MAPPING[constants.WEST],
 }
 BOUNDARY_AT_START_OF_DIM_MAPPING[constants.SOUTHEAST] = {
     **BOUNDARY_AT_START_OF_DIM_MAPPING[constants.SOUTH],
-    **BOUNDARY_AT_START_OF_DIM_MAPPING[constants.EAST]
+    **BOUNDARY_AT_START_OF_DIM_MAPPING[constants.EAST],
 }

@@ -148,39 +148,81 @@ def test_boundary_data_2_by_2_array_2_halo():
     "dim, origin, extent, boundary_type, slice_object, reference",
     [
         pytest.param(
-            fv3util.X_DIM, 1, 3, fv3util.WEST, slice(None, None), slice(None, None),
-            id="none_not_changed"
+            fv3util.X_DIM,
+            1,
+            3,
+            fv3util.WEST,
+            slice(None, None),
+            slice(None, None),
+            id="none_not_changed",
         ),
         pytest.param(
-            fv3util.X_DIM, 1, 3, fv3util.WEST, slice(0, 1), slice(1, 2),
-            id="shift_to_start"
+            fv3util.X_DIM,
+            1,
+            3,
+            fv3util.WEST,
+            slice(0, 1),
+            slice(1, 2),
+            id="shift_to_start",
         ),
         pytest.param(
-            fv3util.X_DIM, 1, 3, fv3util.WEST, slice(0, 2), slice(1, 3),
-            id="shift_larger_to_start"
+            fv3util.X_DIM,
+            1,
+            3,
+            fv3util.WEST,
+            slice(0, 2),
+            slice(1, 3),
+            id="shift_larger_to_start",
         ),
         pytest.param(
-            fv3util.X_DIM, 1, 3, fv3util.EAST, slice(0, 1), slice(4, 5),
-            id="shift_to_end"
+            fv3util.X_DIM,
+            1,
+            3,
+            fv3util.EAST,
+            slice(0, 1),
+            slice(4, 5),
+            id="shift_to_end",
         ),
         pytest.param(
-            fv3util.X_INTERFACE_DIM, 1, 3, fv3util.WEST, slice(0, 1), slice(1, 2),
-            id="shift_interface_to_start"
+            fv3util.X_INTERFACE_DIM,
+            1,
+            3,
+            fv3util.WEST,
+            slice(0, 1),
+            slice(1, 2),
+            id="shift_interface_to_start",
         ),
         pytest.param(
-            fv3util.X_INTERFACE_DIM, 1, 3, fv3util.EAST, slice(0, 1), slice(4, 5),
-            id="shift_interface_to_end"
+            fv3util.X_INTERFACE_DIM,
+            1,
+            3,
+            fv3util.EAST,
+            slice(0, 1),
+            slice(4, 5),
+            id="shift_interface_to_end",
         ),
         pytest.param(
-            fv3util.Y_DIM, 2, 4, fv3util.SOUTH, slice(0, 1), slice(2, 3),
-            id="shift_y_to_start"
+            fv3util.Y_DIM,
+            2,
+            4,
+            fv3util.SOUTH,
+            slice(0, 1),
+            slice(2, 3),
+            id="shift_y_to_start",
         ),
         pytest.param(
-            fv3util.Y_DIM, 2, 4, fv3util.NORTH, slice(0, 1), slice(6, 7),
-            id="shift_y_to_end"
+            fv3util.Y_DIM,
+            2,
+            4,
+            fv3util.NORTH,
+            slice(0, 1),
+            slice(6, 7),
+            id="shift_y_to_end",
         ),
-    ]
+    ],
 )
-def test_shift_boundary_slice(dim, origin, extent, boundary_type, slice_object, reference):
+def test_shift_boundary_slice(
+    dim, origin, extent, boundary_type, slice_object, reference
+):
     result = _shift_boundary_slice(dim, origin, extent, boundary_type, slice_object)
     assert result == reference

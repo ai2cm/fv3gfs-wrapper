@@ -53,8 +53,6 @@ class QuantityMetadata:
 
 
 class BoundaryArrayView:
-    """A boundary representing an edge or corner of a subtile."""
-
     def __init__(self, data, boundary_type, dims, origin, extent):
         self._data = data
         self._boundary_type = boundary_type
@@ -88,6 +86,24 @@ class BoundedArrayView:
         self._origin = origin
         self._extent = extent
         self._west = BoundaryArrayView(array, constants.WEST, dims, origin, extent)
+        self._east = BoundaryArrayView(array, constants.EAST, dims, origin, extent)
+        self._south = BoundaryArrayView(array, constants.SOUTH, dims, origin, extent)
+        self._north = BoundaryArrayView(array, constants.NORTH, dims, origin, extent)
+        self._northwest = BoundaryArrayView(
+            array, constants.NORTHWEST, dims, origin, extent
+        )
+        self._northeast = BoundaryArrayView(
+            array, constants.NORTHEAST, dims, origin, extent
+        )
+        self._southwest = BoundaryArrayView(
+            array, constants.SOUTHWEST, dims, origin, extent
+        )
+        self._southeast = BoundaryArrayView(
+            array, constants.SOUTHEAST, dims, origin, extent
+        )
+        self._interior = BoundaryArrayView(
+            array, constants.INTERIOR, dims, origin, extent
+        )
 
     @property
     def origin(self):
@@ -133,6 +149,38 @@ class BoundedArrayView:
     @property
     def west(self) -> BoundaryArrayView:
         return self._west
+
+    @property
+    def east(self) -> BoundaryArrayView:
+        return self._east
+
+    @property
+    def south(self) -> BoundaryArrayView:
+        return self._south
+
+    @property
+    def north(self) -> BoundaryArrayView:
+        return self._north
+
+    @property
+    def northwest(self) -> BoundaryArrayView:
+        return self._northwest
+
+    @property
+    def northeast(self) -> BoundaryArrayView:
+        return self._northeast
+
+    @property
+    def southwest(self) -> BoundaryArrayView:
+        return self._southwest
+
+    @property
+    def southeast(self) -> BoundaryArrayView:
+        return self._southeast
+
+    @property
+    def interior(self) -> BoundaryArrayView:
+        return self._interior
 
 
 def ensure_int_tuple(arg, arg_name):
