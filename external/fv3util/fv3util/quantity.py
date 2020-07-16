@@ -4,6 +4,8 @@ import warnings
 import dataclasses
 import numpy as np
 import xarray as xr
+from ._boundary_utils import shift_boundary_slice_tuple, bound_default_slice
+from . import constants
 
 try:
     import cupy
@@ -50,11 +52,42 @@ class QuantityMetadata:
             )
 
 
+class BoundaryArrayView:
+    """A boundary representing an edge or corner of a subtile."""
+
+    def __init__(self, data, boundary_type, dims, origin, extent):
+        self._data = data
+        self._boundary_type = boundary_type
+        self._dims = dims
+        self._origin = origin
+        self._extent = extent
+
+    def __getitem__(self, index):
+        if len(self._origin) == 0:
+            if isinstance(index, tuple) and len(index) > 0:
+                raise IndexError("more than one index given for a zero-dimension array")
+            elif isinstance(index, slice) and index != slice(None, None, None):
+                raise IndexError("cannot slice a zero-dimension array")
+            else:
+                return self._data  # array[()] does not return an ndarray
+        else:
+            return self._data[self._get_array_index(index)]
+
+    def __setitem__(self, index, value):
+        self._data[self._get_array_index(index)] = value
+
+    def _get_array_index(self, index):
+        return shift_boundary_slice_tuple(
+            self._dims, self._origin, self._extent, self._boundary_type, index
+        )
+
+
 class BoundedArrayView:
-    def __init__(self, array, origin, extent):
+    def __init__(self, array, dims, origin, extent):
         self._data = array
         self._origin = origin
         self._extent = extent
+        self._west = BoundaryArrayView(array, constants.WEST, dims, origin, extent)
 
     @property
     def origin(self):
@@ -96,6 +129,10 @@ class BoundedArrayView:
             else:
                 shifted_index.append(entry + origin)
         return tuple(shifted_index)
+
+    @property
+    def west(self) -> BoundaryArrayView:
+        return self._west
 
 
 def ensure_int_tuple(arg, arg_name):
@@ -155,7 +192,7 @@ class Quantity:
         self._attrs = {}
         self._data = data
         self._compute_domain_view = BoundedArrayView(
-            self.data, self.origin, self.extent
+            self.data, self.dims, self.origin, self.extent
         )
 
     @classmethod
@@ -285,11 +322,3 @@ def shift_index(current_value, shift, extent):
         if new_value < 0:
             new_value = extent + new_value
     return new_value
-
-
-def bound_default_slice(slice_in, start=None, stop=None):
-    if slice_in.start is not None:
-        start = slice_in.start
-    if slice_in.stop is not None:
-        stop = slice_in.stop
-    return slice(start, stop, slice_in.step)
