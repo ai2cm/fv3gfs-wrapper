@@ -16,31 +16,38 @@ This package uses submodules. After you check out the repository, you must run
 
 * Free software: BSD license
 
-Installation
-------------
+Local Machine Installation
+--------------------------
 
-The Docker image can be built using the `build_docker.sh` script.  This script 
-contains two input variables:
-
-BUILD_HPC: The resulting Docker container will be built so that it can be ran on large 
-clusters and supercomputers.  Valid values are 'gnu' and 'intel', referring to the 
-compilers used to build the Docker container.  Setting this variable will result in
-a substantially longer build time.  This option is not needed to build a Docker 
-container that can be used on a local workstation or in a cloud VM instance. Default
-value is 'n'.
-
-BUILD_FROM_INTERMEDIATE: If set to 'y', existing Docker containers for the ESMF library,
-FMS library, FV3GFS-fortran and fv3gfs-python builds will be downloaded from Vulcan 
-Climate's Google Container Repository.  Set to 'n' if you wish to perform a new clean 
-build.  Default value is 'n'.
-
-Built Docker onatiners can be tested using `test_docker.sh` (which will use the existing 
-build if present).
+The Docker image can be built using `build_docker.sh`, or built and then
+tested using `test_docker.sh` (which will use the existing build if present).
+The first time you build, both ESMF and FMS will be
+built, taking up quite a lot of time. On subsequent builds, these may be retrieved
+from cached images, if you allow caching on your system.
 
 On a host, the package can be built using `make build`, and then installed
 in development mode with `pip install -e .`.
 
 This package only supports linux and Python 3.5 or greater.
+
+Installation for Clusters
+-------------------------
+
+The default installation method outlined above is suitable for running on a local
+computer or on a single cloud VM instance.  If you wish to run FV3 on multiple
+compute nodes (eg. on a cluster of multiple computers), the appropriate Docker
+image can be built using `build_hpc_docker.sh`.  An user will need to select the
+specific configuration (compiler, MPI implementation, GPU support) by setting
+the HPC_CONFIG variable in the script.  The user will also need to set the 
+OUTPUT_IMAGE variable to specify where the final Docker image is to be written 
+(a DockerHub image address can be used).
+
+Currently, there is support for the GNU 8 and 9 suite of compilers, the MPICH
+3.1.4 implementation of MPI and CUDA 10.1 for Nvidia GPU support.
+
+Note that running `build_hpc_docker.sh` will result in building a new Docker 
+image from scratch.  This build process takes approximately 20 minutes on a
+single cloud VM with 8 CPUs.
 
 Building Docs
 -------------
@@ -83,3 +90,6 @@ in the same way, using `mpirun`:
 Running these files requires them to be placed inside a valid run directory. This is
 done automatically if you run them using `fv3run`, as is done in
 the Makefile in that directory.
+
+Please note that the '--oversubscribe --allow-run-as-root --mca btl_vader_single_copy_mechanism none' flags to mpirun 
+are not needed if you are using the Docker images built using the `build_hpc_docker.sh` script.

@@ -1,0 +1,175 @@
+###
+### Stage 0: Build MPI
+###
+
+FROM ubuntu:19.10 AS mpich-bld
+
+RUN apt-get update && \
+    apt-get install -y wget git \
+                       gcc gfortran g++ make \
+                       python3 python3-pip \
+                       libssl-dev && \
+   pip3 install cython
+
+RUN wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz && \
+    tar xzf mpich-3.1.4.tar.gz && \
+    cd mpich-3.1.4 && \
+    ./configure --enable-fortran --enable-cxx --prefix=/usr --enable-fast=all,O3 && \
+    make -j4 && make install && ldconfig && \
+    cd .. && rm -rf mpich-3.1.4*
+
+RUN git clone https://bitbucket.org/mpi4py/mpi4py.git && \
+    cd mpi4py && \
+    python3 setup.py build && \
+    python3 setup.py install
+
+ENV OMP_NUM_THREADS=1 \
+    LD_LIBRARY_PATH=/usr/lib:/usr/lib64:$LD_LIBRARY_PATH \
+    PATH=/usr/bin:$PATH
+
+###
+### Stage 3: Build NCEP libraries
+###
+
+FROM mpich-bld AS ncep-bld
+
+RUN git config --global http.sslverify false && \
+    git clone https://github.com/NCAR/NCEPlibs.git && \
+    cd NCEPlibs && \
+    git checkout 3da51e139d5cd731c9fc27f39d88cb4e1328212b && \
+    mkdir -p /myapps/ncep/lib && \
+    export PATH=/usr/bin:$PATH && \
+    echo "y" | ./make_ncep_libs.sh -s linux -c gnu -d /myapps/ncep -o 1 && \
+    mv *.a /myapps/ncep/lib && cd .. && rm -rf NCEPlibs
+
+###
+### Stage 4: Build ESMF library and modules
+###
+
+FROM mpich-bld AS esmf-bld
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install -y libnetcdf-dev libnetcdff-dev
+
+RUN export ESMF_DIR=/esmf ESMF_INSTALL_PREFIX=/myapps/esmf ESMF_COMM=mpich2 ESMF_LAPACK=internal && \
+    export ESMF_NETCDF_INCLUDE=/usr/local/include && ESMF_NETCDF_LIBS="-L/usr/local/lib -lnetcdf -lnetcdff" ESMF_BOPT=O3 && \
+    git clone -b ESMF_8_0_0 --depth 1 https://git.code.sf.net/p/esmf/esmf && \
+    export PATH=/usr/bin:$PATH && \
+    cd esmf && make -j8 lib
+
+RUN mkdir -p /myapps/esmf/include && mkdir -p /myapps/esmf/lib && \
+    cd /esmf/lib/libO/Linux.gfortran.64.mpich2.default && \
+    cp *.so /myapps/esmf/lib/ && cp *.a /myapps/esmf/lib/ && cp esmf.mk /myapps/esmf/lib/ && \
+    cd /esmf/mod/modO/Linux.gfortran.64.mpich2.default && \
+    cp *.mod /myapps/esmf/include/ && \
+    cd /esmf/src/include && \
+    cp *.h /myapps/esmf/include/
+
+###
+### Stage 5: Build the FMS library and modules
+###
+
+FROM mpich-bld AS fms-bld
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install -y libnetcdf-dev libnetcdff-dev autoconf libtool m4 bats
+
+RUN git clone https://github.com/VulcanClimateModeling/fv3gfs-fortran.git && \
+    mkdir -p /myapps/fms && \
+    cd fv3gfs-fortran/FMS && \
+    export PATH=/usr/bin:$PATH && \
+    export CC=/usr/bin/mpicc FC=/usr/bin/mpif90 LDFLAGS="-L/usr/lib" && \
+    export LOG_DRIVER_FLAGS="--comments" && \
+    export CPPFLAGS="-I/usr/include -Duse_LARGEFILE -DMAXFIELDMETHODS_=500 -DGFS_PHYS" && \
+    export FCFLAGS="-fcray-pointer -Waliasing -ffree-line-length-none -fno-range-check -fdefault-real-8 -fdefault-double-8 -fopenmp" && \
+    autoreconf -i && \
+    ./configure --prefix=/myapps/fms && \
+    make && make install
+
+###
+### Stage 6: Compile FV3
+###
+
+FROM mpich-bld AS fv3-bld
+
+COPY fv3gfs-python.tar /fv3gfs-python/
+COPY --from=esmf-bld /myapps/esmf/ /myapps/esmf/
+COPY --from=fms-bld /myapps/fms/ /myapps/fms/
+COPY --from=ncep-bld /myapps/ncep/ /myapps/ncep/
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get install -y libnetcdf-dev libnetcdff-dev libblas-dev liblapack-dev && \
+    git clone https://github.com/VulcanClimateModeling/fv3gfs-fortran.git && \
+    cd /fv3gfs-python && tar xf fv3gfs-python.tar && rm -r lib/external/FV3 && \
+    cd /fv3gfs-fortran/ && mv FV3 /fv3gfs-python/lib/external/ && \
+    cd /fv3gfs-python/lib/external/FV3 && \
+    cp conf/configure.fv3.linux_gnu conf/configure.fv3 && \
+    export FMS_DIR=/myapps/fms ESMF_DIR=/myapps/esmf ESMF_INC="-I/myapps/esmf/include" NCEPLIBS_DIR=/myapps/ncep NETCDF_DIR=/usr && \
+    make clean_no_dycore && make libs_no_dycore -j8 && \
+    cd atmos_cubed_sphere && make clean && \
+    cd .. && make -j8 && \
+    mkdir -p /myapps/fv3 && cp fv3.exe /myapps/fv3 && \
+    rm -rf /fv3gfs-fortran /fv3gfs-python/fv3gfs-python.tar
+
+ENV LD_LIBRARY_PATH=/myapps/esmf/lib:/myapps/fms/lib:$LD_LIBRARY_PATH
+
+###
+### Stage 7: Build the python wrapper to FV3
+###
+
+FROM fv3-bld AS fv3-python-bld
+
+ENV FV3CONFIG_CACHE_DIR=/inputdata NCEPLIBS_DIR=/myapps/ncep NETCDF_DIR=/usr \
+    FMS_DIR=/myapps/fms FMS_LIB=/myapps/fms/lib \
+    ESMF_DIR=/myapps/esmf ESMF_INC="-I/myapps/esmf/include" ESMF_LIB=/myapps/esmf/lib \
+    LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ESMF_LIB}:${FMS_LIB}:/usr/lib
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        python3-dev \
+        python3-setuptools \
+        python3-pytest \
+        python3-scipy \
+        nano curl netcdf-bin cmake
+ 
+RUN pip3 install --no-cache-dir \
+        jinja2==2.10.3 \
+        xarray==0.13.0 \
+        netcdf4==1.4.2 \
+        f90nml==1.1.2 \
+        requests==2.22.0 \
+        pytest==5.2.2 \
+        appdirs==1.4.3 \
+        pyyaml==5.1.2 \
+        fsspec==0.6.0 \
+        numcodecs==0.6.4 \
+        h5py==2.10.0 \
+        h5netcdf==0.8.0 \
+        pytest-subtests==0.3.0 \
+        toolz==0.10.0 \
+        sphinx==2.2.0 \
+        sphinx_rtd_theme \
+        backoff==1.10 && \
+    ln -s /bin/python3 /bin/python && \
+    ln -s /bin/pip3 /bin/pip
+
+ARG FV3GFS_BUILD_ROOT=/fv3gfs-fortran
+
+RUN cp /myapps/fms/lib/*.so* /lib64/ && \
+    cp /myapps/esmf/lib/*.so* /lib64/ && \
+    mkdir -p /opt/NCEPlibs/lib && \
+    cd /myapps/ncep/lib && cp *.a /opt/NCEPlibs/lib/ && \
+    cd /fv3gfs-python/lib && make -j8 && \
+    export MPI="mpich" && \
+    cd /fv3gfs-python && make build
+
+RUN pip3 install --no-cache-dir -e /fv3gfs-python/external/fv3config \
+                                -e /fv3gfs-python/external/fv3util && \
+    pip3 install --no-cache-dir -e /fv3gfs-python && \
+    pip3 install --no-cache-dir pytest-subtests
+
+CMD ["bash"]
+

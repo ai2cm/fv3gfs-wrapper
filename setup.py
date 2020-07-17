@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 from setuptools import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
@@ -35,25 +36,35 @@ relative_fv3gfs_build_filenames = [
     "io/libfv3io.a",
     "gfsphysics/libgfsphys.a",
     "../stochastic_physics/libstochastic_physics.a",
-    "/opt/NCEPlibs/lib/libnemsio_d.a",
-    "/opt/NCEPlibs/lib/libbacio_4.a",
-    "/opt/NCEPlibs/lib/libsp_v2.0.2_d.a",
-    "/opt/NCEPlibs/lib/libw3emc_d.a",
-    "/opt/NCEPlibs/lib/libw3nco_d.a",
+    "/myapps/ncep/lib/libnemsio_d.a",
+    "/myapps/ncep/lib/libbacio_4.a",
+    "/myapps/ncep/lib/libsp_v2.0.2_d.a",
+    "/myapps/ncep/lib/libw3emc_d.a",
+    "/myapps/ncep/lib/libw3nco_d.a",
 ]
+
+mpi_flavor = os.environ.get("MPI", "openmpi")
+if mpi_flavor == "openmpi":
+   mpi_fortran_lib = "-lmpi_mpifh"
+else:
+   mpi_fortran_lib = "-lmpifort"
 
 library_link_args = [
     "-lFMS",
     "-lesmf",
     "-lgfortran",
-    "-lpython3.7m",
-    "-lmpi_mpifh",
+    "-lpython3."+str(sys.version_info.minor)+"m",
+    mpi_fortran_lib,
     "-lmpi",
     "-lnetcdf",
     "-lnetcdff",
-    "-fopenmp",
-    "-lmvec",
-    "-lblas",
+    "-openmp",
+    "-lmkl_intel_lp64",
+    "-lmkl_intel_thread",
+    "-lmkl_core",
+    "-liomp5",
+    "-lpthread",
+    "-lm",
     "-lc",
     "-lrt",
 ]
@@ -72,8 +83,10 @@ test_requirements = []
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-with open("HISTORY.md") as history_file:
-    history = history_file.read()
+# Unicode decode error occurs with the following read
+#with open("HISTORY.md") as history_file:
+#    history = history_file.read()
+history = "bla bla bla"
 
 if fv3gfs_build_path_environ_name in os.environ:
     fv3gfs_build_path = os.environ(fv3gfs_build_path_environ_name)
