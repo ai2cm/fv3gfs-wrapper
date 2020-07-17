@@ -107,6 +107,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get install -y libnetcdf-dev libnetcdff-dev libblas-dev liblapack-dev && \
     git clone https://github.com/VulcanClimateModeling/fv3gfs-fortran.git && \
     cd /fv3gfs-python && tar xf fv3gfs-python.tar && rm -r lib/external/FV3 && \
+    mv setup.py_hpc_gnu setup.py && \
     cd /fv3gfs-fortran/ && mv FV3 /fv3gfs-python/lib/external/ && \
     cd /fv3gfs-python/lib/external/FV3 && \
     cp conf/configure.fv3.linux_gnu conf/configure.fv3 && \

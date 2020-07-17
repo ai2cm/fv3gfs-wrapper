@@ -20,12 +20,9 @@ OUTPUT_IMAGE=adeytown75/fv3gfs-python:${HPC_CONFIG}
 #===============  Do not change anything below this line ================
 #
 
-# Select the proper setup.py script
-cp setup.py_hpc_gnu setup.py
-
 # Prepare the fv3gfs-python source tarball
 rm -f fv3gfs-python.tar
-tar cvf fv3gfs-python.tar HISTORY.md Makefile docker external setup.cfg tests LICENSE README.md docs fill_templates.py lib setup.py templates tox.ini MANIFEST.in RELEASE.rst dev_docker.sh examples fv3gfs requirements.txt 
+tar cvf fv3gfs-python.tar HISTORY.md Makefile docker external setup.cfg tests LICENSE README.md docs fill_templates.py lib setup.py_hpc_gnu templates tox.ini MANIFEST.in RELEASE.rst dev_docker.sh examples fv3gfs requirements.txt 
 
 # Build the requested Docker image
 export DOCKER_BUILDKIT=1
