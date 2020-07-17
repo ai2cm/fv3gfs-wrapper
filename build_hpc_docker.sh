@@ -7,8 +7,8 @@ set -e
 ##-----------------------------------------------------
 
 export HPC_CONFIG=gnu9_mpich314_nocuda
-export HPC_CONFIG=gnu8_mpich314_nocuda
-export HPC_CONFIG=gnu8_mpich314_cuda101
+#export HPC_CONFIG=gnu8_mpich314_nocuda
+#export HPC_CONFIG=gnu8_mpich314_cuda101
 
 ##
 ## Give the final name & destination of the built fv3gfs-python container
