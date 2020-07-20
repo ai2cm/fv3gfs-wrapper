@@ -51,5 +51,6 @@ from ._capture_stream import capture_stream
 from . import testing
 from .initialization import SubtileGridSizer, GridSizer, QuantityFactory
 from .buffer import array_buffer, send_buffer, recv_buffer
+from ._corners import fill_scalar_corners
 
 __version__ = "0.4.3"

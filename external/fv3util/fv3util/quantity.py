@@ -86,8 +86,37 @@ class BoundaryArrayView:
 
 
 class BoundedArrayView:
+    """
+    A container of objects which provide indexing relative to corners and edges
+    of the computational domain for convenience.
+
+    Default start and end indices for all dimensions are modified to be the
+    start and end of the compute domain. When using edge and corner attributes, it is
+    recommended to explicitly write start and end offsets to avoid confusion.
+
+    Indexing on the object itself (view[:]) is offset by the origin, and default
+    start and end indices are modified to be the start and end of the compute domain.
+
+    Indexing on each of the edge attributes e.g. `west` and `east` is relative to
+    the origin (for start edges) or origin + extent (for end edges) for the
+    corresponding axis. Note directions are relative to the axis system as opposed to
+    physically zonal or meridional directions. For example, view.west[-2:0, :, :] would
+    retrieve two halo points along the edge. view.west[-2:0, 0:-1, :] would extend this
+    into any halo points
+
+    For corner attributes e.g. `northwest`, modified indexing is done for the two
+    axes according to the edges which make up the corner. In other words, indexing
+    is offset relative to the intersection of th two edges which make the corner.
+
+    For `interior`, start indices of the horizontal dimensions are relative to the
+    origin, and end indices are relative to the origin + extent. For example,
+    view.interior[0:0, 0:0, :] would retrieve the entire compute domain for an x/y/z
+    array, while view.interior[-1:1, -1:1, :] would also include one halo point.
+    """
+
     def __init__(self, array, dims, origin, extent):
         self._data = array
+        self._dims = dims
         self._origin = origin
         self._extent = extent
         self._west = BoundaryArrayView(array, constants.WEST, dims, origin, extent)
@@ -135,13 +164,13 @@ class BoundedArrayView:
         self._data[self._get_compute_index(index)] = value
 
     def _get_compute_index(self, index):
-        if len(index) > len(self.dims):
+        if not isinstance(index, (tuple, list)):
+            index = (index,)
+        if len(index) > len(self._dims):
             raise IndexError(
                 f"{len(index)} is too many indices for a "
                 f"{len(self.dims)}-dimensional quantity"
             )
-        if not isinstance(index, (tuple, list)):
-            index = (index,)
         index = fill_index(index, len(self._data.shape))
         shifted_index = []
         for entry, origin, extent in zip(index, self.origin, self.extent):
