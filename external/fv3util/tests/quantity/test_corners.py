@@ -312,7 +312,7 @@ def test_fill_scalar_corners_copies_from_halo(quantity, direction, tile_partitio
     ],
     indirect=["layout"]
 )
-def test_fill_corners(quantity_in, direction, tile_partitioner, rank, n_halo, reference):
+def test_fill_scalar_corners(quantity_in, direction, tile_partitioner, rank, n_halo, reference):
     fv3util.fill_scalar_corners(quantity=quantity_in, direction=direction, tile_partitioner=tile_partitioner, rank=rank, n_halo=n_halo)
     quantity_in.np.testing.assert_array_equal(quantity_in.data, reference)
 
