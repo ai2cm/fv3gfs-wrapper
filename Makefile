@@ -83,11 +83,9 @@ lint:
 	# ignore unused import error in __init__.py files
 	flake8 --ignore=F401 $(PYTHON_INIT_FILES)
 	@echo "LINTING SUCCESSFUL"
-	$(MAKE) -C external/fv3util lint
 
 reformat:
 	black $(PYTHON_FILES) $(PYTHON_INIT_FILES)
-	$(MAKE) -C external/fv3util reformat
 
 test: ## run tests quickly with the default Python
 	bash tests/run_tests.sh
