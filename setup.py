@@ -36,11 +36,11 @@ relative_fv3gfs_build_filenames = [
     "io/libfv3io.a",
     "gfsphysics/libgfsphys.a",
     "../stochastic_physics/libstochastic_physics.a",
-    "/myapps/ncep/lib/libnemsio_d.a",
-    "/myapps/ncep/lib/libbacio_4.a",
-    "/myapps/ncep/lib/libsp_v2.0.2_d.a",
-    "/myapps/ncep/lib/libw3emc_d.a",
-    "/myapps/ncep/lib/libw3nco_d.a",
+    "/opt/NCEPlibs/lib/libnemsio_d.a",
+    "/opt/NCEPlibs/lib/libbacio_4.a",
+    "/opt/NCEPlibs/lib/libsp_v2.0.2_d.a",
+    "/opt/NCEPlibs/lib/libw3emc_d.a",
+    "/opt/NCEPlibs/lib/libw3nco_d.a",
 ]
 
 mpi_flavor = os.environ.get("MPI", "openmpi")
