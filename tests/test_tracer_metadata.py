@@ -5,37 +5,10 @@ import yaml
 from mpi4py import MPI
 import fv3config
 import fv3gfs
-import fv3util
 from util import redirect_stdout
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 rundir = os.path.join(test_dir, "rundir")
-
-
-class RestartTests(unittest.TestCase):
-    def __init__(self, *args, **kwargs):
-        super(RestartTests, self).__init__(*args, **kwargs)
-        self.tracer_data = fv3gfs.get_tracer_metadata()
-        self.dynamics_data = {
-            entry["name"]: entry for entry in fv3util.DYNAMICS_PROPERTIES
-        }
-        self.physics_data = {
-            entry["name"]: entry for entry in fv3util.PHYSICS_PROPERTIES
-        }
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        MPI.COMM_WORLD.barrier()
-
-    # def test_load_fortran_restart_folder_no_raising(self):
-    #     restart.load_fortran_restart_folder(os.path.join(rundir, 'INPUT'))
-
-    # def test_load_fortran_restart_folder_has_time(self):
-    #     state = restart.load_fortran_restart_folder(os.path.join(rundir, 'INPUT'))
-    #     self.assertIn('time', state)
-    #     self.assertIsInstance(state['time'], datetime)
 
 
 class TracerMetadataTests(unittest.TestCase):
@@ -81,7 +54,9 @@ class TracerMetadataTests(unittest.TestCase):
 if __name__ == "__main__":
     with open(os.path.join(test_dir, "default_config.yml"), "r") as f:
         config = yaml.safe_load(f)
-    config["initial_conditions"] = "restart_example"
+    config[
+        "initial_conditions"
+    ] = "gs://vcm-fv3config/data/initial_conditions/c12_restart_initial_conditions/v1.0"
     config["namelist"]["fv_core_nml"]["external_ic"] = False
     config["namelist"]["fv_core_nml"]["nggps_ic"] = False
     config["namelist"]["fv_core_nml"]["make_nh"] = False

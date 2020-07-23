@@ -4,10 +4,23 @@ History
 latest
 ------
 
+Breaking changes:
+- fixed a bug where atmosphere hybrid coordinates were incorrectly marked as cell center variables, and were missing one point
+- `send_buffer` and `recv_buffer` are modified to take in a `callable`, which is more easily serialized than a `numpy`-like module (necessary because we serialize the arguments to re-use buffers), and allows custom specification of the initialization if zeros are needed instead of empty.
+
+Major changes:
+- Added getters and setters for additional dynamics quantities needed to call an alternative dynamical core
+- fv3config is updated to v0.4.0, "default" data options for initial conditions and forcings, as well as functions get_default_config and ensure_data_is_downloaded have been removed
+- `get_state` and `open_restart` have been modified so they can optionally accept a target state dictionary in which to insert variables. `get_state` also can take in an allocator, which manages initialization concerns like halo allocation or the use of storages instead of numpy arrays.
 - added `storage` property to Quantity, implemented as short-term shortcut to .data until gt4py GDP-3 is implemented
+
+Minor changes:
+- Internally, get_state uses the new QuantityFactory class to initialize quantities
 - fixed bug in fv3util setup.py which prevented `python setup.py install` from copying submodules
 - fixed bug in dockerfile where gs://vcm-fv3config data was downloaded to incorrect location
 
+Deprecations:
+- `Quantity.values` is deprecated
 
 v0.4.3 (2020-05-15)
 -------------------

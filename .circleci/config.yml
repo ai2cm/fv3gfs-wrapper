@@ -11,38 +11,6 @@ jobs:
       - run: sudo pip3 install black==19.10b0 flake8==3.7.8
       - run: make lint
 
-  test_python:
-    docker:
-      - image: circleci/python:3.7
-    working_directory: ~/repo
-
-    steps:
-      - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "external/fv3util/requirements.txt" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-      - run:
-          name: install dependencies
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip3 install -r external/fv3util/requirements.txt
-      - save_cache:
-          paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "external/fv3util/requirements.txt" }}
-
-      - run:
-          name: run tests
-          command: |
-            . venv/bin/activate
-            pip3 install -e external/fv3util
-            pytest external/fv3util/tests
-
   build_default:
     machine:
       docker_layer_caching: true
@@ -58,7 +26,7 @@ jobs:
             echo $ENCODED_GCR_KEY | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS
       - add_ssh_keys:
           fingerprints:
-            - "b6:e7:38:b9:a6:61:ec:f2:27:81:0c:8e:b9:79:41:ca"
+            - "31:b8:08:52:8e:57:56:7d:ee:4b:fe:15:7c:d7:06:9e"  # pull fv3util
       - run:
           name: "Pull submodules"
           command: |
@@ -157,14 +125,9 @@ workflows:
           filters:
             tags:
               only: /^v.*/
-      - test_python:
-          filters:
-            tags:
-              only: /^v.*/
       - build_default:
           requires:
             - lint
-            - test_python
           filters:
             tags:
               only: /^v.*/
