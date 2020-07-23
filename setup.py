@@ -45,9 +45,9 @@ relative_fv3gfs_build_filenames = [
 
 mpi_flavor = os.environ.get("MPI", "openmpi")
 if mpi_flavor == "openmpi":
-   mpi_fortran_lib = "-lmpi_mpifh"
+    mpi_fortran_lib = "-lmpi_mpifh"
 else:
-   mpi_fortran_lib = "-lmpifort"
+    mpi_fortran_lib = "-lmpifort"
 
 library_link_args = [
     "-lFMS",
@@ -80,7 +80,7 @@ with open("README.md") as readme_file:
     readme = readme_file.read()
 
 # Unicode decode error occurs with the following read 
-#with open("HISTORY.md") as history_file:
+# with open("HISTORY.md") as history_file:
 #    history = history_file.read()
 history = "bla bla bla"
 
