@@ -20,7 +20,7 @@ RUN wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz && \
 
 RUN git clone -b v8.0.0b3 --depth 1 https://github.com/cupy/cupy.git && \
     cd cupy && pip3 install . && cd .. && \
-    git clone https://bitbucket.org/mpi4py/mpi4py.git && \
+    git clone -b 3.0.3 https://bitbucket.org/mpi4py/mpi4py.git && \
     cd mpi4py && \
     python3 setup.py build && \
     python3 setup.py install

@@ -18,7 +18,7 @@ RUN wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz && \
     make -j4 && make install && ldconfig && \
     cd .. && rm -rf mpich-3.1.4*
 
-RUN git clone https://bitbucket.org/mpi4py/mpi4py.git && \
+RUN git -b 3.0.3 clone https://bitbucket.org/mpi4py/mpi4py.git && \
     cd mpi4py && \
     python3 setup.py build && \
     python3 setup.py install
