@@ -79,9 +79,6 @@ test_requirements = []
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-# Unicode decode error occurs with the following read 
-# with open("HISTORY.md") as history_file:
-#    history = history_file.read()
 history = "bla bla bla"
 
 if fv3gfs_build_path_environ_name in os.environ:
