@@ -45,9 +45,8 @@ OUTPUT_IMAGE variable to specify where the final Docker image is to be written
 Currently, there is support for the GNU 8 and 9 suite of compilers, the MPICH
 3.1.4 implementation of MPI and CUDA 10.1 for Nvidia GPU support.
 
-Note that running `build_hpc_docker.sh` will result in building a new Docker 
-image from scratch.  This build process takes approximately 20 minutes on a
-single cloud VM with 8 CPUs.
+Note that `build_hpc_docker.sh` will build a new Docker image from scratch.  This 
+build process takes approximately 20 minutes on a single cloud VM with 8 CPUs.
 
 Building Docs
 -------------
@@ -92,4 +91,4 @@ done automatically if you run them using `fv3run`, as is done in
 the Makefile in that directory.
 
 Please note that the '--oversubscribe --allow-run-as-root --mca btl_vader_single_copy_mechanism none' flags to mpirun 
-are not needed if you are using the Docker images built using the `build_hpc_docker.sh` script.
+are not needed if you are using the mpich-based Docker images built using the `build_hpc_docker.sh` script.

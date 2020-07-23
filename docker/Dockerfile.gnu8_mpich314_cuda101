@@ -2,7 +2,7 @@
 ### Stage 0: Build MPI
 ###
 
-FROM nvidia/cuda:10.1-devel-ubuntu18.04 AS mpich-bld
+FROM nvidia/cuda:10.1-devel-ubuntu18.04 AS mpich-build
 
 RUN apt-get update && \
     apt-get install -y wget git \
@@ -35,7 +35,7 @@ ENV OMP_NUM_THREADS=1 \
 ### Stage 1: Build NCEP libraries
 ###
 
-FROM mpich-bld AS ncep-bld
+FROM mpich-build AS ncep-build
 
 RUN git config --global http.sslverify false && \
     git clone https://github.com/NCAR/NCEPlibs.git && \
@@ -50,7 +50,7 @@ RUN git config --global http.sslverify false && \
 ### Stage 2: Build ESMF library and modules
 ###
 
-FROM mpich-bld AS esmf-bld
+FROM mpich-build AS esmf-build
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
@@ -74,7 +74,7 @@ RUN mkdir -p /myapps/esmf/include && mkdir -p /myapps/esmf/lib && \
 ### Stage 3: Build the FMS library and modules
 ###
 
-FROM mpich-bld AS fms-bld
+FROM mpich-build AS fms-build
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
@@ -96,11 +96,11 @@ RUN git clone https://github.com/VulcanClimateModeling/fv3gfs-fortran.git && \
 ### Stage 4: Compile FV3
 ###
 
-FROM mpich-bld AS fv3-bld
+FROM mpich-build AS fv3-build
 
-COPY --from=esmf-bld /myapps/esmf/ /myapps/esmf/
-COPY --from=fms-bld /myapps/fms/ /myapps/fms/
-COPY --from=ncep-bld /myapps/ncep/ /myapps/ncep/
+COPY --from=esmf-build /myapps/esmf/ /myapps/esmf/
+COPY --from=fms-build /myapps/fms/ /myapps/fms/
+COPY --from=ncep-build /myapps/ncep/ /myapps/ncep/
 COPY fv3gfs-python.tar /fv3gfs-python/
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -123,7 +123,7 @@ ENV LD_LIBRARY_PATH=/myapps/esmf/lib:/myapps/fms/lib:$LD_LIBRARY_PATH
 ### Stage 5: Build the python wrapper to FV3
 ###
 
-FROM fv3-bld AS fv3-python-bld
+FROM fv3-build AS fv3-python-build
 
 ENV FV3CONFIG_CACHE_DIR=/inputdata NCEPLIBS_DIR=/myapps/ncep NETCDF_DIR=/usr \
     FMS_DIR=/myapps/fms FMS_LIB=/myapps/fms/lib \
