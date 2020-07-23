@@ -14,7 +14,7 @@ export HPC_CONFIG=gnu9_mpich314_nocuda
 ## Give the final name & destination of the built fv3gfs-python container
 ##-----------------------------------------------------------------------
 
-OUTPUT_IMAGE=adeytown75/fv3gfs-python:${HPC_CONFIG}
+OUTPUT_IMAGE=us.gcr.io/vcm-ml/fv3gfs-python:${HPC_CONFIG}
 
 #
 #===============  Do not change anything below this line ================
