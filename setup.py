@@ -79,7 +79,8 @@ test_requirements = []
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-history = "bla bla bla"
+with open("HISTORY.md", "r", encoding="utf-8") as history_file:
+    history = history_file.read()
 
 if fv3gfs_build_path_environ_name in os.environ:
     fv3gfs_build_path = os.environ(fv3gfs_build_path_environ_name)
