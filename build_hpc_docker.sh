@@ -26,7 +26,6 @@ tar cvf fv3gfs-python.tar HISTORY.md Makefile docker external setup.cfg tests LI
 
 # Build the requested Docker image
 export DOCKER_BUILDKIT=1
-export CONTAINER=docker/Dockerfile.${HPC_CONFIG}
+export DOCKERFILE=docker/Dockerfile.${HPC_CONFIG}
 
-docker build -f ${CONTAINER} --target fv3-python-bld -t ${OUTPUT_IMAGE} .
-
+docker build -f ${DOCKERFILE} --target fv3-python-bld -t ${OUTPUT_IMAGE} .
