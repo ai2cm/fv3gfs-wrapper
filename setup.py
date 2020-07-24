@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 from setuptools import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
@@ -42,12 +43,18 @@ relative_fv3gfs_build_filenames = [
     "/opt/NCEPlibs/lib/libw3nco_d.a",
 ]
 
+mpi_flavor = os.environ.get("MPI", "openmpi")
+if mpi_flavor == "openmpi":
+    mpi_fortran_lib = "-lmpi_mpifh"
+else:
+    mpi_fortran_lib = "-lmpifort"
+
 library_link_args = [
     "-lFMS",
     "-lesmf",
     "-lgfortran",
-    "-lpython3.7m",
-    "-lmpi_mpifh",
+    "-lpython3." + str(sys.version_info.minor) + "m",
+    mpi_fortran_lib,
     "-lmpi",
     "-lnetcdf",
     "-lnetcdff",
@@ -72,7 +79,7 @@ test_requirements = []
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-with open("HISTORY.md") as history_file:
+with open("HISTORY.md", "r", encoding="utf-8") as history_file:
     history = history_file.read()
 
 if fv3gfs_build_path_environ_name in os.environ:
