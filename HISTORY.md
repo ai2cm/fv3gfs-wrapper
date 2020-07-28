@@ -4,9 +4,14 @@ History
 latest
 ------
 
+
+v0.5.0 (2020-05-15)
+------
+
 Breaking changes:
 - fixed a bug where atmosphere hybrid coordinates were incorrectly marked as cell center variables, and were missing one point
 - `send_buffer` and `recv_buffer` are modified to take in a `callable`, which is more easily serialized than a `numpy`-like module (necessary because we serialize the arguments to re-use buffers), and allows custom specification of the initialization if zeros are needed instead of empty.
+- use remote data for restart conditions
 
 Major changes:
 - Added getters and setters for additional dynamics quantities needed to call an alternative dynamical core
@@ -18,6 +23,8 @@ Minor changes:
 - Internally, get_state uses the new QuantityFactory class to initialize quantities
 - fixed bug in fv3util setup.py which prevented `python setup.py install` from copying submodules
 - fixed bug in dockerfile where gs://vcm-fv3config data was downloaded to incorrect location
+- New hpc dockerfiles
+- aquaplanet configuration
 
 Deprecations:
 - `Quantity.values` is deprecated
