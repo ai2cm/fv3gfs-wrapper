@@ -1,18 +1,8 @@
 History
 =======
 
-Current
--------
-
-Breaking changes:
-
-Major changes:
-
-Minor changes:
-
-
-v0.5.0 (2020-07-27)
--------------------
+latest
+------
 
 Breaking changes:
 - fixed a bug where atmosphere hybrid coordinates were incorrectly marked as cell center variables, and were missing one point

@@ -9,7 +9,7 @@ from Cython.Build import cythonize
 # This line only needed if building with NumPy in Cython file.
 from numpy import get_include
 
-PACKAGE_VERSION = "0.5.0"
+PACKAGE_VERSION = "0.4.3"
 
 fv3gfs_build_path_environ_name = "FV3GFS_BUILD_DIR"
 make_command = os.environ.get("MAKE", "make")
@@ -69,7 +69,7 @@ requirements = [
     "xarray>=0.13.0",
     "netCDF4>=1.4.2",
     "numpy",
-    "fv3util",
+    f"fv3util=={PACKAGE_VERSION}",
 ]
 
 setup_requirements = ["cython", "numpy", "jinja2"]
