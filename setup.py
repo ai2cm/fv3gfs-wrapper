@@ -69,7 +69,7 @@ requirements = [
     "xarray>=0.13.0",
     "netCDF4>=1.4.2",
     "numpy",
-    f"fv3util=={PACKAGE_VERSION}",
+    f"fv3util>=0.5.1",
 ]
 
 setup_requirements = ["cython", "numpy", "jinja2"]
