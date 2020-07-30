@@ -53,7 +53,7 @@ python3 -m venv venv
 . ./venv/bin/activate
 pip3 install --upgrade pip setuptools wheel
 pip3 install -r external/fv3util/requirements.txt
-pip3 install mpi4py external/fv3util
+pip3 install external/fv3util
 pytest --junitxml results.xml external/fv3util/tests
 
 deactivate
