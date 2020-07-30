@@ -39,9 +39,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            . venv/bin/activate
-            pip3 install -e external/fv3util
-            pytest external/fv3util/tests
+            bash .jenkins/actions/test_fv3util.sh
 
   build_default:
     machine:
