@@ -135,8 +135,6 @@ workflows:
           requires:
             - lint
           filters:
-            branches:
-              only: master
             tags:
               only: /^v.*/
       - docs_deploy:
