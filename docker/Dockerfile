@@ -179,7 +179,7 @@ RUN pip3 install --no-cache-dir -e \
     /fv3gfs-python/external/fv3config \
     -e /fv3gfs-python/external/fv3util && \
     pip3 install --no-cache-dir -e /fv3gfs-python && \
-    pip3 install --no-cache-dir pytest-subtests  # must reinstall to increment pytest, gt4py requires 4 (but not really)
+    pip3 install --no-cache-dir pytest-subtests==0.3.0  # must reinstall to increment pytest, gt4py requires 4 (but not really)
 
 # cache model data
 COPY --from=fv3config-inputdata /fv3config-cache $FV3CONFIG_CACHE_DIR/fv3config-cache
