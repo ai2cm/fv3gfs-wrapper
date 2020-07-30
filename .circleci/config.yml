@@ -74,6 +74,10 @@ jobs:
           then
               echo "pushing untagged image $GCR_IMAGE"
               docker push $GCR_IMAGE
+
+              echo "pushing image $GCR_IMAGE:$CIRCLE_SHA1"
+              docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_SHA1
+              docker push $GCR_IMAGE:$CIRCLE_SHA1
           fi
           if [[ ! -z "$CIRCLE_TAG" ]]
           then
@@ -81,6 +85,8 @@ jobs:
               docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_TAG
               docker push $GCR_IMAGE:$CIRCLE_TAG
           fi
+
+
       - run:
           name: "Delete data files"
           command: |
