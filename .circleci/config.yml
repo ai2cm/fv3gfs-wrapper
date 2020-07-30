@@ -72,8 +72,12 @@ jobs:
           echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://gcr.io
           if [[ "$CIRCLE_BRANCH" == "master" ]]
           then
-              echo "pushing untagged image $GCR_IMAGE"
+              echo "push untagged $GCR_IMAGE"
               docker push $GCR_IMAGE
+
+              echo "push $GCR_IMAGE:$CIRCLE_SHA1"
+              docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_SHA1
+              docker push $GCR_IMAGE:$CIRCLE_SHA1
           fi
           if [[ ! -z "$CIRCLE_TAG" ]]
           then
@@ -81,6 +85,8 @@ jobs:
               docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_TAG
               docker push $GCR_IMAGE:$CIRCLE_TAG
           fi
+
+
       - run:
           name: "Delete data files"
           command: |
@@ -129,6 +135,8 @@ workflows:
           requires:
             - lint
           filters:
+            branches:
+              only: master
             tags:
               only: /^v.*/
       - docs_deploy:
