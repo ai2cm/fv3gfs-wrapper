@@ -72,10 +72,10 @@ jobs:
           echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://gcr.io
           if [[ "$CIRCLE_BRANCH" == "master" ]]
           then
-              echo "push untagged $GCR_IMAGE"
+              echo "pushing untagged image $GCR_IMAGE"
               docker push $GCR_IMAGE
 
-              echo "push $GCR_IMAGE:$CIRCLE_SHA1"
+              echo "pushing image $GCR_IMAGE:$CIRCLE_SHA1"
               docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_SHA1
               docker push $GCR_IMAGE:$CIRCLE_SHA1
           fi
