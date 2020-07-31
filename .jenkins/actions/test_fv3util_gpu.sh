@@ -56,9 +56,11 @@ if [ ! -f external/fv3util/requirements.txt ] ; then
     exitError 1205 ${LINENO} "could not find requirements_dev.txt, run from top directory"
 fi
 python3 -m venv venv
+module unload cray-python
+module unload pycuda
 . ./venv/bin/activate
 pip3 install -r external/fv3util/requirements.txt
-pip3 install external/fv3util cupy-cuda101
+pip3 install external/fv3util cupy-cuda101 pytest==5.4.3
 pytest --junitxml results.xml external/fv3util/tests
 
 deactivate
