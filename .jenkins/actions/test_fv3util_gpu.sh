@@ -46,6 +46,8 @@ T="$(date +%s)"
 parseOptions $*
 
 # we only run this on HPC
+module load daint-gpu
+module load cray-python
 module load pycuda
 
 # run tests
