@@ -1,5 +1,7 @@
 #!/bin/bash -f
 
+set -e
+
 ##################################################
 # functions
 ##################################################
@@ -53,7 +55,6 @@ if [ ! -f external/fv3util/requirements.txt ] ; then
 fi
 python3 -m venv venv
 . ./venv/bin/activate
-pip3 install --upgrade pip setuptools wheel
 pip3 install -r external/fv3util/requirements.txt
 pip3 install external/fv3util cupy-cuda101
 pytest --junitxml results.xml external/fv3util/tests
