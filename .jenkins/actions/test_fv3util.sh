@@ -1,5 +1,7 @@
 #!/bin/bash -f
 
+set -e
+
 ##################################################
 # functions
 ##################################################
@@ -57,9 +59,6 @@ pip3 install external/fv3util
 pytest --junitxml results.xml external/fv3util/tests
 
 deactivate
-
-# cleanup virtual environment
-rm -rf ./venv
 
 # end timer and report time taken
 T="$(($(date +%s)-T))"

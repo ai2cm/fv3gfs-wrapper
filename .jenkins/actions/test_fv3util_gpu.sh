@@ -61,9 +61,6 @@ pytest --junitxml results.xml external/fv3util/tests
 
 deactivate
 
-# cleanup virtual environment
-rm -rf ./venv
-
 # end timer and report time taken
 T="$(($(date +%s)-T))"
 printf "####### time taken: %02d:%02d:%02d:%02d\n" "$((T/86400))" "$((T/3600%24))" "$((T/60%60))" "$((T%60))"
