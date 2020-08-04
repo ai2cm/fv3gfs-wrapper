@@ -40,7 +40,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     netcdf4==1.4.2 \
     f90nml==1.1.2 \
     requests==2.22.0 \
-    pytest==5.2.2 && \
+    pytest==5.4.3 && \
     ln -s /bin/python3 /bin/python && \
     ln -s /bin/pip3 /bin/pip
 
@@ -144,7 +144,7 @@ RUN pip3 install --no-cache-dir \
     zarr==2.3.2 \
     h5py==2.10.0 \
     h5netcdf==0.8.0 \
-    pytest-subtests==0.3.0 \
+    pytest-subtests==0.3.1 \
     dask==2.10.1 \
     toolz==0.10.0 \
     scipy==1.3.1 \
@@ -179,7 +179,7 @@ RUN pip3 install --no-cache-dir -e \
     /fv3gfs-python/external/fv3config \
     -e /fv3gfs-python/external/fv3util && \
     pip3 install --no-cache-dir -e /fv3gfs-python && \
-    pip3 install --no-cache-dir pytest-subtests  # must reinstall to increment pytest, gt4py requires 4 (but not really)
+    pip3 install --no-cache-dir pytest-subtests==0.3.1 pytest==5.4.3  # must reinstall to increment pytest, gt4py requires 4 (but not really)
 
 # cache model data
 COPY --from=fv3config-inputdata /fv3config-cache $FV3CONFIG_CACHE_DIR/fv3config-cache
