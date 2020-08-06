@@ -24,8 +24,6 @@ def tracer_properties(request):
 @pytest.fixture
 def c12_restart_state_list(layout, tracer_properties):
     total_ranks = layout[0] * layout[1]
-    ny = 12 / layout[0]
-    nx = 12 / layout[1]
     shared_buffer = {}
     communicator_list = []
     for rank in range(total_ranks):

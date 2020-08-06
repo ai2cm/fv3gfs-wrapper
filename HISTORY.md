@@ -4,6 +4,9 @@ History
 latest
 ------
 
+Breaking changes:
+- Removed many fv3util imports from fv3gfs, import those symbols from fv3util instead
+
 
 v0.5.0 (2020-07-28)
 ------

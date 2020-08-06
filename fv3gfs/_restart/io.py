@@ -1,4 +1,3 @@
-import fv3util
 from .._wrapper import get_tracer_metadata
 from .._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
 

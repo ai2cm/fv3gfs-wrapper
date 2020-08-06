@@ -6,18 +6,12 @@ import yaml
 import numpy as np
 import fv3config
 import fv3gfs
+from fv3gfs._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
 import fv3util
-import json
 from mpi4py import MPI
 from util import redirect_stdout
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
-
-with open(os.path.join(test_dir, "../metadata/dynamics_properties.json"), "r") as f:
-    DYNAMICS_PROPERTIES = json.load(f)
-
-with open(os.path.join(test_dir, "../metadata/physics_properties.json"), "r") as f:
-    PHYSICS_PROPERTIES = json.load(f)
 
 
 class SetterTests(unittest.TestCase):

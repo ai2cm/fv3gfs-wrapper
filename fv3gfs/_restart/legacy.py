@@ -1,6 +1,4 @@
 from typing import List
-import copy
-import fv3util.fortran_info
 import fv3util
 from .. import _wrapper
 
