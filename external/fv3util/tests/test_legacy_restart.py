@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+import cftime
 import xarray as xr
 import numpy as np
 import pytest
@@ -36,7 +37,7 @@ def test_open_c12_restart_without_crashing(layout):
         assert len(state.keys()) == 63
         for name, value in state.items():
             if name == "time":
-                assert isinstance(value, datetime)
+                assert isinstance(value, cftime.DatetimeJulian)
             else:
                 assert isinstance(value, fv3util.Quantity)
                 assert np.sum(np.isnan(value.view[:])) == 0
@@ -77,7 +78,7 @@ def test_open_c12_restart_empty_to_state_without_crashing(layout):
         assert len(state.keys()) == 63
         for name, value in state.items():
             if name == "time":
-                assert isinstance(value, datetime)
+                assert isinstance(value, cftime.DatetimeJulian)
             else:
                 assert isinstance(value, fv3util.Quantity)
                 assert np.sum(np.isnan(value.view[:])) == 0
@@ -126,7 +127,7 @@ def test_open_c12_restart_to_allocated_state_without_crashing(layout):
         assert len(state.keys()) == 63
         for name, value in state.items():
             if name == "time":
-                assert isinstance(value, datetime)
+                assert isinstance(value, cftime.DatetimeJulian)
             else:
                 assert isinstance(value, fv3util.Quantity)
                 assert np.sum(np.isnan(value.view[:])) == 0
@@ -143,7 +144,7 @@ def test_open_c12_restart_to_allocated_state_without_crashing(layout):
 
 @pytest.fixture
 def coupler_res_file_and_time():
-    return os.path.join(DATA_DIRECTORY, "coupler.res"), datetime(2016, 8, 3)
+    return os.path.join(DATA_DIRECTORY, "coupler.res"), cftime.DatetimeJulian(2016, 8, 3)
 
 
 def test_get_current_date_from_coupler_res(coupler_res_file_and_time):

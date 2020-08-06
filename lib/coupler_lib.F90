@@ -222,9 +222,10 @@ contains
         !call  atmos_model_init (Atm,  Time_init, Time_atmos, Time_step_atmos)
         end subroutine initialize_time
 
-    subroutine get_time(year, month, day, hour, minute, second) bind(c, name='get_time_subroutine')
-        integer, intent(out) :: year, month, day, hour, minute, second
+    subroutine get_time(year, month, day, hour, minute, second, calendar_out) bind(c, name='get_time_subroutine')
+        integer, intent(out) :: year, month, day, hour, minute, second, calendar_out
         call get_date(Time_atmos, year, month, day, hour, minute, second)
+        calendar_out = calendar_type
     end subroutine get_time
 
     subroutine get_physics_timestep_subroutine(physics_timestep) bind(c)

@@ -1,5 +1,6 @@
 import tempfile
 import zarr
+import cftime
 from datetime import datetime, timedelta
 import pytest
 import xarray as xr
@@ -22,7 +23,7 @@ def n_times(request):
 
 @pytest.fixture
 def start_time():
-    return datetime(2010, 1, 1)
+    return cftime.DatetimeJulian(2010, 1, 1)
 
 
 @pytest.fixture
@@ -126,7 +127,9 @@ def validate_store(states, filename, numpy):
 
     def validate_array_dimensions_and_attributes(name, array):
         if name == "time":
-            target_attrs = {"_ARRAY_DIMENSIONS": ["time"]}
+            target_attrs = {"_ARRAY_DIMENSIONS": ["time"],
+                            "units": "microseconds since 1970-01-01",
+                            "calendar": "julian"}
         else:
             target_attrs = states[0][name].attrs
             target_attrs["_ARRAY_DIMENSIONS"] = ["time", "tile"] + list(
@@ -137,7 +140,8 @@ def validate_store(states, filename, numpy):
     def validate_array_values(name, array):
         if name == "time":
             for i, s in enumerate(states):
-                assert array[i] == numpy.datetime64(s["time"])
+                value = cftime.num2date(array[i], units="microseconds since 1970-01-01", calendar="julian")
+                assert value == s["time"]
         else:
             for i, s in enumerate(states):
                 numpy.testing.assert_array_equal(array[i, 0, :], s[name].view[:])
@@ -171,7 +175,7 @@ def test_monitor_file_store_multi_rank_state(
     ny_rank = int(ny / layout[0] + ny_rank_add)
     nx_rank = int(nx / layout[1] + nx_rank_add)
     grid = fv3util.TilePartitioner(layout)
-    time = datetime(2010, 6, 20, 6, 0, 0)
+    time = cftime.DatetimeJulian(2010, 6, 20, 6, 0, 0)
     timestep = timedelta(hours=1)
     total_ranks = 6 * layout[0] * layout[1]
     partitioner = fv3util.CubedSpherePartitioner(grid)

@@ -2,6 +2,7 @@ import unittest
 import yaml
 import os
 import shutil
+import cftime
 import numpy as np
 import fv3config
 import fv3gfs
@@ -148,6 +149,10 @@ class GetterTests(unittest.TestCase):
             with self.subTest(name):
                 self.assertIn(name, state)
         self.assertEqual(len(name_list), len(state.keys()))
+
+    def test_get_time(self):
+        state = fv3gfs.get_state(names=["time"])
+        assert isinstance(state["time"], cftime.DatetimeJulian)
 
 
 class TracerMetadataTests(unittest.TestCase):

@@ -1,4 +1,5 @@
 from typing import Union, Tuple
+import cftime
 import logging
 import zarr
 import numpy as np
@@ -9,6 +10,9 @@ from .partitioner import CubedSpherePartitioner, subtile_slice
 logger = logging.getLogger("fv3util")
 
 __all__ = ["ZarrMonitor"]
+
+
+TIME_ENCODING_UNITS = "microseconds since 1970-01-01"
 
 
 class DummyComm:
@@ -236,7 +240,7 @@ class _ZarrTimeWriter(_ZarrVariableWriter):
         )
 
     def append(self, time):
-        array = xr.DataArray(np.datetime64(time))
+        array = xr.DataArray()
         if self.array is None:
             self._init_zarr(array)
         if self.i_time >= self.array.shape[0] and self.rank == 0:
@@ -244,6 +248,8 @@ class _ZarrTimeWriter(_ZarrVariableWriter):
             self.array.resize(*new_shape)
         self.sync_array()
         if self.rank == 0:
-            self.array[self.i_time] = np.datetime64(time)
+            self.array[self.i_time] = cftime.date2num(time, units=TIME_ENCODING_UNITS)
         self.i_time += 1
+        self.array.attrs["units"] = TIME_ENCODING_UNITS
+        self.array.attrs["calendar"] = time.calendar
         self.comm.barrier()
