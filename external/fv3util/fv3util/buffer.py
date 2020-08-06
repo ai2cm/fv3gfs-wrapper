@@ -2,6 +2,11 @@ from typing import Callable, Iterable
 from numpy import ndarray
 import contextlib
 from .utils import is_c_contiguous
+try:
+    from gt4py.storage.storage import Storage
+except ImportError:
+    class Storage:
+        pass
 
 BUFFER_CACHE = {}
 
@@ -50,7 +55,10 @@ def send_buffer(allocator: Callable, array: ndarray):
         yield array
     else:
         with array_buffer(allocator, array.shape, array.dtype) as sendbuf:
-            sendbuf[:] = array
+            if isinstance(array, Storage):
+                sendbuf[:] = array.data
+            else:
+                sendbuf[:] = array
             yield sendbuf
 
 

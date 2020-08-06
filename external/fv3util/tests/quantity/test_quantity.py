@@ -2,6 +2,10 @@ import pytest
 import numpy as np
 import fv3util
 import fv3util.quantity
+try:
+    import cupy
+except ImportError:
+    cupy = None
 
 
 @pytest.fixture(params=["empty", "one", "five"])
@@ -61,6 +65,13 @@ def data(n_halo, extent_1d, n_dims, numpy, dtype):
 @pytest.fixture
 def quantity(data, origin, extent, dims, units):
     return fv3util.Quantity(data, origin=origin, extent=extent, dims=dims, units=units)
+
+
+def test_numpy(quantity, backend):
+    if "cupy" in backend:
+        assert quantity.np is cupy
+    else:
+        assert quantity.np is np
 
 
 def test_smaller_data_raises(data, origin, extent, dims, units):

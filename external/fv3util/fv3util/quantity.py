@@ -42,10 +42,12 @@ class QuantityMetadata:
     @property
     def np(self) -> ModuleType:
         """numpy-like module used to interact with the data"""
-        if issubclass(self.data_type, np.ndarray):
-            return np
-        elif issubclass(self.data_type, cupy.ndarray):
+        if issubclass(self.data_type, cupy.ndarray):
             return cupy
+        elif gt4py is not None and issubclass(self.data_type, (gt4py.storage.storage.GPUStorage, gt4py.storage.storage.ExplicitlySyncedGPUStorage)):
+            return cupy
+        elif issubclass(self.data_type, np.ndarray):
+            return np
         else:
             raise TypeError(
                 f"quantity underlying data is of unexpected type {self.data_type}"

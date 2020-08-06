@@ -7,6 +7,7 @@ import copy
 import fv3util
 import logging
 from fv3util.testing import DummyComm
+import numpy as numpy_cpu
 
 
 logger = logging.getLogger("test_zarr_monitor")
@@ -137,7 +138,7 @@ def validate_store(states, filename, numpy):
     def validate_array_values(name, array):
         if name == "time":
             for i, s in enumerate(states):
-                assert array[i] == numpy.datetime64(s["time"])
+                assert array[i] == numpy_cpu.datetime64(s["time"])
         else:
             for i, s in enumerate(states):
                 numpy.testing.assert_array_equal(array[i, 0, :], s[name].view[:])
@@ -296,7 +297,7 @@ def test_values_preserved(cube_partitioner, numpy):
 
     # open w/o dask using chunks=None
     dataset = xr.open_zarr(store, chunks=None)
-    numpy.testing.assert_almost_equal(dataset["var"][0, 0, :, :].values, quantity.data)
+    numpy.testing.assert_array_almost_equal(dataset["var"][0, 0, :, :].values, quantity.data)
     assert dataset["var"].shape[:2] == (1, 6)
     assert dataset["var"].attrs["units"] == units
     assert dataset["var"].dims[2:] == dims

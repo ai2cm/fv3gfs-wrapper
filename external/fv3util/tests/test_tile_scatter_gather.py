@@ -143,7 +143,7 @@ def get_quantity(dims, units, extent, n_halo, numpy):
 
 
 def test_tile_gather_state(
-    tile_quantity, scattered_quantities, communicator_list, time
+    tile_quantity, scattered_quantities, communicator_list, time, backend
 ):
     for communicator, rank_quantity in reversed(
         list(zip(communicator_list, scattered_quantities))
@@ -159,6 +159,10 @@ def test_tile_gather_state(
     assert result.dims == tile_quantity.dims
     assert result.units == tile_quantity.units
     assert result.extent == tile_quantity.extent
+    assert type(result.data) is type(tile_quantity.data)
+    print(type(result.view[:]), type(tile_quantity.view[:]), tile_quantity.np)
+    if backend.startswith("gt4py"):
+        result.data.synchronize()
     tile_quantity.np.testing.assert_array_equal(result.view[:], tile_quantity.view[:])
 
 

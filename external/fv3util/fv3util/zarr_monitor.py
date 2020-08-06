@@ -5,6 +5,10 @@ import numpy as np
 import xarray as xr
 from . import constants, utils
 from .partitioner import CubedSpherePartitioner, subtile_slice
+try:
+    import cupy
+except ImportError:
+    cupy = np
 
 logger = logging.getLogger("fv3util")
 
@@ -177,7 +181,13 @@ class _ZarrVariableWriter:
         logger.debug(
             f"assigning data from subtile slice {from_slice} to target slice {target_slice}"
         )
-        self.array[target_slice] = np.asarray(quantity.view[:])[from_slice]
+        try:
+            self.array[target_slice] = quantity.view[:][from_slice]
+        except ValueError as err:
+            if err.args[0] == "object __array__ method not producing an array":
+                self.array[target_slice] = cupy.asnumpy(quantity.view[:][from_slice])
+
+
         self.i_time += 1
 
     def _get_attrs(self, quantity):

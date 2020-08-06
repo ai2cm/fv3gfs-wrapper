@@ -1,12 +1,14 @@
 import pytest
 from fv3util.buffer import send_buffer, recv_buffer
-import numpy as np
+from fv3util.utils import is_contiguous, is_c_contiguous
 
 
 @pytest.fixture
-def contiguous_array(numpy):
+def contiguous_array(numpy, backend):
+    if backend == "gt4py_cupy":
+        pytest.skip("gt4py gpu backend cannot produce contiguous arrays")
     array = numpy.empty([3, 4, 5])
-    array[:] = np.random.randn(3, 4, 5)
+    array[:] = numpy.random.randn(3, 4, 5)
     return array
 
 
@@ -20,10 +22,29 @@ def allocator(request, numpy):
     return getattr(numpy, request.param)
 
 
-def test_sendbuf_uses_buffer(numpy, allocator, non_contiguous_array):
+def test_is_contiguous(contiguous_array):
+    assert is_contiguous(contiguous_array)
+
+
+def test_is_c_contiguous(contiguous_array):
+    assert is_c_contiguous(contiguous_array)
+
+
+def test_not_is_contiguous(non_contiguous_array):
+    assert not is_contiguous(non_contiguous_array)
+
+
+def test_not_is_c_contiguous(non_contiguous_array):
+    assert not is_c_contiguous(non_contiguous_array)
+
+
+def test_sendbuf_uses_buffer(numpy, backend, allocator, non_contiguous_array):
     with send_buffer(allocator, non_contiguous_array) as sendbuf:
         assert sendbuf is not non_contiguous_array
         assert sendbuf.data is not non_contiguous_array.data
+        if backend.startswith("gt4py"):
+            sendbuf.synchronize()
+            non_contiguous_array.synchronize()
         numpy.testing.assert_array_equal(sendbuf, non_contiguous_array)
 
 
@@ -32,6 +53,9 @@ def test_recvbuf_uses_buffer(numpy, allocator, non_contiguous_array):
         assert recvbuf is not non_contiguous_array
         assert recvbuf.data is not non_contiguous_array.data
         recvbuf[:] = 0.0
+        print(recvbuf)
+        print(non_contiguous_array)
+        print(non_contiguous_array == 0.0)
         assert not numpy.all(non_contiguous_array == 0.0)
     assert numpy.all(non_contiguous_array == 0.0)
 
