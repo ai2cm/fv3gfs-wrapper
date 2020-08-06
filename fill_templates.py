@@ -17,7 +17,7 @@ dim_ranges = {
 
 all_templates = ("physics_data.F90", "_wrapper.pyx", "dynamics_data.F90")
 SETUP_DIR = os.path.dirname(os.path.abspath(__file__))
-PROPERTIES_DIR = os.path.join(SETUP_DIR, "external/fv3util/fv3util")
+PROPERTIES_DIR = os.path.join(SETUP_DIR, "metadata")
 
 
 def get_dim_range_string(dim_list):

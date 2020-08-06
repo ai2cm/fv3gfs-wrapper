@@ -39,8 +39,9 @@ def c12_restart_state_list(layout, tracer_properties):
         print(tracer_properties)
         state_list.append(
             fv3util.open_restart(
-                os.path.join(DATA_DIRECTORY, "c12_restart"), communicator,
-                tracer_properties=tracer_properties
+                os.path.join(DATA_DIRECTORY, "c12_restart"),
+                communicator,
+                tracer_properties=tracer_properties,
             )
         )
     return state_list
@@ -77,37 +78,37 @@ def test_open_c12_restart(c12_restart_state_list, layout):
             "specific_humidity": {
                 "dims": [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
                 "units": "kg/kg",
-                "restart_name": "sphum"
+                "restart_name": "sphum",
             },
         },
         {
             "specific_humidity_by_another_name": {
                 "dims": [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
                 "units": "kg/kg",
-                "restart_name": "sphum"
+                "restart_name": "sphum",
             },
         },
         {
             "specific_humidity": {
                 "dims": [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
                 "units": "kg/kg",
-                "restart_name": "sphum"
+                "restart_name": "sphum",
             },
         },
         {
             "specific_humidity": {
                 "dims": [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
                 "units": "kg/kg",
-                "restart_name": "sphum"
+                "restart_name": "sphum",
             },
             "snow_water_mixing_ratio": {
                 "dims": [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
                 "units": "kg/kg",
-                "restart_name": "snowwat"
+                "restart_name": "snowwat",
             },
         },
     ],
-    indirect=True
+    indirect=True,
 )
 def test_open_c12_restart_tracer_properties(c12_restart_state_list, tracer_properties):
     for state in c12_restart_state_list:

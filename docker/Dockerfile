@@ -71,8 +71,9 @@ COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/FV3 /fv3gfs-python/lib/ext
 COPY templates /fv3gfs-python/templates
 COPY examples /fv3gfs-python/examples
 COPY docs /fv3gfs-python/docs
+COPY metadata /fv3gfs-python/metadata
 # files can be copied in one line
-COPY external/fv3util/fv3util/dynamics_properties.json external/fv3util/fv3util/physics_properties.json /fv3gfs-python/external/fv3util/fv3util/
+COPY fv3gfs/dynamics_properties.json fv3gfs/physics_properties.json /fv3gfs-python/fv3gfs/
 COPY fill_templates.py HISTORY.md LICENSE Makefile MANIFEST.in README.md setup.cfg setup.py /fv3gfs-python/
 
 # make sources first, because -j8 doesn't propagate through setup.py layer

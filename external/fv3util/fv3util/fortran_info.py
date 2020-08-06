@@ -11,7 +11,7 @@ __all__ = [
 RestartProperties = Mapping[str, Mapping[str, Union[str, Iterable[str]]]]
 
 DIRNAME = os.path.dirname(os.path.realpath(__file__))
-RESTART_PROPERTIES = yaml.load(
+RESTART_PROPERTIES = yaml.safe_load(
     open(os.path.join(DIRNAME, "restart_properties.yml"), "r")
 )
 

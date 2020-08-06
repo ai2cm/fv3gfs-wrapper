@@ -22,7 +22,7 @@ def open_restart(
     label: str = "",
     only_names: Iterable[str] = None,
     to_state: dict = None,
-    tracer_properties: fortran_info.RestartProperties = None
+    tracer_properties: fortran_info.RestartProperties = None,
 ):
     """Load restart files output by the Fortran model into a state dictionary.
 
@@ -47,7 +47,9 @@ def open_restart(
     if communicator.tile.rank == constants.MASTER_RANK:
         for file in restart_files(dirname, tile_index, label):
             state.update(
-                load_partial_state_from_restart_file(file, restart_properties, only_names=only_names)
+                load_partial_state_from_restart_file(
+                    file, restart_properties, only_names=only_names
+                )
             )
         coupler_res_filename = get_coupler_res_filename(dirname, label)
         if filesystem.is_file(coupler_res_filename):
@@ -130,9 +132,13 @@ def prepend_label(filename, label=None):
         return filename
 
 
-def load_partial_state_from_restart_file(file, restart_properties: fortran_info.RestartProperties, only_names=None):
+def load_partial_state_from_restart_file(
+    file, restart_properties: fortran_info.RestartProperties, only_names=None
+):
     ds = xr.open_dataset(file).isel(Time=0).drop("Time")
-    state = map_keys(ds.data_vars, fortran_info.get_restart_standard_names(restart_properties))
+    state = map_keys(
+        ds.data_vars, fortran_info.get_restart_standard_names(restart_properties)
+    )
     state = apply_restart_metadata(state, restart_properties)
     if only_names is None:
         only_names = state.keys()

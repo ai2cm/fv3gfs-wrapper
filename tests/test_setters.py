@@ -7,22 +7,25 @@ import numpy as np
 import fv3config
 import fv3gfs
 import fv3util
+import json
 from mpi4py import MPI
 from util import redirect_stdout
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(test_dir, "../metadata/dynamics_properties.json"), "r") as f:
+    DYNAMICS_PROPERTIES = json.load(f)
+
+with open(os.path.join(test_dir, "../metadata/physics_properties.json"), "r") as f:
+    PHYSICS_PROPERTIES = json.load(f)
 
 
 class SetterTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(SetterTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.get_tracer_metadata()
-        self.dynamics_data = {
-            entry["name"]: entry for entry in fv3util.DYNAMICS_PROPERTIES
-        }
-        self.physics_data = {
-            entry["name"]: entry for entry in fv3util.PHYSICS_PROPERTIES
-        }
+        self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
+        self.physics_data = {entry["name"]: entry for entry in PHYSICS_PROPERTIES}
 
     def setUp(self):
         pass

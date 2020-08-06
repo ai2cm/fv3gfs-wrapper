@@ -25,19 +25,11 @@ def open_restart(
     Returns:
         state: model state dictionary
     """
-    if fv3util.fortran_info.tracer_properties is None:
-        properties = _metadata_to_properties(_wrapper.get_tracer_metadata())
-        for entry in properties:
-            entry["dims"] = ["z", "y", "x"]
-        fv3util.fortran_info.set_tracer_properties(properties)
+    tracer_properties = _wrapper.get_tracer_metadata()
     return fv3util.open_restart(
-        dirname, communicator, label=label, only_names=only_names
+        dirname,
+        communicator,
+        label=label,
+        only_names=only_names,
+        tracer_properties=tracer_properties,
     )
-
-
-def _metadata_to_properties(metadata):
-    return_list = []
-    for name, properties in metadata.items():
-        return_list.append(copy.deepcopy(properties))
-        return_list[-1]["name"] = name
-    return return_list
