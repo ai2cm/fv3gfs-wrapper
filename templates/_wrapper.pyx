@@ -304,6 +304,7 @@ cpdef dict get_tracer_metadata():
         out_dict[str(tracer_long_name).replace(' ', '_')] = {
             'i_tracer': i_tracer_minus_one + 1,
             'fortran_name': tracer_name,
+            'restart_name': tracer_name,
             'units': tracer_units
         }
     return out_dict

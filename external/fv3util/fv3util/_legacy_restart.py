@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, BinaryIO
 import os
 import xarray as xr
 import copy
@@ -22,6 +22,7 @@ def open_restart(
     label: str = "",
     only_names: Iterable[str] = None,
     to_state: dict = None,
+    tracer_properties: fortran_info.RestartProperties = None
 ):
     """Load restart files output by the Fortran model into a state dictionary.
 
@@ -36,13 +37,17 @@ def open_restart(
     Returns:
         state: model state dictionary
     """
+    if tracer_properties is None:
+        restart_properties = fortran_info.RESTART_PROPERTIES
+    else:
+        restart_properties = {**tracer_properties, **fortran_info.RESTART_PROPERTIES}
     rank = communicator.rank
     tile_index = communicator.partitioner.tile_index(rank)
     state = {}
     if communicator.tile.rank == constants.MASTER_RANK:
         for file in restart_files(dirname, tile_index, label):
             state.update(
-                load_partial_state_from_restart_file(file, only_names=only_names)
+                load_partial_state_from_restart_file(file, restart_properties, only_names=only_names)
             )
         coupler_res_filename = get_coupler_res_filename(dirname, label)
         if filesystem.is_file(coupler_res_filename):
@@ -59,7 +64,7 @@ def get_coupler_res_filename(dirname, label):
     return os.path.join(dirname, prepend_label(COUPLER_RES_NAME, label))
 
 
-def restart_files(dirname, tile_index, label):
+def restart_files(dirname, tile_index, label) -> BinaryIO:
     for filename in restart_filenames(dirname, tile_index, label):
         with filesystem.open(filename, "rb") as f:
             yield f
@@ -95,11 +100,11 @@ def apply_dims(da, new_dims):
     return da.rename(dict(zip(da.dims[-len(new_dims) :], new_dims)))
 
 
-def apply_restart_metadata(state):
+def apply_restart_metadata(state, restart_properties: fortran_info.RestartProperties):
     new_state = {}
     for name, da in state.items():
-        if name in fortran_info.properties_by_std_name:
-            properties = fortran_info.properties_by_std_name[name]
+        if name in restart_properties.keys():
+            properties = restart_properties[name]
             new_dims = properties["dims"]
             new_state[name] = apply_dims(da, new_dims)
             new_state[name].attrs["units"] = properties["units"]
@@ -125,10 +130,10 @@ def prepend_label(filename, label=None):
         return filename
 
 
-def load_partial_state_from_restart_file(file, only_names=None):
+def load_partial_state_from_restart_file(file, restart_properties: fortran_info.RestartProperties, only_names=None):
     ds = xr.open_dataset(file).isel(Time=0).drop("Time")
-    state = map_keys(ds.data_vars, fortran_info.get_restart_standard_names())
-    state = apply_restart_metadata(state)
+    state = map_keys(ds.data_vars, fortran_info.get_restart_standard_names(restart_properties))
+    state = apply_restart_metadata(state, restart_properties)
     if only_names is None:
         only_names = state.keys()
     state = {  # remove any variables that don't have restart metadata

@@ -2,7 +2,6 @@ from ._exceptions import InvalidQuantityError, OutOfBoundsError
 from .time import datetime64_to_datetime
 from .io import read_state, write_state
 from .nudging import get_nudging_tendencies, apply_nudging
-from .fortran_info import PHYSICS_PROPERTIES, DYNAMICS_PROPERTIES
 from ._legacy_restart import open_restart
 from .zarr_monitor import ZarrMonitor
 from .partitioner import (
