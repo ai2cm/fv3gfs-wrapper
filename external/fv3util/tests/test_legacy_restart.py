@@ -244,7 +244,7 @@ def result_dims(data_array, new_dims):
 
 
 def test_apply_dims(data_array, new_dims, result_dims):
-    result = fv3util._legacy_restart.apply_dims(data_array, new_dims)
+    result = fv3util._legacy_restart._apply_dims(data_array, new_dims)
     np.testing.assert_array_equal(result.values, data_array.values)
     assert result.dims == result_dims
     assert result.attrs == data_array.attrs
