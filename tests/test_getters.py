@@ -150,10 +150,6 @@ class GetterTests(unittest.TestCase):
                 self.assertIn(name, state)
         self.assertEqual(len(name_list), len(state.keys()))
 
-    def test_get_time(self):
-        state = fv3gfs.get_state(names=["time"])
-        assert isinstance(state["time"], cftime.DatetimeJulian)
-
 
 class TracerMetadataTests(unittest.TestCase):
     def test_tracer_index_is_one_based(self):
