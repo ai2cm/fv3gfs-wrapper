@@ -5,7 +5,6 @@ cimport numpy as cnp
 import numpy as np
 import fv3util
 from mpi4py import MPI
-from datetime import datetime
 
 ctypedef cnp.double_t REAL_t
 real_type = np.float64
@@ -89,12 +88,12 @@ def get_dimension_lengths():
 
 
 def set_time(time):
-    """Set model time to the given datetime.
+    """Set model time to the given cftime.datetime.
 
     Does not change end time of the model run, or reset the step count.
 
     Args:
-        time (datetime): the target time
+        time (cftime.datetime): the target time
     """
     cdef int year, month, day, hour, minute, second
     year = time.year
@@ -107,11 +106,11 @@ def set_time(time):
 
 
 def get_time():
-    """Returns a datetime corresponding to the current model time.
+    """Returns a cftime.datetime corresponding to the current model time.
     """
-    cdef int year, month, day, hour, minute, second, calendar_type
-    get_time_subroutine(&year, &month, &day, &hour, &minute, &second, &calendar_type)
-    return fv3util.DATE_TYPES_MAPPING[calendar_type](year, month, day, hour, minute, second)
+    cdef int year, month, day, hour, minute, second, fms_calendar_type
+    get_time_subroutine(&year, &month, &day, &hour, &minute, &second, &fms_calendar_type)
+    return fv3util.FMS_TO_CFTIME_TYPE[fms_calendar_type](year, month, day, hour, minute, second)
 
 
 def set_state(state):

@@ -1,7 +1,7 @@
 import tempfile
 import zarr
 import cftime
-from datetime import datetime, timedelta
+from datetime import timedelta
 import pytest
 import xarray as xr
 import copy

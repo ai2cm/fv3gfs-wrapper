@@ -1,4 +1,3 @@
-from datetime import datetime
 import os
 import cftime
 import xarray as xr
@@ -144,7 +143,10 @@ def test_open_c12_restart_to_allocated_state_without_crashing(layout):
 
 @pytest.fixture
 def coupler_res_file_and_time():
-    return os.path.join(DATA_DIRECTORY, "coupler.res"), cftime.DatetimeJulian(2016, 8, 3)
+    return (
+        os.path.join(DATA_DIRECTORY, "coupler.res"),
+        cftime.DatetimeJulian(2016, 8, 3),
+    )
 
 
 def test_get_current_date_from_coupler_res(coupler_res_file_and_time):

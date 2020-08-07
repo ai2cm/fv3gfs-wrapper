@@ -1,8 +1,7 @@
 import cftime
 import xarray as xr
 from typing import TextIO
-from datetime import datetime
-from .time import datetime64_to_datetime, DATE_TYPES_MAPPING
+from .time import FMS_TO_CFTIME_TYPE
 from . import filesystem
 from .quantity import Quantity
 from ._xarray import to_dataset
@@ -44,8 +43,8 @@ def _get_integer_tokens(line, n_tokens):
     return [int(token) for token in all_tokens[:n_tokens]]
 
 
-def get_current_date_from_coupler_res(file: TextIO) -> datetime:
+def get_current_date_from_coupler_res(file: TextIO) -> cftime.datetime:
     (calendar_type,) = _get_integer_tokens(file.readline(), 1)
     file.readline()
     year, month, day, hour, minute, second = _get_integer_tokens(file.readline(), 6)
-    return DATE_TYPES_MAPPING[calendar_type](year, month, day, hour, minute, second)
+    return FMS_TO_CFTIME_TYPE[calendar_type](year, month, day, hour, minute, second)

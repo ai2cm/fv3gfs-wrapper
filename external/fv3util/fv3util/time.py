@@ -8,7 +8,7 @@ THIRTY_DAY_MONTHS = 1
 JULIAN = 2
 GREGORIAN = 3
 NOLEAP = 4
-DATE_TYPES_MAPPING = {
+FMS_TO_CFTIME_TYPE = {
     THIRTY_DAY_MONTHS: cftime.Datetime360Day,
     JULIAN: cftime.DatetimeJulian,
     GREGORIAN: cftime.DatetimeGregorian,  # Not a valid calendar in FV3GFS
@@ -20,3 +20,4 @@ def datetime64_to_datetime(dt64):
     utc_start = np.datetime64(0, "s")
     timestamp = (dt64 - utc_start) / np.timedelta64(1, "s")
     return datetime.utcfromtimestamp(timestamp)
+
