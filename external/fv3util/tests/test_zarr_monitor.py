@@ -21,9 +21,12 @@ def n_times(request):
         return 3
 
 
-@pytest.fixture
-def start_time():
-    return cftime.DatetimeJulian(2010, 1, 1)
+@pytest.fixture(
+    params=[cftime.DatetimeJulian, cftime.Datetime360Day, cftime.DatetimeNoLeap]
+)
+def start_time(request):
+    date_type = request.param
+    return date_type(2010, 1, 1)
 
 
 @pytest.fixture
@@ -98,12 +101,12 @@ def state_list(base_state, n_times, start_time, time_step, numpy):
     return state_list
 
 
-def test_monitor_file_store(state_list, cube_partitioner, numpy):
+def test_monitor_file_store(state_list, cube_partitioner, numpy, start_time):
     with tempfile.TemporaryDirectory(suffix=".zarr") as tempdir:
         monitor = fv3util.ZarrMonitor(tempdir, cube_partitioner)
         for state in state_list:
             monitor.store(state)
-        validate_store(state_list, tempdir, numpy)
+        validate_store(state_list, tempdir, numpy, start_time)
         validate_xarray_can_open(tempdir)
 
 
@@ -112,8 +115,9 @@ def validate_xarray_can_open(dirname):
     xr.open_zarr(dirname)
 
 
-def validate_store(states, filename, numpy):
+def validate_store(states, filename, numpy, start_time):
     nt = len(states)
+    calendar = start_time.calendar
 
     def assert_no_missing_names(store, state):
         missing_names = set(states[0].keys()).difference(store.array_keys())
@@ -130,7 +134,7 @@ def validate_store(states, filename, numpy):
             target_attrs = {
                 "_ARRAY_DIMENSIONS": ["time"],
                 "units": "seconds since 2010-01-01 00:00:00",
-                "calendar": "julian",
+                "calendar": calendar,
             }
         else:
             target_attrs = states[0][name].attrs
@@ -145,7 +149,7 @@ def validate_store(states, filename, numpy):
                 value = cftime.num2date(
                     array[i],
                     units="seconds since 2010-01-01 00:00:00",
-                    calendar="julian",
+                    calendar=calendar,
                 )
                 assert value == s["time"]
         else:
