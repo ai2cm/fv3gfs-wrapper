@@ -140,7 +140,7 @@ jobs:
           at: docs/_build
       - add_ssh_keys:
           fingerprints:
-            - "92:ab:f0:a2:9e:78:fa:5d:dc:c9:b2:38:9a:46:b1:ab"  # push fv3gfs-python
+            - "77:dc:f8:08:f2:17:8d:0f:c3:b0:e8:93:0e:d0:89:e7"  # push fv3gfs-python
       - run:
           name: Install and configure dependencies
           command: |
