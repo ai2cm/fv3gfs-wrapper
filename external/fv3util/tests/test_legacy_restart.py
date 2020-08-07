@@ -141,11 +141,19 @@ def test_open_c12_restart_to_allocated_state_without_crashing(layout):
                         assert extent == ny + 1
 
 
-@pytest.fixture
-def coupler_res_file_and_time():
+@pytest.fixture(
+    params=[
+        ("coupler_julian.res", cftime.DatetimeJulian),
+        ("coupler_thirty_day.res", cftime.Datetime360Day),
+        ("coupler_noleap.res", cftime.DatetimeNoLeap),
+    ],
+    ids=["julian", "thirty_day", "noleap"],
+)
+def coupler_res_file_and_time(request):
+    file, expected_date_type = request.param
     return (
-        os.path.join(DATA_DIRECTORY, "coupler.res"),
-        cftime.DatetimeJulian(2016, 8, 3),
+        os.path.join(DATA_DIRECTORY, file),
+        expected_date_type(2016, 8, 3),
     )
 
 
