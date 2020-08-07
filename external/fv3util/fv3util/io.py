@@ -44,7 +44,7 @@ def _get_integer_tokens(line, n_tokens):
 
 
 def get_current_date_from_coupler_res(file: TextIO) -> cftime.datetime:
-    (calendar_type,) = _get_integer_tokens(file.readline(), 1)
+    (fms_calendar_type,) = _get_integer_tokens(file.readline(), 1)
     file.readline()
     year, month, day, hour, minute, second = _get_integer_tokens(file.readline(), 6)
-    return FMS_TO_CFTIME_TYPE[calendar_type](year, month, day, hour, minute, second)
+    return FMS_TO_CFTIME_TYPE[fms_calendar_type](year, month, day, hour, minute, second)
