@@ -109,7 +109,7 @@ def test_monitor_file_store(state_list, cube_partitioner, numpy):
 
 def validate_xarray_can_open(dirname):
     # just checking there are no crashes, validate_group checks data
-    xr.open_zarr(dirname)
+    xr.open_zarr(dirname, decode_times=False)
 
 
 def validate_store(states, filename, numpy):
@@ -127,9 +127,11 @@ def validate_store(states, filename, numpy):
 
     def validate_array_dimensions_and_attributes(name, array):
         if name == "time":
-            target_attrs = {"_ARRAY_DIMENSIONS": ["time"],
-                            "units": "microseconds since 1970-01-01",
-                            "calendar": "julian"}
+            target_attrs = {
+                "_ARRAY_DIMENSIONS": ["time"],
+                "units": "seconds since 2010-01-01 00:00:00",
+                "calendar": "julian",
+            }
         else:
             target_attrs = states[0][name].attrs
             target_attrs["_ARRAY_DIMENSIONS"] = ["time", "tile"] + list(
@@ -140,7 +142,11 @@ def validate_store(states, filename, numpy):
     def validate_array_values(name, array):
         if name == "time":
             for i, s in enumerate(states):
-                value = cftime.num2date(array[i], units="microseconds since 1970-01-01", calendar="julian")
+                value = cftime.num2date(
+                    array[i],
+                    units="seconds since 2010-01-01 00:00:00",
+                    calendar="julian",
+                )
                 assert value == s["time"]
         else:
             for i, s in enumerate(states):

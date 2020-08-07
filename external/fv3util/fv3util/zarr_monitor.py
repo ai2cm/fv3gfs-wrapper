@@ -236,16 +236,20 @@ class _ZarrTimeWriter(_ZarrVariableWriter):
         shape = self._prepend_shape
         chunks = self._prepend_chunks
         self.array = self.group.create_dataset(
-            self.name, shape=shape, dtype=array.dtype, chunks=chunks
+            self.name, shape=shape, dtype=array.dtype, chunks=chunks, fill_value=None
         )
 
     def _set_time_encoding_attrs(self, time):
-        self.array.attrs["units"] = TIME_ENCODING_UNITS
-        self.array.attrs["calendar"] = time.calendar
+        self._encoding_units = f"seconds since {time}"
+        self._encoding_calendar = time.calendar
+        self.array.attrs["units"] = self._encoding_units
+        self.array.attrs["calendar"] = self._encoding_calendar
+
+    def _encode_time(self, time):
+        return cftime.date2num(time, units=self._encoding_units)
 
     def append(self, time):
-        encoded_time = cftime.date2num(time, units=TIME_ENCODING_UNITS)
-        array = xr.DataArray(encoded_time)
+        array = xr.DataArray()
         if self.array is None:
             self._init_zarr(array)
             self._set_time_encoding_attrs(time)
@@ -254,6 +258,6 @@ class _ZarrTimeWriter(_ZarrVariableWriter):
             self.array.resize(*new_shape)
         self.sync_array()
         if self.rank == 0:
-            self.array[self.i_time] = encoded_time
+            self.array[self.i_time] = self._encode_time(time)
         self.i_time += 1
         self.comm.barrier()
