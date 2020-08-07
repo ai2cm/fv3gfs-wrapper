@@ -47,3 +47,5 @@ from ._restart import get_restart_names, open_restart
 # )
 
 __version__ = "0.5.0"
+
+__all__ = list(key for key in locals().keys() if not key.startswith("_"))
