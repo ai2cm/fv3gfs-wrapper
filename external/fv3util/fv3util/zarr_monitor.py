@@ -12,9 +12,6 @@ logger = logging.getLogger("fv3util")
 __all__ = ["ZarrMonitor"]
 
 
-TIME_ENCODING_UNITS = "microseconds since 1970-01-01"
-
-
 class DummyComm:
     def Get_rank(self):
         return 0
