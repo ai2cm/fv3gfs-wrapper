@@ -15,7 +15,7 @@ dim_ranges = {
     "z_interface": "1:nz()+1",
 }
 
-all_templates = ("physics_data.F90", "_wrapper.pyx", "dynamics_data.F90")
+all_templates = ("physics_data.F90", "_wrapper.pyx", "dynamics_data.F90", "flagstruct_data.F90")
 SETUP_DIR = os.path.dirname(os.path.abspath(__file__))
 PROPERTIES_DIR = os.path.join(SETUP_DIR, "external/fv3util/fv3util")
 
@@ -39,10 +39,14 @@ if __name__ == "__main__":
     dynamics_data = json.load(
         open(os.path.join(PROPERTIES_DIR, "dynamics_properties.json"))
     )
+    flagstruct_data = json.load(
+        open(os.path.join(PROPERTIES_DIR, "flagstruct_properties.json"))
+    )
 
     physics_2d_properties = []
     physics_3d_properties = []
     dynamics_properties = []
+    flagstruct_properties = []
 
     for properties in physics_data:
         if len(properties["dims"]) == 2:
@@ -56,6 +60,9 @@ if __name__ == "__main__":
         properties["dim_colons"] = ", ".join(":" for dim in properties["dims"])
         dynamics_properties.append(properties)
 
+    for properties in flagstruct_data:
+        flagstruct_properties.append(properties)
+
     if len(requested_templates) == 0:
         requested_templates = all_templates
 
@@ -67,6 +74,7 @@ if __name__ == "__main__":
             physics_2d_properties=physics_2d_properties,
             physics_3d_properties=physics_3d_properties,
             dynamics_properties=dynamics_properties,
+            flagstruct_properties=flagstruct_properties,
         )
         with open(out_filename, "w") as f:
             f.write(result)

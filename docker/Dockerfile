@@ -156,7 +156,8 @@ RUN pip3 install --no-cache-dir \
     wget \
     nano \
     curl \
-    netcdf-bin
+    netcdf-bin \
+    ipython
 
 COPY --from=fv3gfs-fms /FMS $FMS_DIR
 COPY --from=fv3gfs-esmf /usr/local/esmf ${ESMF_DIR}
@@ -179,7 +180,7 @@ RUN pip3 install --no-cache-dir -e \
     /fv3gfs-python/external/fv3config \
     -e /fv3gfs-python/external/fv3util && \
     pip3 install --no-cache-dir -e /fv3gfs-python && \
-    pip3 install --no-cache-dir pytest-subtests  # must reinstall to increment pytest, gt4py requires 4 (but not really)
+    pip3 install --no-cache-dir pytest-subtests # must reinstall to increment pytest, gt4py requires 4 (but not really)
 
 # cache model data
 COPY --from=fv3config-inputdata /fv3config-cache $FV3CONFIG_CACHE_DIR/fv3config-cache
@@ -188,6 +189,10 @@ RUN chmod -R 777 $FV3CONFIG_CACHE_DIR && \
     echo "ulimit -s unlimited" >> /etc/bash.bashrc && \
     mkdir /outdir && \
     chmod -R 777 /outdir
+
+# install fv3core
+RUN cd /fv3gfs-python/external/fv3ser/ && \
+    python3 setup.py install
 
 # interactive shell by default
 CMD ["bash"]
