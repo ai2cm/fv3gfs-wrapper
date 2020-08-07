@@ -4,6 +4,11 @@ History
 latest
 ------
 
+Breaking changes:
+- Use `cftime.datetime` objects to represent datetimes in fv3gfs-python and fv3util instead
+of `datetime.datetime` objects.  This results in times stored in a format compatible with
+the fortran model, and accurate internal representation of times with the calendar specified
+in the `coupler_nml` namelist.
 
 v0.5.0 (2020-05-15)
 ------
