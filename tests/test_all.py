@@ -3,7 +3,6 @@ from mpi4py import MPI
 from util import run_unittest_script
 import os
 
-import pytest
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 

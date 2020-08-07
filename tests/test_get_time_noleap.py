@@ -5,7 +5,6 @@ import shutil
 import cftime
 import fv3config
 import fv3gfs
-import fv3util
 from mpi4py import MPI
 from util import redirect_stdout
 
@@ -53,4 +52,3 @@ if __name__ == "__main__":
         os.chdir(original_path)
         if rank == 0:
             shutil.rmtree(rundir)
-

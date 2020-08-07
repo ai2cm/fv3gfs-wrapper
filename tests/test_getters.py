@@ -2,7 +2,6 @@ import unittest
 import yaml
 import os
 import shutil
-import cftime
 import numpy as np
 import fv3config
 import fv3gfs
