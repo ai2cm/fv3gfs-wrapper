@@ -109,7 +109,7 @@ def test_monitor_file_store(state_list, cube_partitioner, numpy):
 
 def validate_xarray_can_open(dirname):
     # just checking there are no crashes, validate_group checks data
-    xr.open_zarr(dirname, decode_times=False)
+    xr.open_zarr(dirname)
 
 
 def validate_store(states, filename, numpy):
