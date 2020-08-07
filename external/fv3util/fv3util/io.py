@@ -35,10 +35,7 @@ def read_state(filename: str) -> dict:
     with filesystem.open(filename, "rb") as f:
         ds = xr.open_dataset(f)
     for name, value in ds.data_vars.items():
-        if name == "time":
-            out_dict[name] = datetime64_to_datetime(value)
-        else:
-            out_dict[name] = Quantity.from_data_array(value)
+        out_dict[name] = Quantity.from_data_array(value)
     return out_dict
 
 
