@@ -12,7 +12,6 @@ real_type = np.float64
 SURFACE_PRECIPITATION_RATE = 'surface_precipitation_rate'
 MM_PER_M = 1000
 
-
 cdef extern:
     void initialize_subroutine(int *comm)
     void do_step_subroutine()

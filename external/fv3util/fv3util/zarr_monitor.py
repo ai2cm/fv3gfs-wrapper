@@ -239,10 +239,15 @@ class _ZarrTimeWriter(_ZarrVariableWriter):
             self.name, shape=shape, dtype=array.dtype, chunks=chunks
         )
 
+    def _set_time_encoding_attrs(self, time):
+        self.array.attrs["units"] = TIME_ENCODING_UNITS
+        self.array.attrs["calendar"] = time.calendar
+
     def append(self, time):
-        array = xr.DataArray()
+        array = xr.DataArray(time)
         if self.array is None:
             self._init_zarr(array)
+            self._set_time_encoding_attrs(time)
         if self.i_time >= self.array.shape[0] and self.rank == 0:
             new_shape = (self.i_time + 1,)
             self.array.resize(*new_shape)
@@ -250,6 +255,4 @@ class _ZarrTimeWriter(_ZarrVariableWriter):
         if self.rank == 0:
             self.array[self.i_time] = cftime.date2num(time, units=TIME_ENCODING_UNITS)
         self.i_time += 1
-        self.array.attrs["units"] = TIME_ENCODING_UNITS
-        self.array.attrs["calendar"] = time.calendar
         self.comm.barrier()
