@@ -3,7 +3,6 @@ from mpi4py import MPI
 from util import run_unittest_script
 import os
 
-
 base_dir = os.path.dirname(os.path.realpath(__file__))
 
 # The packages we import will import MPI, causing an MPI init, but we don't actually
