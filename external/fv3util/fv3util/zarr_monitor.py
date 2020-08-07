@@ -243,7 +243,9 @@ class _ZarrTimeWriter(_ZarrVariableWriter):
         self.array.attrs["calendar"] = self._encoding_calendar
 
     def _encode_time(self, time):
-        return cftime.date2num(time, units=self._encoding_units)
+        return cftime.date2num(
+            time, units=self._encoding_units, calendar=self._encoding_calendar
+        )
 
     def append(self, time):
         array = xr.DataArray()
