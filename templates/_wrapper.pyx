@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # cython: language_level=3, always_allow_keywords=True
 # cython: c_string_type=unicode, c_string_encoding=utf8
-import cftime
 cimport numpy as cnp
 import numpy as np
 import fv3util
@@ -12,19 +11,6 @@ ctypedef cnp.double_t REAL_t
 real_type = np.float64
 SURFACE_PRECIPITATION_RATE = 'surface_precipitation_rate'
 MM_PER_M = 1000
-
-# Calendar constant values copied from time_manager in FMS
-NO_CALENDAR = 0
-THIRTY_DAY_MONTHS = 1
-JULIAN = 2
-GREGORIAN = 3
-NOLEAP = 4
-DATE_TYPES = {
-    1: cftime.Datetime360Day,
-    2: cftime.DatetimeJulian,
-    3: cftime.DatetimeGregorian,  # Not a valid calendar in FV3GFS
-    4: cftime.DatetimeNoLeap
-}
 
 
 cdef extern:
@@ -126,7 +112,7 @@ def get_time():
     """
     cdef int year, month, day, hour, minute, second, calendar_type
     get_time_subroutine(&year, &month, &day, &hour, &minute, &second, &calendar_type)
-    return DATE_TYPES[calendar_type](year, month, day, hour, minute, second)
+    return fv3util.DATE_TYPES_MAPPING[calendar_type](year, month, day, hour, minute, second)
 
 
 def set_state(state):

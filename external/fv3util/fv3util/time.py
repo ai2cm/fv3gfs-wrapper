@@ -1,5 +1,19 @@
+import cftime
 import numpy as np
 import datetime
+
+
+# Calendar constant values copied from time_manager in FMS
+THIRTY_DAY_MONTHS = 1
+JULIAN = 2
+GREGORIAN = 3
+NOLEAP = 4
+DATE_TYPES_MAPPING = {
+    THIRTY_DAY_MONTHS: cftime.Datetime360Day,
+    JULIAN: cftime.DatetimeJulian,
+    GREGORIAN: cftime.DatetimeGregorian,  # Not a valid calendar in FV3GFS
+    NOLEAP: cftime.DatetimeNoLeap,
+}
 
 
 def datetime64_to_datetime(dt64):
