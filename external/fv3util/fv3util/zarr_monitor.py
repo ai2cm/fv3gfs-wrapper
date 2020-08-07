@@ -244,7 +244,8 @@ class _ZarrTimeWriter(_ZarrVariableWriter):
         self.array.attrs["calendar"] = time.calendar
 
     def append(self, time):
-        array = xr.DataArray(time)
+        encoded_time = cftime.date2num(time, units=TIME_ENCODING_UNITS)
+        array = xr.DataArray(encoded_time)
         if self.array is None:
             self._init_zarr(array)
             self._set_time_encoding_attrs(time)
@@ -253,6 +254,6 @@ class _ZarrTimeWriter(_ZarrVariableWriter):
             self.array.resize(*new_shape)
         self.sync_array()
         if self.rank == 0:
-            self.array[self.i_time] = cftime.date2num(time, units=TIME_ENCODING_UNITS)
+            self.array[self.i_time] = encoded_time
         self.i_time += 1
         self.comm.barrier()
