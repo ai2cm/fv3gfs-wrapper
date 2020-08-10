@@ -1,4 +1,5 @@
 import os
+import tempfile
 import cftime
 import xarray as xr
 import numpy as np
@@ -245,3 +246,19 @@ def test_get_rank_suffix_invalid_total_ranks(invalid_total_ranks):
     with pytest.raises(ValueError):
         # total_ranks should be multiple of 6
         fv3util._legacy_restart.get_rank_suffix(0, invalid_total_ranks)
+
+
+def test_read_state_incorrectly_encoded_time():
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".nc") as file:
+        state_ds = xr.DataArray(0.0, name="time").to_dataset()
+        state_ds.to_netcdf(file.name)
+        with pytest.raises(ValueError, match="Time in stored state"):
+            fv3util.io.read_state(file.name)
+
+
+def test_read_state_non_scalar_time():
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".nc") as file:
+        state_ds = xr.DataArray([0.0, 1.0], dims=["T"], name="time").to_dataset()
+        state_ds.to_netcdf(file.name)
+        with pytest.raises(ValueError, match="scalar time"):
+            fv3util.io.read_state(file.name)

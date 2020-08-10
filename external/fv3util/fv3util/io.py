@@ -21,6 +21,21 @@ def write_state(state: dict, filename: str) -> None:
         ds.to_netcdf(f)
 
 
+def _extract_time(value: xr.DataArray) -> cftime.datetime:
+    """Exctract time value from read-in state."""
+    if value.ndim > 0:
+        raise ValueError(
+            "State must be be representative of a single scalar time. " f"Got {value}."
+        )
+    time = value.item()
+    if not isinstance(time, cftime.datetime):
+        raise ValueError(
+            "Time in stored state does not have the proper metadata "
+            "to be decoded as a cftime.datetime object."
+        )
+    return time
+
+
 def read_state(filename: str) -> dict:
     """Read a model state from a NetCDF file.
     
@@ -33,11 +48,11 @@ def read_state(filename: str) -> dict:
     out_dict = {}
     with filesystem.open(filename, "rb") as f:
         ds = xr.open_dataset(f, use_cftime=True)
-    for name, value in ds.data_vars.items():
-        if name == "time":
-            out_dict[name] = value.item()
-        else:
-            out_dict[name] = Quantity.from_data_array(value)
+        for name, value in ds.data_vars.items():
+            if name == "time":
+                out_dict[name] = _extract_time(value)
+            else:
+                out_dict[name] = Quantity.from_data_array(value)
     return out_dict
 
 

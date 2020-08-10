@@ -1,3 +1,16 @@
+"""Example usage:
+
+$ mpirun -n 6 --allow-run-as-root \
+     --oversubscribe \
+     --mca btl_vader_single_copy_mechanism none \
+     python3 -m mpi4py test_get_time.py noleap
+
+Note the argument specifying the calendar type at the end of the command
+is required.  Valid calendars are:
+- julian
+- noleap
+- thirty_day
+ """
 import sys
 import unittest
 import yaml
@@ -24,7 +37,6 @@ class GetTimeTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(GetTimeTests, self).__init__(*args, **kwargs)
         self.mpi_comm = MPI.COMM_WORLD
-        self.calendar = calendar
 
     def setUp(self):
         pass
@@ -34,7 +46,7 @@ class GetTimeTests(unittest.TestCase):
 
     def test_get_time(self):
         state = fv3gfs.get_state(names=["time"])
-        assert isinstance(state["time"], CFTIME_TYPES[self.calendar])
+        assert isinstance(state["time"], self.DATE_TYPE)
 
 
 def set_calendar_type():
@@ -43,6 +55,11 @@ def set_calendar_type():
 
     See https://stackoverflow.com/questions/11380413/python-unittest-passing-arguments.
     """
+    if len(sys.argv) != 2:
+        raise ValueError(
+            "test_get_time.py requires a single calendar argument "
+            "be passed through the command line."
+        )
     calendar = sys.argv.pop()
     GetTimeTests.DATE_TYPE = CFTIME_TYPES[calendar]
     return calendar
