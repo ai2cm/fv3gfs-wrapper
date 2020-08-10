@@ -21,10 +21,10 @@ class UsingMPITests(unittest.TestCase):
     def test_tracer_metadata(self):
         run_unittest_script(os.path.join(base_dir, "test_tracer_metadata.py"))
 
-    def test_get_time_noleap(self):
+    def test_get_time_julian(self):
         run_unittest_script(os.path.join(base_dir, "test_get_time.py"), "julian")
 
-    def test_get_time_noleap(self):
+    def test_get_time_thirty_day(self):
         run_unittest_script(os.path.join(base_dir, "test_get_time.py"), "thirty_day")
 
     def test_get_time_noleap(self):
