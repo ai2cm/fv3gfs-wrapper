@@ -156,8 +156,7 @@ RUN pip3 install --no-cache-dir \
     wget \
     nano \
     curl \
-    netcdf-bin \
-    ipython
+    netcdf-bin
 
 COPY --from=fv3gfs-fms /FMS $FMS_DIR
 COPY --from=fv3gfs-esmf /usr/local/esmf ${ESMF_DIR}
