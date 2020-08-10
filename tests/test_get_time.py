@@ -74,4 +74,3 @@ if __name__ == "__main__":
         os.chdir(original_path)
         if rank == 0:
             shutil.rmtree(rundir)
-
