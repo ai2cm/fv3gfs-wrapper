@@ -1,3 +1,4 @@
+import sys
 import unittest
 import yaml
 import os
@@ -10,11 +11,20 @@ from util import redirect_stdout
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 
+CFTIME_TYPES = {
+    "julian": cftime.DatetimeJulian,
+    "noleap": cftime.DatetimeNoLeap,
+    "thirty_day": cftime.Datetime360Day,
+}
+
 
 class GetTimeTests(unittest.TestCase):
+    DATE_TYPE = None
+
     def __init__(self, *args, **kwargs):
         super(GetTimeTests, self).__init__(*args, **kwargs)
         self.mpi_comm = MPI.COMM_WORLD
+        self.calendar = calendar
 
     def setUp(self):
         pass
@@ -24,13 +34,25 @@ class GetTimeTests(unittest.TestCase):
 
     def test_get_time(self):
         state = fv3gfs.get_state(names=["time"])
-        assert isinstance(state["time"], cftime.DatetimeNoLeap)
+        assert isinstance(state["time"], CFTIME_TYPES[self.calendar])
+
+
+def set_calendar_type():
+    """Required for setting the date type for GetTimeTests with a command line
+    argument.
+
+    See https://stackoverflow.com/questions/11380413/python-unittest-passing-arguments.
+    """
+    calendar = sys.argv.pop()
+    GetTimeTests.DATE_TYPE = CFTIME_TYPES[calendar]
+    return calendar
 
 
 if __name__ == "__main__":
     rank = MPI.COMM_WORLD.Get_rank()
+    calendar = set_calendar_type()
     config = yaml.safe_load(open(os.path.join(test_dir, "default_config.yml"), "r"))
-    config["namelist"]["coupler_nml"]["calendar"] = "noleap"
+    config["namelist"]["coupler_nml"]["calendar"] = calendar
     rundir = os.path.join(test_dir, "rundir")
     if rank == 0:
         if os.path.isdir(rundir):
@@ -52,3 +74,4 @@ if __name__ == "__main__":
         os.chdir(original_path)
         if rank == 0:
             shutil.rmtree(rundir)
+
