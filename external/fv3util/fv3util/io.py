@@ -25,7 +25,7 @@ def _extract_time(value: xr.DataArray) -> cftime.datetime:
     """Exctract time value from read-in state."""
     if value.ndim > 0:
         raise ValueError(
-            "State must be be representative of a single scalar time. " f"Got {value}."
+            "State must be representative of a single scalar time. " f"Got {value}."
         )
     time = value.item()
     if not isinstance(time, cftime.datetime):
