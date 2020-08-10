@@ -243,6 +243,11 @@ class _ZarrTimeWriter(_ZarrVariableWriter):
         self.array.attrs["calendar"] = self._encoding_calendar
 
     def _encode_time(self, time):
+        if time.calendar != self._encoding_calendar:
+            raise ValueError(
+                f"Calendar type of time, {time.calendar}, does not match the original "
+                f"calendar encoding, {self._encoding_calendar}."
+            )
         return cftime.date2num(
             time, units=self._encoding_units, calendar=self._encoding_calendar
         )

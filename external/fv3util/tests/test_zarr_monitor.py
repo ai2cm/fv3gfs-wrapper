@@ -314,3 +314,27 @@ def test_values_preserved(cube_partitioner, numpy):
     assert dataset["var"].shape[:2] == (1, 6)
     assert dataset["var"].attrs["units"] == units
     assert dataset["var"].dims[2:] == dims
+
+
+@pytest.fixture
+def state_list_with_inconsistent_calendars(base_state, numpy):
+    state_list = []
+    state_times = [cftime.DatetimeNoLeap(2000, 1, 1), cftime.Datetime360Day(2000, 1, 2)]
+    for i in range(2):
+        new_state = copy.deepcopy(base_state)
+        for name in set(new_state.keys()).difference(["time"]):
+            new_state[name].view[:] = numpy.random.randn(*new_state[name].extent)
+        state_list.append(new_state)
+        new_state["time"] = state_times[i]
+    return state_list
+
+
+def test_monitor_file_store_inconsistent_calendars(
+    state_list_with_inconsistent_calendars, cube_partitioner, numpy
+):
+    with tempfile.TemporaryDirectory(suffix=".zarr") as tempdir:
+        monitor = fv3util.ZarrMonitor(tempdir, cube_partitioner)
+        initial_state, final_state = state_list_with_inconsistent_calendars
+        monitor.store(initial_state)
+        with pytest.raises(ValueError, match="Calendar type"):
+            monitor.store(final_state)

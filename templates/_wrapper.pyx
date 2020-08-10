@@ -88,12 +88,12 @@ def get_dimension_lengths():
 
 
 def set_time(time):
-    """Set model time to the given cftime.datetime.
+    """Set model time to the given datetime.
 
     Does not change end time of the model run, or reset the step count.
 
     Args:
-        time (cftime.datetime): the target time
+        time (cftime.datetime or datetime.datetime): the target time
     """
     cdef int year, month, day, hour, minute, second
     year = time.year

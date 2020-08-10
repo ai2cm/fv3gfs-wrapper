@@ -1,4 +1,7 @@
+import datetime
+
 import cftime
+import numpy as np
 
 
 # Calendar constant values copied from time_manager in FMS
@@ -12,3 +15,9 @@ FMS_TO_CFTIME_TYPE = {
     GREGORIAN: cftime.DatetimeGregorian,  # Not a valid calendar in FV3GFS
     NOLEAP: cftime.DatetimeNoLeap,
 }
+
+
+def datetime64_to_datetime(dt64):
+    utc_start = np.datetime64(0, "s")
+    timestamp = (dt64 - utc_start) / np.timedelta64(1, "s")
+    return datetime.utcfromtimestamp(timestamp)
