@@ -46,7 +46,13 @@ class QuantityMetadata:
         """numpy-like module used to interact with the data"""
         if issubclass(self.data_type, cupy.ndarray):
             return cupy
-        elif gt4py is not None and issubclass(self.data_type, (gt4py.storage.storage.GPUStorage, gt4py.storage.storage.ExplicitlySyncedGPUStorage)):
+        elif gt4py is not None and issubclass(
+            self.data_type,
+            (
+                gt4py.storage.storage.GPUStorage,
+                gt4py.storage.storage.ExplicitlySyncedGPUStorage,
+            ),
+        ):
             return cupy
         elif issubclass(self.data_type, np.ndarray):
             return np
@@ -287,7 +293,7 @@ class Quantity:
             units=units,
             data_type=type(data),
             dtype=data.dtype,
-            gt4py_backend=gt4py_backend
+            gt4py_backend=gt4py_backend,
         )
         self._attrs = {}
         self._compute_domain_view = BoundedArrayView(
@@ -359,7 +365,13 @@ class Quantity:
                 storage_type = gt4py.storage.storage.CPUStorage
             elif isinstance(self._data, cupy.ndarray):
                 storage_type = gt4py.storage.storage.GPUStorage
-            self._storage = storage_type(shape=self._data.shape, dtype=self._data.dtype, backend=self.gt4py_backend, default_origin=self.origin, mask=None)
+            self._storage = storage_type(
+                shape=self._data.shape,
+                dtype=self._data.dtype,
+                backend=self.gt4py_backend,
+                default_origin=self.origin,
+                mask=None,
+            )
             self._storage[...] = self._data
         return self._storage
 

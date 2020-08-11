@@ -2,6 +2,7 @@ import copy
 import datetime
 import pytest
 import fv3util
+
 try:
     import gt4py
 except ImportError:
@@ -146,12 +147,8 @@ def get_quantity(dims, units, extent, n_halo, numpy):
     )
 
 
-@pytest.mark.parametrize(
-    "backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True
-)
-@pytest.mark.parametrize(
-    "dims, layout", [["x,y,z", (2, 2)]], indirect=True
-)
+@pytest.mark.parametrize("backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True)
+@pytest.mark.parametrize("dims, layout", [["x,y,z", (2, 2)]], indirect=True)
 def test_gathered_quantity_has_storage(
     tile_quantity, scattered_quantities, communicator_list, time, backend
 ):
@@ -165,12 +162,9 @@ def test_gathered_quantity_has_storage(
         else:
             assert result is None
 
-@pytest.mark.parametrize(
-    "backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True
-)
-@pytest.mark.parametrize(
-    "dims, layout", [["x,y,z", (2, 2)]], indirect=True
-)
+
+@pytest.mark.parametrize("backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True)
+@pytest.mark.parametrize("dims, layout", [["x,y,z", (2, 2)]], indirect=True)
 def test_scattered_quantity_has_storage(
     tile_quantity, communicator_list, time, backend
 ):
@@ -201,7 +195,7 @@ def test_tile_gather_state(
     assert result.dims == tile_quantity.dims
     assert result.units == tile_quantity.units
     assert result.extent == tile_quantity.extent
-    assert type(result.data) is type(tile_quantity.data)
+    assert isinstance(result.data, type(tile_quantity.data))
     tile_quantity.np.testing.assert_array_equal(result.view[:], tile_quantity.view[:])
 
 

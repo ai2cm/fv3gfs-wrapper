@@ -53,9 +53,6 @@ def test_recvbuf_uses_buffer(numpy, allocator, non_contiguous_array):
         assert recvbuf is not non_contiguous_array
         assert recvbuf.data is not non_contiguous_array.data
         recvbuf[:] = 0.0
-        print(recvbuf)
-        print(non_contiguous_array)
-        print(non_contiguous_array == 0.0)
         assert not numpy.all(non_contiguous_array == 0.0)
     assert numpy.all(non_contiguous_array == 0.0)
 

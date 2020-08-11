@@ -1,6 +1,7 @@
 import pytest
 import fv3util
 import numpy as np
+
 try:
     import gt4py
 except ImportError:
@@ -76,9 +77,8 @@ def test_numpy(quantity, backend):
     else:
         assert quantity.np is np
 
-@pytest.mark.parametrize(
-    "backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True
-)
+
+@pytest.mark.parametrize("backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True)
 def test_storage_exists(quantity, backend):
     if gt4py is None:
         with pytest.raises(ImportError):
@@ -90,9 +90,7 @@ def test_storage_exists(quantity, backend):
             assert isinstance(quantity.storage, gt4py.storage.storage.GPUStorage)
 
 
-@pytest.mark.parametrize(
-    "backend", ["numpy", "cupy"], indirect=True
-)
+@pytest.mark.parametrize("backend", ["numpy", "cupy"], indirect=True)
 def test_storage_does_not_exist(quantity, backend):
     if gt4py is None:
         with pytest.raises(ImportError):
@@ -101,30 +99,24 @@ def test_storage_does_not_exist(quantity, backend):
         with pytest.raises(TypeError):
             quantity.storage
 
+
 def test_data_is_not_storage(quantity, backend):
     if gt4py is not None:
         assert not isinstance(quantity.data, gt4py.storage.storage.Storage)
 
 
-@pytest.mark.parametrize(
-    "backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True
-)
+@pytest.mark.parametrize("backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True)
 def test_backend_is_accurate(quantity):
     assert quantity.gt4py_backend == quantity.storage.backend
 
 
-@pytest.mark.parametrize(
-    "backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True
-)
+@pytest.mark.parametrize("backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True)
 def test_modifying_data_modifies_storage(quantity):
     quantity.storage[:] = 5
     assert quantity.np.all(quantity.data[:] == 5)
 
 
-@pytest.mark.parametrize(
-    "backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True
-)
+@pytest.mark.parametrize("backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True)
 def test_modifying_storage_modifies_data(quantity):
     quantity.data[:] = 5
     assert quantity.np.all(quantity.np.asarray(quantity.storage[:]) == 5)
-

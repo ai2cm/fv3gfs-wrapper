@@ -5,6 +5,7 @@ import numpy as np
 import xarray as xr
 from . import constants, utils
 from .partitioner import CubedSpherePartitioner, subtile_slice
+
 try:
     import cupy
 except ImportError:
@@ -186,7 +187,6 @@ class _ZarrVariableWriter:
         except ValueError as err:
             if err.args[0] == "object __array__ method not producing an array":
                 self.array[target_slice] = cupy.asnumpy(quantity.view[:][from_slice])
-
 
         self.i_time += 1
 

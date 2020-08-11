@@ -1,9 +1,10 @@
 from . import constants
 import numpy as np
-from gt4py.storage.storage import Storage
+
 try:
     from gt4py.storage.storage import Storage
 except ImportError:
+
     class Storage:
         pass
 

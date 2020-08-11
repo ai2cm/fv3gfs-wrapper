@@ -2,11 +2,14 @@ from typing import Callable, Iterable
 from numpy import ndarray
 import contextlib
 from .utils import is_c_contiguous
+
 try:
     from gt4py.storage.storage import Storage
 except ImportError:
+
     class Storage:
         pass
+
 
 BUFFER_CACHE = {}
 
