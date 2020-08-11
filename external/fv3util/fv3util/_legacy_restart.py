@@ -2,7 +2,7 @@ from typing import Iterable, BinaryIO
 import os
 import xarray as xr
 import copy
-from ._fortran_info import RestartProperties, RESTART_PROPERTIES
+from ._properties import RestartProperties, RESTART_PROPERTIES
 from . import io, filesystem, constants
 from .quantity import Quantity
 from .partitioner import get_tile_index

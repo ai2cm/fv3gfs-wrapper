@@ -1,7 +1,7 @@
 .. meta::
    :robots: noindex, nofollow
 
-Welcome to fv3util's documentation!
+Welcome to FV3GFS's documentation!
 ======================================
 
 .. toctree::
