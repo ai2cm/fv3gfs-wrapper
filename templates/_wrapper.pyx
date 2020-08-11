@@ -5,7 +5,6 @@ cimport numpy as cnp
 import numpy as np
 import fv3util
 from mpi4py import MPI
-from datetime import datetime
 
 ctypedef cnp.double_t REAL_t
 real_type = np.float64
@@ -22,7 +21,7 @@ cdef extern:
     void save_intermediate_restart_if_enabled_subroutine()
     void save_intermediate_restart_subroutine()
     void initialize_time_subroutine(int *year, int *month, int *day, int *hour, int *minute, int *second)
-    void get_time_subroutine(int *year, int *month, int *day, int *hour, int *minute, int *second)
+    void get_time_subroutine(int *year, int *month, int *day, int *hour, int *minute, int *second, int *fms_calendar_type)
     void get_physics_timestep_subroutine(int *physics_timestep)
     void get_centered_grid_dimensions(int *nx, int *ny, int *nz)
     void get_n_ghost_cells_subroutine(int *n_ghost)
@@ -94,7 +93,7 @@ def set_time(time):
     Does not change end time of the model run, or reset the step count.
 
     Args:
-        time (datetime): the target time
+        time (cftime.datetime or datetime.datetime): the target time
     """
     cdef int year, month, day, hour, minute, second
     year = time.year
@@ -107,11 +106,11 @@ def set_time(time):
 
 
 def get_time():
-    """Returns a datetime corresponding to the current model time.
+    """Returns a cftime.datetime corresponding to the current model time.
     """
-    cdef int year, month, day, hour, minute, second
-    get_time_subroutine(&year, &month, &day, &hour, &minute, &second)
-    return datetime(year, month, day, hour, minute, second)
+    cdef int year, month, day, hour, minute, second, fms_calendar_type
+    get_time_subroutine(&year, &month, &day, &hour, &minute, &second, &fms_calendar_type)
+    return fv3util.FMS_TO_CFTIME_TYPE[fms_calendar_type](year, month, day, hour, minute, second)
 
 
 def set_state(state):
@@ -304,6 +303,7 @@ cpdef dict get_tracer_metadata():
         out_dict[str(tracer_long_name).replace(' ', '_')] = {
             'i_tracer': i_tracer_minus_one + 1,
             'fortran_name': tracer_name,
+            'restart_name': tracer_name,
             'units': tracer_units
         }
     return out_dict

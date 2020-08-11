@@ -4,7 +4,8 @@ import sys
 setup_requirements = []
 
 requirements = [
-    "xarray>=0.13.0",
+    "cftime>=1.2.1",
+    "xarray>=0.15.1",
     "numpy>=0.15.0",
     "fsspec>=0.6.0",
     "zarr>=2.3.2",
