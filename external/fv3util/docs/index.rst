@@ -1,7 +1,7 @@
 .. meta::
    :robots: noindex, nofollow
 
-Welcome to FV3GFS's documentation!
+Welcome to fv3util's documentation!
 ======================================
 
 .. toctree::
@@ -12,7 +12,7 @@ Welcome to FV3GFS's documentation!
    installation
    usage
    state
-   developers
+   communication
    api
    history
 

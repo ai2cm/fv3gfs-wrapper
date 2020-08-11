@@ -6,6 +6,7 @@ import yaml
 import numpy as np
 import fv3config
 import fv3gfs
+from fv3gfs._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
 import fv3util
 from mpi4py import MPI
 from util import redirect_stdout
@@ -17,12 +18,8 @@ class SetterTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(SetterTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.get_tracer_metadata()
-        self.dynamics_data = {
-            entry["name"]: entry for entry in fv3util.DYNAMICS_PROPERTIES
-        }
-        self.physics_data = {
-            entry["name"]: entry for entry in fv3util.PHYSICS_PROPERTIES
-        }
+        self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
+        self.physics_data = {entry["name"]: entry for entry in PHYSICS_PROPERTIES}
 
     def setUp(self):
         pass

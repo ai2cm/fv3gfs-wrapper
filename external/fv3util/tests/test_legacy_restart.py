@@ -12,11 +12,13 @@ TEST_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 DATA_DIRECTORY = os.path.join(TEST_DIRECTORY, "data")
 
 
-@pytest.mark.parametrize("layout", [(1, 1), (3, 3)])
-def test_open_c12_restart_without_crashing(layout):
+@pytest.fixture(params=[(1, 1)])
+def layout(request):
+    return request.param
+
+
+def get_c12_restart_state_list(layout, tracer_properties):
     total_ranks = layout[0] * layout[1]
-    ny = 12 / layout[0]
-    nx = 12 / layout[1]
     shared_buffer = {}
     communicator_list = []
     for rank in range(total_ranks):
@@ -29,10 +31,22 @@ def test_open_c12_restart_without_crashing(layout):
     for communicator in communicator_list:
         state_list.append(
             fv3util.open_restart(
-                os.path.join(DATA_DIRECTORY, "c12_restart"), communicator
+                os.path.join(DATA_DIRECTORY, "c12_restart"),
+                communicator,
+                tracer_properties=tracer_properties,
             )
         )
-    for state in state_list:
+    return state_list
+
+
+@pytest.mark.parametrize("layout", [(1, 1), (3, 3)])
+def test_open_c12_restart(layout):
+    tracer_properties = {}
+    c12_restart_state_list = get_c12_restart_state_list(layout, tracer_properties)
+    # C12 has 12 gridcells along each tile side, we divide this across processors
+    ny = 12 / layout[0]
+    nx = 12 / layout[1]
+    for state in c12_restart_state_list:
         assert "time" in state.keys()
         assert len(state.keys()) == 63
         for name, value in state.items():
@@ -50,6 +64,54 @@ def test_open_c12_restart_without_crashing(layout):
                         assert extent == ny
                     elif dim == fv3util.Y_INTERFACE_DIM:
                         assert extent == ny + 1
+
+
+@pytest.mark.parametrize(
+    "tracer_properties",
+    [
+        {
+            "specific_humidity": {
+                "dims": [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
+                "units": "kg/kg",
+                "restart_name": "sphum",
+            },
+        },
+        {
+            "specific_humidity_by_another_name": {
+                "dims": [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
+                "units": "kg/kg",
+                "restart_name": "sphum",
+            },
+        },
+        {
+            "specific_humidity": {
+                "dims": [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
+                "units": "kg/kg",
+                "restart_name": "sphum",
+            },
+        },
+        {
+            "specific_humidity": {
+                "dims": [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
+                "units": "kg/kg",
+                "restart_name": "sphum",
+            },
+            "snow_water_mixing_ratio": {
+                "dims": [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
+                "units": "kg/kg",
+                "restart_name": "snowwat",
+            },
+        },
+    ],
+)
+def test_open_c12_restart_tracer_properties(layout, tracer_properties):
+    c12_restart_state_list = get_c12_restart_state_list(layout, tracer_properties)
+    for state in c12_restart_state_list:
+        for name, properties in tracer_properties.items():
+            assert name in state.keys()
+            assert state[name].dims == tuple(properties["dims"])
+            assert state[name].attrs["units"] == properties["units"]
+            assert properties["restart_name"] not in state
 
 
 @pytest.mark.parametrize("layout", [(1, 1), (3, 3)])
@@ -189,7 +251,7 @@ def result_dims(data_array, new_dims):
 
 
 def test_apply_dims(data_array, new_dims, result_dims):
-    result = fv3util._legacy_restart.apply_dims(data_array, new_dims)
+    result = fv3util._legacy_restart._apply_dims(data_array, new_dims)
     np.testing.assert_array_equal(result.values, data_array.values)
     assert result.dims == result_dims
     assert result.attrs == data_array.attrs

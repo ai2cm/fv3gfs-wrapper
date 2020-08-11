@@ -2,7 +2,6 @@ from ._exceptions import InvalidQuantityError, OutOfBoundsError
 from .time import datetime64_to_datetime, FMS_TO_CFTIME_TYPE
 from .io import read_state, write_state
 from .nudging import get_nudging_tendencies, apply_nudging
-from .fortran_info import PHYSICS_PROPERTIES, DYNAMICS_PROPERTIES
 from ._legacy_restart import open_restart
 from .zarr_monitor import ZarrMonitor
 from .partitioner import (
@@ -54,3 +53,4 @@ from .buffer import array_buffer, send_buffer, recv_buffer
 from ._corners import fill_scalar_corners
 
 __version__ = "0.5.1"
+__all__ = list(key for key in locals().keys() if not key.startswith("_"))
