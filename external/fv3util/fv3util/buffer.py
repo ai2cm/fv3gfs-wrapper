@@ -3,13 +3,6 @@ from numpy import ndarray
 import contextlib
 from .utils import is_c_contiguous
 
-try:
-    from gt4py.storage.storage import Storage
-except ImportError:
-
-    class Storage:
-        pass
-
 
 BUFFER_CACHE = {}
 
@@ -58,10 +51,7 @@ def send_buffer(allocator: Callable, array: ndarray):
         yield array
     else:
         with array_buffer(allocator, array.shape, array.dtype) as sendbuf:
-            if isinstance(array, Storage):
-                sendbuf[:] = array.data
-            else:
-                sendbuf[:] = array
+            sendbuf[:] = array
             yield sendbuf
 
 
