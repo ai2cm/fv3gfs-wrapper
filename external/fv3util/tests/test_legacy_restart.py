@@ -1,5 +1,6 @@
-from datetime import datetime
 import os
+import tempfile
+import cftime
 import xarray as xr
 import numpy as np
 import pytest
@@ -36,7 +37,7 @@ def test_open_c12_restart_without_crashing(layout):
         assert len(state.keys()) == 63
         for name, value in state.items():
             if name == "time":
-                assert isinstance(value, datetime)
+                assert isinstance(value, cftime.DatetimeJulian)
             else:
                 assert isinstance(value, fv3util.Quantity)
                 assert np.sum(np.isnan(value.view[:])) == 0
@@ -77,7 +78,7 @@ def test_open_c12_restart_empty_to_state_without_crashing(layout):
         assert len(state.keys()) == 63
         for name, value in state.items():
             if name == "time":
-                assert isinstance(value, datetime)
+                assert isinstance(value, cftime.DatetimeJulian)
             else:
                 assert isinstance(value, fv3util.Quantity)
                 assert np.sum(np.isnan(value.view[:])) == 0
@@ -126,7 +127,7 @@ def test_open_c12_restart_to_allocated_state_without_crashing(layout):
         assert len(state.keys()) == 63
         for name, value in state.items():
             if name == "time":
-                assert isinstance(value, datetime)
+                assert isinstance(value, cftime.DatetimeJulian)
             else:
                 assert isinstance(value, fv3util.Quantity)
                 assert np.sum(np.isnan(value.view[:])) == 0
@@ -141,9 +142,20 @@ def test_open_c12_restart_to_allocated_state_without_crashing(layout):
                         assert extent == ny + 1
 
 
-@pytest.fixture
-def coupler_res_file_and_time():
-    return os.path.join(DATA_DIRECTORY, "coupler.res"), datetime(2016, 8, 3)
+@pytest.fixture(
+    params=[
+        ("coupler_julian.res", cftime.DatetimeJulian),
+        ("coupler_thirty_day.res", cftime.Datetime360Day),
+        ("coupler_noleap.res", cftime.DatetimeNoLeap),
+    ],
+    ids=["julian", "thirty_day", "noleap"],
+)
+def coupler_res_file_and_time(request):
+    file, expected_date_type = request.param
+    return (
+        os.path.join(DATA_DIRECTORY, file),
+        expected_date_type(2016, 8, 3),
+    )
 
 
 def test_get_current_date_from_coupler_res(coupler_res_file_and_time):
@@ -234,3 +246,19 @@ def test_get_rank_suffix_invalid_total_ranks(invalid_total_ranks):
     with pytest.raises(ValueError):
         # total_ranks should be multiple of 6
         fv3util._legacy_restart.get_rank_suffix(0, invalid_total_ranks)
+
+
+def test_read_state_incorrectly_encoded_time():
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".nc") as file:
+        state_ds = xr.DataArray(0.0, name="time").to_dataset()
+        state_ds.to_netcdf(file.name)
+        with pytest.raises(ValueError, match="Time in stored state"):
+            fv3util.io.read_state(file.name)
+
+
+def test_read_state_non_scalar_time():
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".nc") as file:
+        state_ds = xr.DataArray([0.0, 1.0], dims=["T"], name="time").to_dataset()
+        state_ds.to_netcdf(file.name)
+        with pytest.raises(ValueError, match="scalar time"):
+            fv3util.io.read_state(file.name)
