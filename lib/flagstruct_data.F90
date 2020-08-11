@@ -1,14 +1,14 @@
 module flagstruct_data_mod
 
-    use atmosphere_mod, only: Atm, mytile
-    use fv_nwp_nudge_mod, only: do_adiabatic_init
-    !use tracer_manager_mod, only: get_tracer_names, get_number_tracers, get_tracer_index
-    !use field_manager_mod,  only: MODEL_ATMOS
-    use iso_c_binding
-    
-    implicit none
-    
-    contains
+use atmosphere_mod, only: Atm, mytile
+use fv_nwp_nudge_mod, only: do_adiabatic_init
+!use tracer_manager_mod, only: get_tracer_names, get_number_tracers, get_tracer_index
+!use field_manager_mod,  only: MODEL_ATMOS
+use iso_c_binding
+
+implicit none
+
+contains
     
 
     
@@ -54,5 +54,5 @@ module flagstruct_data_mod
     
 
     
-    end module flagstruct_data_mod
+end module flagstruct_data_mod
     

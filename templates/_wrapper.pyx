@@ -10,7 +10,7 @@ import functools
 
 ctypedef cnp.double_t REAL_t
 ctypedef cnp.int_t INT_t
-# ctypedef cnp.bint_t BOOL_t
+ctypedef cnp.npy_bool BOOL_t
 real_type = np.float64
 SURFACE_PRECIPITATION_RATE = 'surface_precipitation_rate'
 MM_PER_M = 1000
@@ -51,9 +51,9 @@ cdef extern:
     void get_{{ item.fortran_name }}(REAL_t *{{ item.fortran_name }}_out, int *nz)
     void set_{{ item.fortran_name }}(REAL_t *{{ item.fortran_name }}_in, int *nz)
 {% endfor %}
-# {% for item in flagstruct_properties %}
-#     void get_{{ item.fortran_name }}({{item.type_cyth}} *{{ item.fortran_name }}_out)
-# {% endfor %}
+{% for item in flagstruct_properties %}
+    void get_{{ item.fortran_name }}({{item.type_cyth}} *{{ item.fortran_name }}_out)
+{% endfor %}
 
 cdef get_quantity_factory():
     cdef int nx, ny, nz, nz_soil
@@ -329,22 +329,14 @@ cdef list get_tracer_metadata_list():
     return out_list
 
 
-# class Flags:
-# {% for item in flagstruct_properties %}
-#     {% if item.type_definition == "real" %}
-#     @functools.cached_property
-#     def {{item.name}}(self):
-#         cdef REAL_t {{item.name}}
-#         get_{{item.fortran_name}}({{item.name}})
-#         return {{item}}
-#     {% elif item.type_definition == "int" %}
-#     @functools.cached_property
-#     def {{item.name}}(self):
-#         cdef INT_t {{item.name}}
-#         get_{{item.fortran_name}}({{item.name}})
-#         return {{item.name}}
-#     {% endif %}
-# {% endfor %}
+class Flags:
+{% for item in flagstruct_properties %}
+    @functools.cached_property
+    def {{item.name}}(self):
+        cdef {{item.type_cyth}} {{item.name}}
+        get_{{item.fortran_name}}(&{{item.name}})
+        return {{item.name}}
+{% endfor %}
 
 
 def initialize():
