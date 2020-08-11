@@ -66,7 +66,7 @@ libcoupler.a: $(LOCAL_OBJECTS) fortran_libs
 
 clean:
 	@echo "Cleaning ... "
-	$(RM) *.a -f *.o *.mod *.lst *.c depend $(TEMPLATES)
+	$(RM) -f *.a *.o *.mod *.lst *.c depend $(TEMPLATES)
 	$(RM) -rf tests/pytest/output/*
 	(cd external && make clean)
 
