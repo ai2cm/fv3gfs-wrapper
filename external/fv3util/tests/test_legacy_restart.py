@@ -39,7 +39,8 @@ def get_c12_restart_state_list(layout, tracer_properties):
 
 
 @pytest.mark.parametrize("layout", [(1, 1), (3, 3)])
-def test_open_c12_restart(layout, tracer_properties):
+def test_open_c12_restart(layout):
+    tracer_properties = {}
     c12_restart_state_list = get_c12_restart_state_list(layout, tracer_properties)
     # C12 has 12 gridcells along each tile side, we divide this across processors
     ny = 12 / layout[0]
