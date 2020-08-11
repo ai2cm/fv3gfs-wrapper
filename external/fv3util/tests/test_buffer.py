@@ -42,9 +42,6 @@ def test_sendbuf_uses_buffer(numpy, backend, allocator, non_contiguous_array):
     with send_buffer(allocator, non_contiguous_array) as sendbuf:
         assert sendbuf is not non_contiguous_array
         assert sendbuf.data is not non_contiguous_array.data
-        if backend.startswith("gt4py"):
-            sendbuf.synchronize()
-            non_contiguous_array.synchronize()
         numpy.testing.assert_array_equal(sendbuf, non_contiguous_array)
 
 
