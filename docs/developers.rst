@@ -12,15 +12,16 @@ structure for the ``fv3gfs-python`` wrapper.
 ``fv3util`` Package
 -------------------
 
-Much of the functionality of ``fv3gfs-python`` is split out into a package called ``fv3util``.
+Much of the functionality used to write run scripts in ``fv3gfs-python`` is split out
+into a package called ``fv3util``.
 Any functionality that can be written to be independent of the wrapped Fortran model
 is put into ``fv3util``. This makes it much easier to iterate on and test pure Python
 code for the model, as one can install the package onto the host system without needing
 to use Docker to handle Fortran dependencies. This also makes it possible for analysis
 codes to use the same routines used by the Fortran model.
 
-Versions of ``fv3util`` are paired with versions of ``fv3gfs-python``. The wrapper
-requires a copy of ``fv3util`` with the same version.
+We recommend users and developers read the `fv3util` documentation as well to make
+full use of this package.
 
 Templates
 ---------

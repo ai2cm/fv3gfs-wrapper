@@ -59,44 +59,13 @@ Instead of using a Python script, it is also possible to get precisely the behav
 
     $ python -m fv3gfs.run
 
-Nudging
+
+fv3util
 -------
 
-Nudging functionality is provided by :py:func:`fv3gfs.apply_nudging` and
-:py:func:`fv3gfs.get_nudging_tendencies`. The nudging tendencies can be stored to disk
-by the user, for example using a :py:class:`fv3gfs.ZarrMonitor`. A runfile using this
-functionality can be found in the `examples` directory.
-
-Diagnostic IO
--------------
-
-State can be persisted to disk using either :py:func:`fv3gfs.write_state` (described below)
-or :py:class:`fv3gfs.ZarrMonitor`. The latter will coordinate between ranks to
-write state to a unified Zarr store. Initializing it requires passing grid information.
-This can be done directly from the namelist in a configuration dictionary like so::
-
-    import fv3gfs
-    from mpi4py import MPI
-    import yaml
-
-    with open('fv3config.yml', 'r') as f:
-        config = yaml.safe_load(f)
-    partitioner = fv3gfs.TilePartitioner.from_namelist(config['namelist'])
-
-Alternatively, the grid information can be specified manually::
-
-    partitioner = fv3gfs.TilePartitioner(
-        layout=(1, 1)
-    )
-
-Once you have a :py:class:`fv3gfs.Partitioner`, the monitor can be created using any
-Zarr store::
-
-    import zarr
-    store = zarr.storage.DirectoryStore('output_dir')  # relative or absolute path
-    ZarrMonitor(partitioner, store, mode='w', mpi_comm=MPI.COMM_WORLD)
-
-Note this can be used with any directory store available in ``zarr``.
+Any functionality which can be used separately from the compiled Fortran model is included
+in a separate package, fv3util. We recommend reading the documentation for that package
+to see what tools it provides for use in your runfiles.
 
 Restart
 -------
@@ -120,13 +89,14 @@ after calling :py:func:`fv3gfs.set_state`, the model would be reset to the point
 where the checkpoint state was retrieved.
 
 The remaining step for restarting from disk is to be able to write model states to/from disk.
-For this, we have :py:func:`fv3gfs.write_state` and :py:func:`read_state`. Consider a model
+For this, we have :py:func:`fv3util.write_state` and :py:func:`fv3util.read_state`. Consider a model
 script with a general structure as follows:
 
 .. code-block:: python
 
     from mpi4py import MPI
     import fv3gfs
+    import fv3util
     import os
 
     fv3gfs.initialize()
@@ -135,18 +105,18 @@ script with a general structure as follows:
         f'RESTART/restart.rank{MPI.COMM_WORLD.Get_rank()}.nc'
     )
     if os.path.isfile(restart_filename):
-        restart_state = fv3gfs.read_state(restart_filename)
+        restart_state = fv3util.read_state(restart_filename)
         fv3gfs.set_state(restart_state)
 
     # ... continue to main loop and other parts of run script
 
     # after main loop is finished:
     restart_state = fv3gfs.get_state(fv3gfs.get_restart_names())
-    fv3gfs.write_state(restart_state, restart_filename)
+    fv3util.write_state(restart_state, restart_filename)
 
 In this script, if a restart file exists in the RESTART directory, it will be read in and overwrite
 the model state after the Fortran initialization routines take place. Each MPI rank
-(process) reads (with :py:func:`fv3gfs.read_state`) or writes (with :py:func:`fv3gfs.write_state)
+(process) reads (with :py:func:`fv3util.read_state`) or writes (with :py:func:`fv3util.write_state)
 a netCDF file with all of its restart data. :py:func:`fv3gfs.get_restart_names` returns
 a list of all quantity names required to restart the model.
 
@@ -158,14 +128,3 @@ have elapsed. :py:func:`save_fortran_restart` will immediately save restart file
 given label (instead of the model timestamp). :py:func:`load_fortran_restart_folder`
 will load restart files from the given directory, using the provided label if given (e.g. timestamp
 if Fortran intermediate restarts, or chosen saved label if using the wrapper direct-save routine).
-
-Loading legacy restarts
------------------------
-
-A function :py:func:`fv3gfs.open_restart` is available to load restart files that have
-been output by the Fortran code. This routine will handle
-loading the data on a single processor per tile and then distribute the data to other
-processes on the same tile. This may cause out-of-memory errors, which can be mitigated
-in a couple different ways through changes to the code base (e.g. loading a subset of
-the variables or levels at a time before distributing across ranks).
-

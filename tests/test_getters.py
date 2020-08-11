@@ -6,6 +6,7 @@ import numpy as np
 import fv3config
 import fv3gfs
 import fv3util
+from fv3gfs._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
 from mpi4py import MPI
 from util import redirect_stdout
 
@@ -17,12 +18,8 @@ class GetterTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(GetterTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.get_tracer_metadata()
-        self.dynamics_data = {
-            entry["name"]: entry for entry in fv3util.DYNAMICS_PROPERTIES
-        }
-        self.physics_data = {
-            entry["name"]: entry for entry in fv3util.PHYSICS_PROPERTIES
-        }
+        self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
+        self.physics_data = {entry["name"]: entry for entry in PHYSICS_PROPERTIES}
         self.mpi_comm = MPI.COMM_WORLD
 
     def setUp(self):
@@ -122,6 +119,11 @@ class GetterTests(unittest.TestCase):
 
     def test_get_all_tracer_quantities(self):
         self._get_names_helper(self.tracer_data.keys())
+
+    def test_get_restart_names(self):
+        restart_names = fv3gfs.get_restart_names()
+        restart_names.remove("time")
+        self._get_names_helper(restart_names)
 
     def test_get_all_names(self):
         self._get_names_helper(
