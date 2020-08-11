@@ -17,8 +17,8 @@ mpi_flags = [
 ]
 
 
-def run_unittest_script(filename, n_processes=6):
-    python_args = ["python3", "-m", "mpi4py", filename]
+def run_unittest_script(filename, *args, n_processes=6):
+    python_args = ["python3", "-m", "mpi4py", filename] + list(args)
     subprocess.check_call(["mpirun", "-n", str(n_processes)] + mpi_flags + python_args)
 
 

@@ -1,6 +1,7 @@
 import tempfile
 import zarr
-from datetime import datetime, timedelta
+import cftime
+from datetime import timedelta
 import pytest
 import xarray as xr
 import copy
@@ -20,9 +21,12 @@ def n_times(request):
         return 3
 
 
-@pytest.fixture
-def start_time():
-    return datetime(2010, 1, 1)
+@pytest.fixture(
+    params=[cftime.DatetimeJulian, cftime.Datetime360Day, cftime.DatetimeNoLeap]
+)
+def start_time(request):
+    date_type = request.param
+    return date_type(2010, 1, 1)
 
 
 @pytest.fixture
@@ -97,12 +101,12 @@ def state_list(base_state, n_times, start_time, time_step, numpy):
     return state_list
 
 
-def test_monitor_file_store(state_list, cube_partitioner, numpy):
+def test_monitor_file_store(state_list, cube_partitioner, numpy, start_time):
     with tempfile.TemporaryDirectory(suffix=".zarr") as tempdir:
         monitor = fv3util.ZarrMonitor(tempdir, cube_partitioner)
         for state in state_list:
             monitor.store(state)
-        validate_store(state_list, tempdir, numpy)
+        validate_store(state_list, tempdir, numpy, start_time)
         validate_xarray_can_open(tempdir)
 
 
@@ -111,8 +115,9 @@ def validate_xarray_can_open(dirname):
     xr.open_zarr(dirname)
 
 
-def validate_store(states, filename, numpy):
+def validate_store(states, filename, numpy, start_time):
     nt = len(states)
+    calendar = start_time.calendar
 
     def assert_no_missing_names(store, state):
         missing_names = set(states[0].keys()).difference(store.array_keys())
@@ -126,7 +131,11 @@ def validate_store(states, filename, numpy):
 
     def validate_array_dimensions_and_attributes(name, array):
         if name == "time":
-            target_attrs = {"_ARRAY_DIMENSIONS": ["time"]}
+            target_attrs = {
+                "_ARRAY_DIMENSIONS": ["time"],
+                "units": "seconds since 2010-01-01 00:00:00",
+                "calendar": calendar,
+            }
         else:
             target_attrs = states[0][name].attrs
             target_attrs["_ARRAY_DIMENSIONS"] = ["time", "tile"] + list(
@@ -137,7 +146,12 @@ def validate_store(states, filename, numpy):
     def validate_array_values(name, array):
         if name == "time":
             for i, s in enumerate(states):
-                assert array[i] == numpy.datetime64(s["time"])
+                value = cftime.num2date(
+                    array[i],
+                    units="seconds since 2010-01-01 00:00:00",
+                    calendar=calendar,
+                )
+                assert value == s["time"]
         else:
             for i, s in enumerate(states):
                 numpy.testing.assert_array_equal(array[i, 0, :], s[name].view[:])
@@ -171,7 +185,7 @@ def test_monitor_file_store_multi_rank_state(
     ny_rank = int(ny / layout[0] + ny_rank_add)
     nx_rank = int(nx / layout[1] + nx_rank_add)
     grid = fv3util.TilePartitioner(layout)
-    time = datetime(2010, 6, 20, 6, 0, 0)
+    time = cftime.DatetimeJulian(2010, 6, 20, 6, 0, 0)
     timestep = timedelta(hours=1)
     total_ranks = 6 * layout[0] * layout[1]
     partitioner = fv3util.CubedSpherePartitioner(grid)
@@ -300,3 +314,27 @@ def test_values_preserved(cube_partitioner, numpy):
     assert dataset["var"].shape[:2] == (1, 6)
     assert dataset["var"].attrs["units"] == units
     assert dataset["var"].dims[2:] == dims
+
+
+@pytest.fixture
+def state_list_with_inconsistent_calendars(base_state, numpy):
+    state_list = []
+    state_times = [cftime.DatetimeNoLeap(2000, 1, 1), cftime.Datetime360Day(2000, 1, 2)]
+    for i in range(2):
+        new_state = copy.deepcopy(base_state)
+        for name in set(new_state.keys()).difference(["time"]):
+            new_state[name].view[:] = numpy.random.randn(*new_state[name].extent)
+        state_list.append(new_state)
+        new_state["time"] = state_times[i]
+    return state_list
+
+
+def test_monitor_file_store_inconsistent_calendars(
+    state_list_with_inconsistent_calendars, cube_partitioner, numpy
+):
+    with tempfile.TemporaryDirectory(suffix=".zarr") as tempdir:
+        monitor = fv3util.ZarrMonitor(tempdir, cube_partitioner)
+        initial_state, final_state = state_list_with_inconsistent_calendars
+        monitor.store(initial_state)
+        with pytest.raises(ValueError, match="Calendar type"):
+            monitor.store(final_state)

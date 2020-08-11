@@ -66,7 +66,8 @@ library_link_args = [
 ]
 
 requirements = [
-    "xarray>=0.13.0",
+    "cftime>=1.2.1",
+    "xarray>=0.15.1",
     "netCDF4>=1.4.2",
     "numpy",
     f"fv3util>=0.5.1",
