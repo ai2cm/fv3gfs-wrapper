@@ -8,7 +8,7 @@ def dtype(numpy):
     return numpy.float64
 
 
-@pytest.fixture(params=[(1, 1), (3, 3)])
+@pytest.fixture(params=[(3, 3)])
 def layout(request):
     return request.param
 
@@ -38,7 +38,7 @@ def nx(nx_rank, layout):
     return nx_rank * layout[1]
 
 
-@pytest.fixture(params=[1, 3])
+@pytest.fixture(params=[3])
 def n_points(request):
     return request.param
 
@@ -235,7 +235,8 @@ def depth_quantity_list(
     domain boundary."""
     return_list = []
     for rank in range(total_ranks):
-        data = numpy.zeros(shape, dtype=dtype) + numpy.nan
+        data = numpy.empty(shape, dtype=dtype)
+        data[:] = numpy.nan
         for n_inside in range(max(n_points, max(extent) // 2), -1, -1):
             for i, dim in enumerate(dims):
                 if (n_inside <= extent[i] // 2) and (dim in fv3util.HORIZONTAL_DIMS):
@@ -259,6 +260,12 @@ def depth_quantity_list(
     return return_list
 
 
+@pytest.mark.parametrize(
+    "n_points", [1, 3], indirect=True
+)
+@pytest.mark.parametrize(
+    "layout", [(1, 1), (3, 3)], indirect=True
+)
 def test_depth_halo_update(
     depth_quantity_list,
     communicator_list,

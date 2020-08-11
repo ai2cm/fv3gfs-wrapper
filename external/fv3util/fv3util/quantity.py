@@ -258,7 +258,7 @@ class Quantity:
             gt4py_backend = data.backend
             if isinstance(data, gt4py.storage.storage.GPUStorage):
                 self._storage = data
-                self._data = cupy.asarray(data)
+                self._data = data.gpu_view
             elif isinstance(data, gt4py.storage.storage.CPUStorage):
                 self._storage = data
                 self._data = np.asarray(data)

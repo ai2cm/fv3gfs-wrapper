@@ -126,5 +126,5 @@ def test_modifying_data_modifies_storage(quantity):
 )
 def test_modifying_storage_modifies_data(quantity):
     quantity.data[:] = 5
-    assert quantity.np.all(quantity.storage[:] == 5)
+    assert quantity.np.all(quantity.np.asarray(quantity.storage[:]) == 5)
 
