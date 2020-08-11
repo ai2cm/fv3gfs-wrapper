@@ -16,13 +16,7 @@ def layout(request):
     return request.param
 
 
-@pytest.fixture(params=[{}])
-def tracer_properties(request):
-    return request.param
-
-
-@pytest.fixture
-def c12_restart_state_list(layout, tracer_properties):
+def get_c12_restart_state_list(layout, tracer_properties):
     total_ranks = layout[0] * layout[1]
     shared_buffer = {}
     communicator_list = []
@@ -34,7 +28,6 @@ def c12_restart_state_list(layout, tracer_properties):
         communicator_list.append(communicator)
     state_list = []
     for communicator in communicator_list:
-        print(tracer_properties)
         state_list.append(
             fv3util.open_restart(
                 os.path.join(DATA_DIRECTORY, "c12_restart"),
@@ -45,8 +38,10 @@ def c12_restart_state_list(layout, tracer_properties):
     return state_list
 
 
-@pytest.mark.parametrize("layout", [(1, 1), (3, 3)], indirect=True)
-def test_open_c12_restart(c12_restart_state_list, layout):
+@pytest.mark.parametrize("layout", [(1, 1), (3, 3)])
+def test_open_c12_restart(layout, tracer_properties):
+    c12_restart_state_list = get_c12_restart_state_list(layout, tracer_properties)
+    # C12 has 12 gridcells along each tile side, we divide this across processors
     ny = 12 / layout[0]
     nx = 12 / layout[1]
     for state in c12_restart_state_list:
@@ -106,12 +101,11 @@ def test_open_c12_restart(c12_restart_state_list, layout):
             },
         },
     ],
-    indirect=True,
 )
-def test_open_c12_restart_tracer_properties(c12_restart_state_list, tracer_properties):
+def test_open_c12_restart_tracer_properties(layout, tracer_properties):
+    c12_restart_state_list = get_c12_restart_state_list(layout, tracer_properties)
     for state in c12_restart_state_list:
         for name, properties in tracer_properties.items():
-            print(list(state.keys()))
             assert name in state.keys()
             assert state[name].dims == tuple(properties["dims"])
             assert state[name].attrs["units"] == properties["units"]

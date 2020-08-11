@@ -52,6 +52,21 @@ class TracerMetadataTests(unittest.TestCase):
         data = fv3gfs.get_tracer_metadata()
         self.assertEqual(set(data.keys()), set(tracer_names))
 
+    def test_all_tracers_in_restart_names(self):
+        tracer_names = [
+            "specific_humidity",
+            "cloud_water_mixing_ratio",
+            "rain_mixing_ratio",
+            "cloud_ice_mixing_ratio",
+            "snow_mixing_ratio",
+            "graupel_mixing_ratio",
+            "ozone_mixing_ratio",
+            "cloud_amount",
+        ]
+        restart_names = fv3gfs.get_restart_names()
+        missing_names = set(tracer_names).difference(restart_names)
+        self.assertEqual(len(missing_names), 0)
+
 
 if __name__ == "__main__":
     with open(os.path.join(test_dir, "default_config.yml"), "r") as f:

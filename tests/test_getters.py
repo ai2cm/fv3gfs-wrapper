@@ -120,6 +120,9 @@ class GetterTests(unittest.TestCase):
     def test_get_all_tracer_quantities(self):
         self._get_names_helper(self.tracer_data.keys())
 
+    def test_get_restart_names(self):
+        self._get_names_helper(fv3gfs.get_restart_names())
+
     def test_get_all_names(self):
         self._get_names_helper(
             list(self.dynamics_data.keys())
