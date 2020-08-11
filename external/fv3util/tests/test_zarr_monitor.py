@@ -8,7 +8,6 @@ import copy
 import fv3util
 import logging
 from fv3util.testing import DummyComm
-import numpy as numpy_cpu
 
 
 logger = logging.getLogger("test_zarr_monitor")
