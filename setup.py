@@ -9,48 +9,62 @@ from Cython.Build import cythonize
 # This line only needed if building with NumPy in Cython file.
 from numpy import get_include
 
-
 PACKAGE_VERSION = "0.5.0"
+
+fv3gfs_build_path_environ_name = "FV3GFS_BUILD_DIR"
+make_command = os.environ.get("MAKE", "make")
+package_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class BuildDirectoryError(Exception):
     pass
 
 
-def find_coupler_lib(dir_="lib"):
-    path = os.path.join(dir_, "libcoupler.a")
-    if os.path.exists(path):
-        return ["-lcoupler", f"-L{dir_}"]
-    else:
-        raise BuildDirectoryError(f"File {path} is missing, first run make in {dir_}")
+relative_wrapper_build_filenames = [
+    "lib/coupler_lib.o",
+    "lib/physics_data.o",
+    "lib/dynamics_data.o",
+    "lib/tracers.o"
+]
 
+relative_fv3gfs_build_filenames = [
+    "atmos_model.o",
+    "module_fv3_config.o",
+    "cpl/libfv3cpl.a",
+    "ipd/libipd.a",
+    "atmos_cubed_sphere/libfv3core.a",
+    "coarse_graining/libfv3coarse_graining.a",
+    "io/libfv3io.a",
+    "gfsphysics/libgfsphys.a",
+    "../stochastic_physics/libstochastic_physics.a",
+    "/opt/NCEPlibs/lib/libnemsio_d.a",
+    "/opt/NCEPlibs/lib/libbacio_4.a",
+    "/opt/NCEPlibs/lib/libsp_v2.0.2_d.a",
+    "/opt/NCEPlibs/lib/libw3emc_d.a",
+    "/opt/NCEPlibs/lib/libw3nco_d.a",
+]
 
-def find_mpi_libraries():
-    mpi_flavor = os.environ.get("MPI", "openmpi")
-    if mpi_flavor == "openmpi":
-        mpi_fortran_lib = "-lmpi_mpifh"
-    else:
-        mpi_fortran_lib = "-lmpifort"
+mpi_flavor = os.environ.get("MPI", "openmpi")
+if mpi_flavor == "openmpi":
+    mpi_fortran_lib = "-lmpi_mpifh"
+else:
+    mpi_fortran_lib = "-lmpifort"
 
-    return [mpi_fortran_lib]
-
-
-def find_python_library():
-    return ["-lpython3." + str(sys.version_info.minor) + "m"]
-
-
-def find_fv3_executable():
-    if fv3gfs_build_path_environ_name in os.environ:
-        fv3gfs_build_path = os.environ(fv3gfs_build_path_environ_name)
-    else:
-        fv3gfs_build_path = os.path.join(package_dir, "lib/external/FV3/")
-    return os.path.join(fv3gfs_build_path, "fv3.exe")
-
-
-fv3gfs_build_path_environ_name = "FV3GFS_BUILD_DIR"
-make_command = os.environ.get("MAKE", "make")
-package_dir = os.path.dirname(os.path.abspath(__file__))
-
+library_link_args = [
+    "-lFMS",
+    "-lesmf",
+    "-lgfortran",
+    "-lpython3." + str(sys.version_info.minor) + "m",
+    mpi_fortran_lib,
+    "-lmpi",
+    "-lnetcdf",
+    "-lnetcdff",
+    "-fopenmp",
+    "-lmvec",
+    "-lblas",
+    "-lc",
+    "-lrt",
+]
 
 requirements = [
     "cftime>=1.2.1",
@@ -70,26 +84,29 @@ with open("README.md") as readme_file:
 with open("HISTORY.md", "r", encoding="utf-8") as history_file:
     history = history_file.read()
 
+if fv3gfs_build_path_environ_name in os.environ:
+    fv3gfs_build_path = os.environ(fv3gfs_build_path_environ_name)
+else:
+    fv3gfs_build_path = os.path.join(package_dir, "lib/external/FV3/")
 
-extra_link_args = [
-    "-lFMS",
-    "-lesmf",
-    "-lgfortran",
-    "-lmpi",
-    "-lnetcdf",
-    "-lnetcdff",
-    "-fopenmp",
-    "-lmvec",
-    "-lblas",
-    "-lc",
-    "-lrt",
-]
-extra_link_args += find_coupler_lib()
-extra_link_args += find_mpi_libraries()
-extra_link_args += find_python_library()
+fortran_build_filenames = []
+for relative_filename in relative_fv3gfs_build_filenames:
+    fortran_build_filenames.append(os.path.join(fv3gfs_build_path, relative_filename))
+
+wrapper_build_filenames = []
+for relative_filename in relative_wrapper_build_filenames:
+    wrapper_build_filenames.append(os.path.join(package_dir, relative_filename))
+
+for filename in fortran_build_filenames:
+    if not os.path.isfile(filename):
+        raise BuildDirectoryError(
+            f"File {filename} is missing, first run make in {fv3gfs_build_path}"
+        )
 
 # copy2 preserves executable flag
-shutil.copy2(find_fv3_executable(), os.path.join(package_dir, "fv3.exe"))
+shutil.copy2(
+    os.path.join(fv3gfs_build_path, "fv3.exe"), os.path.join(package_dir, "fv3.exe")
+)
 
 ext_modules = [
     Extension(  # module name:
@@ -97,7 +114,10 @@ ext_modules = [
         # source file:
         ["lib/_wrapper.pyx"],
         include_dirs=[get_include()],
-        extra_link_args=extra_link_args,
+        extra_link_args=wrapper_build_filenames
+        + fortran_build_filenames
+        + library_link_args,
+        depends=fortran_build_filenames + wrapper_build_filenames,
     )
 ]
 
