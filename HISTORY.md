@@ -13,6 +13,9 @@ of `datetime.datetime` objects.  This results in times stored in a format compat
 the fortran model, and accurate internal representation of times with the calendar specified
 in the `coupler_nml` namelist.
 
+Minor changes:
+- added jenkins scripts under .jenkins
+
 v0.5.0 (2020-07-28)
 ------
 
