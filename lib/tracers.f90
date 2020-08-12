@@ -1,5 +1,6 @@
 module tracers_mod
 use atmosphere_mod, only: Atm, mytile
+use atmos_model_mod, only: IPD_Data, IPD_Control, Atm_block
 use tracer_manager_mod, only: get_tracer_names, get_number_tracers, get_tracer_index
 use field_manager_mod,  only: MODEL_ATMOS
 use iso_c_binding
@@ -61,6 +62,46 @@ contains
             array_out(:, :, :) = Atm(mytile)%qdiag(i_start():i_end(), j_start():j_end(), 1:nz(), tracer_index)
         end if
     end subroutine get_tracer
+
+    subroutine set_physics_tracer(tracer_index, array, nz) bind(c)
+        ! get tracer at the given one-based index
+        real(c_double), intent(in) :: array(i_start():i_end(), j_start():j_end(), nz)
+        integer(c_int), intent(in) :: tracer_index
+        integer(c_int), intent(in) :: nz
+
+        ! locals
+        integer :: blocks_per_MPI_domain, i, j, i_block, i_column, i_z
+        blocks_per_MPI_domain = Atm_block%nblks
+        do i_block = 1, blocks_per_MPI_domain ! blocks per MPI domain
+            do i_column = 1, Atm_block%blksz(i_block) ! points per block
+                i = Atm_block%index(i_block)%ii(i_column)
+                j = Atm_block%index(i_block)%jj(i_column)
+                do i_z = 1, nz
+                    IPD_Data(i_block)%Stateout%gq0(i_column, i_z, tracer_index) = array(i, j, i_z)
+                enddo
+            enddo
+        enddo
+    end subroutine set_physics_tracer
+
+    subroutine get_physics_tracer(tracer_index, array, nz) bind(c)
+        ! get tracer at the given one-based index
+        real(c_double), intent(out) :: array(i_start():i_end(), j_start():j_end(), nz)
+        integer(c_int), intent(in) :: tracer_index
+        integer(c_int), intent(in) :: nz
+
+        ! locals
+        integer :: blocks_per_MPI_domain, i, j, i_block, i_column, i_z
+        blocks_per_MPI_domain = Atm_block%nblks
+        do i_block = 1, blocks_per_MPI_domain ! blocks per MPI domain
+            do i_column = 1, Atm_block%blksz(i_block) ! points per block
+                i = Atm_block%index(i_block)%ii(i_column)
+                j = Atm_block%index(i_block)%jj(i_column)
+                do i_z = 1, nz
+                    array(i, j, i_z) = IPD_Data(i_block)%Stateout%gq0(i_column, i_z, tracer_index)
+                enddo
+            enddo
+        enddo
+    end subroutine get_physics_tracer
 
     subroutine set_tracer(tracer_index, array_in) bind(c)
         ! set tracer at the given one-based index
