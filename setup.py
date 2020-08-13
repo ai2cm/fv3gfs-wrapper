@@ -109,7 +109,7 @@ shutil.copy2(
 
 ext_modules = [
     Extension(  # module name:
-        "fv3gfs._wrapper",
+        "fv3gfs.wrapper._wrapper",
         # source file:
         ["lib/_wrapper.pyx"],
         include_dirs=[get_include()],
