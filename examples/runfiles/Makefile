@@ -2,7 +2,7 @@
 RUNFILE ?=
 CONFIG ?= default.yml
 OUTDIR ?= outdir
-DOCKER_IMAGE ?= us.gcr.io/vcm-ml/fv3gfs-python
+DOCKER_IMAGE ?= us.gcr.io/vcm-ml/fv3gfs-wrapper
 
 CASES=basic_model online_code
 

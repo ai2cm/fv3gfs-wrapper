@@ -1,5 +1,5 @@
 GCR_URL ?= us.gcr.io/vcm-ml
-TARGET ?= fv3gfs-python
+TARGET ?= fv3gfs-wrapper
 TAG_NAME ?= latest
 DOCKERFILE ?= Dockerfile
 FORTRAN_ROOT ?= ../lib/external
@@ -29,7 +29,7 @@ all: build_deps build
 
 build:
 	COMPILED_IMAGE=$(FORTRAN_IMAGE) COMPILE_TARGET=fv3gfs-build $(MAKE) -C ../lib/external build
-	docker build -f $(DOCKERFILE) -t $(FV3GFS_PYTHON_IMAGE) $(FV3GFS_PYTHON_BUILD_ARGS) .. --target fv3gfs-python
+	docker build -f $(DOCKERFILE) -t $(FV3GFS_PYTHON_IMAGE) $(FV3GFS_PYTHON_BUILD_ARGS) .. --target $(TARGET)
 
 build_deps:
 ifeq ($(BUILD_FROM_INTERMEDIATE),y)

@@ -2,10 +2,10 @@
 FV3GFS
 ======
 
-fv3gfs-python (`import fv3gfs`), is a Python wrapper for the FV3GFS
+fv3gfs-wrapper (`import fv3gfs.wrapper`), is a Python wrapper for the FV3GFS
 global climate model.
 
-See the [documentation](https://vulcanclimatemodeling.github.io/fv3gfs-python/f12n7eq5xkoibbqp/index.html)
+See the [documentation](https://vulcanclimatemodeling.github.io/fv3gfs-wrapper/f12n7eq5xkoibbqp/index.html)
 for more detailed instructions.
 
 Checking out
@@ -67,10 +67,10 @@ when you're done to remove the build artifacts, or it may cause problems when yo
 build the docker image.
 
 With the image already built by `build_docker.sh` or pulled using
-`docker pull us.gcr.io/vcm-ml/fv3gfs-python`, run `dev_docker.sh`. This will
+`docker pull us.gcr.io/vcm-ml/fv3gfs-wrapper`, run `dev_docker.sh`. This will
 bind-mount the `fv3gfs`, `lib`, `tests`, `external`, and `templates` directories into the
 docker image. Inside the docker image, you can build or re-build the model with
-`make build` inside the `/fv3gfs-python` directory, and run the test suite with
+`make build` inside the `/fv3gfs-wrapper` directory, and run the test suite with
 `make test`.
 
 Re-building the model inside the image is necessary since your local

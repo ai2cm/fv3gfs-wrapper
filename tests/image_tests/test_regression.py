@@ -13,7 +13,7 @@ CONFIG_DIR = os.path.join(TEST_DIR, "config")
 SUBMIT_JOB_FILENAME = os.path.join(TEST_DIR, "run_files/submit_job.sh")
 STDOUT_FILENAME = "stdout.log"
 STDERR_FILENAME = "stderr.log"
-MODEL_IMAGE = "us.gcr.io/vcm-ml/fv3gfs-python"
+MODEL_IMAGE = "us.gcr.io/vcm-ml/fv3gfs-wrapper"
 MD5SUM_FILENAME = "md5.txt"
 
 USE_LOCAL_ARCHIVE = True

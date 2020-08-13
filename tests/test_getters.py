@@ -4,9 +4,9 @@ import os
 import shutil
 import numpy as np
 import fv3config
-import fv3gfs
-import fv3util
-from fv3gfs._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
+import fv3gfs.wrapper
+import fv3gfs.util
+from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
 from mpi4py import MPI
 from util import redirect_stdout
 
@@ -17,7 +17,7 @@ MM_PER_M = 1000
 class GetterTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(GetterTests, self).__init__(*args, **kwargs)
-        self.tracer_data = fv3gfs.get_tracer_metadata()
+        self.tracer_data = fv3gfs.wrapper.get_tracer_metadata()
         self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
         self.physics_data = {entry["name"]: entry for entry in PHYSICS_PROPERTIES}
         self.mpi_comm = MPI.COMM_WORLD
@@ -48,10 +48,10 @@ class GetterTests(unittest.TestCase):
 
     def test_air_temperatures_are_reasonable(self):
         """Test that air temperatures are numbers that look like air temperatures"""
-        state = fv3gfs.get_state(names=["air_temperature"])
+        state = fv3gfs.wrapper.get_state(names=["air_temperature"])
         self.assertIn("air_temperature", state.keys())
         quantity = state["air_temperature"]
-        self.assertIsInstance(quantity, fv3util.Quantity)
+        self.assertIsInstance(quantity, fv3gfs.util.Quantity)
 
         self.assertEqual(quantity.units, "degK")
         self.assertTrue(quantity.np.all(quantity.view[:] > 150.0))
@@ -59,19 +59,19 @@ class GetterTests(unittest.TestCase):
 
     def test_get_surface_geopotential(self):
         """This is a special test because it's the only 2D dynamics variable."""
-        state = fv3gfs.get_state(names=["surface_geopotential"])
+        state = fv3gfs.wrapper.get_state(names=["surface_geopotential"])
         self.assertIn("surface_geopotential", state.keys())
         quantity = state["surface_geopotential"]
-        self.assertIsInstance(quantity, fv3util.Quantity)
+        self.assertIsInstance(quantity, fv3gfs.util.Quantity)
 
         self.assertEqual(quantity.units, "m^2 s^-2")
 
     def test_get_soil_temperature(self):
         """This is a special test because it uses a different vertical grid (soil levels)."""
-        state = fv3gfs.get_state(names=["soil_temperature"])
+        state = fv3gfs.wrapper.get_state(names=["soil_temperature"])
         self.assertIn("soil_temperature", state.keys())
         quantity = state["soil_temperature"]
-        self.assertIsInstance(quantity, fv3util.Quantity)
+        self.assertIsInstance(quantity, fv3gfs.util.Quantity)
 
         self.assertEqual(quantity.units, "degK")
 
@@ -82,7 +82,7 @@ class GetterTests(unittest.TestCase):
     def test_get_surface_precipitation_rate(self):
         """Special test since this quantity is not in physics_properties.json file"""
         self._get_names_helper(["surface_precipitation_rate"])
-        state = fv3gfs.get_state(
+        state = fv3gfs.wrapper.get_state(
             names=["total_precipitation", "surface_precipitation_rate"]
         )
         total_precip = state["total_precipitation"]
@@ -121,7 +121,7 @@ class GetterTests(unittest.TestCase):
         self._get_names_helper(self.tracer_data.keys())
 
     def test_get_restart_names(self):
-        restart_names = fv3gfs.get_restart_names()
+        restart_names = fv3gfs.wrapper.get_restart_names()
         restart_names.remove("time")
         self._get_names_helper(restart_names)
 
@@ -141,11 +141,11 @@ class GetterTests(unittest.TestCase):
         self._get_names_helper(all_name_list[::3])
 
     def _get_names_helper(self, name_list):
-        state = fv3gfs.get_state(names=name_list)
+        state = fv3gfs.wrapper.get_state(names=name_list)
         for name, value in state.items():
             with self.subTest(name):
                 self.assertIsInstance(name, str)
-                self.assertIsInstance(value, fv3util.Quantity)
+                self.assertIsInstance(value, fv3gfs.util.Quantity)
         for name in name_list:
             with self.subTest(name):
                 self.assertIn(name, state)
@@ -154,7 +154,7 @@ class GetterTests(unittest.TestCase):
 
 class TracerMetadataTests(unittest.TestCase):
     def test_tracer_index_is_one_based(self):
-        data = fv3gfs.get_tracer_metadata()
+        data = fv3gfs.wrapper.get_tracer_metadata()
         indexes = []
         for entry in data.values():
             self.assertIn("i_tracer", entry)
@@ -167,7 +167,7 @@ class TracerMetadataTests(unittest.TestCase):
         )  # test there are no duplicates
 
     def test_tracer_metadata_has_all_keys(self):
-        data = fv3gfs.get_tracer_metadata()
+        data = fv3gfs.wrapper.get_tracer_metadata()
         for name, metadata in data.items():
             with self.subTest(msg=name):
                 self.assertIn("units", metadata)
@@ -188,7 +188,7 @@ class TracerMetadataTests(unittest.TestCase):
             "ozone_mixing_ratio",
             "cloud_amount",
         ]
-        data = fv3gfs.get_tracer_metadata()
+        data = fv3gfs.wrapper.get_tracer_metadata()
         self.assertEqual(set(data.keys()), set(tracer_names))
 
 
@@ -205,7 +205,7 @@ if __name__ == "__main__":
     os.chdir(rundir)
     try:
         with redirect_stdout(os.devnull):
-            fv3gfs.initialize()
+            fv3gfs.wrapper.initialize()
             MPI.COMM_WORLD.barrier()
         if rank != 0:
             kwargs = {"verbosity": 0}

@@ -7,20 +7,20 @@ Developers Notes
 ================
 
 Here are some fairly informal notes about the build system and package organization
-structure for the ``fv3gfs-python`` wrapper.
+structure for the ``fv3gfs-wrapper`` wrapper.
 
-``fv3util`` Package
+``fv3gfs-util`` Package
 -------------------
 
-Much of the functionality used to write run scripts in ``fv3gfs-python`` is split out
-into a package called ``fv3util``.
+Much of the functionality used to write run scripts in ``fv3gfs-wrapper`` is split out
+into a package called ``fv3gfs-util``.
 Any functionality that can be written to be independent of the wrapped Fortran model
-is put into ``fv3util``. This makes it much easier to iterate on and test pure Python
+is put into ``fv3gfs-util``. This makes it much easier to iterate on and test pure Python
 code for the model, as one can install the package onto the host system without needing
 to use Docker to handle Fortran dependencies. This also makes it possible for analysis
 codes to use the same routines used by the Fortran model.
 
-We recommend users and developers read the `fv3util` documentation as well to make
+We recommend users and developers read the `fv3gfs-util` documentation as well to make
 full use of this package.
 
 Templates
@@ -32,28 +32,28 @@ converted into Fortran sources which are then compiled.
 Properties Files
 ----------------
 
-Inside fv3util are "properties" for Fortran model variables. These are separated into
-"dynamics", "physics", and "tracer". "tracer" properties don't exist in fv3util itself
+Inside fv3gfs-util are "properties" for Fortran model variables. These are separated into
+"dynamics", "physics", and "tracer". "tracer" properties don't exist in fv3gfs-util itself
 but rather have to be registered into the package. This allows the Fortran model to
 pass information about the tracers being used with the current run configuration.
-Analysis codes can similarly pass tracer properties into fv3util. This is required,
+Analysis codes can similarly pass tracer properties into fv3gfs-util. This is required,
 for example, to load restart data that includes tracers.
 
 While building the model, these properties are used by the Jinja templates to
 automatically write getters and setters for each model variable. This allows
-:py:func:`fv3gfs.get_state` and :py:func:`fv3gfs.set_state` to interface with those
+:py:func:`fv3gfs.wrapper.get_state` and :py:func:`fv3gfs.wrapper.set_state` to interface with those
 variables in the Fortran model. Getting/setting new variables involves updating those
 properties (in their respective JSON files) and then rebuilding the wrapper.
 
 Docker build system
 -------------------
 
-`fv3gfs-python` depends on a number of docker build stages, and is itself used to
+`fv3gfs-wrapper` depends on a number of docker build stages, and is itself used to
 build other images. To avoid these docs being out of date, you can see exactly which
 stages are depended on by reading `build_docker.sh`.
 
 Images built using a dockerfile under `lib/external` are provided by the fv3gfs-fortran
-repo. Compiled binaries from these images are copied into the fv3gfs-python image.
+repo. Compiled binaries from these images are copied into the fv3gfs-wrapper image.
 
 Building using Docker is a little all-or-nothing. For example, to rebuild the image
 after making a small change to the Fortran code requires entirely re-building the
@@ -67,7 +67,7 @@ For certain dependencies, images are pre-generated and pulled from GCR by defaul
 This prevents having to re-build dependencies which rarely change. As of writing there
 is no versioning on these dependencies.
 
-To perform a default fv3gfs-python build which pulls images from GCR, in the root directory run::
+To perform a default fv3gfs-wrapper build which pulls images from GCR, in the root directory run::
 
     $ make build-docker
 
@@ -79,7 +79,7 @@ To push built images to GCR::
 
     $ make -C docker push_deps
 
-To perform a fv3gfs-python build while building all steps locally, run::
+To perform a fv3gfs-wrapper build while building all steps locally, run::
 
     $ BUILD_FROM_INTERMEDIATE=n make -C docker build
 

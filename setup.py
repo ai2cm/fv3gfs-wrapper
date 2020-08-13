@@ -1,7 +1,7 @@
 import os
 import shutil
 import sys
-from setuptools import setup
+from setuptools import setup, find_namespace_packages
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
 from Cython.Build import cythonize
@@ -70,7 +70,7 @@ requirements = [
     "xarray>=0.15.1",
     "netCDF4>=1.4.2",
     "numpy",
-    f"fv3util>=0.5.1",
+    f"fv3gfs-util>=0.5.1",
 ]
 
 setup_requirements = ["cython", "numpy", "jinja2"]
@@ -123,7 +123,7 @@ ext_modules = [
 setup(
     author="Vulcan Technologies LLC",
     author_email="jeremym@vulcan.com",
-    python_requires=">=3.5",
+    python_requires=">=3.6",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
@@ -137,16 +137,16 @@ setup(
     install_requires=requirements,
     setup_requires=setup_requirements,
     tests_require=test_requirements,
-    name="fv3gfs-python",
+    name="fv3gfs-wrapper",
     license="BSD license",
     long_description=readme + "\n\n" + history,
     cmdclass={"build_ext": build_ext},
-    packages=["fv3gfs"],
+    packages=find_namespace_packages(include=["fv3gfs.*"]),
     # Needed if building with NumPy.
     # This includes the NumPy headers when compiling.
     include_dirs=[get_include()],
     ext_modules=cythonize(ext_modules),
-    url="https://github.com/VulcanClimateModeling/fv3gfs-python",
+    url="https://github.com/VulcanClimateModeling/fv3gfs-wrapper",
     version=PACKAGE_VERSION,
     zip_safe=False,
 )

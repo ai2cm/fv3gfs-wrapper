@@ -16,7 +16,7 @@ version, while "v1" is not and "0.3.0" is not.
 
 6. In the project root, run `bumpversion <major/minor/patch>`. This will create a new commit.
 
-7. Repeat steps 4-6 inside `external/fv3util` to create a new version of fv3util.
+7. Repeat steps 4-6 inside `external/fv3gfs-util` to create a new version of fv3gfs-util.
 
 8. `git push -u origin release/<version>` and create a new pull request in Github.
 

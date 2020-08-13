@@ -18,7 +18,7 @@ import os
 import shutil
 import cftime
 import fv3config
-import fv3gfs
+import fv3gfs.wrapper
 from mpi4py import MPI
 from util import redirect_stdout
 
@@ -45,7 +45,7 @@ class GetTimeTests(unittest.TestCase):
         self.mpi_comm.barrier()
 
     def test_get_time(self):
-        state = fv3gfs.get_state(names=["time"])
+        state = fv3gfs.wrapper.get_state(names=["time"])
         assert isinstance(state["time"], self.DATE_TYPE)
 
 
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     os.chdir(rundir)
     try:
         with redirect_stdout(os.devnull):
-            fv3gfs.initialize()
+            fv3gfs.wrapper.initialize()
             MPI.COMM_WORLD.barrier()
         if rank != 0:
             kwargs = {"verbosity": 0}

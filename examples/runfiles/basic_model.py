@@ -1,4 +1,4 @@
-import fv3gfs
+import fv3gfs.wrapper
 
 # May need to run 'ulimit -s unlimited' before running this example
 # If you're running in our prepared docker container, you definitely need to do this
@@ -14,9 +14,9 @@ import fv3gfs
 # mpirun -n 6 --allow-run-as-root --oversubscribe --mca btl_vader_single_copy_mechanism none python3 basic_model.py
 
 if __name__ == "__main__":
-    fv3gfs.initialize()
-    for i in range(fv3gfs.get_step_count()):
-        fv3gfs.step_dynamics()
-        fv3gfs.step_physics()
-        fv3gfs.save_intermediate_restart_if_enabled()
-    fv3gfs.cleanup()
+    fv3gfs.wrapper.initialize()
+    for i in range(fv3gfs.wrapper.get_step_count()):
+        fv3gfs.wrapper.step_dynamics()
+        fv3gfs.wrapper.step_physics()
+        fv3gfs.wrapper.save_intermediate_restart_if_enabled()
+    fv3gfs.wrapper.cleanup()

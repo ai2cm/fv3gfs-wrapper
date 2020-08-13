@@ -1,7 +1,7 @@
 import os
 from datetime import timedelta
 import yaml
-import fv3gfs
+import fv3gfs.wrapper
 from mpi4py import MPI
 
 
@@ -32,7 +32,7 @@ def get_restart_directory(label):
 def get_reference_state(time, communicator, only_names):
     label = time_to_label(time)
     dirname = get_restart_directory(label)
-    return fv3gfs.open_restart(
+    return fv3gfs.wrapper.open_restart(
         dirname, communicator, label=label, only_names=only_names
     )
 
@@ -41,7 +41,7 @@ def nudge_to_reference(state, communicator, timescales, timestep):
     reference = get_reference_state(
         state["time"], communicator, only_names=timescales.keys()
     )
-    tendencies = fv3gfs.apply_nudging(state, reference, timescales, timestep)
+    tendencies = fv3gfs.wrapper.apply_nudging(state, reference, timescales, timestep)
     tendencies = append_key_label(tendencies, "_tendency_due_to_nudging")
     tendencies["time"] = state["time"]
     return tendencies
@@ -60,28 +60,28 @@ if __name__ == "__main__":
     with open("fv3config.yml", "r") as config_file:
         config = yaml.safe_load(config_file)
     MPI.COMM_WORLD.barrier()  # wait for master rank to write run directory
-    communicator = fv3gfs.CubedSphereCommunicator(
-        MPI.COMM_WORLD, fv3gfs.CubedSpherePartitioner.from_namelist(config["namelist"])
+    communicator = fv3gfs.wrapper.CubedSphereCommunicator(
+        MPI.COMM_WORLD, fv3gfs.wrapper.CubedSpherePartitioner.from_namelist(config["namelist"])
     )
     nudging_timescales = get_timescales_from_config(config)
     timestep = get_timestep(config)
-    tendency_monitor = fv3gfs.ZarrMonitor(
+    tendency_monitor = fv3gfs.wrapper.ZarrMonitor(
         os.path.join(RUN_DIR, "tendencies.zarr"),
         communicator.partitioner,
         mode="w",
         mpi_comm=MPI.COMM_WORLD,
     )
 
-    fv3gfs.initialize()
-    for i in range(fv3gfs.get_step_count()):
-        fv3gfs.step_dynamics()
-        fv3gfs.step_physics()
-        fv3gfs.save_intermediate_restart_if_enabled()
+    fv3gfs.wrapper.initialize()
+    for i in range(fv3gfs.wrapper.get_step_count()):
+        fv3gfs.wrapper.step_dynamics()
+        fv3gfs.wrapper.step_physics()
+        fv3gfs.wrapper.save_intermediate_restart_if_enabled()
 
-        state = fv3gfs.get_state(names=["time"] + list(nudging_timescales.keys()))
+        state = fv3gfs.wrapper.get_state(names=["time"] + list(nudging_timescales.keys()))
         tendencies = nudge_to_reference(
             state, communicator, nudging_timescales, timestep
         )
         tendency_monitor.store(tendencies)
-        fv3gfs.set_state(state)
-    fv3gfs.cleanup()
+        fv3gfs.wrapper.set_state(state)
+    fv3gfs.wrapper.cleanup()
