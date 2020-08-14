@@ -85,11 +85,18 @@ jobs:
           paths:
             - /opt/circleci/.pyenv/versions/3.6.2
           key: v1-build-dependencies-{{ checksum "requirements.txt" }}
+      - restore_cache:
+          keys:
+            - v1-fv3config-cache
       - run: 
           name: "Compile model and perform model tests"
           command: |
             echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://us.gcr.io
             DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain BUILD_FROM_INTERMEDIATE=y bash test_docker.sh
+      - save_cache:
+          paths:
+            - /home/circleci/.cache/fv3gfs/fv3config-cache
+          key: v1-fv3config-cache
       - run:
           name: "Run example runfiles"
           command: |
