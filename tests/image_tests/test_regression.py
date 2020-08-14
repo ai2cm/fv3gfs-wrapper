@@ -16,6 +16,7 @@ STDERR_FILENAME = "stderr.log"
 MODEL_IMAGE = "us.gcr.io/vcm-ml/fv3gfs-wrapper"
 MD5SUM_FILENAME = "md5.txt"
 MPI_FLAGS = [
+    "--oversubscribe",
     "--allow-run-as-root",
     "--use-hwthread-cpus",
     "--mca",
