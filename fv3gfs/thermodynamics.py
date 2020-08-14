@@ -35,8 +35,8 @@ def set_state_mass_conserving(
         old_state = fv3gfs.get_state([pressure, *water_variables])
         delp_old = old_state[pressure]
 
-        # change total water mixing ratio is only affected by the species which
-        # were modified and are therefore present in ``state``.
+        # the change in total water mixing ratio is only affected by the
+        # species which were modified and are therefore present in ``state``.
         total_water_old = 0.0
         for v in water_in_input:
             total_water_old += old_state[v].view[:]

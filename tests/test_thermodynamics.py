@@ -20,6 +20,7 @@ class MockFv3GFS:
         state = {
             "delp": fv3util.Quantity(self.one, units="Pa", dims=self.dims),
             "specific_humidity": fv3util.Quantity(self.one, units="", dims=self.dims),
+            "cloud_water_mixing_ratio": fv3util.Quantity(self.one, units="", dims=self.dims),
         }
         return {name: state[name] for name in names}
 
@@ -27,7 +28,7 @@ class MockFv3GFS:
         self.state = state
 
     def get_tracer_metadata(self):
-        return {"specific_humidity": {"is_water": True}}
+        return {"specific_humidity": {"is_water": True}, "cloud_water_mixing_ratio": {"is_water": True}}
 
 
 def test_set_state_mass_conserving_non_water():
