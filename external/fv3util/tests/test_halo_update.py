@@ -78,8 +78,8 @@ def dims(request, fast):
     print(dir(request))
     print(request.param_index, request.keywords, request.node)
     if fast and request.param in (
-            (fv3util.X_DIM, fv3util.Y_DIM, fv3util.Z_DIM),
-            (fv3util.Z_INTERFACE_DIM, fv3util.Y_INTERFACE_DIM, fv3util.X_INTERFACE_DIM)
+        (fv3util.X_DIM, fv3util.Y_DIM, fv3util.Z_DIM),
+        (fv3util.Z_INTERFACE_DIM, fv3util.Y_INTERFACE_DIM, fv3util.X_INTERFACE_DIM),
     ):
         pytest.skip("running in fast mode")
     return request.param

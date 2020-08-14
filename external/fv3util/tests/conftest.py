@@ -23,6 +23,7 @@ def backend(request):
     else:
         return request.param
 
+
 @pytest.fixture
 def fast(pytestconfig):
     return pytestconfig.getoption("--fast")
@@ -42,12 +43,16 @@ def numpy(backend):
     else:
         raise NotImplementedError()
 
+
 def pytest_addoption(parser):
     parser.addoption(
         "--gpu-only", action="store_true", default=False, help="only run gpu tests"
     )
     parser.addoption(
-        "--fast", action="store_true", default=False, help="run a limited suite of tests which completes quickly"
+        "--fast",
+        action="store_true",
+        default=False,
+        help="run a limited suite of tests which completes quickly",
     )
 
 

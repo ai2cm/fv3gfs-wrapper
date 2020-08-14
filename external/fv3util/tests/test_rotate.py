@@ -75,9 +75,11 @@ def start_data(request, numpy):
             id="2d_y_increasing_values",
         ),
     ],
-    indirect=["start_data"]
+    indirect=["start_data"],
 )
-def test_rotate_scalar_data(start_data, n_clockwise_rotations, dims, numpy, target_data):
+def test_rotate_scalar_data(
+    start_data, n_clockwise_rotations, dims, numpy, target_data
+):
     result = fv3util.rotate.rotate_scalar_data(
         start_data, dims, numpy, n_clockwise_rotations
     )
@@ -132,7 +134,9 @@ def test_rotate_scalar_data(start_data, n_clockwise_rotations, dims, numpy, targ
     ],
     indirect=["start_data"],
 )
-def test_rotate_vector_data(start_data, n_clockwise_rotations, dims, numpy, target_data):
+def test_rotate_vector_data(
+    start_data, n_clockwise_rotations, dims, numpy, target_data
+):
     x_data, y_data = start_data
     x_target, y_target = target_data
     x_result, y_result = fv3util.rotate.rotate_vector_data(
