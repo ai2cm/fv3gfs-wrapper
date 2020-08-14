@@ -21,6 +21,7 @@ for ranks_per_tile in (1, 4):
 @pytest.mark.parametrize(
     "rank, total_ranks, tile_index", zip(rank_list, total_rank_list, tile_index_list)
 )
+@pytest.mark.cpu_only
 def test_get_tile_number(rank, total_ranks, tile_index):
     tile = fv3util.get_tile_number(rank, total_ranks)
     assert tile == tile_index + 1
@@ -29,6 +30,7 @@ def test_get_tile_number(rank, total_ranks, tile_index):
 @pytest.mark.parametrize(
     "rank, total_ranks, tile_index", zip(rank_list, total_rank_list, tile_index_list)
 )
+@pytest.mark.cpu_only
 def test_get_tile_index(rank, total_ranks, tile_index):
     tile = fv3util.get_tile_index(rank, total_ranks)
     assert tile == tile_index
@@ -57,6 +59,7 @@ for layout in ((1, 1), (1, 2), (2, 2), (2, 3)):
 @pytest.mark.parametrize(
     "rank, layout, subtile_index", zip(rank_list, layout_list, subtile_index_list)
 )
+@pytest.mark.cpu_only
 def test_subtile_index(rank, layout, subtile_index):
     partitioner = fv3util.TilePartitioner(layout)
     assert partitioner.subtile_index(rank) == subtile_index
@@ -91,6 +94,7 @@ def test_subtile_index(rank, layout, subtile_index):
         ),
     ],
 )
+@pytest.mark.cpu_only
 def test_tile_extent_from_rank_metadata(array_extent, array_dims, layout, tile_extent):
     result = fv3util.partitioner.tile_extent_from_rank_metadata(
         array_dims, array_extent, layout
@@ -238,6 +242,7 @@ def test_tile_extent_from_rank_metadata(array_extent, array_dims, layout, tile_e
         ),
     ],
 )
+@pytest.mark.cpu_only
 def test_subtile_slice(
     array_dims, tile_extent, layout, subtile_index, subtile_slice, overlap
 ):

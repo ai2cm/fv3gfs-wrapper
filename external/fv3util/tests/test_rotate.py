@@ -3,6 +3,11 @@ import pytest
 import numpy as np
 
 
+@pytest.fixture
+def start_data(request, numpy):
+    return numpy.asarray(request.param)
+
+
 @pytest.mark.parametrize(
     "start_data, n_clockwise_rotations, dims, target_data",
     [
@@ -70,12 +75,13 @@ import numpy as np
             id="2d_y_increasing_values",
         ),
     ],
+    indirect=["start_data"]
 )
-def test_rotate_scalar_data(start_data, n_clockwise_rotations, dims, target_data):
+def test_rotate_scalar_data(start_data, n_clockwise_rotations, dims, numpy, target_data):
     result = fv3util.rotate.rotate_scalar_data(
-        start_data, dims, np, n_clockwise_rotations
+        start_data, dims, numpy, n_clockwise_rotations
     )
-    np.testing.assert_array_equal(result, target_data)
+    numpy.testing.assert_array_equal(result, target_data)
 
 
 @pytest.mark.parametrize(
@@ -124,12 +130,13 @@ def test_rotate_scalar_data(start_data, n_clockwise_rotations, dims, target_data
             id="2d_array_increasing_values",
         ),
     ],
+    indirect=["start_data"],
 )
-def test_rotate_vector_data(start_data, n_clockwise_rotations, dims, target_data):
+def test_rotate_vector_data(start_data, n_clockwise_rotations, dims, numpy, target_data):
     x_data, y_data = start_data
     x_target, y_target = target_data
     x_result, y_result = fv3util.rotate.rotate_vector_data(
-        x_data, y_data, n_clockwise_rotations, dims, np
+        x_data, y_data, n_clockwise_rotations, dims, numpy
     )
-    np.testing.assert_array_equal(x_result, x_target)
-    np.testing.assert_array_equal(y_result, y_target)
+    numpy.testing.assert_array_equal(x_result, x_target)
+    numpy.testing.assert_array_equal(y_result, y_target)

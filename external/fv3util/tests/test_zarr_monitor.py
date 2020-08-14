@@ -14,9 +14,12 @@ logger = logging.getLogger("test_zarr_monitor")
 
 
 @pytest.fixture(params=["one_step", "three_steps"])
-def n_times(request):
+def n_times(request, fast):
     if request.param == "one_step":
-        return 1
+        if fast:
+            pytest.skip("running in fast mode")
+        else:
+            return 1
     elif request.param == "three_steps":
         return 3
 
