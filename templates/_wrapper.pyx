@@ -297,7 +297,7 @@ cpdef dict get_tracer_metadata():
     Returns a dict whose keys are tracer names and values are dictionaries with metadata.
 
     Metadata includes the keys 'i_tracer' (tracer index number in Fortran), 'fortran_name'
-    (the short name in Fortran) and 'units'.
+    (the short name in Fortran), 'units', and a boolean 'is_water'.
     """
     cdef list out_list = []
     cdef int n_prognostic_tracers, n_total_tracers, i_tracer
