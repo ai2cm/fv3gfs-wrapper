@@ -36,6 +36,8 @@ cdef extern:
     void get_tracer_count(int *n_prognostic_tracers, int *n_total_tracers)
     void get_tracer(int *i_tracer, REAL_t *array_out)
     void set_tracer(int *i_tracer, REAL_t *array_in)
+    void get_physics_tracer(int *, REAL_t *, int *)
+    void set_physics_tracer(int * , REAL_t *, int *)
     void get_tracer_name(int *tracer_index, char *tracer_name_out, char *tracer_long_name_out, char *tracer_units_out)
     void get_num_cpld_calls(int *num_cpld_calls_out)
     void get_nz_soil_subroutine(int *nz_soil)
@@ -289,6 +291,37 @@ def get_state(names, dict state=None, allocator=None):
                 f'Quantity {name} does not exist - is there a typo?'
             )
     return state
+
+
+def _get_physics_tracer(int i, units='unknown', allocator=None) -> fv3util.Quantity:
+
+    cdef REAL_t[:, :, ::1] array_3d
+    cdef int nz
+
+    if allocator is None:
+        allocator = get_quantity_factory()
+
+    quantity = allocator.empty(
+        dims=[fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
+        units=units,
+        dtype=real_type
+    )
+
+    with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_3d:
+        nz = array_3d.shape[0]
+        get_physics_tracer(&i, &array_3d[0, 0, 0], &nz)
+
+    return quantity
+
+
+def _set_physics_tracer(int i, quantity: fv3util.Quantity):
+
+    cdef REAL_t[:, :, ::1] array
+    cdef int nz
+
+    array = np.ascontiguousarray(quantity.view[:])
+    nz = quantity.extent[0]
+    set_physics_tracer(&i, &array[0, 0, 0], &nz)
 
 
 cpdef dict get_tracer_metadata():
