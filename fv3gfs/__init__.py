@@ -47,4 +47,6 @@ from fv3util import (
     GridSizer,
 )
 
+from .thermodynamics import set_state_mass_conserving
+
 __version__ = "0.5.0"
