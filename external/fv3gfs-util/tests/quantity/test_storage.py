@@ -1,5 +1,5 @@
 import pytest
-import fv3util
+import fv3gfs.util
 import numpy as np
 
 try:
@@ -60,7 +60,7 @@ def data(n_halo, extent_1d, n_dims, numpy, dtype):
 
 @pytest.fixture
 def quantity(data, origin, extent, dims, units):
-    return fv3util.Quantity(data, origin=origin, extent=extent, dims=dims, units=units)
+    return fv3gfs.util.Quantity(data, origin=origin, extent=extent, dims=dims, units=units)
 
 
 def test_numpy(quantity, backend):
