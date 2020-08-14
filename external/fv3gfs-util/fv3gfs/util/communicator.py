@@ -109,6 +109,7 @@ class TileCommunicator(Communicator):
                 metadata.np.empty(shape, dtype=metadata.dtype),
                 dims=metadata.dims,
                 units=metadata.units,
+                gt4py_backend=metadata.gt4py_backend,
             )
         if self.rank == constants.MASTER_RANK:
             with array_buffer(
@@ -171,6 +172,7 @@ class TileCommunicator(Communicator):
                         units=send_quantity.units,
                         origin=tuple([0 for dim in send_quantity.dims]),
                         extent=tile_extent,
+                        gt4py_backend=send_quantity.gt4py_backend,
                     )
                 for rank in range(self.partitioner.total_ranks):
                     to_slice = self.partitioner.subtile_slice(

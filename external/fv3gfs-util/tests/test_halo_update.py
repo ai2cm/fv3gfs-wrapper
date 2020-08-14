@@ -235,7 +235,8 @@ def depth_quantity_list(
     domain boundary."""
     return_list = []
     for rank in range(total_ranks):
-        data = numpy.zeros(shape, dtype=dtype) + numpy.nan
+        data = numpy.empty(shape, dtype=dtype)
+        data[:] = numpy.nan
         for n_inside in range(max(n_points, max(extent) // 2), -1, -1):
             for i, dim in enumerate(dims):
                 if (n_inside <= extent[i] // 2) and (dim in fv3gfs.util.HORIZONTAL_DIMS):

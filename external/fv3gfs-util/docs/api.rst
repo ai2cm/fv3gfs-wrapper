@@ -4,7 +4,7 @@
 API
 ===
 
-.. automodule:: fv3gfs.util
+.. automodule:: fv3util
    :members:
    :undoc-members:
    :show-inheritance:

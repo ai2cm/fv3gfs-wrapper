@@ -40,9 +40,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            . venv/bin/activate
-            pip3 install -e external/fv3gfs-util
-            make -C external/fv3gfs-util test test_mpi
+            bash .jenkins/actions/test_fv3util.sh
 
   build_default:
     machine:

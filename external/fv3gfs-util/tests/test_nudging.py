@@ -114,7 +114,7 @@ def test_apply_nudging_equals(
         assert result[name].dims == tendency.dims
         assert result[name].units == tendency.units
     for name, reference_array in final_state.items():
-        numpy.testing.assert_equal(state[name].data, reference_array.data)
+        numpy.testing.assert_array_equal(state[name].data, reference_array.data)
         assert state[name].dims == reference_array.dims
         assert state[name].units == reference_array.units
 

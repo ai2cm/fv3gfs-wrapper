@@ -310,7 +310,9 @@ def test_values_preserved(cube_partitioner, numpy):
 
     # open w/o dask using chunks=None
     dataset = xr.open_zarr(store, chunks=None)
-    numpy.testing.assert_almost_equal(dataset["var"][0, 0, :, :].values, quantity.data)
+    numpy.testing.assert_array_almost_equal(
+        dataset["var"][0, 0, :, :].values, quantity.data
+    )
     assert dataset["var"].shape[:2] == (1, 6)
     assert dataset["var"].attrs["units"] == units
     assert dataset["var"].dims[2:] == dims
