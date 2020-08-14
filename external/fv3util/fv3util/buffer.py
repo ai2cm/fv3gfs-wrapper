@@ -3,6 +3,7 @@ from numpy import ndarray
 import contextlib
 from .utils import is_c_contiguous
 
+
 BUFFER_CACHE = {}
 
 

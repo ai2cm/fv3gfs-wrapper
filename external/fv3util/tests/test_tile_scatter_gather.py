@@ -3,6 +3,11 @@ import datetime
 import pytest
 import fv3util
 
+try:
+    import gt4py
+except ImportError:
+    gt4py = None
+
 
 @pytest.fixture(params=[(1, 1), (3, 3)])
 def layout(request):
@@ -148,8 +153,39 @@ def get_quantity(dims, units, extent, n_halo, numpy):
     )
 
 
+@pytest.mark.parametrize("backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True)
+@pytest.mark.parametrize("dims, layout", [["x,y,z", (2, 2)]], indirect=True)
+def test_gathered_quantity_has_storage(
+    tile_quantity, scattered_quantities, communicator_list, time, backend
+):
+    for communicator, rank_quantity in reversed(
+        list(zip(communicator_list, scattered_quantities))
+    ):
+        result = communicator.gather(send_quantity=rank_quantity)
+        if communicator.rank == 0:
+            print(result.gt4py_backend, result.metadata)
+            assert isinstance(result.storage, gt4py.storage.storage.Storage)
+        else:
+            assert result is None
+
+
+@pytest.mark.parametrize("backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True)
+@pytest.mark.parametrize("dims, layout", [["x,y,z", (2, 2)]], indirect=True)
+def test_scattered_quantity_has_storage(
+    tile_quantity, communicator_list, time, backend
+):
+    result_list = []
+    for communicator in communicator_list:
+        if communicator.rank == 0:
+            result_list.append(communicator.scatter(send_quantity=tile_quantity))
+        else:
+            result_list.append(communicator.scatter())
+    for rank, result in enumerate(result_list):
+        assert isinstance(result.storage, gt4py.storage.storage.Storage)
+
+
 def test_tile_gather_state(
-    tile_quantity, scattered_quantities, communicator_list, time
+    tile_quantity, scattered_quantities, communicator_list, time, backend
 ):
     for communicator, rank_quantity in reversed(
         list(zip(communicator_list, scattered_quantities))
@@ -165,6 +201,7 @@ def test_tile_gather_state(
     assert result.dims == tile_quantity.dims
     assert result.units == tile_quantity.units
     assert result.extent == tile_quantity.extent
+    assert isinstance(result.data, type(tile_quantity.data))
     tile_quantity.np.testing.assert_array_equal(result.view[:], tile_quantity.view[:])
 
 
