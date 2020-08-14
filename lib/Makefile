@@ -6,7 +6,7 @@ endif
 include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
 
 TEMPLATES = $(shell ls ../templates)
-PROPERTIES_FILES = ../external/fv3util/fv3util/dynamics_properties.json ../external/fv3util/fv3util/physics_properties.json
+PROPERTIES_FILES = ../fv3gfs/dynamics_properties.json ../fv3gfs/physics_properties.json
 
 FFLAGS += \
 	-I$(FMS_DIR) \
