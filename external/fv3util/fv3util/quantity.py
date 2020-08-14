@@ -46,14 +46,6 @@ class QuantityMetadata:
         """numpy-like module used to interact with the data"""
         if issubclass(self.data_type, cupy.ndarray):
             return cupy
-        elif gt4py is not None and issubclass(
-            self.data_type,
-            (
-                gt4py.storage.storage.GPUStorage,
-                gt4py.storage.storage.ExplicitlySyncedGPUStorage,
-            ),
-        ):
-            return cupy
         elif issubclass(self.data_type, np.ndarray):
             return np
         else:
@@ -291,7 +283,7 @@ class Quantity:
             extent=ensure_int_tuple(extent, "extent"),
             dims=tuple(dims),
             units=units,
-            data_type=type(data),
+            data_type=type(self._data),
             dtype=data.dtype,
             gt4py_backend=gt4py_backend,
         )

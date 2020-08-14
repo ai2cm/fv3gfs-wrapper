@@ -12,20 +12,12 @@ except ImportError:
     cupy = None
 
 
-@pytest.fixture(params=["five"])
-def extent_1d(request, backend, n_halo):
-    if request.param == "empty":
-        if "gt4py" in backend and n_halo == 0:
-            pytest.skip("gt4py does not support length-zero dimensions")
-        else:
-            return 0
-    elif request.param == "one":
-        return 1
-    elif request.param == "five":
-        return 5
+@pytest.fixture
+def extent_1d():
+    return 5
 
 
-@pytest.fixture(params=[3])
+@pytest.fixture(params=[0, 3])
 def n_halo(request):
     return request.param
 
