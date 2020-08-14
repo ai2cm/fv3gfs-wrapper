@@ -70,7 +70,9 @@ def base_state(request, nz, ny, nx, numpy):
         return {}
     elif request.param == "one_var_2d":
         return {
-            "var1": fv3gfs.util.Quantity(numpy.ones([ny, nx]), dims=("y", "x"), units="m",)
+            "var1": fv3gfs.util.Quantity(
+                numpy.ones([ny, nx]), dims=("y", "x"), units="m",
+            )
         }
     elif request.param == "one_var_3d":
         return {
@@ -80,7 +82,9 @@ def base_state(request, nz, ny, nx, numpy):
         }
     elif request.param == "two_vars":
         return {
-            "var1": fv3gfs.util.Quantity(numpy.ones([ny, nx]), dims=("y", "x"), units="m",),
+            "var1": fv3gfs.util.Quantity(
+                numpy.ones([ny, nx]), dims=("y", "x"), units="m",
+            ),
             "var2": fv3gfs.util.Quantity(
                 numpy.ones([nz, ny, nx]), dims=("z", "y", "x"), units="degK",
             ),
@@ -235,11 +239,17 @@ def test_monitor_file_store_multi_rank_state(
             (6, 6),
             id="single_chunk_tile_2d",
         ),
-        pytest.param((1, 1), (6,), [fv3gfs.util.Y_DIM], (6,), id="single_chunk_tile_1d"),
+        pytest.param(
+            (1, 1), (6,), [fv3gfs.util.Y_DIM], (6,), id="single_chunk_tile_1d"
+        ),
         pytest.param(
             (1, 1),
             (7, 6, 6),
-            [fv3gfs.util.Z_DIM, fv3gfs.util.Y_INTERFACE_DIM, fv3gfs.util.X_INTERFACE_DIM],
+            [
+                fv3gfs.util.Z_DIM,
+                fv3gfs.util.Y_INTERFACE_DIM,
+                fv3gfs.util.X_INTERFACE_DIM,
+            ],
             (7, 5, 5),
             id="single_chunk_tile_3d_interfaces",
         ),
@@ -260,7 +270,11 @@ def test_monitor_file_store_multi_rank_state(
         pytest.param(
             (2, 2),
             (7, 7, 7),
-            [fv3gfs.util.Z_DIM, fv3gfs.util.Y_INTERFACE_DIM, fv3gfs.util.X_INTERFACE_DIM],
+            [
+                fv3gfs.util.Z_DIM,
+                fv3gfs.util.Y_INTERFACE_DIM,
+                fv3gfs.util.X_INTERFACE_DIM,
+            ],
             (7, 3, 3),
             id="2_by_2_tile_3d_interfaces",
         ),
@@ -287,7 +301,9 @@ def test_open_zarr_without_nans(cube_partitioner, numpy, backend, mask_and_scale
 
     # initialize store
     monitor = fv3gfs.util.ZarrMonitor(store, cube_partitioner)
-    zero_quantity = fv3gfs.util.Quantity(numpy.zeros([10, 10]), dims=("y", "x"), units="m")
+    zero_quantity = fv3gfs.util.Quantity(
+        numpy.zeros([10, 10]), dims=("y", "x"), units="m"
+    )
     monitor.store({"var": zero_quantity})
 
     # open w/o dask using chunks=None

@@ -85,7 +85,11 @@ def test_subtile_index(rank, layout, subtile_index):
         ((2, 3), (fv3gfs.util.Y_DIM, fv3gfs.util.X_INTERFACE_DIM), (2, 2), (4, 5)),
         (
             (4, 2, 3),
-            (fv3gfs.util.Z_INTERFACE_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_INTERFACE_DIM),
+            (
+                fv3gfs.util.Z_INTERFACE_DIM,
+                fv3gfs.util.Y_DIM,
+                fv3gfs.util.X_INTERFACE_DIM,
+            ),
             (2, 2),
             (4, 4, 5),
         ),

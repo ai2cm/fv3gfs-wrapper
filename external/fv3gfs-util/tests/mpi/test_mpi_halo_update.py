@@ -64,18 +64,26 @@ def n_points_update(request, n_points):
 @pytest.fixture(
     params=[
         pytest.param((fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM), id="center"),
-        pytest.param((fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM), id="center_3d"),
         pytest.param(
-            (fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM), id="center_3d_reverse"
+            (fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM), id="center_3d"
         ),
         pytest.param(
-            (fv3gfs.util.X_DIM, fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM), id="center_3d_shuffle"
+            (fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM),
+            id="center_3d_reverse",
+        ),
+        pytest.param(
+            (fv3gfs.util.X_DIM, fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM),
+            id="center_3d_shuffle",
         ),
         pytest.param(
             (fv3gfs.util.Y_INTERFACE_DIM, fv3gfs.util.X_INTERFACE_DIM), id="interface"
         ),
         pytest.param(
-            (fv3gfs.util.Z_INTERFACE_DIM, fv3gfs.util.Y_INTERFACE_DIM, fv3gfs.util.X_INTERFACE_DIM),
+            (
+                fv3gfs.util.Z_INTERFACE_DIM,
+                fv3gfs.util.Y_INTERFACE_DIM,
+                fv3gfs.util.X_INTERFACE_DIM,
+            ),
             id="interface_3d",
         ),
     ]

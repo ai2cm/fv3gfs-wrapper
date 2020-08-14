@@ -25,7 +25,12 @@ def test_boundary_data_1_by_1_array_1_halo():
         origin=(1, 1),
         extent=(1, 1),
     )
-    for side in (fv3gfs.util.WEST, fv3gfs.util.EAST, fv3gfs.util.NORTH, fv3gfs.util.SOUTH):
+    for side in (
+        fv3gfs.util.WEST,
+        fv3gfs.util.EAST,
+        fv3gfs.util.NORTH,
+        fv3gfs.util.SOUTH,
+    ):
         assert (
             boundary_data(quantity, side, n_points=1, interior=True)
             == quantity.data[1, 1]
@@ -57,7 +62,12 @@ def test_boundary_data_3d_array_1_halo_z_offset_origin():
         origin=(1, 1, 1),
         extent=(1, 1, 1),
     )
-    for side in (fv3gfs.util.WEST, fv3gfs.util.EAST, fv3gfs.util.NORTH, fv3gfs.util.SOUTH):
+    for side in (
+        fv3gfs.util.WEST,
+        fv3gfs.util.EAST,
+        fv3gfs.util.NORTH,
+        fv3gfs.util.SOUTH,
+    ):
         quantity.np.testing.assert_array_equal(
             boundary_data(quantity, side, n_points=1, interior=True),
             quantity.data[1, 1, 1],
@@ -89,7 +99,12 @@ def test_boundary_data_2_by_2_array_2_halo():
         origin=(2, 2),
         extent=(2, 2),
     )
-    for side in (fv3gfs.util.WEST, fv3gfs.util.EAST, fv3gfs.util.NORTH, fv3gfs.util.SOUTH):
+    for side in (
+        fv3gfs.util.WEST,
+        fv3gfs.util.EAST,
+        fv3gfs.util.NORTH,
+        fv3gfs.util.SOUTH,
+    ):
         np.testing.assert_array_equal(
             boundary_data(quantity, side, n_points=2, interior=True),
             quantity.data[2:4, 2:4],

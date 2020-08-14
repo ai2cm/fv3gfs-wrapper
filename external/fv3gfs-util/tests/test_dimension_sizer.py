@@ -132,7 +132,10 @@ def dim_case(request, nx, ny, nz):
             (fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM,),
             (fv3gfs.util.N_HALO_DEFAULT, fv3gfs.util.N_HALO_DEFAULT),
             (nx, ny),
-            (2 * fv3gfs.util.N_HALO_DEFAULT + nx + 1, 2 * fv3gfs.util.N_HALO_DEFAULT + ny + 1),
+            (
+                2 * fv3gfs.util.N_HALO_DEFAULT + nx + 1,
+                2 * fv3gfs.util.N_HALO_DEFAULT + ny + 1,
+            ),
         )
     elif request.param == "z_y_x":
         return DimCase(

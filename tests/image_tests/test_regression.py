@@ -4,7 +4,6 @@ import shutil
 import subprocess
 import pytest
 import fv3config
-import tempfile
 
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -72,7 +71,20 @@ def test_regression(config, model_image, reference_dir):
 def run_model(config, run_dir, model_image):
     fv3config.write_run_directory(config, run_dir)
     subprocess.check_call(
-        ["docker", "run", "-v", f"{run_dir}:/rundir", "--workdir", "/rundir", MODEL_IMAGE, "mpirun", "-n", "6"] + MPI_FLAGS + ["python3", "-m", "mpi4py", "-m", "fv3gfs.wrapper.run"]
+        [
+            "docker",
+            "run",
+            "-v",
+            f"{run_dir}:/rundir",
+            "--workdir",
+            "/rundir",
+            MODEL_IMAGE,
+            "mpirun",
+            "-n",
+            "6",
+        ]
+        + MPI_FLAGS
+        + ["python3", "-m", "mpi4py", "-m", "fv3gfs.wrapper.run"]
     )
 
 

@@ -51,18 +51,26 @@ def n_points_update(request, n_points):
 @pytest.fixture(
     params=[
         pytest.param((fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM), id="center"),
-        pytest.param((fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM), id="center_3d"),
         pytest.param(
-            (fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM), id="center_3d_reverse"
+            (fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM), id="center_3d"
         ),
         pytest.param(
-            (fv3gfs.util.X_DIM, fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM), id="center_3d_shuffle"
+            (fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM),
+            id="center_3d_reverse",
+        ),
+        pytest.param(
+            (fv3gfs.util.X_DIM, fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM),
+            id="center_3d_shuffle",
         ),
         pytest.param(
             (fv3gfs.util.Y_INTERFACE_DIM, fv3gfs.util.X_INTERFACE_DIM), id="interface"
         ),
         pytest.param(
-            (fv3gfs.util.Z_INTERFACE_DIM, fv3gfs.util.Y_INTERFACE_DIM, fv3gfs.util.X_INTERFACE_DIM),
+            (
+                fv3gfs.util.Z_INTERFACE_DIM,
+                fv3gfs.util.Y_INTERFACE_DIM,
+                fv3gfs.util.X_INTERFACE_DIM,
+            ),
             id="interface_3d",
         ),
     ]
@@ -239,7 +247,9 @@ def depth_quantity_list(
         data[:] = numpy.nan
         for n_inside in range(max(n_points, max(extent) // 2), -1, -1):
             for i, dim in enumerate(dims):
-                if (n_inside <= extent[i] // 2) and (dim in fv3gfs.util.HORIZONTAL_DIMS):
+                if (n_inside <= extent[i] // 2) and (
+                    dim in fv3gfs.util.HORIZONTAL_DIMS
+                ):
                     pos = [slice(None, None)] * len(dims)
                     pos[i] = origin[i] + n_inside
                     data[tuple(pos)] = n_inside

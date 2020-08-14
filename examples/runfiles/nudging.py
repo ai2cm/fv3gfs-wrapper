@@ -61,7 +61,8 @@ if __name__ == "__main__":
         config = yaml.safe_load(config_file)
     MPI.COMM_WORLD.barrier()  # wait for master rank to write run directory
     communicator = fv3gfs.wrapper.CubedSphereCommunicator(
-        MPI.COMM_WORLD, fv3gfs.wrapper.CubedSpherePartitioner.from_namelist(config["namelist"])
+        MPI.COMM_WORLD,
+        fv3gfs.wrapper.CubedSpherePartitioner.from_namelist(config["namelist"]),
     )
     nudging_timescales = get_timescales_from_config(config)
     timestep = get_timestep(config)
@@ -78,7 +79,9 @@ if __name__ == "__main__":
         fv3gfs.wrapper.step_physics()
         fv3gfs.wrapper.save_intermediate_restart_if_enabled()
 
-        state = fv3gfs.wrapper.get_state(names=["time"] + list(nudging_timescales.keys()))
+        state = fv3gfs.wrapper.get_state(
+            names=["time"] + list(nudging_timescales.keys())
+        )
         tendencies = nudge_to_reference(
             state, communicator, nudging_timescales, timestep
         )

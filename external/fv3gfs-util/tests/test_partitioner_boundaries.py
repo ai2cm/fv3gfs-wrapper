@@ -513,7 +513,12 @@ def test_edge_boundaries_pair(layout, subtests):
 
 @pytest.mark.parametrize("layout", [(1, 1), (2, 2), (4, 4)])
 def test_corner_boundaries_pair(layout, subtests):
-    order = [fv3gfs.util.NORTHWEST, fv3gfs.util.NORTHEAST, fv3gfs.util.SOUTHEAST, fv3gfs.util.SOUTHWEST]
+    order = [
+        fv3gfs.util.NORTHWEST,
+        fv3gfs.util.NORTHEAST,
+        fv3gfs.util.SOUTHEAST,
+        fv3gfs.util.SOUTHWEST,
+    ]
     tile = fv3gfs.util.TilePartitioner(layout)
     partitioner = fv3gfs.util.CubedSpherePartitioner(tile)
     for rank in range(partitioner.total_ranks):
