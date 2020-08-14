@@ -198,7 +198,6 @@
     {
         "name": "surface_temperature",
         "fortran_name": "tsfc",
-        "restart_name": "tsea",
         "units": "degK",
         "description": "surface skin temperature",
         "container": "Sfcprop",
@@ -207,7 +206,6 @@
     {
         "name": "water_equivalent_of_accumulated_snow_depth",
         "fortran_name": "weasd",
-        "restart_name": "sheleg",
         "units": "kg/m^2",
         "description": "weasd in Fortran code, over land and sea ice only",
         "container": "Sfcprop",
@@ -381,7 +379,6 @@
     {
         "name": "snow_depth_water_equivalent",
         "fortran_name": "snowd",
-        "restart_name": "snwdph",
         "units": "mm",
         "container": "Sfcprop",
         "dims": ["y", "x"]

@@ -62,7 +62,6 @@
     {
         "name": "air_temperature",
         "fortran_name": "pt",
-        "restart_name": "T",
         "units": "degK",
         "dims": ["z", "y", "x"]
     },
@@ -75,7 +74,6 @@
     {
         "name": "vertical_wind",
         "fortran_name": "w",
-        "restart_name": "W",
         "units": "m/s",
         "dims": ["z", "y", "x"]
     },
@@ -88,7 +86,6 @@
     {
         "name": "vertical_thickness_of_atmospheric_layer",
         "fortran_name": "delz",
-        "restart_name": "DZ",
         "units": "m",
         "dims": ["z", "y", "x"]
     },
