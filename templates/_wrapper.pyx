@@ -35,6 +35,7 @@ cdef extern:
 {% endfor %}
     void get_tracer_count(int *n_prognostic_tracers, int *n_total_tracers)
     void get_tracer(int *i_tracer, REAL_t *array_out)
+    void get_tracer_breakdown(int *, int *, int *)
     void set_tracer(int *i_tracer, REAL_t *array_in)
     void get_tracer_name(int *tracer_index, char *tracer_name_out, char *tracer_long_name_out, char *tracer_units_out)
     void get_num_cpld_calls(int *num_cpld_calls_out)
@@ -298,16 +299,6 @@ cpdef dict get_tracer_metadata():
     Metadata includes the keys 'i_tracer' (tracer index number in Fortran), 'fortran_name'
     (the short name in Fortran) and 'units'.
     """
-    cdef dict out_dict = {}
-    for i_tracer_minus_one, (tracer_name, tracer_long_name, tracer_units) in enumerate(get_tracer_metadata_list()):
-        out_dict[str(tracer_long_name).replace(' ', '_')] = {
-            'i_tracer': i_tracer_minus_one + 1,
-            'fortran_name': tracer_name,
-            'units': tracer_units
-        }
-    return out_dict
-
-cdef list get_tracer_metadata_list():
     cdef list out_list = []
     cdef int n_prognostic_tracers, n_total_tracers, i_tracer
     # these lengths were chosen arbitrarily as "probably long enough"
@@ -315,11 +306,30 @@ cdef list get_tracer_metadata_list():
     cdef char tracer_long_name[64]
     cdef char tracer_units[64]
     cdef int i
+
+    cdef int n_water_tracers, dnats, pnats
+
+
+    # get tracer counts
     get_tracer_count(&n_prognostic_tracers, &n_total_tracers)
+    get_tracer_breakdown(&n_water_tracers, &dnats, &pnats)
+
+    out_dict = {}
     for i_tracer in range(1, n_total_tracers + 1):
+
         get_tracer_name(&i_tracer, &tracer_name[0], &tracer_long_name[0], &tracer_units[0])
-        out_list.append((tracer_name, tracer_long_name, tracer_units))
-    return out_list
+        is_water = i_tracer <= n_water_tracers
+        fv3_python_name = str(tracer_long_name).replace(' ', '_')
+
+        out_dict[fv3_python_name] = {
+            'i_tracer': i_tracer,
+            'fortran_name': tracer_name,
+            'units': tracer_units,
+            'is_water': is_water
+        }
+
+
+    return out_dict
 
 
 def initialize():
