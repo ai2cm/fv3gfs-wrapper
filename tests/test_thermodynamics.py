@@ -15,15 +15,19 @@ class MockFv3GFS:
         self.dims = dims
         self.one = one
 
-    def get_state(self):
+    def get_state(self, names):
 
-        return {
+        state = {
             "delp": fv3util.Quantity(self.one, units="Pa", dims=self.dims),
             "specific_humidity": fv3util.Quantity(self.one, units="", dims=self.dims),
         }
+        return {name: state[name] for name in names}
 
     def set_state(self, state):
         self.state = state
+
+    def get_tracer_metadata(self):
+        return {"specific_humidity": {"is_water": True}}
 
 
 def test_set_state_mass_conserving_non_water():
@@ -31,6 +35,27 @@ def test_set_state_mass_conserving_non_water():
     fv3gfs.set_state_mass_conserving(
         {"air_temperature": fv3util.Quantity(mock.one, dims=mock.dims, units="K")},
         fv3gfs=mock,
+        pressure="delp",
     )
 
     np.testing.assert_equal(mock.state["air_temperature"].view[:], mock.one)
+
+
+def test_set_state_mass_conserving_cant_set_delp():
+    mock = MockFv3GFS()
+    with pytest.raises(ValueError):
+        fv3gfs.set_state_mass_conserving(
+            {"delp": fv3util.Quantity(mock.one, dims=mock.dims, units="K")},
+            fv3gfs=mock,
+            pressure="delp",
+        )
+
+
+def test_set_state_mass_conserving_water_added():
+    mock = MockFv3GFS()
+    fv3gfs.set_state_mass_conserving(
+        {"specific_humidity": fv3util.Quantity(2 * mock.one, dims=mock.dims, units="")},
+        fv3gfs=mock,
+        pressure="delp",
+    )
+    np.testing.assert_allclose(mock.state["delp"].view[:], 2)
