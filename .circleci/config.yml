@@ -66,11 +66,6 @@ jobs:
           name: "Pull submodules"
           command: |
             git submodule update --init --recursive
-      - run:
-          name: "Enable Python 2 for google cloud tools"
-          command: |
-            pyenv global 2.7.12
-      - gcp-gcr/gcr-auth
       - restore_cache:
           keys:
             - v1-build-dependencies-{{ checksum "requirements.txt" }}
