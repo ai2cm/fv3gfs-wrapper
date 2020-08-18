@@ -331,7 +331,7 @@ cdef list get_tracer_metadata_list():
 
 class Flags:
 {% for item in flagstruct_properties %}
-    @functools.cached_property
+    @property
     def {{item.name}}(self):
         cdef {{item.type_cyth}} {{item.name}}
         get_{{item.fortran_name}}(&{{item.name}})

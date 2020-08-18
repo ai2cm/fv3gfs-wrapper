@@ -142,7 +142,7 @@ namelist:
     nord: 2
     npx: 13
     npy: 13
-    npz: 63
+    npz: 79
     ntiles: 6
     nudge: false
     nudge_qv: true

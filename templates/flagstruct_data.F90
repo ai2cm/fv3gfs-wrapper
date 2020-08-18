@@ -19,7 +19,13 @@ contains
     {% else %}
     subroutine get_{{ item.fortran_name }}({{ item.fortran_name }}_out) bind(c)
         {{ item.type_fortran }}({{ item.type_c }}), intent(out) :: {{ item.fortran_name }}_out
+        {% if item.location == "flagstruct" %}
         {{ item.fortran_name }}_out = Atm(mytile)%flagstruct%{{ item.fortran_name }}
+        {% elif item.location == "Atm" %}
+        {{ item.fortran_name }}_out = Atm(mytile)%{{ item.fortran_name }}
+        {% else %}
+        {{ item.fortran_name }}_out = {{ item.fortran_name }}
+        {% endif %}
     end subroutine get_{{ item.fortran_name }}
     {% endif %}
 {% endfor %}

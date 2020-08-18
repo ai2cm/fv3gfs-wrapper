@@ -14,35 +14,36 @@ contains
     
     subroutine get_n_split(n_split_out) bind(c)
         integer(c_int), intent(out) :: n_split_out
+        
         n_split_out = Atm(mytile)%flagstruct%n_split
+        
     end subroutine get_n_split
     
 
     
     subroutine get_consv_te(consv_te_out) bind(c)
         real(c_double), intent(out) :: consv_te_out
+        
         consv_te_out = Atm(mytile)%flagstruct%consv_te
+        
     end subroutine get_consv_te
-    
-
-    
-    subroutine get_dt_atmos(dt_atmos_out) bind(c)
-        integer(c_int), intent(out) :: dt_atmos_out
-        dt_atmos_out = Atm(mytile)%flagstruct%dt_atmos
-    end subroutine get_dt_atmos
     
 
     
     subroutine get_ks(ks_out) bind(c)
         integer(c_int), intent(out) :: ks_out
-        ks_out = Atm(mytile)%flagstruct%ks
+        
+        ks_out = Atm(mytile)%ks
+        
     end subroutine get_ks
     
 
     
     subroutine get_ptop(ptop_out) bind(c)
         real(c_double), intent(out) :: ptop_out
-        ptop_out = Atm(mytile)%flagstruct%ptop
+        
+        ptop_out = Atm(mytile)%ptop
+        
     end subroutine get_ptop
     
 

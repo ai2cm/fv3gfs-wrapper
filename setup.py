@@ -24,6 +24,7 @@ relative_wrapper_build_filenames = [
     "lib/coupler_lib.o",
     "lib/physics_data.o",
     "lib/dynamics_data.o",
+    "lib/flagstruct_data.o"
 ]
 
 relative_fv3gfs_build_filenames = [
