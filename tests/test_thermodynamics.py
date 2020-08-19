@@ -27,7 +27,7 @@ class MockFv3GFS:
         return {name: state[name] for name in names}
 
     def set_state(self, state):
-        self.state = state
+        self.state.update(state)
 
     def get_tracer_metadata(self):
         return {
