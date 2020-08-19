@@ -33,9 +33,11 @@ class TracerMetadataTests(unittest.TestCase):
                 self.assertIn("i_tracer", metadata)
                 self.assertIn("fortran_name", metadata)
                 self.assertIn("restart_name", metadata)
+                self.assertIn("is_water", metadata)
                 self.assertIsInstance(metadata["units"], str)
                 self.assertIsInstance(metadata["i_tracer"], int)
                 self.assertIsInstance(metadata["fortran_name"], str)
+                self.assertIsInstance(metadata["is_water"], bool)
                 self.assertIsInstance(metadata["restart_name"], str)
 
     def test_all_tracers_present(self):
@@ -51,6 +53,14 @@ class TracerMetadataTests(unittest.TestCase):
         ]
         data = fv3gfs.get_tracer_metadata()
         self.assertEqual(set(data.keys()), set(tracer_names))
+
+    def test_ozone_not_water(self):
+        data = fv3gfs.get_tracer_metadata()
+        self.assertFalse(data["ozone_mixing_ratio"]["is_water"])
+
+    def test_specific_humidity_is_water(self):
+        data = fv3gfs.get_tracer_metadata()
+        self.assertTrue(data["specific_humidity"]["is_water"])
 
     def test_all_tracers_in_restart_names(self):
         tracer_names = [
