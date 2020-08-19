@@ -299,7 +299,6 @@ cpdef dict get_tracer_metadata():
     Metadata includes the keys 'i_tracer' (tracer index number in Fortran), 'fortran_name'
     (the short name in Fortran), 'units', and a boolean 'is_water'.
     """
-    cdef list out_list = []
     cdef int n_prognostic_tracers, n_total_tracers, i_tracer
     # these lengths were chosen arbitrarily as "probably long enough"
     cdef char tracer_name[64]
@@ -324,6 +323,7 @@ cpdef dict get_tracer_metadata():
         out_dict[fv3_python_name] = {
             'i_tracer': i_tracer,
             'fortran_name': tracer_name,
+            'restart_name': tracer_name,
             'units': tracer_units,
             'is_water': is_water
         }

@@ -32,11 +32,13 @@ class TracerMetadataTests(unittest.TestCase):
                 self.assertIn("units", metadata)
                 self.assertIn("i_tracer", metadata)
                 self.assertIn("fortran_name", metadata)
+                self.assertIn("restart_name", metadata)
                 self.assertIn("is_water", metadata)
                 self.assertIsInstance(metadata["units"], str)
                 self.assertIsInstance(metadata["i_tracer"], int)
                 self.assertIsInstance(metadata["fortran_name"], str)
                 self.assertIsInstance(metadata["is_water"], bool)
+                self.assertIsInstance(metadata["restart_name"], str)
 
     def test_all_tracers_present(self):
         tracer_names = [
@@ -59,6 +61,21 @@ class TracerMetadataTests(unittest.TestCase):
     def test_specific_humidity_is_water(self):
         data = fv3gfs.get_tracer_metadata()
         self.assertTrue(data["specific_humidity"]["is_water"])
+
+    def test_all_tracers_in_restart_names(self):
+        tracer_names = [
+            "specific_humidity",
+            "cloud_water_mixing_ratio",
+            "rain_mixing_ratio",
+            "cloud_ice_mixing_ratio",
+            "snow_mixing_ratio",
+            "graupel_mixing_ratio",
+            "ozone_mixing_ratio",
+            "cloud_amount",
+        ]
+        restart_names = fv3gfs.get_restart_names()
+        missing_names = set(tracer_names).difference(restart_names)
+        self.assertEqual(len(missing_names), 0)
 
 
 if __name__ == "__main__":

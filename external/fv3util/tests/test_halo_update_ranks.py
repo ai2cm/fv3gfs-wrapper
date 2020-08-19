@@ -101,7 +101,8 @@ def communicator_list(cube_partitioner):
 def rank_quantity_list(total_ranks, numpy, dtype):
     quantity_list = []
     for rank in range(total_ranks):
-        data = numpy.ones((3, 3), dtype=dtype) * numpy.nan
+        data = numpy.empty((3, 3), dtype=dtype)
+        data[:] = numpy.nan
         data[1, 1] = rank
         quantity = fv3util.Quantity(
             data,
