@@ -1,10 +1,8 @@
 """Module for thermodynamics
-
-This should probably be moved to fv3util once that package stabilizes
 """
 import fv3gfs._wrapper
 from typing import Mapping
-from fv3util import Quantity
+from fv3gfs.util import Quantity
 
 
 def set_state_mass_conserving(
