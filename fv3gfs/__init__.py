@@ -16,6 +16,8 @@ from ._wrapper import (
 )
 from ._restart import get_restart_names, open_restart
 
+from .thermodynamics import set_state_mass_conserving
+
 __version__ = "0.5.0"
 
 __all__ = list(key for key in locals().keys() if not key.startswith("_"))
