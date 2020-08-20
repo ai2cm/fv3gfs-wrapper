@@ -1,6 +1,6 @@
 """Module for thermodynamics
 """
-import fv3gfs._wrapper
+import fv3gfs.wrapper._wrapper
 from typing import Mapping
 from fv3gfs.util import Quantity
 
