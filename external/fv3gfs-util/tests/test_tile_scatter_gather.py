@@ -25,17 +25,23 @@ def n_tile_halo(request):
 
 
 @pytest.fixture(params=["x,y", "y,x", "xi,y", "x,y,z", "z,y,x", "y,z,x"])
-def dims(request):
+def dims(request, fast):
     if request.param == "x,y":
         return [fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM]
     elif request.param == "y,x":
-        return [fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM]
+        if fast:
+            pytest.skip("running in fast mode")
+        else:
+            return [fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM]
     elif request.param == "xi,y":
         return [fv3gfs.util.X_INTERFACE_DIM, fv3gfs.util.Y_DIM]
     elif request.param == "x,y,z":
         return [fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM]
     elif request.param == "z,y,x":
-        return [fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM]
+        if fast:
+            pytest.skip("running in fast mode")
+        else:
+            return [fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM]
     elif request.param == "y,z,x":
         return [fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM, fv3gfs.util.X_DIM]
     else:

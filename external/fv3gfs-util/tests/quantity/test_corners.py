@@ -305,6 +305,7 @@ def test_fill_scalar_corners_copies_from_halo(
     ],
     indirect=["layout"],
 )
+@pytest.mark.cpu_only
 def test_fill_corners(
     quantity_in, direction, tile_partitioner, rank, n_halo, reference
 ):
