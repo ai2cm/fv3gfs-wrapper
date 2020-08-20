@@ -63,6 +63,13 @@ contains
         call get_number_tracers(MODEL_ATMOS, num_tracers=n_total_tracers, num_prog=n_prognostic_tracers)
     end subroutine get_tracer_count
 
+    subroutine get_tracer_breakdown(nwat, dnats, pnats) bind(c)
+        integer(c_int), intent(out) :: nwat, dnats, pnats
+        nwat = Atm(mytile)%flagstruct%nwat
+        dnats = Atm(mytile)%flagstruct%dnats
+        pnats = Atm(mytile)%flagstruct%pnats
+    end subroutine get_tracer_breakdown
+
     subroutine get_tracer(tracer_index, array_out) bind(c)
         ! get tracer at the given one-based index
         real(c_double), intent(out) :: array_out(i_start():i_end(), j_start():j_end(), nz())

@@ -249,8 +249,9 @@ class _ZarrTimeWriter(_ZarrVariableWriter):
     def _set_time_encoding_attrs(self, time):
         self._encoding_units = f"seconds since {time}"
         self._encoding_calendar = time.calendar
-        self.array.attrs["units"] = self._encoding_units
-        self.array.attrs["calendar"] = self._encoding_calendar
+        if self.rank == 0:
+            self.array.attrs["units"] = self._encoding_units
+            self.array.attrs["calendar"] = self._encoding_calendar
 
     def _encode_time(self, time):
         if time.calendar != self._encoding_calendar:
