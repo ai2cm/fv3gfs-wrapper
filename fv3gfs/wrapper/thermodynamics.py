@@ -1,13 +1,13 @@
 """Module for thermodynamics
 """
-import fv3gfs.wrapper._wrapper
+import fv3gfs.wrapper
 from typing import Mapping
 from fv3gfs.util import Quantity
 
 
 def set_state_mass_conserving(
     state: Mapping[str, Quantity],
-    fv3gfs=fv3gfs._wrapper,
+    fv3gfs=fv3gfs.wrapper._wrapper,
     pressure="pressure_thickness_of_atmospheric_layer",
 ):
     """Set the state in a mass conserving way
@@ -23,14 +23,14 @@ def set_state_mass_conserving(
             the `fv3gfs`, but can be overrided for testing purposes.
     
     """
-    metadata = fv3gfs.get_tracer_metadata()
+    metadata = fv3gfs.wrapper.get_tracer_metadata()
     water_variables = {k for k, v in metadata.items() if v["is_water"]}
     water_in_input = set(water_variables) & set(state)
 
     if pressure in state:
         raise ValueError(f"Can't set {pressure} for mass a conserving update.")
     else:
-        old_state = fv3gfs.get_state([pressure, *water_variables])
+        old_state = fv3gfs.wrapper.get_state([pressure, *water_variables])
         delp_old = old_state[pressure]
 
         # the change in total water mixing ratio is only affected by the
@@ -46,4 +46,4 @@ def set_state_mass_conserving(
         delp_new = delp_old.view[:] * (1 + total_water_new - total_water_old)
         state[pressure] = Quantity(delp_new, units=delp_old.units, dims=delp_old.dims)
 
-    fv3gfs.set_state(state)
+    fv3gfs.wrapper.set_state(state)
