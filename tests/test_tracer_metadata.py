@@ -40,7 +40,7 @@ class TracerMetadataTests(unittest.TestCase):
                 self.assertIsInstance(metadata["fortran_name"], str)
                 self.assertIsInstance(metadata["is_water"], bool)
                 self.assertIsInstance(metadata["restart_name"], str)
-                self.assertIsInstance(metadata["dims"], [])
+                self.assertIsInstance(metadata["dims"], list)
 
     def test_all_tracers_present(self):
         tracer_names = [
