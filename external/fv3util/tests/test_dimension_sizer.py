@@ -9,12 +9,16 @@ def nx_tile(request):
 
 
 @pytest.fixture(params=[48, 96])
-def ny_tile(request):
+def ny_tile(request, fast):
+    if fast and request.param == 96:
+        pytest.skip("running in fast mode")
     return request.param
 
 
 @pytest.fixture(params=[60, 80])
-def nz(request):
+def nz(request, fast):
+    if fast and request.param == 80:
+        pytest.skip("running in fast mode")
     return request.param
 
 
@@ -147,16 +151,19 @@ def dim_case(request, nx, ny, nz):
         )
 
 
+@pytest.mark.cpu_only
 def test_subtile_dimension_sizer_origin(sizer, dim_case):
     result = sizer.get_origin(dim_case.dims)
     assert result == dim_case.origin
 
 
+@pytest.mark.cpu_only
 def test_subtile_dimension_sizer_extent(sizer, dim_case):
     result = sizer.get_extent(dim_case.dims)
     assert result == dim_case.extent
 
 
+@pytest.mark.cpu_only
 def test_subtile_dimension_sizer_shape(sizer, dim_case):
     result = sizer.get_shape(dim_case.dims)
     assert result == dim_case.shape
