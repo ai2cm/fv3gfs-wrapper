@@ -77,7 +77,9 @@ def start_data(request, numpy):
     ],
     indirect=["start_data"],
 )
-def test_rotate_scalar_data(start_data, n_clockwise_rotations, dims, numpy, target_data):
+def test_rotate_scalar_data(
+    start_data, n_clockwise_rotations, dims, numpy, target_data
+):
     result = fv3gfs.util.rotate.rotate_scalar_data(
         start_data, dims, numpy, n_clockwise_rotations
     )
