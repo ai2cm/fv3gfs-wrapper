@@ -32,12 +32,9 @@ converted into Fortran sources which are then compiled.
 Properties Files
 ----------------
 
-Inside fv3gfs-util are "properties" for Fortran model variables. These are separated into
-"dynamics", "physics", and "tracer". "tracer" properties don't exist in fv3gfs-util itself
-but rather have to be registered into the package. This allows the Fortran model to
-pass information about the tracers being used with the current run configuration.
-Analysis codes can similarly pass tracer properties into fv3gfs-util. This is required,
-for example, to load restart data that includes tracers.
+The build system for fv3gfs-wrapper uses "properties" files which list Fortran model 
+variables. These do not handle "tracer" properties, which need to be determined at 
+run-time by querying the model, since these are determined by the field table.
 
 While building the model, these properties are used by the Jinja templates to
 automatically write getters and setters for each model variable. This allows

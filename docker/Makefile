@@ -6,7 +6,7 @@ FORTRAN_ROOT ?= ../lib/external
 FORTRAN_DOCKERFILE ?= $(FORTRAN_ROOT)/docker/Dockerfile
 BUILD_FROM_INTERMEDIATE ?= n
 
-FV3GFS_PYTHON_IMAGE = $(GCR_URL)/$(TARGET):$(TAG_NAME)
+FV3GFS_WRAPPER_IMAGE = $(GCR_URL)/$(TARGET):$(TAG_NAME)
 FMS_IMAGE ?= $(GCR_URL)/fms-build
 ESMF_IMAGE ?= $(GCR_URL)/esmf-build
 DAWN_IMAGE ?= $(GCR_URL)/dawn-build
@@ -22,14 +22,14 @@ EXPERIMENT ?= new
 RUNDIR_CONTAINER=/rundir
 RUNDIR_HOST=$(shell pwd)/rundir
 
-FV3GFS_PYTHON_BUILD_ARGS = --build-arg FMS_IMAGE=$(FMS_IMAGE) --build-arg ESMF_IMAGE=$(ESMF_IMAGE) --build-arg DAWN_IMAGE=$(DAWN_IMAGE) --build-arg FORTRAN_ENV_IMAGE=$(FORTRAN_IMAGE)
+FV3GFS_WRAPPER_BUILD_ARGS = --build-arg FMS_IMAGE=$(FMS_IMAGE) --build-arg ESMF_IMAGE=$(ESMF_IMAGE) --build-arg DAWN_IMAGE=$(DAWN_IMAGE) --build-arg FORTRAN_ENV_IMAGE=$(FORTRAN_IMAGE)
 DAWN_BUILD_ARGS = --build-arg FMS_IMAGE=$(FMS_IMAGE) --build-arg ESMF_IMAGE=$(ESMF_IMAGE) --build-arg FORTRAN_ENV_IMAGE=$(FORTRAN_IMAGE)
 
 all: build_deps build
 
 build:
 	COMPILED_IMAGE=$(FORTRAN_IMAGE) COMPILE_TARGET=fv3gfs-build $(MAKE) -C ../lib/external build
-	docker build -f $(DOCKERFILE) -t $(FV3GFS_PYTHON_IMAGE) $(FV3GFS_PYTHON_BUILD_ARGS) .. --target $(TARGET)
+	docker build -f $(DOCKERFILE) -t $(FV3GFS_WRAPPER_IMAGE) $(FV3GFS_WRAPPER_BUILD_ARGS) .. --target $(TARGET)
 
 build_deps:
 ifeq ($(BUILD_FROM_INTERMEDIATE),y)
