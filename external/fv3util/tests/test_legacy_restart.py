@@ -40,6 +40,7 @@ def get_c12_restart_state_list(layout, tracer_properties):
 
 
 @pytest.mark.parametrize("layout", [(1, 1), (3, 3)])
+@pytest.mark.cpu_only
 def test_open_c12_restart(layout):
     tracer_properties = {}
     c12_restart_state_list = get_c12_restart_state_list(layout, tracer_properties)
@@ -104,6 +105,7 @@ def test_open_c12_restart(layout):
         },
     ],
 )
+@pytest.mark.cpu_only
 def test_open_c12_restart_tracer_properties(layout, tracer_properties):
     c12_restart_state_list = get_c12_restart_state_list(layout, tracer_properties)
     for state in c12_restart_state_list:
@@ -115,6 +117,7 @@ def test_open_c12_restart_tracer_properties(layout, tracer_properties):
 
 
 @pytest.mark.parametrize("layout", [(1, 1), (3, 3)])
+@pytest.mark.cpu_only
 def test_open_c12_restart_empty_to_state_without_crashing(layout):
     total_ranks = layout[0] * layout[1]
     ny = 12 / layout[0]
@@ -156,6 +159,7 @@ def test_open_c12_restart_empty_to_state_without_crashing(layout):
 
 
 @pytest.mark.parametrize("layout", [(1, 1), (3, 3)])
+@pytest.mark.cpu_only
 def test_open_c12_restart_to_allocated_state_without_crashing(layout):
     total_ranks = layout[0] * layout[1]
     ny = 12 / layout[0]
@@ -220,6 +224,7 @@ def coupler_res_file_and_time(request):
     )
 
 
+@pytest.mark.cpu_only
 def test_get_current_date_from_coupler_res(coupler_res_file_and_time):
     filename, current_time = coupler_res_file_and_time
     with open(filename, "r") as f:
@@ -250,6 +255,7 @@ def result_dims(data_array, new_dims):
     return tuple(list(data_array.dims[:kept_dims]) + list(new_dims))
 
 
+@pytest.mark.cpu_only
 def test_apply_dims(data_array, new_dims, result_dims):
     result = fv3util._legacy_restart._apply_dims(data_array, new_dims)
     np.testing.assert_array_equal(result.values, data_array.values)
@@ -284,6 +290,7 @@ def test_apply_dims(data_array, new_dims, result_dims):
         ),
     ],
 )
+@pytest.mark.cpu_only
 def test_map_keys(old_dict, key_mapping, new_dict):
     result = fv3util._legacy_restart.map_keys(old_dict, key_mapping)
     assert result == new_dict
@@ -298,18 +305,21 @@ def test_map_keys(old_dict, key_mapping, new_dict):
         pytest.param(6, 24, ".tile2.nc.0002", id="third_subtile_second_tile",),
     ],
 )
+@pytest.mark.cpu_only
 def test_get_rank_suffix(rank, total_ranks, suffix):
     result = fv3util._legacy_restart.get_rank_suffix(rank, total_ranks)
     assert result == suffix
 
 
 @pytest.mark.parametrize("invalid_total_ranks", [5, 7, 9, 23])
+@pytest.mark.cpu_only
 def test_get_rank_suffix_invalid_total_ranks(invalid_total_ranks):
     with pytest.raises(ValueError):
         # total_ranks should be multiple of 6
         fv3util._legacy_restart.get_rank_suffix(0, invalid_total_ranks)
 
 
+@pytest.mark.cpu_only
 def test_read_state_incorrectly_encoded_time():
     with tempfile.NamedTemporaryFile(mode="w", suffix=".nc") as file:
         state_ds = xr.DataArray(0.0, name="time").to_dataset()
@@ -318,6 +328,7 @@ def test_read_state_incorrectly_encoded_time():
             fv3util.io.read_state(file.name)
 
 
+@pytest.mark.cpu_only
 def test_read_state_non_scalar_time():
     with tempfile.NamedTemporaryFile(mode="w", suffix=".nc") as file:
         state_ds = xr.DataArray([0.0, 1.0], dims=["T"], name="time").to_dataset()
