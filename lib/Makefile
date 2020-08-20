@@ -8,29 +8,21 @@ include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
 TEMPLATES = $(shell ls ../templates)
 PROPERTIES_FILES = ../fv3gfs/dynamics_properties.json ../fv3gfs/physics_properties.json
 
-FFLAGS += \
+FFLAGS += $(shell pkg-config fv3 --cflags) \
 	-I$(FMS_DIR) \
-	-I$(FMS_DIR)/include \
-	-I$(FV3GFS_BUILD_DIR)/gfsphysics \
-	-I$(FV3GFS_BUILD_DIR)/ipd \
-	-I$(FV3GFS_BUILD_DIR)/cpl \
-	-I$(FV3GFS_BUILD_DIR)/io \
-	-I$(FV3GFS_BUILD_DIR)/atmos_cubed_sphere \
-	-I$(FV3GFS_BUILD_DIR)/ccpp/driver \
-	-I$(FV3GFS_BUILD_DIR)/../stochastic_physics \
-	-I$(FV3GFS_BUILD_DIR)
+	-I$(FMS_DIR)/include
 
 .PHONY: clean cleanall fortran_libs
 
 all: coupler_lib.o dynamics_data.o physics_data.o $(TEMPLATES)
 
-dynamics_data.o: dynamics_data.F90 fortran_libs
+dynamics_data.o: dynamics_data.F90
 	$(FC) $(CPPDEFS) $(CPPFLAGS) $(FPPFLAGS) $(FFLAGS) $(OTHERFLAGS) $(OTHER_FFLAGS) $(ESMF_INC) -c $< -o $@
 
-physics_data.o: physics_data.F90 dynamics_data.o fortran_libs
+physics_data.o: physics_data.F90 dynamics_data.o
 	$(FC) $(CPPDEFS) $(CPPFLAGS) $(FPPFLAGS) $(FFLAGS) $(OTHERFLAGS) $(OTHER_FFLAGS) $(ESMF_INC) -c $< -o $@
 
-coupler_lib.o: coupler_lib.F90 fortran_libs
+coupler_lib.o: coupler_lib.F90
 	$(FC) $(CPPDEFS) $(CPPFLAGS) $(FPPFLAGS) $(FFLAGS) $(OTHERFLAGS) $(OTHER_FFLAGS) $(ESMF_INC) -c $< -o $@
 
 clean:
@@ -41,8 +33,5 @@ clean:
 
 $(TEMPLATES): %: ../templates/% $(PROPERTIES_FILES)
 	python3 ../fill_templates.py $@
-
-fortran_libs:
-	cd $(FV3GFS_BUILD_DIR) && make
 
 cleanall: clean
