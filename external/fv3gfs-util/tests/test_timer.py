@@ -19,10 +19,11 @@ def test_start_stop(timer):
 def test_clock(timer):
     with timer.clock("label"):
         # small arbitrary computation task to time
-        time.sleep(0.01)
+        time.sleep(0.1)
     times = timer.times
     assert "label" in times
     assert len(times) == 1
+    assert abs(times["label"] - 0.1) < 1e-2
 
 
 def test_start_twice(timer):
