@@ -1,4 +1,5 @@
 import contextlib
+from typing import Mapping
 from time import time
 
 
@@ -27,7 +28,7 @@ class Timer:
         self.stop(name)
 
     @property
-    def times(self):
+    def times(self) -> Mapping[str, float]:
         if len(self._clock_starts) > 0:
             raise RuntimeError(
                 "Cannot retrieve times while clocks are still going: "
