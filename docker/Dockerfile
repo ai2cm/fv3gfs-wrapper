@@ -23,24 +23,17 @@ RUN mkdir -p /fv3config-cache/gs/vcm-fv3config && \
 #-----------------------------------------------------------------------------
 FROM $FORTRAN_ENV_IMAGE as fv3gfs-wrapper-env
 
+COPY requirements.txt /tmp/requirements.txt
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     libpython3-dev \
     python3-dev \
     python3-setuptools \
-    python3-pytest \
-    python3-numpy-dbg \
     python3-pip \
-    python3-mpi4py \
-    python3-numpy \
     cython3 && \
-    pip3 install --no-cache-dir \
-    jinja2==2.10.3 \
-    xarray==0.13.0 \
-    netcdf4==1.4.2 \
-    f90nml==1.1.2 \
-    requests==2.22.0 \
-    pytest==5.4.3 && \
+    pip3 install wheel && \
+    pip3 install -r /tmp/requirements.txt  && \
     ln -s /bin/python3 /bin/python && \
     ln -s /bin/pip3 /bin/pip
 
@@ -105,6 +98,7 @@ RUN apt-get update && apt-get install -y \
     python3-numpy \
     python3-nose \
     python3-sphinx
+
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 10
 
@@ -132,32 +126,6 @@ ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ESMF_LIB}:${FMS_LIB}
 
 ENV FV3CONFIG_CACHE_DIR=/inputdata
 
-# install fv3config requirements and utility packages
-RUN pip3 install --no-cache-dir \
-    appdirs==1.4.3 \
-    pyyaml==5.1.2 \
-    google-cloud-storage==1.23.0 \
-    gcsfs==0.6.0 \
-    fsspec==0.6.0 \
-    kubernetes==10.0.1 \
-    numcodecs==0.6.4 \
-    zarr==2.3.2 \
-    h5py==2.10.0 \
-    h5netcdf==0.8.0 \
-    pytest-subtests==0.3.1 \
-    dask==2.10.1 \
-    toolz==0.10.0 \
-    scipy==1.3.1 \
-    sphinx==2.2.0 \
-    sphinx_rtd_theme \
-    backoff==1.10 && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
-    wget \
-    nano \
-    curl \
-    netcdf-bin
-
 COPY --from=fv3gfs-fms /FMS $FMS_DIR
 COPY --from=fv3gfs-esmf /usr/local/esmf ${ESMF_DIR}
 COPY --from=fv3gfs-fms /FMS/libFMS/.libs/*.so* /lib64/
@@ -174,12 +142,8 @@ COPY tests /fv3gfs-wrapper/tests
 
 # copy and install dependency packages
 COPY external /fv3gfs-wrapper/external
-
-RUN pip3 install --no-cache-dir -e \
-    /fv3gfs-wrapper/external/fv3config \
-    -e /fv3gfs-wrapper/external/fv3gfs-util && \
-    pip3 install --no-cache-dir -e /fv3gfs-wrapper && \
-    pip3 install --no-cache-dir pytest-subtests==0.3.1 pytest==5.4.3  # must reinstall to increment pytest, gt4py requires 4 (but not really)
+COPY requirements.txt.local /tmp/requirements.txt.local 
+RUN pip3 install --no-cache-dir -r /tmp/requirements.txt.local
 
 # cache model data
 COPY --from=fv3config-inputdata /fv3config-cache $FV3CONFIG_CACHE_DIR/fv3config-cache
