@@ -144,8 +144,7 @@ COPY tests /fv3gfs-wrapper/tests
 # copy and install dependency packages
 COPY external /fv3gfs-wrapper/external
 COPY requirements_local.txt /tmp/requirements_local.txt
-WORKDIR /fv3gfs-wrapper
-RUN pip3 install --no-deps --no-cache-dir -r /tmp/requirements_local.txt
+RUN cd /fv3gfs-wrapper && pip3 install --no-deps --no-cache-dir -r /tmp/requirements_local.txt
 
 # cache model data
 COPY --from=fv3config-inputdata /fv3config-cache $FV3CONFIG_CACHE_DIR/fv3config-cache
