@@ -85,7 +85,11 @@ def n_points_update(request, n_points, fast):
 def dims(request, fast):
     if fast and request.param in (
         (fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM),
-        (fv3gfs.util.Z_INTERFACE_DIM, fv3gfs.util.Y_INTERFACE_DIM, fv3gfs.util.X_INTERFACE_DIM),
+        (
+            fv3gfs.util.Z_INTERFACE_DIM,
+            fv3gfs.util.Y_INTERFACE_DIM,
+            fv3gfs.util.X_INTERFACE_DIM,
+        ),
     ):
         pytest.skip("running in fast mode")
     return request.param
