@@ -3,7 +3,7 @@
 # cython: c_string_type=unicode, c_string_encoding=utf8
 cimport numpy as cnp
 import numpy as np
-import fv3util
+import fv3gfs.util
 from mpi4py import MPI
 
 ctypedef cnp.double_t REAL_t
@@ -53,16 +53,16 @@ cdef get_quantity_factory():
     cdef int nx, ny, nz, nz_soil
     get_centered_grid_dimensions(&nx, &ny, &nz)
     get_nz_soil_subroutine(&nz_soil)
-    sizer = fv3util.SubtileGridSizer(
+    sizer = fv3gfs.util.SubtileGridSizer(
         nx,
         ny,
         nz,
-        n_halo=fv3util.N_HALO_DEFAULT,
+        n_halo=fv3gfs.util.N_HALO_DEFAULT,
         extra_dim_lengths={
-            fv3util.Z_SOIL_DIM: nz_soil,
+            fv3gfs.util.Z_SOIL_DIM: nz_soil,
         },
     )
-    return fv3util.QuantityFactory(sizer, np)
+    return fv3gfs.util.QuantityFactory(sizer, np)
 
 
 cpdef int get_n_ghost_cells():
@@ -111,7 +111,7 @@ def get_time():
     """
     cdef int year, month, day, hour, minute, second, fms_calendar_type
     get_time_subroutine(&year, &month, &day, &hour, &minute, &second, &fms_calendar_type)
-    return fv3util.FMS_TO_CFTIME_TYPE[fms_calendar_type](year, month, day, hour, minute, second)
+    return fv3gfs.util.FMS_TO_CFTIME_TYPE[fms_calendar_type](year, month, day, hour, minute, second)
 
 
 def set_state(state):
@@ -215,7 +215,7 @@ def get_state(names, dict state=None, allocator=None):
         state (dict, optional): If given, update this state in-place with any retrieved
             quantities, and update any pre-existing quantities in-place with Fortran
             values.
-        allocator (fv3util.QuantityFactory, optional): if given, use this to construct
+        allocator (fv3gfs.util.QuantityFactory, optional): if given, use this to construct
             quantities. Otherwise use a QuantityFactory which uses the dimensions
             from the Fortran model with 3 allocated halo points.
 
@@ -239,14 +239,14 @@ def get_state(names, dict state=None, allocator=None):
 {% for item in physics_2d_properties %}
     if '{{ item.name }}' in input_names_set:
         quantity = _get_quantity(state, "{{ item.name }}", allocator, {{ item.dims | safe }}, "{{ item.units }}", dtype=real_type)
-        with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_2d:
+        with fv3gfs.util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_2d:
             get_{{ item.fortran_name }}{% if "fortran_subname" in item %}_{{ item.fortran_subname }}{% endif %}(&array_2d[0, 0])
 {% endfor %}
 
 {% for item in physics_3d_properties %}
     if '{{ item.name }}' in input_names_set:
         quantity = _get_quantity(state, "{{ item.name }}", allocator, {{ item.dims | safe }}, "{{ item.units }}", dtype=real_type)
-        with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_3d:
+        with fv3gfs.util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_3d:
             nz = array_3d.shape[0]
             get_{{ item.fortran_name }}{% if "fortran_subname" in item %}_{{ item.fortran_subname }}{% endif %}(&array_3d[0, 0, 0], &nz)
 {% endfor %}
@@ -255,17 +255,17 @@ def get_state(names, dict state=None, allocator=None):
     {% if item.dims|length == 3 %}
     if '{{ item.name }}' in input_names_set:
         quantity = _get_quantity(state, "{{ item.name }}", allocator, {{ item.dims | safe }}, "{{ item.units }}", dtype=real_type)
-        with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_3d:
+        with fv3gfs.util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_3d:
             get_{{ item.fortran_name }}(&array_3d[0, 0, 0])
     {% elif item.dims|length == 2 %}
     if '{{ item.name }}' in input_names_set:
         quantity = _get_quantity(state, "{{ item.name }}", allocator, {{ item.dims | safe }}, "{{ item.units }}", dtype=real_type)
-        with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_2d:
+        with fv3gfs.util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_2d:
             get_{{ item.fortran_name }}(&array_2d[0, 0])
     {% elif item.dims|length == 1 %}
     if '{{ item.name }}' in input_names_set:
         quantity = _get_quantity(state, "{{ item.name }}", allocator, {{ item.dims | safe }}, "{{ item.units }}", dtype=real_type)
-        with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_1d:
+        with fv3gfs.util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_1d:
             get_{{ item.fortran_name }}(&array_1d[0])
     {% endif %}
 {% endfor %}
@@ -273,20 +273,20 @@ def get_state(names, dict state=None, allocator=None):
     for tracer_name, tracer_data in get_tracer_metadata().items():
         i_tracer = tracer_data['i_tracer']
         if (tracer_name in input_names_set):
-            quantity = _get_quantity(state, tracer_name, allocator, [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM], tracer_data["units"], dtype=real_type)
-            with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_3d:
+            quantity = _get_quantity(state, tracer_name, allocator, [fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM], tracer_data["units"], dtype=real_type)
+            with fv3gfs.util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_3d:
                 get_tracer(&i_tracer, &array_3d[0, 0, 0])
 
     if SURFACE_PRECIPITATION_RATE in input_names_set:
-        quantity = _get_quantity(state, SURFACE_PRECIPITATION_RATE, allocator, [fv3util.Y_DIM, fv3util.X_DIM], "mm/s", dtype=real_type)
+        quantity = _get_quantity(state, SURFACE_PRECIPITATION_RATE, allocator, [fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM], "mm/s", dtype=real_type)
         get_physics_timestep_subroutine(&dt_physics)
-        with fv3util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_2d:
+        with fv3gfs.util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_2d:
             get_tprcp(&array_2d[0, 0])
         quantity.view[:] *= MM_PER_M / dt_physics
 
     for name in names:
         if name not in state:
-            raise fv3util.InvalidQuantityError(
+            raise fv3gfs.util.InvalidQuantityError(
                 f'Quantity {name} does not exist - is there a typo?'
             )
     return state
@@ -326,7 +326,7 @@ cpdef dict get_tracer_metadata():
             'restart_name': tracer_name,
             'units': tracer_units,
             'is_water': is_water,
-            'dims': [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
+            'dims': [fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM],
         }
 
 

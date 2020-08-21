@@ -18,11 +18,15 @@ jobs:
 
     steps:
       - checkout
-
+      - run:
+          name: "install MPI"
+          command: |
+            sudo apt-get update
+            sudo apt-get install libopenmpi3
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "external/fv3util/requirements.txt" }}
+            - v1-dependencies-{{ checksum "external/fv3gfs-util/requirements.txt" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
       - run:
@@ -30,11 +34,12 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip3 install -r external/fv3util/requirements.txt
+            pip3 install -r external/fv3gfs-util/requirements.txt
+            pip3 install mpi4py==3.0.3
       - save_cache:
           paths:
             - ./venv
-          key: v1-dependencies-{{ checksum "external/fv3util/requirements.txt" }}
+          key: v1-dependencies-{{ checksum "external/fv3gfs-util/requirements.txt" }}
 
       - run:
           name: run tests
@@ -46,7 +51,7 @@ jobs:
       docker_layer_caching: true
       image: ubuntu-1604:201903-01
     environment:
-      GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-python
+      GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-wrapper
       GOOGLE_APPLICATION_CREDENTIALS: /tmp/key.json
     steps:
       - checkout
@@ -56,7 +61,7 @@ jobs:
             echo $ENCODED_GCR_KEY | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS
       - add_ssh_keys:
           fingerprints:
-            - "31:b8:08:52:8e:57:56:7d:ee:4b:fe:15:7c:d7:06:9e"  # pull fv3util
+            - "31:b8:08:52:8e:57:56:7d:ee:4b:fe:15:7c:d7:06:9e"  # pull fv3gfs-util
       - run:
           name: "Pull submodules"
           command: |
@@ -75,16 +80,23 @@ jobs:
             pip install --upgrade pip setuptools
             pip install -r requirements.txt
             pip install -e external/fv3config
-            pip install -e external/fv3util
+            pip install -e external/fv3gfs-util
       - save_cache:
           paths:
             - /opt/circleci/.pyenv/versions/3.6.2
           key: v1-build-dependencies-{{ checksum "requirements.txt" }}
+      - restore_cache:
+          keys:
+            - v1-fv3config-cache
       - run: 
           name: "Compile model and perform model tests"
           command: |
             echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://us.gcr.io
-            DOCKER_BUILDKIT=1 BUILD_FROM_INTERMEDIATE=y bash test_docker.sh
+            DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain BUILD_FROM_INTERMEDIATE=y bash test_docker.sh
+      - save_cache:
+          paths:
+            - /home/circleci/.cache/fv3gfs/fv3config-cache
+          key: v1-fv3config-cache
       - run:
           name: "Run example runfiles"
           command: |
@@ -138,7 +150,7 @@ jobs:
           at: docs/_build
       - add_ssh_keys:
           fingerprints:
-            - "77:dc:f8:08:f2:17:8d:0f:c3:b0:e8:93:0e:d0:89:e7"  # push fv3gfs-python
+            - "77:dc:f8:08:f2:17:8d:0f:c3:b0:e8:93:0e:d0:89:e7"  # push fv3gfs-wrapper
       - run:
           name: Install and configure dependencies
           command: |

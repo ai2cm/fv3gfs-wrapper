@@ -13,8 +13,16 @@ CONFIG_DIR = os.path.join(TEST_DIR, "config")
 SUBMIT_JOB_FILENAME = os.path.join(TEST_DIR, "run_files/submit_job.sh")
 STDOUT_FILENAME = "stdout.log"
 STDERR_FILENAME = "stderr.log"
-MODEL_IMAGE = "us.gcr.io/vcm-ml/fv3gfs-python"
+MODEL_IMAGE = "us.gcr.io/vcm-ml/fv3gfs-wrapper"
 MD5SUM_FILENAME = "md5.txt"
+MPI_FLAGS = [
+    "--oversubscribe",
+    "--allow-run-as-root",
+    "--use-hwthread-cpus",
+    "--mca",
+    "btl_vader_single_copy_mechanism",
+    "none",
+]
 
 USE_LOCAL_ARCHIVE = True
 
@@ -62,7 +70,23 @@ def test_regression(config, model_image, reference_dir):
 
 
 def run_model(config, run_dir, model_image):
-    fv3config.run_docker(config, run_dir, docker_image=model_image)
+    fv3config.write_run_directory(config, run_dir)
+    subprocess.check_call(
+        [
+            "docker",
+            "run",
+            "-v",
+            f"{run_dir}:/rundir",
+            "--workdir",
+            "/rundir",
+            MODEL_IMAGE,
+            "mpirun",
+            "-n",
+            "6",
+        ]
+        + MPI_FLAGS
+        + ["python3", "-m", "mpi4py", "-m", "fv3gfs.wrapper.run"]
+    )
 
 
 def check_md5sum(run_dir, md5sum_filename):

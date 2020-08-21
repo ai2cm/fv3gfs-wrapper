@@ -5,9 +5,9 @@ from copy import deepcopy
 import yaml
 import numpy as np
 import fv3config
-import fv3gfs
-from fv3gfs._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
-import fv3util
+import fv3gfs.wrapper
+from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
+import fv3gfs.util
 from mpi4py import MPI
 from util import redirect_stdout
 
@@ -17,7 +17,7 @@ test_dir = os.path.dirname(os.path.abspath(__file__))
 class SetterTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(SetterTests, self).__init__(*args, **kwargs)
-        self.tracer_data = fv3gfs.get_tracer_metadata()
+        self.tracer_data = fv3gfs.wrapper.get_tracer_metadata()
         self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
         self.physics_data = {entry["name"]: entry for entry in PHYSICS_PROPERTIES}
 
@@ -92,9 +92,9 @@ class SetterTests(unittest.TestCase):
 
     def test_set_non_existent_quantity(self):
         with self.assertRaises(ValueError):
-            fv3gfs.set_state(
+            fv3gfs.wrapper.set_state(
                 {
-                    "non_quantity": fv3util.Quantity(
+                    "non_quantity": fv3gfs.util.Quantity(
                         np.array([0.0]), dims=["dim1"], units=""
                     )
                 }
@@ -105,13 +105,13 @@ class SetterTests(unittest.TestCase):
         self._set_names_one_at_a_time_helper(name_list)
 
     def _set_all_names_at_once_helper(self, name_list):
-        old_state = fv3gfs.get_state(names=name_list)
+        old_state = fv3gfs.wrapper.get_state(names=name_list)
         self._check_gotten_state(old_state, name_list)
         replace_state = deepcopy(old_state)
         for name, quantity in replace_state.items():
             quantity.view[:] = np.random.uniform(size=quantity.extent)
-        fv3gfs.set_state(replace_state)
-        new_state = fv3gfs.get_state(names=name_list)
+        fv3gfs.wrapper.set_state(replace_state)
+        new_state = fv3gfs.wrapper.get_state(names=name_list)
         self._check_gotten_state(new_state, name_list)
         for name, new_quantity in new_state.items():
             with self.subTest(name):
@@ -119,15 +119,15 @@ class SetterTests(unittest.TestCase):
                 self.assert_values_equal(new_quantity, replace_quantity)
 
     def _set_names_one_at_a_time_helper(self, name_list):
-        old_state = fv3gfs.get_state(names=name_list)
+        old_state = fv3gfs.wrapper.get_state(names=name_list)
         self._check_gotten_state(old_state, name_list)
         for replace_name in name_list:
             with self.subTest(replace_name):
                 quantity = deepcopy(old_state[replace_name])
                 quantity.view[:] = np.random.uniform(size=quantity.extent)
                 replace_state = {replace_name: quantity}
-                fv3gfs.set_state(replace_state)
-                new_state = fv3gfs.get_state(names=name_list)
+                fv3gfs.wrapper.set_state(replace_state)
+                new_state = fv3gfs.wrapper.get_state(names=name_list)
                 self._check_gotten_state(new_state, name_list)
                 for name, new_quantity in new_state.items():
                     if name == replace_name:
@@ -145,7 +145,7 @@ class SetterTests(unittest.TestCase):
     def _check_gotten_state(self, state, name_list):
         for name, value in state.items():
             self.assertIsInstance(name, str)
-            self.assertIsInstance(value, fv3util.Quantity)
+            self.assertIsInstance(value, fv3gfs.util.Quantity)
         for name in name_list:
             self.assertIn(name, state)
         self.assertEqual(len(name_list), len(state.keys()))
@@ -168,7 +168,7 @@ if __name__ == "__main__":
     os.chdir(rundir)
     try:
         with redirect_stdout(os.devnull):
-            fv3gfs.initialize()
+            fv3gfs.wrapper.initialize()
             MPI.COMM_WORLD.barrier()
         if rank != 0:
             kwargs = {"verbosity": 0}

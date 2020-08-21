@@ -21,7 +21,7 @@ RUN mkdir -p /fv3config-cache/gs/vcm-fv3config && \
         /fv3config-cache/base_forcing
 
 #-----------------------------------------------------------------------------
-FROM $FORTRAN_ENV_IMAGE as fv3gfs-python-env
+FROM $FORTRAN_ENV_IMAGE as fv3gfs-wrapper-env
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
@@ -45,10 +45,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ln -s /bin/pip3 /bin/pip
 
 #-----------------------------------------------------------------------------
-FROM fv3gfs-python-env AS fv3gfs-python-build
+FROM fv3gfs-wrapper-env AS fv3gfs-wrapper-build
 
-ENV FMS_DIR=/fv3gfs-python/lib/external/FMS
-ENV ESMF_DIR=/fv3gfs-python/lib/external/esmf
+ENV FMS_DIR=/fv3gfs-wrapper/lib/external/FMS
+ENV ESMF_DIR=/fv3gfs-wrapper/lib/external/esmf
 ENV ESMF_INC="-I${ESMF_DIR}/include -I${ESMF_DIR}/mod/modO3/Linux.gfortran.64.mpiuni.default/"
 
 ENV FMS_LIB=${FMS_DIR}/libFMS/.libs/
@@ -65,24 +65,24 @@ COPY --from=fv3gfs-esmf /usr/local/esmf/lib/libO3/Linux.gfortran.64.mpiuni.defau
 
 # copy wrapper and fortran sources
 # directory copy commands must be separate due to docker limitations
-COPY lib /fv3gfs-python/lib
-COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/stochastic_physics /fv3gfs-python/lib/external/stochastic_physics
-COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/FV3 /fv3gfs-python/lib/external/FV3
-COPY templates /fv3gfs-python/templates
-COPY examples /fv3gfs-python/examples
-COPY docs /fv3gfs-python/docs
+COPY lib /fv3gfs-wrapper/lib
+COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/stochastic_physics /fv3gfs-wrapper/lib/external/stochastic_physics
+COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/FV3 /fv3gfs-wrapper/lib/external/FV3
+COPY templates /fv3gfs-wrapper/templates
+COPY examples /fv3gfs-wrapper/examples
+COPY docs /fv3gfs-wrapper/docs
 # files can be copied in one line
-COPY fv3gfs/dynamics_properties.json fv3gfs/physics_properties.json /fv3gfs-python/fv3gfs/
-COPY fill_templates.py HISTORY.md LICENSE Makefile MANIFEST.in README.md setup.cfg setup.py /fv3gfs-python/
+COPY fv3gfs/wrapper/dynamics_properties.json fv3gfs/wrapper/physics_properties.json /fv3gfs-wrapper/fv3gfs/wrapper/
+COPY fill_templates.py HISTORY.md LICENSE Makefile MANIFEST.in README.md setup.cfg setup.py /fv3gfs-wrapper/
 
 # make sources first, because -j8 doesn't propagate through setup.py layer
-RUN cd /fv3gfs-python/lib && \
+RUN cd /fv3gfs-wrapper/lib && \
     make -j8
 
-COPY fv3gfs /fv3gfs-python/fv3gfs
+COPY fv3gfs /fv3gfs-wrapper/fv3gfs
 
 # compile wrapper
-RUN cd /fv3gfs-python && \
+RUN cd /fv3gfs-wrapper && \
     make build
 
 
@@ -120,7 +120,7 @@ RUN git clone --depth 1 -b fv3_validation https://github.com/eddie-c-davis/gt4py
 FROM $DAWN_IMAGE AS fv3gfs-dawn
 
 #-----------------------------------------------------------------------------
-FROM fv3gfs-python-env AS fv3gfs-python
+FROM fv3gfs-wrapper-env AS fv3gfs-wrapper
 
 ENV FMS_DIR=/FMS
 ENV ESMF_DIR=/esmf
@@ -169,16 +169,16 @@ COPY --from=fv3gfs-dawn /usr/src/gt4py /usr/src/gt4py
 RUN pip3 install --no-cache-dir /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
 RUN pip3 install --no-cache-dir /usr/src/gt4py
 
-COPY --from=fv3gfs-python-build /fv3gfs-python /fv3gfs-python
-COPY tests /fv3gfs-python/tests
+COPY --from=fv3gfs-wrapper-build /fv3gfs-wrapper /fv3gfs-wrapper
+COPY tests /fv3gfs-wrapper/tests
 
 # copy and install dependency packages
-COPY external /fv3gfs-python/external
+COPY external /fv3gfs-wrapper/external
 
 RUN pip3 install --no-cache-dir -e \
-    /fv3gfs-python/external/fv3config \
-    -e /fv3gfs-python/external/fv3util && \
-    pip3 install --no-cache-dir -e /fv3gfs-python && \
+    /fv3gfs-wrapper/external/fv3config \
+    -e /fv3gfs-wrapper/external/fv3gfs-util && \
+    pip3 install --no-cache-dir -e /fv3gfs-wrapper && \
     pip3 install --no-cache-dir pytest-subtests==0.3.1 pytest==5.4.3  # must reinstall to increment pytest, gt4py requires 4 (but not really)
 
 # cache model data
