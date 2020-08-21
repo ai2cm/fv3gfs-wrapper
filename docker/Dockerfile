@@ -134,8 +134,8 @@ COPY --from=fv3gfs-dawn /usr/src/dawn /usr/src/dawn
 COPY --from=fv3gfs-dawn /dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
 COPY --from=fv3gfs-dawn /usr/src/gt4py /usr/src/gt4py
 
-RUN pip3 install --no-cache-dir /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
-RUN pip3 install --no-cache-dir /usr/src/gt4py
+RUN pip3 install --no-deps --no-cache-dir /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
+RUN pip3 install --no-deps --no-cache-dir /usr/src/gt4py
 
 COPY --from=fv3gfs-wrapper-build /fv3gfs-wrapper /fv3gfs-wrapper
 COPY tests /fv3gfs-wrapper/tests
@@ -143,7 +143,7 @@ COPY tests /fv3gfs-wrapper/tests
 # copy and install dependency packages
 COPY external /fv3gfs-wrapper/external
 COPY requirements.txt.local /tmp/requirements.txt.local 
-RUN pip3 install --no-cache-dir -r /tmp/requirements.txt.local
+RUN pip3 install --no-deps --no-cache-dir -r /tmp/requirements.txt.local
 
 # cache model data
 COPY --from=fv3config-inputdata /fv3config-cache $FV3CONFIG_CACHE_DIR/fv3config-cache
