@@ -1,6 +1,5 @@
 from mpi4py import MPI
 from fv3gfs.util import Timer
-import time
 import numpy as np
 import contextlib
 

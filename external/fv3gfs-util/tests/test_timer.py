@@ -45,7 +45,6 @@ def test_clock_in_clock(timer):
 
 def test_consecutive_start_stops(timer):
     """total time increases with consecutive clock blocks"""
-    foo = 0
     timer.start("label")
     time.sleep(0.01)
     timer.stop("label")
@@ -60,7 +59,6 @@ def test_consecutive_start_stops(timer):
 
 def test_consecutive_clocks(timer):
     """total time increases with consecutive clock blocks"""
-    foo = 0
     with timer.clock("label"):
         time.sleep(0.01)
     previous_time = timer.times["label"]
