@@ -1,0 +1,3 @@
+-e fv3gfs-wrapper/external/fv3config
+-e fv3gfs-wrapper/external/fv3gfs-util 
+-e fv3gfs-wrapper
