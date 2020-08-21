@@ -288,10 +288,8 @@ def depth_quantity_list(
 
 @pytest.mark.parametrize(
     "layout, n_points, n_points_update, dims",
-    [
-        [(1, 1), 3, "same", [fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM]]
-    ],
-    indirect=True
+    [[(1, 1), 3, "same", [fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM]]],
+    indirect=True,
 )
 def test_halo_update_timer(
     zeros_quantity_list,

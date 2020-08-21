@@ -4,7 +4,6 @@ from time import time
 
 
 class Timer:
-
     def __init__(self):
         self._clock_starts = {}
         self._accumulated_time = {}
