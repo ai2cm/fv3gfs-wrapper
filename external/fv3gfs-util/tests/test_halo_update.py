@@ -286,6 +286,46 @@ def depth_quantity_list(
     return return_list
 
 
+@pytest.mark.parametrize(
+    "layout, n_points, n_points_update, dims",
+    [
+        [(1, 1), 3, "same", [fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM]]
+    ],
+    indirect=True
+)
+def test_halo_update_timer(
+    zeros_quantity_list,
+    communicator_list,
+    n_points_update,
+    n_points,
+    numpy,
+    subtests,
+    boundary_dict,
+    ranks_per_tile,
+):
+    """
+    test that halo update produces nonzero timings for all expected labels
+    """
+    req_list = []
+    for communicator, quantity in zip(communicator_list, zeros_quantity_list):
+        req = communicator.start_halo_update(quantity, n_points_update)
+        req_list.append(req)
+    for req in req_list:
+        req.wait()
+    required_times_keys = ("pack", "unpack", "Isend", "Recv")
+    for communicator in communicator_list:
+        with subtests.test(rank=communicator.rank):
+            assert isinstance(communicator.timer, fv3gfs.util.Timer)
+            times = communicator.timer.times
+            missing_keys = set(required_times_keys).difference(times.keys())
+            assert len(missing_keys) == 0
+            extra_keys = set(times.keys()).difference(required_times_keys)
+            assert len(extra_keys) == 0
+            for key in required_times_keys:
+                assert times[key] > 0
+                assert isinstance(times[key], float)
+
+
 def test_depth_halo_update(
     depth_quantity_list,
     communicator_list,

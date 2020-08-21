@@ -5,6 +5,7 @@ from . import constants
 from .boundary import Boundary
 from .rotate import rotate_scalar_data, rotate_vector_data
 from .buffer import array_buffer, send_buffer, recv_buffer
+from ._timing import Timer
 import logging
 
 __all__ = [
@@ -283,7 +284,8 @@ class CubedSphereCommunicator(Communicator):
             comm: mpi4py.Comm object
             partitioner: cubed sphere partitioner
         """
-        self.partitioner = partitioner
+        self.partitioner: CubedSpherePartitioner = partitioner
+        self.timer: Timer = Timer()
         self._tile_communicator = None
         self._boundaries = None
         super(CubedSphereCommunicator, self).__init__(comm)
@@ -319,8 +321,9 @@ class CubedSphereCommunicator(Communicator):
             quantity: the quantity to be updated
             n_points: how many halo points to update, starting from the interior
         """
-        req = self.start_halo_update(quantity, n_points)
-        req.wait()
+        with self.timer.clock("halo_update"):
+            req = self.start_halo_update(quantity, n_points)
+            req.wait()
 
     def start_halo_update(self, quantity: Quantity, n_points: int) -> HaloUpdateRequest:
         """Start an asynchronous halo update on a quantity.
@@ -341,21 +344,23 @@ class CubedSphereCommunicator(Communicator):
     def _Isend_halos(self, quantity: Quantity, n_points: int):
         send_requests = []
         for boundary_type, boundary in self.boundaries.items():
-            data = boundary.send_view(quantity, n_points=n_points)
-            # sending data across the boundary will rotate the data
-            # n_clockwise_rotations times, due to the difference in axis orientation.\
-            # Thus we rotate that number of times counterclockwise before sending,
-            # to get the right final orientation
-            data = rotate_scalar_data(
-                data, quantity.dims, quantity.np, -boundary.n_clockwise_rotations
-            )
+            with self.timer.clock("pack"):
+                data = boundary.send_view(quantity, n_points=n_points)
+                # sending data across the boundary will rotate the data
+                # n_clockwise_rotations times, due to the difference in axis orientation.\
+                # Thus we rotate that number of times counterclockwise before sending,
+                # to get the right final orientation
+                data = rotate_scalar_data(
+                    data, quantity.dims, quantity.np, -boundary.n_clockwise_rotations
+                )
             send_requests.append(self._Isend(quantity.np, data, dest=boundary.to_rank))
         return send_requests
 
     def _Irecv_halos(self, quantity: Quantity, n_points: int):
         recv_requests = []
         for boundary_type, boundary in self.boundaries.items():
-            dest_view = boundary.recv_view(quantity, n_points=n_points)
+            with self.timer.clock("unpack"):
+                dest_view = boundary.recv_view(quantity, n_points=n_points)
             logger.debug(
                 "finish_halo_update: retrieving boundary_type=%s shape=%s from_rank=%s to_rank=%s",
                 boundary_type,
@@ -444,24 +449,36 @@ class CubedSphereCommunicator(Communicator):
     def _Isend(self, numpy, in_array, **kwargs):
         # don't want to use a buffer here, because we leave this scope and can't close
         # the context manager. might figure out a way to do it later
-        array = numpy.ascontiguousarray(in_array)
-        return self.comm.Isend(array, **kwargs)
+        with self.timer.clock("pack"):
+            array = numpy.ascontiguousarray(in_array)
+        with self.timer.clock("Isend"):
+            return self.comm.Isend(array, **kwargs)
 
     def _Send(self, numpy, in_array, **kwargs):
+        self.timer.start("pack")
         with send_buffer(numpy.empty, in_array) as sendbuf:
+            self.timer.stop("pack")
             self.comm.Send(sendbuf, **kwargs)
 
     def _Recv(self, numpy, out_array, **kwargs):
         with recv_buffer(numpy.empty, out_array) as recvbuf:
-            self.comm.Recv(recvbuf, **kwargs)
+            with self.timer.clock("Recv"):
+                self.comm.Recv(recvbuf, **kwargs)
+            self.timer.start("unpack")
+        self.timer.stop("unpack")
 
     def _Irecv(self, numpy, out_array, **kwargs):
         # we can't perform a true Irecv because we need to receive the data into a
         # buffer and then copy that buffer into the output array. Instead we will
         # just do a Recv() when wait is called.
         def recv():
+            self.timer.start("unpack")
             with recv_buffer(numpy.empty, out_array) as recvbuf:
-                self.comm.Recv(recvbuf, **kwargs)
+                self.timer.stop("unpack")
+                with self.timer.clock("Recv"):
+                    self.comm.Recv(recvbuf, **kwargs)
+                self.timer.start("unpack")
+            self.timer.stop("unpack")
 
         return FunctionRequest(recv)
 
