@@ -326,7 +326,7 @@ cpdef dict get_tracer_metadata():
             'restart_name': tracer_name,
             'units': tracer_units,
             'is_water': is_water,
-            'dims': [fv3util.Z_DIM, fv3util.Y_DIM, fv3util.X_DIM],
+            'dims': [fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM],
         }
 
 
