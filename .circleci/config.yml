@@ -78,9 +78,7 @@ jobs:
             [ -d /opt/circleci/.pyenv/versions/3.6.2 ] || pyenv install 3.6.2
             pyenv global 3.6.2
             pip install --upgrade pip setuptools
-            pip install -r requirements.txt
             pip install -e external/fv3config
-            pip install -e external/fv3gfs-util
       - save_cache:
           paths:
             - /opt/circleci/.pyenv/versions/3.6.2
