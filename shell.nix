@@ -1,7 +1,6 @@
 with import <nixpkgs> {};
 let p=  import lib/external/nix;
 pythonl = python3.withPackages (ps: [
-        ps.numcodecs
         ps.pip
   ]);
 in
@@ -35,7 +34,13 @@ mkShell {
   OMPI_CC="${gfortran.cc}/bin/gcc";
 
   shellHook = ''
+    # on darwwin the stack size maxes out at 65533
+    # https://stackoverflow.com/questions/13245019/how-to-change-the-stack-size-using-ulimit-or-per-process-on-mac-os-x-for-a-c-or
+    ulimit -s 65532
+    
+    export CC=gcc
     cp lib/external/nix/fv3/configure.fv3 lib/external/FV3/conf
+    [[ -f .env/bin/activate ]] || python -m venv .env
     source .env/bin/activate
   '';
 }

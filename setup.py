@@ -35,22 +35,24 @@ else:
     mpi_fortran_lib = "-lmpifort"
 
 library_link_args = [
-    "-lpython3." + str(sys.version_info.minor) + "m",
     mpi_fortran_lib,
     # "-lgfortran",
     "-lmpi",
     # "-lmvec",
+    # "-lpython3." + str(sys.version_info.minor) + "m",
     # "-lblas",
     # "-lc",
     # "-lrt",
 ] + pkgconfig.libs('fv3').split()
 
 requirements = [
+    "mpi4py",
     "cftime>=1.2.1",
     "xarray>=0.15.1",
     "netCDF4>=1.4.2",
     "numpy",
     f"fv3util>=0.5.1",
+    "pyyaml",
 ]
 
 setup_requirements = ["cython", "numpy", "jinja2"]
