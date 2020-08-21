@@ -57,11 +57,11 @@ class TracerMetadataTests(unittest.TestCase):
         self.assertEqual(set(data.keys()), set(tracer_names))
 
     def test_ozone_not_water(self):
-        data = fv3gfs.get_tracer_metadata()
+        data = fv3gfs.wrapper.get_tracer_metadata()
         self.assertFalse(data["ozone_mixing_ratio"]["is_water"])
 
     def test_specific_humidity_is_water(self):
-        data = fv3gfs.get_tracer_metadata()
+        data = fv3gfs.wrapper.get_tracer_metadata()
         self.assertTrue(data["specific_humidity"]["is_water"])
 
     def test_all_tracers_in_restart_names(self):
