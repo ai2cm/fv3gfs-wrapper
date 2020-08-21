@@ -43,7 +43,7 @@ library_link_args = [
     # "-lblas",
     # "-lc",
     # "-lrt",
-] + pkgconfig.libs('fv3').split()
+] + pkgconfig.libs("fv3").split()
 
 requirements = [
     "mpi4py",
@@ -80,8 +80,7 @@ ext_modules = [
         # source file:
         ["lib/_wrapper.pyx"],
         include_dirs=[get_include()],
-        extra_link_args=wrapper_build_filenames
-        + library_link_args,
+        extra_link_args=wrapper_build_filenames + library_link_args,
         depends=wrapper_build_filenames,
     )
 ]
