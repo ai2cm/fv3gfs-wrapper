@@ -23,7 +23,7 @@ RUN mkdir -p /fv3config-cache/gs/vcm-fv3config && \
 #-----------------------------------------------------------------------------
 FROM $FORTRAN_ENV_IMAGE as fv3gfs-wrapper-env
 
-COPY requirements.txt /tmp/requirements.txt
+COPY requirements.txt /fv3gfs-wrapper/requirements.txt
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
@@ -34,7 +34,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip \
     cython3 && \
     pip3 install wheel && \
-    pip3 install -r /tmp/requirements.txt  && \
+    pip3 install -r /fv3gfs-wrapper/requirements.txt  && \
     ln -s /bin/python3 /bin/python && \
     ln -s /bin/pip3 /bin/pip
 
@@ -143,8 +143,8 @@ COPY tests /fv3gfs-wrapper/tests
 
 # copy and install dependency packages
 COPY external /fv3gfs-wrapper/external
-COPY requirements_local.txt /tmp/requirements_local.txt
-RUN cd /fv3gfs-wrapper && pip3 install --no-deps --no-cache-dir -r /tmp/requirements_local.txt
+COPY requirements_local.txt /fv3gfs-wrapper/requirements_local.txt
+RUN cd /fv3gfs-wrapper && pip3 install --no-deps --no-cache-dir -r /fv3gfs-wrapper/requirements_local.txt
 
 # cache model data
 COPY --from=fv3config-inputdata /fv3config-cache $FV3CONFIG_CACHE_DIR/fv3config-cache
