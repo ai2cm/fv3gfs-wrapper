@@ -1,6 +1,4 @@
 import os
-import shutil
-import sys
 from setuptools import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
@@ -51,7 +49,7 @@ requirements = [
     "xarray>=0.15.1",
     "netCDF4>=1.4.2",
     "numpy",
-    f"fv3util>=0.5.1",
+    "fv3util>=0.5.1",
     "pyyaml",
 ]
 
