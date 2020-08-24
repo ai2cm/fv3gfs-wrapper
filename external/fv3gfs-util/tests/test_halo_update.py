@@ -320,7 +320,7 @@ def test_halo_update_timer(
             extra_keys = set(times.keys()).difference(required_times_keys)
             assert len(extra_keys) == 0
             for key in required_times_keys:
-                assert times[key] > 0.
+                assert times[key] > 0.0
                 assert isinstance(times[key], float)
 
 
