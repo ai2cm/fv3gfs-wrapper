@@ -53,7 +53,7 @@ def test_consecutive_start_stops(timer):
         timer.start("label")
         time.sleep(0.01)
         timer.stop("label")
-        assert timer.times["label"] > previous_time
+        assert timer.times["label"] > previous_time + 0.01
         previous_time = timer.times["label"]
 
 
@@ -65,5 +65,5 @@ def test_consecutive_clocks(timer):
     for i in range(5):
         with timer.clock("label"):
             time.sleep(0.01)
-        assert timer.times["label"] > previous_time
+        assert timer.times["label"] > previous_time + 0.01
         previous_time = timer.times["label"]
