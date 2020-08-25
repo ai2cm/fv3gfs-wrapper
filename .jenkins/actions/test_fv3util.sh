@@ -48,15 +48,15 @@ parseOptions $*
 
 # run tests
 echo "### run tests"
-if [ ! -f external/fv3util/requirements.txt ] ; then
+if [ ! -f external/fv3gfs-util/requirements.txt ] ; then
     exitError 1205 ${LINENO} "could not find requirements_dev.txt, run from top directory"
 fi
 python3 -m venv venv
 . ./venv/bin/activate
 pip3 install --upgrade pip setuptools wheel
-pip3 install -r external/fv3util/requirements.txt
-pip3 install external/fv3util
-pytest --junitxml results.xml external/fv3util/tests
+pip3 install -r external/fv3gfs-util/requirements.txt
+pip3 install -e external/fv3gfs-util
+pytest --junitxml results.xml external/fv3gfs-util/tests
 
 deactivate
 

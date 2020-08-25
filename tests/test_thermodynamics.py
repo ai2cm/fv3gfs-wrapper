@@ -1,7 +1,7 @@
 import fv3util
 import numpy as np
 
-import fv3gfs
+import fv3gfs.wrapper
 
 import pytest
 
@@ -38,7 +38,7 @@ class MockFv3GFS:
 
 def test_set_state_mass_conserving_non_water():
     mock = MockFv3GFS()
-    fv3gfs.set_state_mass_conserving(
+    fv3gfs.wrapper.set_state_mass_conserving(
         {"air_temperature": fv3util.Quantity(mock.one, dims=mock.dims, units="K")},
         fv3gfs=mock,
         pressure="delp",
@@ -50,7 +50,7 @@ def test_set_state_mass_conserving_non_water():
 def test_set_state_mass_conserving_cant_set_delp():
     mock = MockFv3GFS()
     with pytest.raises(ValueError):
-        fv3gfs.set_state_mass_conserving(
+        fv3gfs.wrapper.set_state_mass_conserving(
             {"delp": fv3util.Quantity(mock.one, dims=mock.dims, units="K")},
             fv3gfs=mock,
             pressure="delp",
@@ -59,7 +59,7 @@ def test_set_state_mass_conserving_cant_set_delp():
 
 def test_set_state_mass_conserving_water_added():
     mock = MockFv3GFS()
-    fv3gfs.set_state_mass_conserving(
+    fv3gfs.wrapper.set_state_mass_conserving(
         {"specific_humidity": fv3util.Quantity(2 * mock.one, dims=mock.dims, units="")},
         fv3gfs=mock,
         pressure="delp",

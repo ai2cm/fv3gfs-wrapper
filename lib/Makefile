@@ -1,7 +1,7 @@
 SHELL = /bin/sh
 
 TEMPLATES = $(shell ls ../templates)
-PROPERTIES_FILES = ../fv3gfs/dynamics_properties.json ../fv3gfs/physics_properties.json
+PROPERTIES_FILES = ../fv3gfs/wrapper/dynamics_properties.json ../fv3gfs/wrapper/physics_properties.json
 
 # Use pkg-config to get flags for fv3
 # If we run without PKG_CONFIG_ALLOW_SYSTEM_CFLAGS,

@@ -1,6 +1,6 @@
 from datetime import timedelta
 from mpi4py import MPI
-import fv3gfs
+import fv3gfs.wrapper
 import yaml
 
 # This code shows an example where we relax specific humidity towards zero with a 7-day timescale.
@@ -35,18 +35,18 @@ if __name__ == "__main__":
     relaxation_rate = timedelta(days=7)
     timestep = timedelta(seconds=config["namelist"]["coupler_nml"]["dt_atmos"])
 
-    fv3gfs.initialize()
-    for i in range(fv3gfs.get_step_count()):
-        fv3gfs.step_dynamics()
-        fv3gfs.step_physics()
-        fv3gfs.save_intermediate_restart_if_enabled()
+    fv3gfs.wrapper.initialize()
+    for i in range(fv3gfs.wrapper.get_step_count()):
+        fv3gfs.wrapper.step_dynamics()
+        fv3gfs.wrapper.step_physics()
+        fv3gfs.wrapper.save_intermediate_restart_if_enabled()
 
         # dry out the model with the given relaxation rate
-        state = fv3gfs.get_state(names=["specific_humidity"])
+        state = fv3gfs.wrapper.get_state(names=["specific_humidity"])
         state["specific_humidity"].view[:] -= (
             state["specific_humidity"].view[:]
             * timestep.total_seconds()
             / relaxation_rate.total_seconds()
         )
-        fv3gfs.set_state(state)
-    fv3gfs.cleanup()
+        fv3gfs.wrapper.set_state(state)
+    fv3gfs.wrapper.cleanup()

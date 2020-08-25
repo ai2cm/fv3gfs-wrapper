@@ -1,0 +1,3 @@
+-e external/fv3config
+-e external/fv3gfs-util
+-e .

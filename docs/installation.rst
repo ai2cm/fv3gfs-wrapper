@@ -18,12 +18,12 @@ as possible on your machine.
 Build
 -----
 
-The `fv3gfs-python` docker image can be build with:: console
+The `fv3gfs-wrapper` docker image can be build with:: console
 
     $ build_docker.sh
 
-By default this will produce an image ``us.gcr.io/vcm-ml/fv3gfs-python:latest``. You can
-rename this image to whatever you like using ``docker tag us.gcr.io/vcm-ml/fv3gfs-python:latest <new_name>``.
+By default this will produce an image ``us.gcr.io/vcm-ml/fv3gfs-wrapper:latest``. You can
+rename this image to whatever you like using ``docker tag us.gcr.io/vcm-ml/fv3gfs-wrapper:latest <new_name>``.
 
 Test
 ----
