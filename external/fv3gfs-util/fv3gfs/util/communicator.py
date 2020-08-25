@@ -419,30 +419,32 @@ class CubedSphereCommunicator(Communicator):
     def _Isend_vector_halos(self, x_quantity, y_quantity, n_points):
         send_requests = []
         for boundary_type, boundary in self.boundaries.items():
-            x_data = boundary.send_view(x_quantity, n_points=n_points)
-            y_data = boundary.send_view(y_quantity, n_points=n_points)
-            logger.debug("%s %s", x_data.shape, y_data.shape)
-            x_data, y_data = rotate_vector_data(
-                x_data,
-                y_data,
-                -boundary.n_clockwise_rotations,
-                x_quantity.dims,
-                x_quantity.np,
-            )
-            logger.debug(
-                "%s %s %s %s %s",
-                boundary.from_rank,
-                boundary.to_rank,
-                boundary.n_clockwise_rotations,
-                x_data.shape,
-                y_data.shape,
-            )
-            send_requests.append(
-                self._Isend(x_quantity.np, x_data, dest=boundary.to_rank)
-            )
-            send_requests.append(
-                self._Isend(y_quantity.np, y_data, dest=boundary.to_rank)
-            )
+            with self.timer.clock("pack"):
+                x_data = boundary.send_view(x_quantity, n_points=n_points)
+                y_data = boundary.send_view(y_quantity, n_points=n_points)
+                logger.debug("%s %s", x_data.shape, y_data.shape)
+                x_data, y_data = rotate_vector_data(
+                    x_data,
+                    y_data,
+                    -boundary.n_clockwise_rotations,
+                    x_quantity.dims,
+                    x_quantity.np,
+                )
+                logger.debug(
+                    "%s %s %s %s %s",
+                    boundary.from_rank,
+                    boundary.to_rank,
+                    boundary.n_clockwise_rotations,
+                    x_data.shape,
+                    y_data.shape,
+                )
+            with self.timer.clock("Isend"):
+                send_requests.append(
+                    self._Isend(x_quantity.np, x_data, dest=boundary.to_rank)
+                )
+                send_requests.append(
+                    self._Isend(y_quantity.np, y_data, dest=boundary.to_rank)
+                )
         return send_requests
 
     def _Isend(self, numpy, in_array, **kwargs):
