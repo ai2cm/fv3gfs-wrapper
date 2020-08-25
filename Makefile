@@ -108,7 +108,7 @@ docs-docker:
 build-docker:
 	BUILD_FROM_INTERMEDIATE=y $(MAKE) -C docker
 
-test-docker:
+test-docker: build-docker
 	./test_docker.sh
 
 servedocs: docs ## compile the docs watching for changes
