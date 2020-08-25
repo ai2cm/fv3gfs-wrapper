@@ -12,6 +12,10 @@ Major changes:
 of `datetime.datetime` objects.  This results in times stored in a format compatible with
 the fortran model, and accurate internal representation of times with the calendar specified
 in the `coupler_nml` namelist.
+- Fortran source updated to include new per-physics-component tendency diagnostics for
+temperature and specific humidity, and to ensure that the column moistening implied by
+nudging specific humidity is subtracted from the precipitation felt by the land surface
+model.
 
 Minor changes:
 - added jenkins scripts under .jenkins
