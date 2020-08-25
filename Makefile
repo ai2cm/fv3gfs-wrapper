@@ -106,7 +106,7 @@ docs-docker:
 	$(BROWSER) docs/_build/html/index.html
 
 build-docker:
-	./build_docker.sh
+	BUILD_FROM_INTERMEDIATE=y $(MAKE) -C docker
 
 test-docker:
 	./test_docker.sh

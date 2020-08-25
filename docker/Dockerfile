@@ -68,6 +68,9 @@ COPY --from=fv3gfs-esmf /usr/local/esmf/lib/libO3/Linux.gfortran.64.mpiuni.defau
 COPY lib /fv3gfs-python/lib
 COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/stochastic_physics /fv3gfs-python/lib/external/stochastic_physics
 COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/FV3 /fv3gfs-python/lib/external/FV3
+
+RUN PREFIX=/usr make -C /fv3gfs-python/lib/external/FV3 install
+
 COPY templates /fv3gfs-python/templates
 COPY examples /fv3gfs-python/examples
 COPY docs /fv3gfs-python/docs
@@ -82,8 +85,7 @@ RUN cd /fv3gfs-python/lib && \
 COPY fv3gfs /fv3gfs-python/fv3gfs
 
 # compile wrapper
-RUN cd /fv3gfs-python && \
-    make build
+RUN make -C /fv3gfs-python build
 
 
 #-----------------------------------------------------------------------------
