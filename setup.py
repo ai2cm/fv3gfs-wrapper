@@ -35,7 +35,7 @@ for relative_filename in relative_wrapper_build_filenames:
 # https://stackoverflow.com/questions/45135/why-does-the-order-in-which-libraries-are-linked-sometimes-cause-errors-in-gcc
 library_link_args = []
 library_link_args.extend(wrapper_build_filenames)
-library_link_args = pkgconfig.libs("fv3").split()
+library_link_args += pkgconfig.libs("fv3").split()
 
 mpi_flavor = os.environ.get("MPI", "openmpi")
 if mpi_flavor == "openmpi":
@@ -44,7 +44,7 @@ else:
     library_link_args += pkgconfig.libs("mpich-fort").split()
 
 # need to include math and c library
-library_link_args += ["-lm", "-lc"]
+library_link_args += ["-lmvec", "-lc"]
 
 requirements = [
     "mpi4py",
