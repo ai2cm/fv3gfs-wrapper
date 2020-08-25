@@ -4,6 +4,8 @@ History
 latest
 ------
 
+- make `SubtileGridSizer.from_tile_params` public API
+
 v0.5.1
 ------
 

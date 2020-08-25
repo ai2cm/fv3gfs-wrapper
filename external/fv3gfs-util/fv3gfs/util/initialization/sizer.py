@@ -31,7 +31,7 @@ class GridSizer:
 
 class SubtileGridSizer(GridSizer):
     @classmethod
-    def _from_tile_params(
+    def from_tile_params(
         cls,
         nx_tile: int,
         ny_tile: int,
@@ -90,7 +90,7 @@ class SubtileGridSizer(GridSizer):
         nx_tile = namelist["fv_core_nml"]["npx"] - 1
         ny_tile = namelist["fv_core_nml"]["npy"] - 1
         nz = namelist["fv_core_nml"]["npz"]
-        return cls._from_tile_params(
+        return cls.from_tile_params(
             nx_tile,
             ny_tile,
             nz,
