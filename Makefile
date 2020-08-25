@@ -119,7 +119,7 @@ release: dist ## package and upload a release
 
 build:
 	$(MAKE) -C lib
-	python3 setup.py build_ext --inplace
+	pip install -e .
 
 dist: clean ## builds source and wheel package
 	$(MAKE) -C lib
