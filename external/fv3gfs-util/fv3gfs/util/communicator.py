@@ -286,7 +286,12 @@ class CubedSphereCommunicator(Communicator):
         self.partitioner = partitioner
         self._tile_communicator = None
         self._boundaries = None
+        self._last_halo_tag = 0
         super(CubedSphereCommunicator, self).__init__(comm)
+
+    def _get_halo_tag(self) -> int:
+        self._last_halo_tag += 1
+        return self._last_halo_tag
 
     @property
     def boundaries(self) -> Iterable[Boundary]:
@@ -349,7 +354,7 @@ class CubedSphereCommunicator(Communicator):
             data = rotate_scalar_data(
                 data, quantity.dims, quantity.np, -boundary.n_clockwise_rotations
             )
-            send_requests.append(self._Isend(quantity.np, data, dest=boundary.to_rank))
+            send_requests.append(self._Isend(quantity.np, data, dest=boundary.to_rank, tag=self._get_halo_tag()))
         return send_requests
 
     def _Irecv_halos(self, quantity: Quantity, n_points: int):
@@ -434,10 +439,10 @@ class CubedSphereCommunicator(Communicator):
                 y_data.shape,
             )
             send_requests.append(
-                self._Isend(x_quantity.np, x_data, dest=boundary.to_rank)
+                self._Isend(x_quantity.np, x_data, dest=boundary.to_rank, tag=self._get_halo_tag())
             )
             send_requests.append(
-                self._Isend(y_quantity.np, y_data, dest=boundary.to_rank)
+                self._Isend(y_quantity.np, y_data, dest=boundary.to_rank, tag=self._get_halo_tag())
             )
         return send_requests
 
