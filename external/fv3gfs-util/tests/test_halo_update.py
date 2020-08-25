@@ -510,9 +510,7 @@ def test_vector_halo_update_timer(
     x_list = zeros_quantity_list
     y_list = copy.deepcopy(x_list)
     req_list = []
-    for communicator, y_quantity, x_quantity in zip(
-        communicator_list, y_list, x_list
-    ):
+    for communicator, y_quantity, x_quantity in zip(communicator_list, y_list, x_list):
         req_list.append(
             communicator.start_vector_halo_update(
                 y_quantity, x_quantity, n_points_update
