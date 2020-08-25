@@ -71,12 +71,9 @@ COPY docs /fv3gfs-python/docs
 # files can be copied in one line
 COPY fv3gfs/wrapper/dynamics_properties.json fv3gfs/wrapper/physics_properties.json /fv3gfs-wrapper/fv3gfs/wrapper/
 COPY fill_templates.py HISTORY.md LICENSE Makefile MANIFEST.in README.md setup.cfg setup.py /fv3gfs-wrapper/
-
 COPY fv3gfs /fv3gfs-wrapper/fv3gfs
 
-# compile wrapper
-RUN make -C /fv3gfs-python build
-
+RUN make -C /fv3gfs-wrapper build
 
 #-----------------------------------------------------------------------------
 FROM $FORTRAN_ENV_IMAGE AS fv3gfs-dawn-build
