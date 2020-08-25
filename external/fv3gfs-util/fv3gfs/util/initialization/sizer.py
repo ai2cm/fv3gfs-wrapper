@@ -9,9 +9,9 @@ from ..partitioner import TilePartitioner
 class GridSizer:
 
     nx: int
-    """length of the x compute dimension"""
+    """length of the x compute dimension on this process"""
     ny: int
-    """length of the y compute dimension"""
+    """length of the y compute dimension on this process"""
     nz: int
     """length of the z compute dimension"""
     n_halo: int
