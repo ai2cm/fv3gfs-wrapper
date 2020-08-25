@@ -58,4 +58,4 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
 
-.PHONY: docs lint reformat clean test
+.PHONY: docs clean test lint reformat test_mpi coverage help
