@@ -8,13 +8,13 @@ def print_global_timings(times, comm, root=0):
     is_root = comm.Get_rank() == root
     recvbuf = np.array(0.0)
     for name, value in timer.times.items():
-        comm.Reduce(np.array(value), recvbuf, op=MPI.SUM)
         if is_root:
             print(name)
-            print(f"    mean: {recvbuf / comm.Get_size()}")
-        for label, op in [("min", MPI.MIN), ("max", MPI.MAX)]:
+        for label, op in [("min", MPI.MIN), ("max", MPI.MAX), ("mean", MPI.SUM)]:
             comm.Reduce(np.array(value), recvbuf, op=op)
             if is_root:
+                if op == "mean":
+                    recvbuf /= comm.Get_size()
                 print(f"    {label}: {recvbuf}")
 
 
