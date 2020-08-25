@@ -4,7 +4,6 @@ from time import time
 
 
 class Timer:
-
     def __init__(self):
         self._clock_starts = {}
         self._accumulated_time = {}
@@ -56,7 +55,6 @@ class Timer:
     @property
     def enabled(self):
         return self._enabled
-
 
 
 class NullTimer(Timer):

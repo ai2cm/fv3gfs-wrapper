@@ -77,7 +77,7 @@ def test_consecutive_clocks(timer):
         (["disable"], False),
         (["disable", "enable"], True),
         (["disable", "disable"], False),
-    ]
+    ],
 )
 def test_enable_disable(timer, ops, result):
     for op in ops:
@@ -119,6 +119,7 @@ def used_timer(request, timer):
         with timer.clock("label2"):
             time.sleep(0.01)
         return timer
+
 
 def test_timer_reset(used_timer):
     used_timer.reset()

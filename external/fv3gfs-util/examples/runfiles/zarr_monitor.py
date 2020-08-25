@@ -9,23 +9,21 @@ OUTPUT_PATH = "output/zarr_monitor"
 
 
 def get_example_state(time):
-    sizer = fv3gfs.util.SubtileGridSizer(nx=48, ny=48, nz=70, n_halo=3, extra_dim_lengths={})
+    sizer = fv3gfs.util.SubtileGridSizer(
+        nx=48, ny=48, nz=70, n_halo=3, extra_dim_lengths={}
+    )
     allocator = fv3gfs.util.QuantityFactory(sizer, np)
     air_temperature = allocator.zeros(
-        [fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM],
-        units="degK"
+        [fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM], units="degK"
     )
     air_temperature.view[:] = np.random.randn(*air_temperature.extent)
-    return {
-        "time": time,
-        "air_temperature": air_temperature
-    }
+    return {"time": time, "air_temperature": air_temperature}
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     size = MPI.COMM_WORLD.Get_size()
     # assume square tile faces
-    ranks_per_edge = int((size//6) ** 0.5)
+    ranks_per_edge = int((size // 6) ** 0.5)
     layout = (ranks_per_edge, ranks_per_edge)
 
     store = zarr.storage.DirectoryStore(OUTPUT_PATH)
