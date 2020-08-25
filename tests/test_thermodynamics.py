@@ -19,7 +19,9 @@ class MockFv3GFS:
 
         state = {
             "delp": fv3gfs.util.Quantity(self.one, units="Pa", dims=self.dims),
-            "specific_humidity": fv3gfs.util.Quantity(self.one, units="", dims=self.dims),
+            "specific_humidity": fv3gfs.util.Quantity(
+                self.one, units="", dims=self.dims
+            ),
             "cloud_water_mixing_ratio": fv3gfs.util.Quantity(
                 self.one, units="", dims=self.dims
             ),
@@ -60,7 +62,11 @@ def test_set_state_mass_conserving_cant_set_delp():
 def test_set_state_mass_conserving_water_added():
     mock = MockFv3GFS()
     fv3gfs.wrapper.set_state_mass_conserving(
-        {"specific_humidity": fv3gfs.util.Quantity(2 * mock.one, dims=mock.dims, units="")},
+        {
+            "specific_humidity": fv3gfs.util.Quantity(
+                2 * mock.one, dims=mock.dims, units=""
+            )
+        },
         fv3gfs=mock,
         pressure="delp",
     )
