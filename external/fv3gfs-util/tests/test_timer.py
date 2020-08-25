@@ -67,3 +67,59 @@ def test_consecutive_clocks(timer):
             time.sleep(0.01)
         assert timer.times["label"] >= previous_time + 0.01
         previous_time = timer.times["label"]
+
+
+@pytest.mark.parametrize(
+    "ops, result",
+    [
+        ([], True),
+        (["enable"], True),
+        (["disable"], False),
+        (["disable", "enable"], True),
+        (["disable", "disable"], False),
+    ]
+)
+def test_enable_disable(timer, ops, result):
+    for op in ops:
+        getattr(timer, op)()
+    assert timer.enabled == result
+
+
+def test_disabled_timer_does_not_add_key(timer):
+    timer.disable()
+    with timer.clock("label1"):
+        time.sleep(0.01)
+    assert len(timer.times) == 0
+    with timer.clock("label2"):
+        time.sleep(0.01)
+    assert len(timer.times) == 0
+
+
+def test_disabled_timer_does_not_add_time(timer):
+    with timer.clock("label"):
+        time.sleep(0.01)
+    initial_time = timer.times["label"]
+    timer.disable()
+    with timer.clock("label"):
+        time.sleep(0.01)
+    assert timer.times["label"] == initial_time
+
+
+@pytest.fixture(params=["clean", "one_label", "two_labels"])
+def used_timer(request, timer):
+    if request.param == "clean":
+        return timer
+    elif request.param == "one_label":
+        with timer.clock("label1"):
+            time.sleep(0.01)
+        return timer
+    elif request.param == "two_labels":
+        with timer.clock("label1"):
+            time.sleep(0.01)
+        with timer.clock("label2"):
+            time.sleep(0.01)
+        return timer
+
+def test_timer_reset(used_timer):
+    used_timer.reset()
+    assert len(used_timer.times) == 0

@@ -321,9 +321,8 @@ class CubedSphereCommunicator(Communicator):
             quantity: the quantity to be updated
             n_points: how many halo points to update, starting from the interior
         """
-        with self.timer.clock("halo_update"):
-            req = self.start_halo_update(quantity, n_points)
-            req.wait()
+        req = self.start_halo_update(quantity, n_points)
+        req.wait()
 
     def start_halo_update(self, quantity: Quantity, n_points: int) -> HaloUpdateRequest:
         """Start an asynchronous halo update on a quantity.

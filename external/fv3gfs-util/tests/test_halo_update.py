@@ -163,7 +163,7 @@ def extent(n_points, dims, nz, ny, nx):
     return return_list
 
 
-@pytest.fixture()
+@pytest.fixture
 def communicator_list(cube_partitioner):
     shared_buffer = {}
     return_list = []
