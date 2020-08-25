@@ -76,8 +76,8 @@ COPY external/fv3util/fv3util/dynamics_properties.json external/fv3util/fv3util/
 COPY fill_templates.py HISTORY.md LICENSE Makefile MANIFEST.in README.md setup.cfg setup.py /fv3gfs-python/
 
 # make sources first, because -j8 doesn't propagate through setup.py layer
-RUN cd /fv3gfs-python/lib && \
-    make -j8
+# RUN cd /fv3gfs-python/lib && \
+#     make -j8
 
 COPY fv3gfs /fv3gfs-python/fv3gfs
 
@@ -87,7 +87,7 @@ RUN cd /fv3gfs-python && \
 
 
 #-----------------------------------------------------------------------------
-FROM $FORTRAN_ENV_IMAGE AS fv3gfs-dawn-build
+# FROM $FORTRAN_ENV_IMAGE AS fv3gfs-dawn-build
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
@@ -109,10 +109,11 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 10
 
 RUN pip install --no-cache-dir scikit-build && \
-    git clone https://github.com/MeteoSwiss-APN/dawn.git /usr/src/dawn && \
+    git clone https://github.com/MeteoSwiss-APN/dawn.git /usr/src/dawn  && \
     pip install --no-cache-dir /usr/src/dawn/dawn
 RUN pip wheel /usr/src/dawn/dawn
-RUN git clone --depth 1 -b fv3_validation https://github.com/eddie-c-davis/gt4py.git /usr/src/gt4py && \
+RUN git clone https://github.com/GridTools/gt4py.git /usr/src/gt4py && \
+    cd /usr/src/gt4py && git checkout e9fe299319c8d12a28bbc45135da76c427d7fa23 && \
     pip install --no-cache-dir -e /usr/src/gt4py && \
     cd /usr/src/gt4py && python -m gt4py.gt_src_manager install
 
@@ -190,8 +191,8 @@ RUN chmod -R 777 $FV3CONFIG_CACHE_DIR && \
     chmod -R 777 /outdir
 
 # install fv3core
-RUN cd /fv3gfs-python/external/fv3ser/ && \
-    python3 setup.py install
+RUN cd /fv3gfs-python/external/fv3core/ && \
+    python setup.py install
 
 # interactive shell by default
 CMD ["bash"]

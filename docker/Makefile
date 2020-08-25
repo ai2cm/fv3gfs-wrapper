@@ -9,7 +9,8 @@ BUILD_FROM_INTERMEDIATE ?= n
 FV3GFS_PYTHON_IMAGE = $(GCR_URL)/$(TARGET):$(TAG_NAME)
 FMS_IMAGE ?= $(GCR_URL)/fms-build
 ESMF_IMAGE ?= $(GCR_URL)/esmf-build
-DAWN_IMAGE ?= $(GCR_URL)/dawn-build
+DAWN_IMAGE ?= $(GCR_URL)/dawn-build:gt
+# DAWN_IMAGE ?= $(GCR_URL)/dawn-build
 
 FORTRAN_IMAGE = fv3gfs-fortran-build
 
@@ -37,11 +38,12 @@ ifeq ($(BUILD_FROM_INTERMEDIATE),y)
 else
 		docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-fms -t $(FMS_IMAGE) $(FORTRAN_ROOT)
 		docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-esmf -t $(ESMF_IMAGE) $(FORTRAN_ROOT)
-		docker build -f $(DOCKERFILE) --target fv3gfs-dawn -t $(DAWN_IMAGE) $(DAWN_BUILD_ARGS) .
+		COMPILED_IMAGE=$(FORTRAN_IMAGE) COMPILE_TARGET=fv3gfs-build $(MAKE) -C ../lib/external build
+		docker build -f $(DOCKERFILE) --target fv3gfs-dawn -t $(DAWN_IMAGE) $(DAWN_BUILD_ARGS) ..
 endif
 
 build_dawn:
-	docker build -f $(DOCKERFILE) --target fv3gfs-dawn -t $(DAWN_IMAGE) $(BUILD_ARGS) .
+	docker build -f $(DOCKERFILE) --target fv3gfs-dawn -t $(DAWN_IMAGE) $(BUILD_ARGS) ..
 
 
 push_deps:

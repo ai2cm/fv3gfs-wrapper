@@ -3,7 +3,8 @@ diag_table: default
 experiment_name: default
 forcing: gs://vcm-fv3config/data/base_forcing/v1.1/
 orographic_forcing: gs://vcm-fv3config/data/orographic_data/v1.0
-initial_conditions: gs://vcm-fv3config/data/initial_conditions/gfs_c12_example/v1.0 
+initial_conditions: gs://vcm-fv3config/data/initial_conditions/gfs_c12_example/v1.0
+field_table: gs://vcm-fv3config/config/field_table/TKE-EDMF/v1.0/field_table 
 namelist:
   amip_interp_nml:
     data_set: reynolds_oi
@@ -69,7 +70,7 @@ namelist:
     dt_ocean: 900
     hours: 0
     memuse_verbose: true
-    minutes: 30
+    minutes: 15
     months: 0
     ncores_per_node: 32
     seconds: 0
@@ -133,7 +134,7 @@ namelist:
     - 1
     make_nh: true
     mountain: false
-    n_split: 6
+    n_split: 1
     n_sponge: 4
     na_init: 1
     ncep_ic: false
@@ -153,7 +154,7 @@ namelist:
     range_warn: true
     reset_eta: false
     rf_cutoff: 800.0
-    rf_fast: false
+    rf_fast: true
     tau: 5.0
     use_hydro_pressure: false
     vtdm4: 0.06

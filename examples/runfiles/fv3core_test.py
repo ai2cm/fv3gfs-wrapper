@@ -26,7 +26,7 @@ import fv3core._config as spec
 #     turbulent_kinetic_energy = Quantity.from_data_array(arr)
 
 sys.path.append("/serialbox2/python")
-sys.path.append("/fv3gfs-python/external/fv3ser/tests/translate")
+sys.path.append("/fv3gfs-python/external/fv3core/tests/translate")
 import serialbox
 import translate
 
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     names = ["specific_humidity", "cloud_water_mixing_ratio", "rain_mixing_ratio", "snow_mixing_ratio", "cloud_ice_mixing_ratio", "graupel_mixing_ratio", "ozone_mixing_ratio", "cloud_amount", "turbulent_kinetic_energy", "cloud_fraction", "air_temperature", "pressure_thickness_of_atmospheric_layer", "vertical_thickness_of_atmospheric_layer", "logarithm_of_interface_pressure", "x_wind", "y_wind", "vertical_wind", "x_wind_on_a_grid", "y_wind_on_a_grid", "x_wind_on_c_grid", "y_wind_on_c_grid", "total_condensate_mixing_ratio", "interface_pressure", "surface_geopotential", "interface_pressure_raised_to_power_of_kappa", "finite_volume_mean_pressure_raised_to_power_of_kappa", "surface_pressure", "vertical_pressure_velocity", "atmosphere_hybrid_a_coordinate", "atmosphere_hybrid_b_coordinate", "accumulated_x_mass_flux", "accumulated_y_mass_flux", "accumulated_x_courant_number", "accumulated_y_courant_number", "dissipation_estimate_from_heat_source", "ptop", "ks", "timestep"]
 
     #get grid from serialized data
-    serializer = serialbox.Serializer(serialbox.OpenModeKind.Read, "/fv3gfs-python/external/fv3ser/test_data/c12_6ranks_standard", "Generator_rank" + str(rank))
+    serializer = serialbox.Serializer(serialbox.OpenModeKind.Read, "/fv3gfs-python/external/fv3core/test_data/c12_6ranks_standard", "Generator_rank" + str(rank))
     grid_savepoint = serializer.get_savepoint('Grid-Info')[0]
     grid_data = {}
     grid_fields = serializer.fields_at_savepoint(grid_savepoint)
@@ -80,6 +80,9 @@ if __name__ == "__main__":
     finite_volume_mean_pressure_raised_to_power_of_kappa = Quantity.from_data_array(xr.DataArray(arr, attrs={"fortran_name": "pkz", "units": "unknown"}, dims=["z", "y", "x"]))
 
     flags = fv3gfs.Flags()
+    print("HERE HERE HERE")
+    print(flags.ptop)
+    print("^^^^^^^^^")
     for i in range(fv3gfs.get_step_count()):
         if i==0:
             state = fv3gfs.get_state(names=names0)
