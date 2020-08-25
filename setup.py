@@ -26,7 +26,15 @@ relative_wrapper_build_filenames = [
     "lib/dynamics_data.o",
 ]
 
+wrapper_build_filenames = []
+for relative_filename in relative_wrapper_build_filenames:
+    wrapper_build_filenames.append(os.path.join(package_dir, relative_filename))
 
+# order of library link args matters
+# dependencies must be to the right of dependees
+# https://stackoverflow.com/questions/45135/why-does-the-order-in-which-libraries-are-linked-sometimes-cause-errors-in-gcc
+library_link_args = []
+library_link_args.extend(wrapper_build_filenames)
 library_link_args = pkgconfig.libs("fv3").split()
 
 mpi_flavor = os.environ.get("MPI", "openmpi")
@@ -34,6 +42,9 @@ if mpi_flavor == "openmpi":
     library_link_args += pkgconfig.libs("ompi-fort").split()
 else:
     library_link_args += pkgconfig.libs("mpich-fort").split()
+
+# need to include math and c library
+library_link_args += ["-lm", "-lc"]
 
 requirements = [
     "mpi4py",
@@ -60,18 +71,14 @@ if fv3gfs_build_path_environ_name in os.environ:
 else:
     fv3gfs_build_path = os.path.join(package_dir, "lib/external/FV3/")
 
-wrapper_build_filenames = []
-for relative_filename in relative_wrapper_build_filenames:
-    wrapper_build_filenames.append(os.path.join(package_dir, relative_filename))
 
 ext_modules = [
     Extension(  # module name:
         "fv3gfs._wrapper",
         # source file:
         ["lib/_wrapper.pyx"],
-        libraries=["c", "m", ],
         include_dirs=[get_include()],
-        extra_link_args=wrapper_build_filenames + library_link_args,
+        extra_link_args=library_link_args,
         depends=wrapper_build_filenames,
     )
 ]
