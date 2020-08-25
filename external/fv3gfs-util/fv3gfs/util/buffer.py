@@ -1,4 +1,4 @@
-from typing import Callable, Iterable
+from typing import Callable, Iterable, Optional
 from ._timing import Timer, NullTimer
 from numpy import ndarray
 import contextlib
@@ -36,7 +36,7 @@ def array_buffer(allocator: Callable, shape: Iterable[int], dtype: type):
 
 
 @contextlib.contextmanager
-def send_buffer(allocator: Callable, array: ndarray, timer: Timer = None):
+def send_buffer(allocator: Callable, array: ndarray, timer: Optional[Timer] = None):
     """A context manager ensuring that `array` is contiguous in a context where it is
     being sent as data, copying into a recycled buffer array if necessary.
 
@@ -66,7 +66,7 @@ def send_buffer(allocator: Callable, array: ndarray, timer: Timer = None):
 
 
 @contextlib.contextmanager
-def recv_buffer(allocator: Callable, array: ndarray, timer: Timer = None):
+def recv_buffer(allocator: Callable, array: ndarray, timer: Optional[Timer] = None):
     """A context manager ensuring that array is contiguous in a context where it is
     being used to receive data, using a recycled buffer array and then copying the
     result into array if necessary.
