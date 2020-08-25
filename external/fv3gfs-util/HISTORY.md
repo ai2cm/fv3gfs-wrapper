@@ -11,6 +11,7 @@ the fortran model, and accurate internal representation of times with the calend
 in the `coupler_nml` namelist.
 - `Timer` class is added, with methods `start` and `stop`, and properties `clock` (context manager), and `times` (dictionary of accumulated timing)
 - `CubedSphereCommunicator` instances now have a `.timer` attribute, which accumulates times for "pack", "unpack", "Isend", and "Recv" during halo updates
+- make `SubtileGridSizer.from_tile_params` public API
 
 v0.5.1
 ------
