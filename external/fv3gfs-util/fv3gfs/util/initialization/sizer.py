@@ -9,13 +9,13 @@ from ..partitioner import TilePartitioner
 class GridSizer:
 
     nx: int
-    """length of the x compute dimension on this process"""
+    """length of the x compute dimension for produced arrays"""
     ny: int
-    """length of the y compute dimension on this process"""
+    """length of the y compute dimension for produced arrays"""
     nz: int
-    """length of the z compute dimension"""
+    """length of the z compute dimension for produced arrays"""
     n_halo: int
-    """number of horizontal halo points"""
+    """number of horizontal halo points for produced arrays"""
     extra_dim_lengths: Dict[str, int]
     """lengths of any non-x/y/z dimensions, such as land or radiation dimensions"""
 
