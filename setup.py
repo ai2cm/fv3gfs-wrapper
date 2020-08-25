@@ -26,22 +26,14 @@ relative_wrapper_build_filenames = [
     "lib/dynamics_data.o",
 ]
 
+
+library_link_args = pkgconfig.libs("fv3").split()
+
 mpi_flavor = os.environ.get("MPI", "openmpi")
 if mpi_flavor == "openmpi":
-    mpi_fortran_lib = "-lmpi_mpifh"
+    library_link_args += pkgconfig.libs("ompi-fort").split()
 else:
-    mpi_fortran_lib = "-lmpifort"
-
-library_link_args = [
-    mpi_fortran_lib,
-    # "-lgfortran",
-    "-lmpi",
-    # "-lmvec",
-    # "-lpython3." + str(sys.version_info.minor) + "m",
-    # "-lblas",
-    # "-lc",
-    # "-lrt",
-] + pkgconfig.libs("fv3").split()
+    library_link_args += pkgconfig.libs("mpich-fort").split()
 
 requirements = [
     "mpi4py",
@@ -77,6 +69,7 @@ ext_modules = [
         "fv3gfs._wrapper",
         # source file:
         ["lib/_wrapper.pyx"],
+        libraries=["c", "m", ],
         include_dirs=[get_include()],
         extra_link_args=wrapper_build_filenames + library_link_args,
         depends=wrapper_build_filenames,
