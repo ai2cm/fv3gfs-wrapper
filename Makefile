@@ -109,7 +109,7 @@ build-docker:
 	BUILD_FROM_INTERMEDIATE=y $(MAKE) -C docker
 
 test-docker: build-docker
-	pytest ./tests/image_tests/*.py
+	./test_docker.sh
 
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .

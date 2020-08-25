@@ -133,9 +133,8 @@ RUN chmod -R 777 $FV3CONFIG_CACHE_DIR && \
     mkdir /outdir && \
     chmod -R 777 /outdir
 
-# test the image
+# copy the tests
 COPY tests /fv3gfs-wrapper/tests
-RUN make -C /fv3gfs-wrapper test
 
 # interactive shell by default
 CMD ["bash"]
