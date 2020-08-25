@@ -59,15 +59,15 @@ COPY --from=fv3gfs-esmf /usr/local/esmf/lib/libO3/Linux.gfortran.64.mpiuni.defau
 
 # copy wrapper and fortran sources
 # directory copy commands must be separate due to docker limitations
-COPY lib /fv3gfs-python/lib
-COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/stochastic_physics /fv3gfs-python/lib/external/stochastic_physics
-COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/FV3 /fv3gfs-python/lib/external/FV3
+COPY lib /fv3gfs-wrapper/lib
+COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/stochastic_physics /fv3gfs-wrapper/lib/external/stochastic_physics
+COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/FV3 /fv3gfs-wrapper/lib/external/FV3
 
-RUN PREFIX=/usr make -C /fv3gfs-python/lib/external/FV3 install
+RUN PREFIX=/usr make -C /fv3gfs-wrapper/lib/external/FV3 install
 
-COPY templates /fv3gfs-python/templates
-COPY examples /fv3gfs-python/examples
-COPY docs /fv3gfs-python/docs
+COPY templates /fv3gfs-wrapper/templates
+COPY examples /fv3gfs-wrapper/examples
+COPY docs /fv3gfs-wrapper/docs
 # files can be copied in one line
 COPY fv3gfs/wrapper/dynamics_properties.json fv3gfs/wrapper/physics_properties.json /fv3gfs-wrapper/fv3gfs/wrapper/
 COPY fill_templates.py HISTORY.md LICENSE Makefile MANIFEST.in README.md setup.cfg setup.py /fv3gfs-wrapper/
