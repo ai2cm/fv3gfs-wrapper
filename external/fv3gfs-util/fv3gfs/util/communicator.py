@@ -438,13 +438,12 @@ class CubedSphereCommunicator(Communicator):
                     x_data.shape,
                     y_data.shape,
                 )
-            with self.timer.clock("Isend"):
-                send_requests.append(
-                    self._Isend(x_quantity.np, x_data, dest=boundary.to_rank)
-                )
-                send_requests.append(
-                    self._Isend(y_quantity.np, y_data, dest=boundary.to_rank)
-                )
+            send_requests.append(
+                self._Isend(x_quantity.np, x_data, dest=boundary.to_rank)
+            )
+            send_requests.append(
+                self._Isend(y_quantity.np, y_data, dest=boundary.to_rank)
+            )
         return send_requests
 
     def _Isend(self, numpy, in_array, **kwargs):
@@ -456,30 +455,22 @@ class CubedSphereCommunicator(Communicator):
             return self.comm.Isend(array, **kwargs)
 
     def _Send(self, numpy, in_array, **kwargs):
-        self.timer.start("pack")
-        with send_buffer(numpy.empty, in_array) as sendbuf:
-            self.timer.stop("pack")
+        with send_buffer(numpy.empty, in_array, timer=self.timer) as sendbuf:
             self.comm.Send(sendbuf, **kwargs)
 
     def _Recv(self, numpy, out_array, **kwargs):
-        with recv_buffer(numpy.empty, out_array) as recvbuf:
+        with recv_buffer(numpy.empty, out_array, timer=self.timer) as recvbuf:
             with self.timer.clock("Recv"):
                 self.comm.Recv(recvbuf, **kwargs)
-            self.timer.start("unpack")
-        self.timer.stop("unpack")
 
     def _Irecv(self, numpy, out_array, **kwargs):
         # we can't perform a true Irecv because we need to receive the data into a
         # buffer and then copy that buffer into the output array. Instead we will
         # just do a Recv() when wait is called.
         def recv():
-            self.timer.start("unpack")
-            with recv_buffer(numpy.empty, out_array) as recvbuf:
-                self.timer.stop("unpack")
+            with recv_buffer(numpy.empty, out_array, timer=self.timer) as recvbuf:
                 with self.timer.clock("Recv"):
                     self.comm.Recv(recvbuf, **kwargs)
-                self.timer.start("unpack")
-            self.timer.stop("unpack")
 
         return FunctionRequest(recv)
 

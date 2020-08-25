@@ -57,3 +57,16 @@ class Timer:
     def enabled(self):
         return self._enabled
 
+
+
+class NullTimer(Timer):
+    """A Timer class which does not actually accumulate timings.
+
+    Meant to be used in place of an optional timer.
+    """
+
+    def start(self, name):
+        pass
+
+    def stop(self, name):
+        pass

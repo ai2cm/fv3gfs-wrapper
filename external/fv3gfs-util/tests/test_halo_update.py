@@ -489,6 +489,51 @@ def test_zeros_vector_halo_update(
                         )
 
 
+@pytest.mark.parametrize(
+    "layout, n_points, n_points_update, dims",
+    [[(1, 1), 3, "same", [fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM]]],
+    indirect=True,
+)
+def test_vector_halo_update_timer(
+    zeros_quantity_list,
+    communicator_list,
+    n_points_update,
+    n_points,
+    numpy,
+    subtests,
+    boundary_dict,
+    ranks_per_tile,
+):
+    """
+    test that halo update produces nonzero timings for all expected labels
+    """
+    x_list = zeros_quantity_list
+    y_list = copy.deepcopy(x_list)
+    req_list = []
+    for communicator, y_quantity, x_quantity in zip(
+        communicator_list, y_list, x_list
+    ):
+        req_list.append(
+            communicator.start_vector_halo_update(
+                y_quantity, x_quantity, n_points_update
+            )
+        )
+    for req in req_list:
+        req.wait()
+    required_times_keys = ("pack", "unpack", "Isend", "Recv")
+    for communicator in communicator_list:
+        with subtests.test(rank=communicator.rank):
+            assert isinstance(communicator.timer, fv3gfs.util.Timer)
+            times = communicator.timer.times
+            missing_keys = set(required_times_keys).difference(times.keys())
+            assert len(missing_keys) == 0
+            extra_keys = set(times.keys()).difference(required_times_keys)
+            assert len(extra_keys) == 0
+            for key in required_times_keys:
+                assert times[key] > 0.0
+                assert isinstance(times[key], float)
+
+
 def get_horizontal_dims(dims):
     for dim in fv3gfs.util.X_DIMS:
         if dim in dims:
