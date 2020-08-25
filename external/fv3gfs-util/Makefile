@@ -50,6 +50,9 @@ lint:
 	flake8 --ignore=F401 $(PYTHON_INIT_FILES)
 	@echo "LINTING SUCCESSFUL"
 
+clean:
+	$(MAKE) -c examples/runfiles clean
+
 reformat:
 	black $(PYTHON_FILES) $(PYTHON_INIT_FILES)
 
