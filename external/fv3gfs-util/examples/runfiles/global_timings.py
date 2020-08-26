@@ -4,6 +4,11 @@ import numpy as np
 import contextlib
 
 
+@contextlib.contextmanager
+def nullcontext():
+    yield
+
+
 def print_global_timings(times, comm, root=0):
     is_root = comm.Get_rank() == root
     recvbuf = np.array(0.0)
@@ -32,7 +37,7 @@ if __name__ == "__main__":
     # sometimes, you will need to trigger the start and end of the timer manually, if
     # the start and end cannot be represented by a context manager
     timer.start("context_manager")
-    with contextlib.nullcontext():
+    with nullcontext():
         timer.stop("context_manager")
 
     comm = MPI.COMM_WORLD
