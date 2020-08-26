@@ -41,7 +41,7 @@ test: ## run tests quickly with the default Python
 
 test_mpi:
 	mpirun -n 6 --allow-run-as-root --mca btl_vader_single_copy_mechanism none --oversubscribe pytest $(PYTEST_ARGS) tests/mpi
-	$(MAKE) -C examples/runfiles
+	$(MAKE) -C examples/mpi
 
 lint:
 	black --diff --check $(PYTHON_FILES) $(PYTHON_INIT_FILES)
@@ -49,6 +49,9 @@ lint:
 	# ignore unused import error in __init__.py files
 	flake8 --ignore=F401 $(PYTHON_INIT_FILES)
 	@echo "LINTING SUCCESSFUL"
+
+clean:
+	$(MAKE) -c examples/mpi clean
 
 reformat:
 	black $(PYTHON_FILES) $(PYTHON_INIT_FILES)
@@ -58,4 +61,4 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
 
-.PHONY: docs test lint reformat test_mpi coverage help
+.PHONY: docs clean test lint reformat test_mpi coverage help
