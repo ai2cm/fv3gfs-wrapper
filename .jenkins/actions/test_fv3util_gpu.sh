@@ -52,17 +52,17 @@ module load pycuda
 
 # run tests
 echo "### run tests"
-if [ ! -f external/fv3util/requirements.txt ] ; then
+if [ ! -f external/fv3gfs-util/requirements.txt ] ; then
     exitError 1205 ${LINENO} "could not find requirements.txt, run from top directory"
 fi
 python3 -m venv venv
 module unload cray-python
 module unload pycuda
 . ./venv/bin/activate
-pip3 install -r external/fv3util/requirements.txt
-pip3 install external/fv3util cupy-cuda101 pytest==5.4.3
+pip3 install -r external/fv3gfs-util/requirements.txt
+pip3 install external/fv3gfs-util cupy-cuda101 pytest==5.4.3
 pip3 install git+git://github.com/GridTools/gt4py.git@204838ea0e88a30b6eb41babbd58fb8a86d14a0e
-pytest --junitxml results.xml external/fv3util/tests
+pytest --junitxml results.xml external/fv3gfs-util/tests
 
 deactivate
 

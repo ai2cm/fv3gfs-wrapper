@@ -1,6 +1,9 @@
 import os
 from setuptools import setup, find_namespace_packages
 from distutils.extension import Extension
+
+# Specify these build requirements in pyproject.toml
+# https://www.python.org/dev/peps/pep-0518/
 from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 
@@ -35,7 +38,7 @@ for relative_filename in relative_wrapper_build_filenames:
 # https://stackoverflow.com/questions/45135/why-does-the-order-in-which-libraries-are-linked-sometimes-cause-errors-in-gcc
 library_link_args = []
 library_link_args.extend(wrapper_build_filenames)
-library_link_args = pkgconfig.libs("fv3").split()
+library_link_args += pkgconfig.libs("fv3").split()
 
 mpi_flavor = os.environ.get("MPI", "openmpi")
 if mpi_flavor == "openmpi":
@@ -44,19 +47,17 @@ else:
     library_link_args += pkgconfig.libs("mpich-fort").split()
 
 # need to include math and c library
-library_link_args += ["-lm", "-lc"]
+library_link_args += ["-lmvec", "-lc"]
 
 requirements = [
-    "mpi4py",
+    "mpi4py>=3",
     "cftime>=1.2.1",
     "xarray>=0.15.1",
     "netCDF4>=1.4.2",
-    "numpy",
-    "pyyaml",
+    "numpy>=1.16",
+    "pyyaml>=5",
     f"fv3gfs-util>=0.5.1",
 ]
-
-setup_requirements = ["cython", "numpy", "jinja2"]
 
 test_requirements = []
 
@@ -98,7 +99,6 @@ setup(
         "Programming Language :: Python :: 3.7",
     ],
     install_requires=requirements,
-    setup_requires=setup_requirements,
     tests_require=test_requirements,
     name="fv3gfs-wrapper",
     license="BSD license",
