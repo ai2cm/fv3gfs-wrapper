@@ -50,9 +50,6 @@ lint:
 	flake8 --ignore=F401 $(PYTHON_INIT_FILES)
 	@echo "LINTING SUCCESSFUL"
 
-clean:
-	$(MAKE) -c examples/runfiles clean
-
 reformat:
 	black $(PYTHON_FILES) $(PYTHON_INIT_FILES)
 
@@ -61,4 +58,4 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
 
-.PHONY: docs clean test lint reformat test_mpi coverage help
+.PHONY: docs test lint reformat test_mpi coverage help
