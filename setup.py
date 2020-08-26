@@ -50,12 +50,12 @@ else:
 library_link_args += ["-lmvec", "-lc"]
 
 requirements = [
-    "mpi4py",
+    "mpi4py>=3",
     "cftime>=1.2.1",
     "xarray>=0.15.1",
     "netCDF4>=1.4.2",
-    "numpy",
-    "pyyaml",
+    "numpy>=1.16",
+    "pyyaml>=5",
     f"fv3gfs-util>=0.5.1",
 ]
 

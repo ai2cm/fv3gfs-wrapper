@@ -63,7 +63,7 @@ COPY lib /fv3gfs-wrapper/lib
 COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/stochastic_physics /fv3gfs-wrapper/lib/external/stochastic_physics
 COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/FV3 /fv3gfs-wrapper/lib/external/FV3
 
-RUN PREFIX=/usr make -C /fv3gfs-wrapper/lib/external/FV3 install
+RUN PREFIX=/usr/local make -C /fv3gfs-wrapper/lib/external/FV3 install
 
 COPY templates /fv3gfs-wrapper/templates
 COPY examples /fv3gfs-wrapper/examples
