@@ -5,7 +5,7 @@ from datetime import timedelta
 import cftime
 import zarr
 
-OUTPUT_PATH = "output/zarr_monitor"
+OUTPUT_PATH = "output/zarr_monitor.zarr"
 
 
 def get_example_state(time):
