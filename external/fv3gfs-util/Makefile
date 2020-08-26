@@ -41,6 +41,7 @@ test: ## run tests quickly with the default Python
 
 test_mpi:
 	mpirun -n 6 --allow-run-as-root --mca btl_vader_single_copy_mechanism none --oversubscribe pytest $(PYTEST_ARGS) tests/mpi
+	$(MAKE) -C examples/runfiles
 
 lint:
 	black --diff --check $(PYTHON_FILES) $(PYTHON_INIT_FILES)
