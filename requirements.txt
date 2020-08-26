@@ -83,4 +83,4 @@ websocket-client==0.57.0
 xarray==0.16.0
 zarr==2.3.2
 zipp==0.5.2
-pkgconfig>=1.5.0
+pkgconfig==1.5.0
