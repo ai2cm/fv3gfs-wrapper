@@ -1,6 +1,9 @@
 import os
 from setuptools import setup, find_namespace_packages
 from distutils.extension import Extension
+
+# Specify these build requirements in pyproject.toml
+# https://www.python.org/dev/peps/pep-0518/
 from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 
@@ -56,8 +59,6 @@ requirements = [
     f"fv3gfs-util>=0.5.1",
 ]
 
-setup_requirements = ["cython", "numpy", "jinja2"]
-
 test_requirements = []
 
 with open("README.md") as readme_file:
@@ -98,7 +99,6 @@ setup(
         "Programming Language :: Python :: 3.7",
     ],
     install_requires=requirements,
-    setup_requires=setup_requirements,
     tests_require=test_requirements,
     name="fv3gfs-wrapper",
     license="BSD license",
