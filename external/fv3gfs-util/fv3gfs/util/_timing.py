@@ -1,6 +1,7 @@
 import contextlib
 from typing import Mapping
-from time import time
+from timeit import default_timer as time
+import warnings
 
 
 class Timer:
@@ -32,9 +33,11 @@ class Timer:
     @property
     def times(self) -> Mapping[str, float]:
         if len(self._clock_starts) > 0:
-            raise RuntimeError(
-                "Cannot retrieve times while clocks are still going: "
-                f"{list(self._clock_starts.keys())}"
+            warnings.warn(
+                "Retrieved times while clocks are still going, "
+                "incomplete times are not included: "
+                f"{list(self._clock_starts.keys())}",
+                RuntimeWarning,
             )
         return self._accumulated_time.copy()
 

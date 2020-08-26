@@ -13,3 +13,6 @@ zarr_monitor:
 clean:
 	$(RM) -r output/*
 	touch output/.gitkeep
+
+global_timings:
+	PMIX_MCA_gds=hash mpirun -n 4 python -m mpi4py global_timings.py
