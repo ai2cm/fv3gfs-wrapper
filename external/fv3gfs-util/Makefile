@@ -41,7 +41,7 @@ test: ## run tests quickly with the default Python
 
 test_mpi:
 	mpirun -n 6 --allow-run-as-root --mca btl_vader_single_copy_mechanism none --oversubscribe pytest $(PYTEST_ARGS) tests/mpi
-	$(MAKE) -C examples/runfiles
+	$(MAKE) -C examples/mpi
 
 lint:
 	black --diff --check $(PYTHON_FILES) $(PYTHON_INIT_FILES)
@@ -51,7 +51,7 @@ lint:
 	@echo "LINTING SUCCESSFUL"
 
 clean:
-	$(MAKE) -c examples/runfiles clean
+	$(MAKE) -c examples/mpi clean
 
 reformat:
 	black $(PYTHON_FILES) $(PYTHON_INIT_FILES)
