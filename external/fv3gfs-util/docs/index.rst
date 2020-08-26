@@ -1,8 +1,8 @@
 .. meta::
    :robots: noindex, nofollow
 
-Welcome to fv3util's documentation!
-======================================
+Welcome to fv3gfs-util's documentation!
+=======================================
 
 .. toctree::
    :maxdepth: 2
