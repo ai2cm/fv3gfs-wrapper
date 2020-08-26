@@ -7,7 +7,7 @@ PROPERTIES_FILES = ../fv3gfs/wrapper/dynamics_properties.json ../fv3gfs/wrapper/
 # If we run without PKG_CONFIG_ALLOW_SYSTEM_CFLAGS,
 # the -I/usr/include flag will be missing
 FFLAGS += $(shell PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1 pkg-config fv3 --cflags)
-FC = mpif90
+FC ?= mpif90
 
 .PHONY: clean cleanall fortran_libs
 
