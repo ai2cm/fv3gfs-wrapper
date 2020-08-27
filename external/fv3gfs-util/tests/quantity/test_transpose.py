@@ -100,7 +100,7 @@ def param_product(*param_lists):
             (2, 3),
             (fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM),
             (0, 1),
-            id="2d_keep_order"
+            id="2d_keep_order",
         ),
         pytest.param(
             (fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM),
@@ -109,7 +109,7 @@ def param_product(*param_lists):
             (2, 3),
             (fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM),
             (1, 0),
-            id="2d_transpose"
+            id="2d_transpose",
         ),
         pytest.param(
             (fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM),
@@ -118,7 +118,7 @@ def param_product(*param_lists):
             (2, 3, 4),
             (fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM),
             (0, 1, 2),
-            id="3d_keep_order"
+            id="3d_keep_order",
         ),
         pytest.param(
             (fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM),
@@ -127,7 +127,7 @@ def param_product(*param_lists):
             (2, 3, 4),
             (fv3gfs.util.X_DIMS, fv3gfs.util.Y_DIMS, fv3gfs.util.Z_DIMS),
             (0, 1, 2),
-            id="3d_keep_order_list_dims"
+            id="3d_keep_order_list_dims",
         ),
         pytest.param(
             (fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM),
@@ -136,7 +136,7 @@ def param_product(*param_lists):
             (2, 3, 4),
             (fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM),
             (2, 1, 0),
-            id="3d_transpose"
+            id="3d_transpose",
         ),
         pytest.param(
             (fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.Z_DIM),
@@ -145,10 +145,10 @@ def param_product(*param_lists):
             (2, 3, 4),
             (fv3gfs.util.Z_DIMS, fv3gfs.util.Y_DIMS, fv3gfs.util.X_DIMS),
             (2, 1, 0),
-            id="3d_transpose_list_dims"
+            id="3d_transpose_list_dims",
         ),
     ],
-    indirect=True
+    indirect=True,
 )
 @pytest.mark.parametrize("backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True)
 def test_transpose(
@@ -162,17 +162,12 @@ def test_transpose(
     assert result.units == quantity.units
     assert result.gt4py_backend == quantity.gt4py_backend
 
+
 @pytest.mark.parametrize(
     "initial_dims, initial_shape, initial_origin, initial_extent, target_dims, transpose_order",
     [
         pytest.param(
-            (fv3gfs.util.X_DIM,),
-            (6,),
-            (1,),
-            (2,),
-            (fv3gfs.util.Y_DIM,),
-            (0,),
-            id="1d"
+            (fv3gfs.util.X_DIM,), (6,), (1,), (2,), (fv3gfs.util.Y_DIM,), (0,), id="1d"
         ),
         pytest.param(
             (fv3gfs.util.X_DIM, fv3gfs.util.Y_INTERFACE_DIM),
@@ -181,7 +176,7 @@ def test_transpose(
             (2, 3),
             (fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM),
             (0, 1),
-            id="2d_switch_stagger"
+            id="2d_switch_stagger",
         ),
         pytest.param(
             (fv3gfs.util.X_DIM, fv3gfs.util.Y_DIM),
@@ -190,13 +185,13 @@ def test_transpose(
             (2, 3),
             (fv3gfs.util.Y_DIM, fv3gfs.util.X_INTERFACE_DIM),
             (1, 0),
-            id="2d_transpose_switch_stagger"
+            id="2d_transpose_switch_stagger",
         ),
     ],
-    indirect=True
+    indirect=True,
 )
 def test_transpose_invalid_cases(
     quantity, target_dims, final_data, final_dims, final_origin, final_extent, numpy
 ):
     with pytest.raises(ValueError):
-        result = quantity.transpose(target_dims)
+        quantity.transpose(target_dims)

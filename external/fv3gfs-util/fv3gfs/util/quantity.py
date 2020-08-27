@@ -427,7 +427,6 @@ class Quantity:
     def np(self) -> ModuleType:
         return self.metadata.np
 
-
     def transpose(self, target_dims: Sequence[Union[str, Iterable[str]]]) -> "Quantity":
         """Change the dimension order of this Quantity.
 
@@ -497,7 +496,6 @@ def _collapse_dims(target_dims, dims):
             else:
                 return_list.append(matches[0])
     return return_list
-
 
 
 def fill_index(index, length):
