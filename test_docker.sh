@@ -6,8 +6,6 @@ if [ -z "$DOCKER_IMAGE" ]; then
     DOCKER_IMAGE=us.gcr.io/vcm-ml/fv3gfs-wrapper
 fi
 
-./build_docker.sh
-
 pytest ./tests/image_tests/*.py
 
 if [[ "GOOGLE_APPLICATION_CREDENTIALS" == "" ]]
