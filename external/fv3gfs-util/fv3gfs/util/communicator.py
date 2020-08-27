@@ -277,6 +277,9 @@ class TileCommunicator(Communicator):
 class CubedSphereCommunicator(Communicator):
     """Performs communications within a cubed sphere"""
 
+    timer: Timer
+    partitioner: CubedSpherePartitioner
+
     def __init__(self, comm, partitioner: CubedSpherePartitioner):
         """Initialize a CubedSphereCommunicator.
         
