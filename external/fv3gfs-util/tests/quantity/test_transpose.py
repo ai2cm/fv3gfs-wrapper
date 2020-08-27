@@ -18,6 +18,17 @@ def initial_data(initial_shape, numpy):
 
 
 @pytest.fixture
+def quantity_data_input(initial_data, numpy, backend):
+    if "gt4py" in backend:
+        array = numpy.empty(initial_data.shape)
+        array[:] = initial_data
+    else:
+        array = initial_data
+    print(type(array))
+    return array
+
+
+@pytest.fixture
 def initial_origin(request):
     return request.param
 
@@ -58,9 +69,9 @@ def final_data(initial_data, transpose_order, numpy):
 
 
 @pytest.fixture
-def quantity(initial_data, initial_dims, initial_origin, initial_extent):
+def quantity(quantity_data_input, initial_dims, initial_origin, initial_extent):
     return fv3gfs.util.Quantity(
-        initial_data,
+        quantity_data_input,
         dims=initial_dims,
         units="unit_string",
         origin=initial_origin,
@@ -76,8 +87,6 @@ def param_product(*param_lists):
         for item in param_lists[0]:
             for later_items in param_product(*param_lists[1:]):
                 return_list.append([item] + later_items)
-    if len(param_lists) == 5:
-        print(return_list)
     return return_list
 
 
@@ -141,6 +150,7 @@ def param_product(*param_lists):
     ],
     indirect=True
 )
+@pytest.mark.parametrize("backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True)
 def test_transpose(
     quantity, target_dims, final_data, final_dims, final_origin, final_extent, numpy
 ):
@@ -150,6 +160,7 @@ def test_transpose(
     assert result.origin == final_origin
     assert result.extent == final_extent
     assert result.units == quantity.units
+    assert result.gt4py_backend == quantity.gt4py_backend
 
 @pytest.mark.parametrize(
     "initial_dims, initial_shape, initial_origin, initial_extent, target_dims, transpose_order",
