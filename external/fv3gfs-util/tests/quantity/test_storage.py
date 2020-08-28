@@ -74,14 +74,10 @@ def test_numpy(quantity, backend):
 
 @pytest.mark.parametrize("backend", ["gt4py_numpy", "gt4py_cupy"], indirect=True)
 def test_storage_exists(quantity, backend):
-    if gt4py is None:
-        with pytest.raises(ImportError):
-            quantity.storage
+    if "numpy" in backend:
+        assert isinstance(quantity.storage, gt4py.storage.storage.CPUStorage)
     else:
-        if "numpy" in backend:
-            assert isinstance(quantity.storage, gt4py.storage.storage.CPUStorage)
-        else:
-            assert isinstance(quantity.storage, gt4py.storage.storage.GPUStorage)
+        assert isinstance(quantity.storage, gt4py.storage.storage.GPUStorage)
 
 
 @pytest.mark.parametrize("backend", ["numpy", "cupy"], indirect=True)
