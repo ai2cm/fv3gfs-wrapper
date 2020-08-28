@@ -1,4 +1,4 @@
-from typing import Tuple, Iterable, Dict, Union
+from typing import Tuple, Iterable, Dict, Union, Sequence
 from types import ModuleType
 import warnings
 import dataclasses
@@ -298,7 +298,7 @@ class Quantity:
         data_array: xr.DataArray,
         origin: Iterable[int] = None,
         extent: Iterable[int] = None,
-    ):
+    ) -> "Quantity":
         """
         Initialize a Quantity from an xarray.DataArray.
 
@@ -426,6 +426,76 @@ class Quantity:
     @property
     def np(self) -> ModuleType:
         return self.metadata.np
+
+    def transpose(self, target_dims: Sequence[Union[str, Iterable[str]]]) -> "Quantity":
+        """Change the dimension order of this Quantity.
+
+        If you know you are working with cell-centered variables, you can do:
+
+        >>> from fv3gfs.util import X_DIM, Y_DIM, Z_DIM
+        >>> transposed_quantity = quantity.transpose([X_DIM, Y_DIM, Z_DIM])
+
+        To support re-ordering without checking whether quantities are on
+        cell centers or interfaces, the API supports giving a list of dimension names
+        for dimensions. For example, to re-order to X-Y-Z dimensions regardless of the
+        grid the variable is on, one could do:
+        
+        >>> from fv3gfs.util import X_DIMS, Y_DIMS, Z_DIMS
+        >>> transposed_quantity = quantity.transpose([X_DIMS, Y_DIMS, Z_DIMS])
+        
+        Args:
+            target_dims: a list of output dimensions. Instead of a single dimension
+                name, an iterable of dimensions can be used instead for any entries.
+                For example, you may want to use fv3gfs.util.X_DIMS to place an
+                x-dimension without knowing whether it is on cell centers or interfaces.
+
+        Returns:
+            transposed: Quantity with the requested output dimension order
+
+        Raises:
+            ValueError: if any of the target dimensions do not exist on this Quantity,
+                or if this Quantity contains multiple values from an iterable entry
+        """
+        target_dims = _collapse_dims(target_dims, self.dims)
+        transpose_order = [self.dims.index(dim) for dim in target_dims]
+        return Quantity(
+            self.np.transpose(self.data, transpose_order),
+            dims=transpose_sequence(self.dims, transpose_order),
+            units=self.units,
+            origin=transpose_sequence(self.origin, transpose_order),
+            extent=transpose_sequence(self.extent, transpose_order),
+            gt4py_backend=self.gt4py_backend,
+        )
+
+
+def transpose_sequence(sequence, order):
+    return sequence.__class__(sequence[i] for i in order)
+
+
+def _collapse_dims(target_dims, dims):
+    return_list = []
+    for target in target_dims:
+        if isinstance(target, str):
+            if target in dims:
+                return_list.append(target)
+            else:
+                raise ValueError(
+                    f"requested dimension {target} is not defined in "
+                    f"quantity dimensions {dims}"
+                )
+        elif isinstance(target, Iterable):
+            matches = [d for d in target if d in dims]
+            if len(matches) > 1:
+                raise ValueError(
+                    f"multiple matches for {target} found in quantity dimensions {dims}"
+                )
+            elif len(matches) == 0:
+                raise ValueError(
+                    f"no matches for {target} found in quantity dimensions {dims}"
+                )
+            else:
+                return_list.append(matches[0])
+    return return_list
 
 
 def fill_index(index, length):
