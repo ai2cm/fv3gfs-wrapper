@@ -52,9 +52,9 @@ if __name__ == "__main__":
     )
 
     #Set the names of quantities in State
-    names0 = ["specific_humidity", "cloud_water_mixing_ratio", "rain_mixing_ratio", "snow_mixing_ratio", "cloud_ice_mixing_ratio", "graupel_mixing_ratio", "ozone_mixing_ratio", "cloud_amount", "air_temperature", "pressure_thickness_of_atmospheric_layer", "vertical_thickness_of_atmospheric_layer", "logarithm_of_interface_pressure", "x_wind", "y_wind", "vertical_wind", "x_wind_on_c_grid", "y_wind_on_c_grid", "total_condensate_mixing_ratio", "interface_pressure", "surface_geopotential", "interface_pressure_raised_to_power_of_kappa", "surface_pressure", "vertical_pressure_velocity", "atmosphere_hybrid_a_coordinate", "atmosphere_hybrid_b_coordinate", "accumulated_x_mass_flux", "accumulated_y_mass_flux", "accumulated_x_courant_number", "accumulated_y_courant_number", "dissipation_estimate_from_heat_source"]
+    names0 = ["specific_humidity", "cloud_water_mixing_ratio", "rain_mixing_ratio", "snow_mixing_ratio", "cloud_ice_mixing_ratio", "graupel_mixing_ratio", "ozone_mixing_ratio", "cloud_fraction", "air_temperature", "pressure_thickness_of_atmospheric_layer", "vertical_thickness_of_atmospheric_layer", "logarithm_of_interface_pressure", "x_wind", "y_wind", "vertical_wind", "x_wind_on_c_grid", "y_wind_on_c_grid", "total_condensate_mixing_ratio", "interface_pressure", "surface_geopotential", "interface_pressure_raised_to_power_of_kappa", "surface_pressure", "vertical_pressure_velocity", "atmosphere_hybrid_a_coordinate", "atmosphere_hybrid_b_coordinate", "accumulated_x_mass_flux", "accumulated_y_mass_flux", "accumulated_x_courant_number", "accumulated_y_courant_number", "dissipation_estimate_from_heat_source", "eastward_wind", "northward_wind", "layer_mean_pressure_raised_to_power_of_kappa"] #, "turbulent_kinetic_energy", "x_wind_on_a_grid", "y_wind_on_a_grid", "finite_volume_mean_pressure_raised_to_power_of_kappa"
 
-    names = ["specific_humidity", "cloud_water_mixing_ratio", "rain_mixing_ratio", "snow_mixing_ratio", "cloud_ice_mixing_ratio", "graupel_mixing_ratio", "ozone_mixing_ratio", "cloud_amount", "turbulent_kinetic_energy", "cloud_fraction", "air_temperature", "pressure_thickness_of_atmospheric_layer", "vertical_thickness_of_atmospheric_layer", "logarithm_of_interface_pressure", "x_wind", "y_wind", "vertical_wind", "x_wind_on_a_grid", "y_wind_on_a_grid", "x_wind_on_c_grid", "y_wind_on_c_grid", "total_condensate_mixing_ratio", "interface_pressure", "surface_geopotential", "interface_pressure_raised_to_power_of_kappa", "finite_volume_mean_pressure_raised_to_power_of_kappa", "surface_pressure", "vertical_pressure_velocity", "atmosphere_hybrid_a_coordinate", "atmosphere_hybrid_b_coordinate", "accumulated_x_mass_flux", "accumulated_y_mass_flux", "accumulated_x_courant_number", "accumulated_y_courant_number", "dissipation_estimate_from_heat_source", "ptop", "ks", "timestep"]
+    names = ["specific_humidity", "cloud_water_mixing_ratio", "rain_mixing_ratio", "snow_mixing_ratio", "cloud_ice_mixing_ratio", "graupel_mixing_ratio", "ozone_mixing_ratio", "cloud_fraction", "turbulent_kinetic_energy", "air_temperature", "pressure_thickness_of_atmospheric_layer", "vertical_thickness_of_atmospheric_layer", "logarithm_of_interface_pressure", "x_wind", "y_wind", "vertical_wind", "eastward_wind", "northward_wind", "x_wind_on_c_grid", "y_wind_on_c_grid", "total_condensate_mixing_ratio", "interface_pressure", "surface_geopotential", "interface_pressure_raised_to_power_of_kappa", "layer_mean_pressure_raised_to_power_of_kappa", "surface_pressure", "vertical_pressure_velocity", "atmosphere_hybrid_a_coordinate", "atmosphere_hybrid_b_coordinate", "accumulated_x_mass_flux", "accumulated_y_mass_flux", "accumulated_x_courant_number", "accumulated_y_courant_number", "dissipation_estimate_from_heat_source"]
 
     #get grid from serialized data
     serializer = serialbox.Serializer(serialbox.OpenModeKind.Read, "/fv3gfs-python/external/fv3core/test_data/c12_6ranks_standard", "Generator_rank" + str(rank))
@@ -72,30 +72,32 @@ if __name__ == "__main__":
     fv3gfs.initialize()
 
     #add things to State
+    origin = (0, 3, 3)
+    extent = (spec.namelist["npz"], spec.namelist["npy"]-1, spec.namelist["npx"]-1)
     arr = np.zeros((spec.namelist["npz"]+1, spec.namelist["npy"]+6, spec.namelist["npx"]+6))
-    turbulent_kinetic_energy = Quantity.from_data_array(xr.DataArray(arr, attrs={"fortran_name": "qsgs_tke", "units": "m**2/s**2"}, dims=["z", "y", "x"]))
-    cloud_fraction = Quantity.from_data_array(xr.DataArray(arr, attrs={"fortran_name": "qcld", "units": ""}, dims=["z", "y", "x"]))
-    x_wind_on_a_grid = Quantity.from_data_array(xr.DataArray(arr, attrs={"fortran_name": "ua", "units": "m/s"}, dims=["z", "y", "x_interface"]))
-    y_wind_on_a_grid = Quantity.from_data_array(xr.DataArray(arr, attrs={"fortran_name": "va", "units": "m/s"}, dims=["z", "y_interface", "x"]))
-    finite_volume_mean_pressure_raised_to_power_of_kappa = Quantity.from_data_array(xr.DataArray(arr, attrs={"fortran_name": "pkz", "units": "unknown"}, dims=["z", "y", "x"]))
+    turbulent_kinetic_energy = Quantity.from_data_array(xr.DataArray(arr, attrs={"fortran_name": "qsgs_tke", "units": "m**2/s**2"}, dims=["z", "y", "x"]), origin=origin, extent=extent)
+    # x_wind_on_a_grid = Quantity.from_data_array(xr.DataArray(arr, attrs={"fortran_name": "ua", "units": "m/s"}, dims=["z", "y", "x_interface"]))
+    # y_wind_on_a_grid = Quantity.from_data_array(xr.DataArray(arr, attrs={"fortran_name": "va", "units": "m/s"}, dims=["z", "y_interface", "x"]))
+    # finite_volume_mean_pressure_raised_to_power_of_kappa = Quantity.from_data_array(xr.DataArray(arr, attrs={"fortran_name": "pkz", "units": "unknown"}, dims=["z", "y", "x"]))
+    # cloud_fraction = Quantity.from_data_array(xr.DataArray(arr, attrs={"fortran_name": "qcld", "units": ""}, dims=["z", "y", "x"]), origin=origin, extent=extent)
 
     flags = fv3gfs.Flags()
-    print("HERE HERE HERE")
-    print(flags.ptop)
-    print("^^^^^^^^^")
+    # print("HERE HERE HERE")
+    # print(flags.ptop)
+    # print("^^^^^^^^^")
     for i in range(fv3gfs.get_step_count()):
         if i==0:
             state = fv3gfs.get_state(names=names0)
             state["turbulent_kinetic_energy"] = turbulent_kinetic_energy
-            state["cloud_fraction"] = cloud_fraction
-            state["x_wind_on_a_grid"] = x_wind_on_a_grid
-            state["y_wind_on_a_grid"] = y_wind_on_a_grid
-            state["finite_volume_mean_pressure_raised_to_power_of_kappa"] = finite_volume_mean_pressure_raised_to_power_of_kappa
+            # state["x_wind_on_a_grid"] = x_wind_on_a_grid
+            # state["y_wind_on_a_grid"] = y_wind_on_a_grid
+            # state["finite_volume_mean_pressure_raised_to_power_of_kappa"] = finite_volume_mean_pressure_raised_to_power_of_kappa
         else:
             state = fv3gfs.get_state(names=names)
-        print(state["x_wind_on_c_grid"].storage.shape, state["surface_pressure"].storage.shape, state["accumulated_x_courant_number"].storage.shape, state["y_wind"].storage.shape)
-        print(type(state["atmosphere_hybrid_a_coordinate"].storage))
+        # print(state["x_wind_on_c_grid"].storage.shape, state["surface_pressure"].storage.shape, state["accumulated_x_courant_number"].storage.shape, state["y_wind"].storage.shape)
+        # print(type(state["atmosphere_hybrid_a_coordinate"].storage))
         fv3core.fv_dynamics(state, cube_comm, flags.consv_te, flags.do_adiabatic_init, dt_atmos, flags.ptop, flags.n_split, flags.ks)
+        # print(state["x_wind_on_a_grid"].dims, len(state["x_wind_on_a_grid"].dims))
         fv3gfs.set_state(state)
         fv3gfs.step_physics()
         fv3gfs.save_intermediate_restart_if_enabled()
