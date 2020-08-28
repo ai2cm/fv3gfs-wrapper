@@ -1,7 +1,7 @@
 import sys
 import fv3gfs
 import fv3core
-from fv3util import Quantity
+from fv3util import Quantity, X_DIMS, Y_DIMS, Z_DIMS
 import numpy as np
 import xarray as xr
 import yaml
@@ -92,6 +92,9 @@ if __name__ == "__main__":
             # state["x_wind_on_a_grid"] = x_wind_on_a_grid
             # state["y_wind_on_a_grid"] = y_wind_on_a_grid
             # state["finite_volume_mean_pressure_raised_to_power_of_kappa"] = finite_volume_mean_pressure_raised_to_power_of_kappa
+            #just gotta make sure everything is the right shape...
+            for quant in state.keys():
+                state[quant] = state[quant].transpose([X_DIMS, Y_DIMS, Z_DIMS])
         else:
             state = fv3gfs.get_state(names=names)
         # print(state["x_wind_on_c_grid"].storage.shape, state["surface_pressure"].storage.shape, state["accumulated_x_courant_number"].storage.shape, state["y_wind"].storage.shape)
