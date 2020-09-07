@@ -66,16 +66,10 @@ set +e
 command -v run_script 2>&1 1>/dev/null
 exit_status=$?
 set -e
-echo "========="
-echo "exit_status=${exit_status}"
-echo "pwd=`pwd`"
-echo "ls=`/bin/ls`"
-echo "========="
 if [ $exit_status -eq 0 ] ; then
     run_script "${cmd}"
 else
-    /bin/ls ./venv/bin
-    ${cmd}
+    eval ${cmd}
 fi
 
 # end timer and report time taken
