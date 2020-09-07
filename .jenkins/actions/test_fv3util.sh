@@ -62,7 +62,13 @@ pip3 install -e external/fv3gfs-util
 deactivate
 
 # run tests
-run_script "source venv/bin/activate; pytest --junitxml results.xml external/fv3gfs-util/tests"
+cmd="source venv/bin/activate; pytest --junitxml results.xml external/fv3gfs-util/tests"
+command -v run_script 2>&1 1>/dev/null
+if [ $? -eq 0 ] ; then
+    run_script "source venv/bin/activate; pytest --junitxml results.xml external/fv3gfs-util/tests"
+else
+    ${cmd}
+fi
 
 # end timer and report time taken
 T="$(($(date +%s)-T))"

@@ -56,9 +56,6 @@ popd > /dev/null
 test -f ${envloc}/env/machineEnvironment.sh || exitError 1201 ${LINENO} "cannot find machineEnvironment.sh script"
 . ${envloc}/env/machineEnvironment.sh
 
-# check that host (define in machineEnvironment.sh) and slave are consistent
-echo ${host} | grep "${shortslave}" || exitError 1006 ${LINENO} "host does not contain slave"
-
 # get root directory of where jenkins.sh is sitting
 root=`dirname $0`
 
