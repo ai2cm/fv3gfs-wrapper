@@ -47,6 +47,33 @@ T="$(date +%s)"
 # parse command line options (pass all of them to function)
 parseOptions $*
 
+# check presence of env directory
+pushd `dirname $0` > /dev/null
+envloc=`/bin/pwd`/..
+popd > /dev/null
+
+# Download the env
+. ${envloc}/env.sh
+
+# setup module environment and default queue
+if [ ! -f ${envloc}/env/machineEnvironment.sh ] ; then
+    echo "Error 1201 test.sh ${LINENO}: Could not find ${envloc}/env/machineEnvironment.sh"
+    exit 1
+fi
+. ${envloc}/env/machineEnvironment.sh
+
+# load machine dependent environment
+if [ ! -f ${envloc}/env/env.${host}.sh ] ; then
+    exitError 1202 ${LINENO} "could not find ${envloc}/env/env.${host}.sh"
+fi
+. ${envloc}/env/env.${host}.sh
+
+# load scheduler tools
+if [ ! -f ${envloc}/env/schedulerTools.sh ] ; then
+    exitError 1203 ${LINENO} "could not find ${envloc}/env/schedulerTools.sh"
+fi
+. ${envloc}/env/schedulerTools.sh
+
 # setup virtual environment
 echo "### install venv"
 if [ ! -f external/fv3gfs-util/requirements.txt ] ; then
