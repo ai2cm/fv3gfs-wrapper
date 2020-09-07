@@ -74,6 +74,7 @@ echo "========="
 if [ $exit_status -eq 0 ] ; then
     run_script "${cmd}"
 else
+    /bin/ls ./venv/bin
     ${cmd}
 fi
 
