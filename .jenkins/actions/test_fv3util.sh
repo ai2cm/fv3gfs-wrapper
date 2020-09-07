@@ -45,14 +45,13 @@ T="$(date +%s)"
 # parse command line options (pass all of them to function)
 parseOptions $*
 
-
-# run tests
+# setup virtual environment
 echo "### run tests"
 if [ ! -f external/fv3gfs-util/requirements.txt ] ; then
     exitError 1205 ${LINENO} "could not find requirements.txt, run from top directory"
 fi
 python3 -m venv venv
-. ./venv/bin/activate
+source ./venv/bin/activate
 pip3 install --upgrade pip setuptools wheel
 pip3 install -r external/fv3gfs-util/requirements.txt
 if [ "${target}" == "gpu" ] ; then
@@ -62,13 +61,18 @@ pip3 install -e external/fv3gfs-util
 deactivate
 
 # run tests
-cmd="source venv/bin/activate; pytest --junitxml results.xml external/fv3gfs-util/tests"
+cmd="source ./venv/bin/activate; pytest --junitxml results.xml external/fv3gfs-util/tests"
 set +e
 command -v run_script 2>&1 1>/dev/null
 exit_status=$?
 set -e
+echo "========="
+echo "exit_status=${exit_status}"
+echo "pwd=`pwd`"
+echo "ls=`/bin/ls`"
+echo "========="
 if [ $exit_status -eq 0 ] ; then
-    run_script "source venv/bin/activate; pytest --junitxml results.xml external/fv3gfs-util/tests"
+    run_script "${cmd}"
 else
     ${cmd}
 fi
