@@ -46,7 +46,7 @@ T="$(date +%s)"
 parseOptions $*
 
 # setup virtual environment
-echo "### run tests"
+echo "### install venv"
 if [ ! -f external/fv3gfs-util/requirements.txt ] ; then
     exitError 1205 ${LINENO} "could not find requirements.txt, run from top directory"
 fi
@@ -61,6 +61,7 @@ pip3 install -e external/fv3gfs-util
 deactivate
 
 # run tests
+echo "### run tests"
 cmd="source ./venv/bin/activate; pytest --junitxml results.xml external/fv3gfs-util/tests"
 set +e
 command -v run_script 2>&1 1>/dev/null
