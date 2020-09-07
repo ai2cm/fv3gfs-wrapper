@@ -65,8 +65,9 @@ deactivate
 cmd="source venv/bin/activate; pytest --junitxml results.xml external/fv3gfs-util/tests"
 set +e
 command -v run_script 2>&1 1>/dev/null
+exit_status=$?
 set -e
-if [ $? -eq 0 ] ; then
+if [ $exit_status -eq 0 ] ; then
     run_script "source venv/bin/activate; pytest --junitxml results.xml external/fv3gfs-util/tests"
 else
     ${cmd}
