@@ -68,6 +68,11 @@ if [ ! -f ${envloc}/env/env.${host}.sh ] ; then
 fi
 . ${envloc}/env/env.${host}.sh
 
+# load scheduler tools
+if [ ! -f ${envloc}/env/schedulerTools.sh ] ; then
+    exitError 1203 ${LINENO} "could not find ${envloc}/env/schedulerTools.sh"
+fi
+. ${envloc}/env/schedulerTools.sh
 
 # check if action script exists
 script="${root}/actions/${action}.sh"

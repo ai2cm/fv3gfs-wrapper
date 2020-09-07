@@ -49,16 +49,20 @@ parseOptions $*
 # run tests
 echo "### run tests"
 if [ ! -f external/fv3gfs-util/requirements.txt ] ; then
-    exitError 1205 ${LINENO} "could not find requirements_dev.txt, run from top directory"
+    exitError 1205 ${LINENO} "could not find requirements.txt, run from top directory"
 fi
 python3 -m venv venv
 . ./venv/bin/activate
 pip3 install --upgrade pip setuptools wheel
 pip3 install -r external/fv3gfs-util/requirements.txt
+if [ "${target}" == "gpu" ] ; then
+    pip3 install cupy-cuda101
+fi
 pip3 install -e external/fv3gfs-util
-pytest --junitxml results.xml external/fv3gfs-util/tests
-
 deactivate
+
+# run tests
+run_script "source venv/bin/activate; pytest --junitxml results.xml external/fv3gfs-util/tests"
 
 # end timer and report time taken
 T="$(($(date +%s)-T))"
