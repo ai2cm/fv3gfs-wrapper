@@ -92,13 +92,11 @@ echo "### run tests"
 cmd="source ./venv/bin/activate; pytest --junitxml results.xml external/fv3gfs-util/tests"
 command -v run_command 2>&1 1>/dev/null
 exit_status=$?
-set -e
 if [ $exit_status -eq 0 ] ; then
     run_command "${cmd}"
 else
     eval ${cmd}
 fi
-set +e
 
 # end timer and report time taken
 T="$(($(date +%s)-T))"
