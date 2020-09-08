@@ -1,5 +1,4 @@
 #!/bin/bash -f
-set -e
 
 ##################################################
 # functions
@@ -76,6 +75,7 @@ echo "### install venv"
 if [ ! -f external/fv3gfs-util/requirements.txt ] ; then
     exitError 1205 ${LINENO} "could not find requirements.txt, run from top directory"
 fi
+set -e
 python3 -m venv venv
 source ./venv/bin/activate
 pip3 install --upgrade pip setuptools wheel
@@ -85,11 +85,11 @@ if [ "${target}" == "gpu" ] ; then
 fi
 pip3 install -e external/fv3gfs-util
 deactivate
+set +e
 
 # run tests
 echo "### run tests"
 cmd="source ./venv/bin/activate; pytest --junitxml results.xml external/fv3gfs-util/tests"
-set +e
 command -v run_script 2>&1 1>/dev/null
 exit_status=$?
 set -e
@@ -98,6 +98,7 @@ if [ $exit_status -eq 0 ] ; then
 else
     eval ${cmd}
 fi
+set +e
 
 # end timer and report time taken
 T="$(($(date +%s)-T))"
