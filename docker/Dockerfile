@@ -62,23 +62,18 @@ COPY --from=fv3gfs-esmf /usr/local/esmf/lib/libO3/Linux.gfortran.64.mpiuni.defau
 COPY lib /fv3gfs-wrapper/lib
 COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/stochastic_physics /fv3gfs-wrapper/lib/external/stochastic_physics
 COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/FV3 /fv3gfs-wrapper/lib/external/FV3
+
+RUN PREFIX=/usr/local make -C /fv3gfs-wrapper/lib/external/FV3 install
+
 COPY templates /fv3gfs-wrapper/templates
 COPY examples /fv3gfs-wrapper/examples
 COPY docs /fv3gfs-wrapper/docs
 # files can be copied in one line
 COPY fv3gfs/wrapper/dynamics_properties.json fv3gfs/wrapper/physics_properties.json /fv3gfs-wrapper/fv3gfs/wrapper/
 COPY fill_templates.py HISTORY.md LICENSE Makefile MANIFEST.in README.md setup.cfg setup.py /fv3gfs-wrapper/
-
-# make sources first, because -j8 doesn't propagate through setup.py layer
-RUN cd /fv3gfs-wrapper/lib && \
-    make -j8
-
 COPY fv3gfs /fv3gfs-wrapper/fv3gfs
 
-# compile wrapper
-RUN cd /fv3gfs-wrapper && \
-    make build
-
+RUN make -C /fv3gfs-wrapper build
 
 #-----------------------------------------------------------------------------
 FROM $FORTRAN_ENV_IMAGE AS fv3gfs-dawn-build
@@ -115,31 +110,14 @@ RUN git clone --depth 1 -b fv3_validation https://github.com/eddie-c-davis/gt4py
 FROM $DAWN_IMAGE AS fv3gfs-dawn
 
 #-----------------------------------------------------------------------------
-FROM fv3gfs-wrapper-env AS fv3gfs-wrapper
+FROM fv3gfs-wrapper-build AS fv3gfs-wrapper
 
-ENV FMS_DIR=/FMS
-ENV ESMF_DIR=/esmf
-ENV ESMF_INC="-I${ESMF_DIR}/include -I${ESMF_DIR}/mod/modO3/Linux.gfortran.64.mpiuni.default/"
-
-ENV FMS_LIB=${FMS_DIR}/libFMS/.libs/
-ENV ESMF_LIB=${ESMF_DIR}/lib/libO3/Linux.gfortran.64.mpiuni.default/
-ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ESMF_LIB}:${FMS_LIB}
-
-ENV FV3CONFIG_CACHE_DIR=/inputdata
-
-COPY --from=fv3gfs-fms /FMS $FMS_DIR
-COPY --from=fv3gfs-esmf /usr/local/esmf ${ESMF_DIR}
-COPY --from=fv3gfs-fms /FMS/libFMS/.libs/*.so* /lib64/
-COPY --from=fv3gfs-esmf /usr/local/esmf/lib/libO3/Linux.gfortran.64.mpiuni.default/*.so* /lib64/
+# Install Dawn and gt4py
 COPY --from=fv3gfs-dawn /usr/src/dawn /usr/src/dawn
 COPY --from=fv3gfs-dawn /dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
 COPY --from=fv3gfs-dawn /usr/src/gt4py /usr/src/gt4py
-
 RUN pip3 install --no-deps --no-cache-dir /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
 RUN pip3 install --no-deps --no-cache-dir /usr/src/gt4py
-
-COPY --from=fv3gfs-wrapper-build /fv3gfs-wrapper /fv3gfs-wrapper
-COPY tests /fv3gfs-wrapper/tests
 
 # copy and install dependency packages
 COPY external /fv3gfs-wrapper/external
@@ -147,12 +125,16 @@ COPY requirements_local.txt /fv3gfs-wrapper/requirements_local.txt
 RUN cd /fv3gfs-wrapper && pip3 install --no-deps --no-cache-dir -r /fv3gfs-wrapper/requirements_local.txt
 
 # cache model data
+ENV FV3CONFIG_CACHE_DIR=/inputdata
 COPY --from=fv3config-inputdata /fv3config-cache $FV3CONFIG_CACHE_DIR/fv3config-cache
 
 RUN chmod -R 777 $FV3CONFIG_CACHE_DIR && \
     echo "ulimit -s unlimited" >> /etc/bash.bashrc && \
     mkdir /outdir && \
     chmod -R 777 /outdir
+
+# copy the tests
+COPY tests /fv3gfs-wrapper/tests
 
 # interactive shell by default
 CMD ["bash"]

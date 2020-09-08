@@ -19,8 +19,8 @@ This package uses submodules. After you check out the repository, you must run
 Local Machine Installation
 --------------------------
 
-The Docker image can be built using `build_docker.sh`, or built and then
-tested using `test_docker.sh` (which will use the existing build if present).
+The Docker image can be built using `make build-docker`, or built and then
+tested using `make test-docker` (which will use the existing build if present).
 The first time you build, both ESMF and FMS will be
 built, taking up quite a lot of time. On subsequent builds, these may be retrieved
 from cached images, if you allow caching on your system.
@@ -66,7 +66,7 @@ docker image with bind-mounts into your local filesystem. Just be sure to `make 
 when you're done to remove the build artifacts, or it may cause problems when you
 build the docker image.
 
-With the image already built by `build_docker.sh` or pulled using
+With the image already built by `make build-docker` or pulled using
 `docker pull us.gcr.io/vcm-ml/fv3gfs-wrapper`, run `dev_docker.sh`. This will
 bind-mount the `fv3gfs`, `lib`, `tests`, `external`, and `templates` directories into the
 docker image. Inside the docker image, you can build or re-build the model with
