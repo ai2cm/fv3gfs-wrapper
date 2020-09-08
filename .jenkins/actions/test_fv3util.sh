@@ -1,7 +1,5 @@
 #!/bin/bash -f
 
-set -e
-
 ##################################################
 # functions
 ##################################################
@@ -45,20 +43,54 @@ T="$(date +%s)"
 # parse command line options (pass all of them to function)
 parseOptions $*
 
+# check presence of env directory
+pushd `dirname $0` > /dev/null
+envloc=`/bin/pwd`/..
+popd > /dev/null
+
+# Download the env
+. ${envloc}/env.sh
+
+# setup module environment and default queue
+if [ ! -f ${envloc}/env/machineEnvironment.sh ] ; then
+    echo "Error 1201 test.sh ${LINENO}: Could not find ${envloc}/env/machineEnvironment.sh"
+    exit 1
+fi
+. ${envloc}/env/machineEnvironment.sh
+
+# load machine dependent environment
+if [ ! -f ${envloc}/env/env.${host}.sh ] ; then
+    exitError 1202 ${LINENO} "could not find ${envloc}/env/env.${host}.sh"
+fi
+. ${envloc}/env/env.${host}.sh
+
+# load scheduler tools
+if [ ! -f ${envloc}/env/schedulerTools.sh ] ; then
+    exitError 1203 ${LINENO} "could not find ${envloc}/env/schedulerTools.sh"
+fi
+. ${envloc}/env/schedulerTools.sh
+
+# setup virtual environment
+echo "### install venv"
+if [ ! -f external/fv3gfs-util/requirements.txt ] ; then
+    exitError 1205 ${LINENO} "could not find requirements.txt, run from top directory"
+fi
+set -e
+python3 -m venv venv
+source ./venv/bin/activate
+pip3 install --upgrade pip setuptools wheel
+pip3 install -r external/fv3gfs-util/requirements.txt
+if [ "${target}" == "gpu" ] ; then
+    pip3 install cupy-cuda101
+fi
+pip3 install -e external/fv3gfs-util
+deactivate
+set +e
 
 # run tests
 echo "### run tests"
-if [ ! -f external/fv3gfs-util/requirements.txt ] ; then
-    exitError 1205 ${LINENO} "could not find requirements_dev.txt, run from top directory"
-fi
-python3 -m venv venv
-. ./venv/bin/activate
-pip3 install --upgrade pip setuptools wheel
-pip3 install -r external/fv3gfs-util/requirements.txt
-pip3 install -e external/fv3gfs-util
-pytest --junitxml results.xml external/fv3gfs-util/tests
-
-deactivate
+cmd="source ./venv/bin/activate; pytest --junitxml results.xml external/fv3gfs-util/tests"
+run_command "${cmd}" # run_command() is provded by schedulerTools.sh above
 
 # end timer and report time taken
 T="$(($(date +%s)-T))"
