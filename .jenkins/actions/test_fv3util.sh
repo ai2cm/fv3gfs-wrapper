@@ -90,7 +90,7 @@ set +e
 # run tests
 echo "### run tests"
 cmd="source ./venv/bin/activate; pytest --junitxml results.xml external/fv3gfs-util/tests"
-run_command "${cmd}"
+run_command "${cmd}" # run_command() is provded by schedulerTools.sh above
 
 # end timer and report time taken
 T="$(($(date +%s)-T))"
