@@ -1,0 +1,4 @@
+# credit: https://stackoverflow.com/questions/60045913/installing-numpy-before-using-numpy-distutils-core-setup
+[build-system]
+build-backend = "setuptools.build_meta"
+requires=["numpy", "setuptools", "cython", "pkgconfig", "wheel"]

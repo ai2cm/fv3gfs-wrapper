@@ -58,7 +58,7 @@ def namelist(nx_tile, ny_tile, nz, layout):
 @pytest.fixture(params=["from_namelist", "from_tile_params"])
 def sizer(request, nx_tile, ny_tile, nz, layout, namelist, extra_dimension_lengths):
     if request.param == "from_tile_params":
-        sizer = fv3gfs.util.SubtileGridSizer._from_tile_params(
+        sizer = fv3gfs.util.SubtileGridSizer.from_tile_params(
             nx_tile,
             ny_tile,
             nz,

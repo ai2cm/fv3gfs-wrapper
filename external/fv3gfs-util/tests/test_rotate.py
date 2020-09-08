@@ -5,7 +5,10 @@ import numpy as np
 
 @pytest.fixture
 def start_data(request, numpy):
-    return numpy.asarray(request.param)
+    if isinstance(request.param, tuple):
+        return tuple(numpy.asarray(item) for item in request.param)
+    else:
+        return numpy.asarray(request.param)
 
 
 @pytest.mark.parametrize(
