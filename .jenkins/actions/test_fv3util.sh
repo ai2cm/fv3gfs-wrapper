@@ -94,7 +94,6 @@ command -v run_command 2>&1 1>/dev/null
 exit_status=$?
 set -e
 if [ $exit_status -eq 0 ] ; then
-    set -x
     run_command "${cmd}"
 else
     eval ${cmd}
