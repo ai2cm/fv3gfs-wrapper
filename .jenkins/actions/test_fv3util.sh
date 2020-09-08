@@ -57,6 +57,7 @@ if [ ! -f ${envloc}/env/machineEnvironment.sh ] ; then
     echo "Error 1201 test.sh ${LINENO}: Could not find ${envloc}/env/machineEnvironment.sh"
     exit 1
 fi
+echo CIRCLECI=${CIRCLECI}
 . ${envloc}/env/machineEnvironment.sh
 
 # load machine dependent environment
