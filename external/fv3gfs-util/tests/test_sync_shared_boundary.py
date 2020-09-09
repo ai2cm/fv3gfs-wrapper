@@ -79,6 +79,7 @@ def rank_quantity_list(total_ranks, numpy, dtype, units=units):
     return quantity_list
 
 
+@pytest.fixture
 def rank_target_list(total_ranks, numpy):
     return_list = []
     for rank in range(total_ranks):
