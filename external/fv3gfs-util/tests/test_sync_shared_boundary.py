@@ -84,18 +84,14 @@ def rank_target_list(total_ranks, numpy):
     for rank in range(total_ranks):
         if rank % 2 == 0:
             target_x = (
-                numpy.array([[rank, rank], [rank, rank], [rank + 2, rank + 2],]) % 6
+                numpy.array([[rank, rank], [rank, rank], [rank + 2, rank + 2]]) % 6
             )
-            target_y = (
-                numpy.array([[rank, rank, rank + 1], [rank, rank, rank + 1],]) % 6
-            )
+            target_y = numpy.array([[rank, rank, rank + 1], [rank, rank, rank + 1]]) % 6
         else:
             target_x = (
-                numpy.array([[rank, rank], [rank, rank], [rank + 1, rank + 1],]) % 6
+                numpy.array([[rank, rank], [rank, rank], [rank + 1, rank + 1]]) % 6
             )
-            target_y = (
-                numpy.array([[rank, rank, rank + 2], [rank, rank, rank + 2],]) % 6
-            )
+            target_y = numpy.array([[rank, rank, rank + 2], [rank, rank, rank + 2]]) % 6
         return_list.append((target_x, target_y))
     return return_list
 
