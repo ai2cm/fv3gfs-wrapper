@@ -7,7 +7,3 @@
 [submodule "external/fv3util"]
 	path = external/fv3util
 	url = git@github.com:VulcanClimateModeling/fv3util.git
-[submodule "external/fv3core"]
-	path = external/fv3core
-	url = git@github.com:VulcanClimateModeling/fv3core.git
-	branch = master
