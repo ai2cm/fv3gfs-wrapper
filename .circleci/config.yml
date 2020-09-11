@@ -61,7 +61,7 @@ jobs:
             echo $ENCODED_GCR_KEY | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS
       - add_ssh_keys:
           fingerprints:
-            - "31:b8:08:52:8e:57:56:7d:ee:4b:fe:15:7c:d7:06:9e"  # pull fv3gfs-util
+            - "dd:76:98:a1:2c:ec:29:0d:7e:3e:fd:57:c5:4e:a2:8f"  # github user key
       - run:
           name: "Pull submodules"
           command: |
