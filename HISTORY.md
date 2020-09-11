@@ -19,6 +19,7 @@ model.
 
 Minor changes:
 - added jenkins scripts under .jenkins
+- Dawn is removed from the fv3gfs-wrapper test image
 
 v0.5.0 (2020-07-28)
 ------
