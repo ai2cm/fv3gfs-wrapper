@@ -76,10 +76,10 @@ namelist:
     dt_ocean: 225
     hours: 0
     memuse_verbose: false
-    minutes: 7 
+    minutes: 3 
     months: 0
     ncores_per_node: 32
-    seconds: 30
+    seconds: 45
     use_hyper_thread: false
   diag_manager_nml:
     max_axes: 240
