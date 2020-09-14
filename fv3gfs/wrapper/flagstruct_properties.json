@@ -1,0 +1,42 @@
+[
+    {
+        "name": "n_split",
+        "fortran_name" : "n_split",
+        "location" : "flagstruct",
+        "type_fortran": "integer",
+        "type_c": "c_int",
+        "type_cyth": "int"
+    },
+    {
+        "name": "consv_te",
+        "fortran_name" : "consv_te",
+        "location" : "flagstruct",
+        "type_fortran": "real",
+        "type_c": "c_double",
+        "type_cyth": "REAL_t"
+    },
+    {
+        "name": "ks",
+        "fortran_name" : "ks",
+        "location" : "Atm",
+        "type_fortran": "integer",
+        "type_c": "c_int",
+        "type_cyth": "int"
+    },
+    {
+        "name": "ptop",
+        "fortran_name" : "ptop",
+        "location" : "Atm",
+        "type_fortran": "real",
+        "type_c": "c_double",
+        "type_cyth": "REAL_t"
+    },
+    {
+        "name": "do_adiabatic_init",
+        "fortran_name" : "do_adiabatic_init",
+        "location" : "do_adiabatic_init",
+        "type_fortran": "logical",
+        "type_c": "c_bool",
+        "type_cyth": "bint"
+    }
+]
