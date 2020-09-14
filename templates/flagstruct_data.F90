@@ -23,7 +23,7 @@ contains
         {{ item.fortran_name }}_out = Atm(mytile)%flagstruct%{{ item.fortran_name }}
         {% elif item.location == "Atm" %}
         {{ item.fortran_name }}_out = Atm(mytile)%{{ item.fortran_name }}
-        {% else %}
+        {% elif item.fortran_name == 'do_adiabatic_init' %}
         {{ item.fortran_name }}_out = {{ item.fortran_name }}
         {% endif %}
     end subroutine get_{{ item.fortran_name }}

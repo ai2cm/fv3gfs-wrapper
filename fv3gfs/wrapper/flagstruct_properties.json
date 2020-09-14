@@ -5,7 +5,7 @@
         "location" : "flagstruct",
         "type_fortran": "integer",
         "type_c": "c_int",
-        "type_cyth": "int"
+        "type_cython": "int"
     },
     {
         "name": "consv_te",
@@ -13,7 +13,7 @@
         "location" : "flagstruct",
         "type_fortran": "real",
         "type_c": "c_double",
-        "type_cyth": "REAL_t"
+        "type_cython": "REAL_t"
     },
     {
         "name": "ks",
@@ -21,7 +21,7 @@
         "location" : "Atm",
         "type_fortran": "integer",
         "type_c": "c_int",
-        "type_cyth": "int"
+        "type_cython": "int"
     },
     {
         "name": "ptop",
@@ -29,7 +29,7 @@
         "location" : "Atm",
         "type_fortran": "real",
         "type_c": "c_double",
-        "type_cyth": "REAL_t"
+        "type_cython": "REAL_t"
     },
     {
         "name": "do_adiabatic_init",
@@ -37,6 +37,6 @@
         "location" : "do_adiabatic_init",
         "type_fortran": "logical",
         "type_c": "c_bool",
-        "type_cyth": "bint"
+        "type_cython": "bint"
     }
 ]

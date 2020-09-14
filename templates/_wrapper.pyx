@@ -53,7 +53,7 @@ cdef extern:
     void set_{{ item.fortran_name }}(REAL_t *{{ item.fortran_name }}_in, int *nz)
 {% endfor %}
 {% for item in flagstruct_properties %}
-    void get_{{ item.fortran_name }}({{item.type_cyth}} *{{ item.fortran_name }}_out)
+    void get_{{ item.fortran_name }}({{item.type_cython}} *{{ item.fortran_name }}_out)
 {% endfor %}
 
 cdef get_quantity_factory():
@@ -344,7 +344,7 @@ class Flags:
 {% for item in flagstruct_properties %}
     @property
     def {{item.name}}(self):
-        cdef {{item.type_cyth}} {{item.name}}
+        cdef {{item.type_cython}} {{item.name}}
         get_{{item.fortran_name}}(&{{item.name}})
         return {{item.name}}
 {% endfor %}

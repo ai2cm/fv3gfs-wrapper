@@ -17,7 +17,7 @@ import mpi4py
 
 if __name__ == "__main__":
 
-    names0 = [
+    save_names = [
         "specific_humidity",
         "cloud_water_mixing_ratio",
         "rain_mixing_ratio",
@@ -52,6 +52,7 @@ if __name__ == "__main__":
         "northward_wind",
         "layer_mean_pressure_raised_to_power_of_kappa",
         "turbulent_kinetic_energy",
+        "time",
     ]
     comm = mpi4py.MPI.COMM_WORLD
     rank = comm.Get_rank()
@@ -61,7 +62,6 @@ if __name__ == "__main__":
         fv3gfs.wrapper.step_dynamics()
         fv3gfs.wrapper.step_physics()
         fv3gfs.wrapper.save_intermediate_restart_if_enabled()
-    state = fv3gfs.wrapper.get_state(names=names0)
-    state["time"] = "7.30"
+    state = fv3gfs.wrapper.get_state(names=save_names)
     io.write_state(state, "outstate_{0}.nc".format(rank))
     fv3gfs.wrapper.cleanup()

@@ -39,11 +39,11 @@ else
 		docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-fms -t $(FMS_IMAGE) $(FORTRAN_ROOT)
 		docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-esmf -t $(ESMF_IMAGE) $(FORTRAN_ROOT)
 		COMPILED_IMAGE=$(FORTRAN_IMAGE) COMPILE_TARGET=fv3gfs-build $(MAKE) -C ../lib/external build
-		docker build -f $(DOCKERFILE) --target fv3gfs-dawn -t $(DAWN_IMAGE) $(DAWN_BUILD_ARGS) ..
+		docker build -f $(DOCKERFILE) --target fv3gfs-dawn -t $(DAWN_IMAGE) $(DAWN_BUILD_ARGS) .
 endif
 
 build_dawn:
-	docker build -f $(DOCKERFILE) --target fv3gfs-dawn -t $(DAWN_IMAGE) $(BUILD_ARGS) ..
+	docker build -f $(DOCKERFILE) --target fv3gfs-dawn -t $(DAWN_IMAGE) $(BUILD_ARGS) .
 
 
 push_deps:
