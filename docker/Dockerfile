@@ -134,9 +134,6 @@ RUN chmod -R 777 $FV3CONFIG_CACHE_DIR && \
     mkdir /outdir && \
     chmod -R 777 /outdir
 
-# install fv3core
-RUN cd /fv3gfs-python/external/fv3core/ && \
-    python setup.py install
 # copy the tests
 COPY tests /fv3gfs-wrapper/tests
 
