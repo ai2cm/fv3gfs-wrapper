@@ -15,7 +15,12 @@ dim_ranges = {
     "z_interface": "1:nz()+1",
 }
 
-all_templates = ("physics_data.F90", "_wrapper.pyx", "dynamics_data.F90", "flagstruct_data.F90")
+all_templates = (
+    "physics_data.F90",
+    "_wrapper.pyx",
+    "dynamics_data.F90",
+    "flagstruct_data.F90",
+)
 SETUP_DIR = os.path.dirname(os.path.abspath(__file__))
 PROPERTIES_DIR = os.path.join(SETUP_DIR, "external/fv3util/fv3util")
 

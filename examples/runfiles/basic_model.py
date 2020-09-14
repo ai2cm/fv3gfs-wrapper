@@ -17,10 +17,45 @@ import mpi4py
 
 if __name__ == "__main__":
 
-    names0 = ["specific_humidity", "cloud_water_mixing_ratio", "rain_mixing_ratio", "snow_mixing_ratio", "cloud_ice_mixing_ratio", "graupel_mixing_ratio", "ozone_mixing_ratio", "cloud_fraction", "air_temperature", "pressure_thickness_of_atmospheric_layer", "vertical_thickness_of_atmospheric_layer", "logarithm_of_interface_pressure", "x_wind", "y_wind", "vertical_wind", "x_wind_on_c_grid", "y_wind_on_c_grid", "total_condensate_mixing_ratio", "interface_pressure", "surface_geopotential", "interface_pressure_raised_to_power_of_kappa", "surface_pressure", "vertical_pressure_velocity", "atmosphere_hybrid_a_coordinate", "atmosphere_hybrid_b_coordinate", "accumulated_x_mass_flux", "accumulated_y_mass_flux", "accumulated_x_courant_number", "accumulated_y_courant_number", "dissipation_estimate_from_heat_source", "eastward_wind", "northward_wind", "layer_mean_pressure_raised_to_power_of_kappa", "turbulent_kinetic_energy"]
+    names0 = [
+        "specific_humidity",
+        "cloud_water_mixing_ratio",
+        "rain_mixing_ratio",
+        "snow_mixing_ratio",
+        "cloud_ice_mixing_ratio",
+        "graupel_mixing_ratio",
+        "ozone_mixing_ratio",
+        "cloud_fraction",
+        "air_temperature",
+        "pressure_thickness_of_atmospheric_layer",
+        "vertical_thickness_of_atmospheric_layer",
+        "logarithm_of_interface_pressure",
+        "x_wind",
+        "y_wind",
+        "vertical_wind",
+        "x_wind_on_c_grid",
+        "y_wind_on_c_grid",
+        "total_condensate_mixing_ratio",
+        "interface_pressure",
+        "surface_geopotential",
+        "interface_pressure_raised_to_power_of_kappa",
+        "surface_pressure",
+        "vertical_pressure_velocity",
+        "atmosphere_hybrid_a_coordinate",
+        "atmosphere_hybrid_b_coordinate",
+        "accumulated_x_mass_flux",
+        "accumulated_y_mass_flux",
+        "accumulated_x_courant_number",
+        "accumulated_y_courant_number",
+        "dissipation_estimate_from_heat_source",
+        "eastward_wind",
+        "northward_wind",
+        "layer_mean_pressure_raised_to_power_of_kappa",
+        "turbulent_kinetic_energy",
+    ]
     comm = mpi4py.MPI.COMM_WORLD
     rank = comm.Get_rank()
-    
+
     fv3gfs.initialize()
     for i in range(fv3gfs.get_step_count()):
         fv3gfs.step_dynamics()
