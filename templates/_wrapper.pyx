@@ -5,9 +5,6 @@ cimport numpy as cnp
 import numpy as np
 import fv3gfs.util
 from mpi4py import MPI
-from datetime import datetime
-import functools
-
 ctypedef cnp.double_t REAL_t
 ctypedef cnp.int_t INT_t
 ctypedef cnp.npy_bool BOOL_t
