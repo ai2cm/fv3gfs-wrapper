@@ -35,7 +35,7 @@ export PRINT_HELP_PYSCRIPT
 
 BROWSER := python3 -c "$$BROWSER_PYSCRIPT"
 
-DOCKER_IMAGE?=us.gcr.io/vcm-ml/fv3gfs-python:latest
+DOCKER_IMAGE?=us.gcr.io/vcm-ml/fv3gfs-wrapper:latest
 
 PYTHON_FILES = $(shell git ls-files | grep -e 'py$$' | grep -v -e '__init__.py')
 PYTHON_INIT_FILES = $(shell git ls-files | grep '__init__.py')
@@ -102,13 +102,13 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	$(BROWSER) docs/_build/html/index.html
 
 docs-docker:
-	docker run --rm -v $(shell pwd)/docs:/fv3gfs-python/docs -w /fv3gfs-python $(DOCKER_IMAGE) make docs
+	docker run --rm -v $(shell pwd)/docs:/fv3gfs-wrapper/docs -w /fv3gfs-wrapper $(DOCKER_IMAGE) make docs
 	$(BROWSER) docs/_build/html/index.html
 
 build-docker:
-	./build_docker.sh
+	BUILD_FROM_INTERMEDIATE=y $(MAKE) -C docker
 
-test-docker:
+test-docker: build-docker
 	./test_docker.sh
 
 servedocs: docs ## compile the docs watching for changes

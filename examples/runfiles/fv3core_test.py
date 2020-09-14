@@ -8,8 +8,8 @@ import yaml
 import mpi4py
 import fv3core._config as spec
 
-sys.path.append("/serialbox2/python")
-sys.path.append("/fv3gfs-python/external/fv3core/tests/translate")
+sys.path.append("/serialbox2/python")  # noqa: E402
+sys.path.append("/fv3gfs-python/external/fv3core/tests/translate")  # noqa: E402
 import serialbox
 import translate
 

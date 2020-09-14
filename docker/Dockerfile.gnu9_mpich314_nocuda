@@ -94,7 +94,7 @@ RUN git clone https://github.com/VulcanClimateModeling/fv3gfs-fortran.git && \
 
 FROM mpich-build AS fv3-build
 
-COPY fv3gfs-python.tar /fv3gfs-python/
+COPY fv3gfs-wrapper.tar /fv3gfs-wrapper/
 COPY --from=esmf-build /myapps/esmf/ /myapps/esmf/
 COPY --from=fms-build /myapps/fms/ /myapps/fms/
 COPY --from=ncep-build /myapps/ncep/ /myapps/ncep/
@@ -102,16 +102,16 @@ COPY --from=ncep-build /myapps/ncep/ /myapps/ncep/
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get install -y libnetcdf-dev libnetcdff-dev libblas-dev liblapack-dev && \
     git clone https://github.com/VulcanClimateModeling/fv3gfs-fortran.git && \
-    cd /fv3gfs-python && tar xf fv3gfs-python.tar && rm -r lib/external/FV3 && \
-    cd /fv3gfs-fortran/ && mv FV3 /fv3gfs-python/lib/external/ && \
-    cd /fv3gfs-python/lib/external/FV3 && \
+    cd /fv3gfs-wrapper && tar xf fv3gfs-wrapper.tar && rm -r lib/external/FV3 && \
+    cd /fv3gfs-fortran/ && mv FV3 /fv3gfs-wrapper/lib/external/ && \
+    cd /fv3gfs-wrapper/lib/external/FV3 && \
     cp conf/configure.fv3.linux_gnu conf/configure.fv3 && \
     export FMS_DIR=/myapps/fms ESMF_DIR=/myapps/esmf ESMF_INC="-I/myapps/esmf/include" NCEPLIBS_DIR=/myapps/ncep NETCDF_DIR=/usr && \
     make clean_no_dycore && make libs_no_dycore -j8 && \
     cd atmos_cubed_sphere && make clean && \
     cd .. && make -j8 && \
     mkdir -p /myapps/fv3 && cp fv3.exe /myapps/fv3 && \
-    rm -rf /fv3gfs-fortran /fv3gfs-python/fv3gfs-python.tar
+    rm -rf /fv3gfs-fortran /fv3gfs-wrapper/fv3gfs-wrapper.tar
 
 ENV LD_LIBRARY_PATH=/myapps/esmf/lib:/myapps/fms/lib:$LD_LIBRARY_PATH
 
@@ -162,13 +162,13 @@ RUN cp /myapps/fms/lib/*.so* /lib64/ && \
     cp /myapps/esmf/lib/*.so* /lib64/ && \
     mkdir -p /opt/NCEPlibs/lib && \
     cd /myapps/ncep/lib && cp *.a /opt/NCEPlibs/lib/ && \
-    cd /fv3gfs-python/lib && make -j8 && \
+    cd /fv3gfs-wrapper/lib && make -j8 && \
     export MPI="mpich" && \
-    cd /fv3gfs-python && make build
+    cd /fv3gfs-wrapper && make build
 
-RUN pip3 install --no-cache-dir -e /fv3gfs-python/external/fv3config \
-                                -e /fv3gfs-python/external/fv3util && \
-    pip3 install --no-cache-dir -e /fv3gfs-python && \
+RUN pip3 install --no-cache-dir -e /fv3gfs-wrapper/external/fv3config \
+                                -e /fv3gfs-wrapper/external/fv3gfs-util && \
+    pip3 install --no-cache-dir -e /fv3gfs-wrapper && \
     pip3 install --no-cache-dir pytest-subtests
 
 CMD ["bash"]

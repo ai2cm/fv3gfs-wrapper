@@ -11,12 +11,47 @@ jobs:
       - run: sudo pip3 install black==19.10b0 flake8==3.7.8
       - run: make lint
 
+  test_python:
+    docker:
+      - image: circleci/python:3.7
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+      - run:
+          name: "install MPI"
+          command: |
+            sudo apt-get update
+            sudo apt-get install libopenmpi3
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "external/fv3gfs-util/requirements.txt" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip3 install -r external/fv3gfs-util/requirements.txt
+            pip3 install mpi4py==3.0.3
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "external/fv3gfs-util/requirements.txt" }}
+
+      - run:
+          name: run tests
+          command: |
+            bash .jenkins/actions/test_fv3util.sh
+
   build_default:
     machine:
       docker_layer_caching: true
       image: ubuntu-1604:201903-01
     environment:
-      GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-python
+      GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-wrapper
       GOOGLE_APPLICATION_CREDENTIALS: /tmp/key.json
     steps:
       - checkout
@@ -26,7 +61,7 @@ jobs:
             echo $ENCODED_GCR_KEY | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS
       - add_ssh_keys:
           fingerprints:
-            - "31:b8:08:52:8e:57:56:7d:ee:4b:fe:15:7c:d7:06:9e"  # pull fv3util
+            - "31:b8:08:52:8e:57:56:7d:ee:4b:fe:15:7c:d7:06:9e"  # pull fv3gfs-util
       - run:
           name: "Pull submodules"
           command: |
@@ -43,18 +78,24 @@ jobs:
             [ -d /opt/circleci/.pyenv/versions/3.6.2 ] || pyenv install 3.6.2
             pyenv global 3.6.2
             pip install --upgrade pip setuptools
-            pip install -r requirements.txt
-            pip install -e external/fv3config
-            pip install -e external/fv3util
+            pip install -r tests/image_tests/requirements.txt
+            pip install --no-deps -e external/fv3config
       - save_cache:
           paths:
             - /opt/circleci/.pyenv/versions/3.6.2
           key: v1-build-dependencies-{{ checksum "requirements.txt" }}
+      - restore_cache:
+          keys:
+            - v1-fv3config-cache
       - run: 
           name: "Compile model and perform model tests"
           command: |
             echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://us.gcr.io
-            DOCKER_BUILDKIT=1 BUILD_FROM_INTERMEDIATE=y bash test_docker.sh
+            DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain BUILD_FROM_INTERMEDIATE=y make test-docker
+      - save_cache:
+          paths:
+            - /home/circleci/.cache/fv3gfs/fv3config-cache
+          key: v1-fv3config-cache
       - run:
           name: "Run example runfiles"
           command: |
@@ -74,6 +115,10 @@ jobs:
           then
               echo "pushing untagged image $GCR_IMAGE"
               docker push $GCR_IMAGE
+
+              echo "pushing image $GCR_IMAGE:$CIRCLE_SHA1"
+              docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_SHA1
+              docker push $GCR_IMAGE:$CIRCLE_SHA1
           fi
           if [[ ! -z "$CIRCLE_TAG" ]]
           then
@@ -81,6 +126,8 @@ jobs:
               docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_TAG
               docker push $GCR_IMAGE:$CIRCLE_TAG
           fi
+
+
       - run:
           name: "Delete data files"
           command: |
@@ -102,7 +149,7 @@ jobs:
           at: docs/_build
       - add_ssh_keys:
           fingerprints:
-            - "92:ab:f0:a2:9e:78:fa:5d:dc:c9:b2:38:9a:46:b1:ab"  # push fv3gfs-python
+            - "77:dc:f8:08:f2:17:8d:0f:c3:b0:e8:93:0e:d0:89:e7"  # push fv3gfs-wrapper
       - run:
           name: Install and configure dependencies
           command: |
@@ -125,9 +172,14 @@ workflows:
           filters:
             tags:
               only: /^v.*/
+      - test_python:
+          filters:
+            tags:
+              only: /^v.*/
       - build_default:
           requires:
             - lint
+            - test_python
           filters:
             tags:
               only: /^v.*/

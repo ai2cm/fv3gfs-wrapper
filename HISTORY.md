@@ -5,8 +5,28 @@ latest
 ------
 
 Breaking changes:
+- Removed many fv3util imports from fv3gfs, import those symbols from fv3util instead
+
+Major changes:
+- Use `cftime.datetime` objects to represent datetimes in fv3gfs-python and fv3util instead
+of `datetime.datetime` objects.  This results in times stored in a format compatible with
+the fortran model, and accurate internal representation of times with the calendar specified
+in the `coupler_nml` namelist.
+- Fortran source updated to include new per-physics-component tendency diagnostics for
+temperature and specific humidity, and to ensure that the column moistening implied by
+nudging specific humidity is subtracted from the precipitation felt by the land surface
+model.
+
+Minor changes:
+- added jenkins scripts under .jenkins
+
+v0.5.0 (2020-07-28)
+------
+
+Breaking changes:
 - fixed a bug where atmosphere hybrid coordinates were incorrectly marked as cell center variables, and were missing one point
 - `send_buffer` and `recv_buffer` are modified to take in a `callable`, which is more easily serialized than a `numpy`-like module (necessary because we serialize the arguments to re-use buffers), and allows custom specification of the initialization if zeros are needed instead of empty.
+- use remote data for restart conditions
 
 Major changes:
 - Added getters and setters for additional dynamics quantities needed to call an alternative dynamical core
@@ -18,6 +38,8 @@ Minor changes:
 - Internally, get_state uses the new QuantityFactory class to initialize quantities
 - fixed bug in fv3util setup.py which prevented `python setup.py install` from copying submodules
 - fixed bug in dockerfile where gs://vcm-fv3config data was downloaded to incorrect location
+- New hpc dockerfiles
+- aquaplanet configuration
 
 Deprecations:
 - `Quantity.values` is deprecated

@@ -8,8 +8,7 @@ version, while "v1" is not and "0.3.0" is not.
 
 2. Prepare a release branch with `git checkout -b release/<version>`.
 
-3. Ensure that submodules (e.g. fv3config) point to a tagged commit on master. Tagged
-   versions of fv3gfs-python should depend on tagged versions of dependencies.
+3. Run `git submodule status` and ensure fv3config shows a tagged version at the end its line, such as in f4862a7bbcccd0602d54c77aede935e4cba36a72 fv3config (v0.4.0). If it does not, you must first create a version-tagged commit by releasing fv3config, and then update the submodule reference. Then re-do this check.
 
 4. Update the HISTORY.md, replacing the "latest" version heading with the new version.
 
@@ -17,11 +16,12 @@ version, while "v1" is not and "0.3.0" is not.
 
 6. In the project root, run `bumpversion <major/minor/patch>`. This will create a new commit.
 
-7. `git push -u origin release/<version>` and create a new pull request in Github.
+7. Repeat steps 4-6 inside `external/fv3gfs-util` to create a new version of fv3gfs-util.
 
-8. When the pull request is merged to master, `git checkout master` and `git pull`,
-   followed by `git tag <version>` and 
+8. `git push -u origin release/<version>` and create a new pull request in Github.
 
-3. Run `git push origin --tags` to push all local tags to Github.
+9. When the pull request is merged to master, `git checkout master` and `git pull`, followed by `git tag <version>`. This creates a local tag. It is crucial that you pull the latest master after the pull request is merged and before you create the tag.
+
+10. Run `git push origin --tags` to push all local tags to Github.
 
 Circle CI will automatically push a tagged image to GCR when you pushing tags to master.

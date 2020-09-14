@@ -1,15 +1,18 @@
 import os
-import shutil
-import sys
-from setuptools import setup
+from setuptools import setup, find_namespace_packages
 from distutils.extension import Extension
+
+# Specify these build requirements in pyproject.toml
+# https://www.python.org/dev/peps/pep-0518/
 from Cython.Distutils import build_ext
 from Cython.Build import cythonize
+
+import pkgconfig
 
 # This line only needed if building with NumPy in Cython file.
 from numpy import get_include
 
-PACKAGE_VERSION = "0.4.3"
+PACKAGE_VERSION = "0.5.0"
 
 fv3gfs_build_path_environ_name = "FV3GFS_BUILD_DIR"
 make_command = os.environ.get("MAKE", "make")
@@ -27,53 +30,35 @@ relative_wrapper_build_filenames = [
     "lib/flagstruct_data.o",
 ]
 
-relative_fv3gfs_build_filenames = [
-    "atmos_model.o",
-    "module_fv3_config.o",
-    "cpl/libfv3cpl.a",
-    "ipd/libipd.a",
-    "atmos_cubed_sphere/libfv3core.a",
-    "coarse_graining/libfv3coarse_graining.a",
-    "io/libfv3io.a",
-    "gfsphysics/libgfsphys.a",
-    "../stochastic_physics/libstochastic_physics.a",
-    "/opt/NCEPlibs/lib/libnemsio_d.a",
-    "/opt/NCEPlibs/lib/libbacio_4.a",
-    "/opt/NCEPlibs/lib/libsp_v2.0.2_d.a",
-    "/opt/NCEPlibs/lib/libw3emc_d.a",
-    "/opt/NCEPlibs/lib/libw3nco_d.a",
-]
+wrapper_build_filenames = []
+for relative_filename in relative_wrapper_build_filenames:
+    wrapper_build_filenames.append(os.path.join(package_dir, relative_filename))
+
+# order of library link args matters
+# dependencies must be to the right of dependees
+# https://stackoverflow.com/questions/45135/why-does-the-order-in-which-libraries-are-linked-sometimes-cause-errors-in-gcc
+library_link_args = []
+library_link_args.extend(wrapper_build_filenames)
+library_link_args += pkgconfig.libs("fv3").split()
 
 mpi_flavor = os.environ.get("MPI", "openmpi")
 if mpi_flavor == "openmpi":
-    mpi_fortran_lib = "-lmpi_mpifh"
+    library_link_args += pkgconfig.libs("ompi-fort").split()
 else:
-    mpi_fortran_lib = "-lmpifort"
+    library_link_args += pkgconfig.libs("mpich-fort").split()
 
-library_link_args = [
-    "-lFMS",
-    "-lesmf",
-    "-lgfortran",
-    "-lpython3." + str(sys.version_info.minor) + "m",
-    mpi_fortran_lib,
-    "-lmpi",
-    "-lnetcdf",
-    "-lnetcdff",
-    "-fopenmp",
-    "-lmvec",
-    "-lblas",
-    "-lc",
-    "-lrt",
-]
+# need to include math and c library
+library_link_args += ["-lmvec", "-lc"]
 
 requirements = [
-    "xarray>=0.13.0",
+    "mpi4py>=3",
+    "cftime>=1.2.1",
+    "xarray>=0.15.1",
     "netCDF4>=1.4.2",
-    "numpy",
-    f"fv3util=={PACKAGE_VERSION}",
+    "numpy>=1.16",
+    "pyyaml>=5",
+    f"fv3gfs-util>=0.5.1",
 ]
-
-setup_requirements = ["cython", "numpy", "jinja2"]
 
 test_requirements = []
 
@@ -88,42 +73,22 @@ if fv3gfs_build_path_environ_name in os.environ:
 else:
     fv3gfs_build_path = os.path.join(package_dir, "lib/external/FV3/")
 
-fortran_build_filenames = []
-for relative_filename in relative_fv3gfs_build_filenames:
-    fortran_build_filenames.append(os.path.join(fv3gfs_build_path, relative_filename))
-
-wrapper_build_filenames = []
-for relative_filename in relative_wrapper_build_filenames:
-    wrapper_build_filenames.append(os.path.join(package_dir, relative_filename))
-
-for filename in fortran_build_filenames:
-    if not os.path.isfile(filename):
-        raise BuildDirectoryError(
-            f"File {filename} is missing, first run make in {fv3gfs_build_path}"
-        )
-
-# copy2 preserves executable flag
-shutil.copy2(
-    os.path.join(fv3gfs_build_path, "fv3.exe"), os.path.join(package_dir, "fv3.exe")
-)
 
 ext_modules = [
     Extension(  # module name:
-        "fv3gfs._wrapper",
+        "fv3gfs.wrapper._wrapper",
         # source file:
         ["lib/_wrapper.pyx"],
         include_dirs=[get_include()],
-        extra_link_args=wrapper_build_filenames
-        + fortran_build_filenames
-        + library_link_args,
-        depends=fortran_build_filenames + wrapper_build_filenames,
+        extra_link_args=library_link_args,
+        depends=wrapper_build_filenames,
     )
 ]
 
 setup(
     author="Vulcan Technologies LLC",
     author_email="jeremym@vulcan.com",
-    python_requires=">=3.5",
+    python_requires=">=3.6",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
@@ -135,18 +100,17 @@ setup(
         "Programming Language :: Python :: 3.7",
     ],
     install_requires=requirements,
-    setup_requires=setup_requirements,
     tests_require=test_requirements,
-    name="fv3gfs-python",
+    name="fv3gfs-wrapper",
     license="BSD license",
     long_description=readme + "\n\n" + history,
     cmdclass={"build_ext": build_ext},
-    packages=["fv3gfs"],
+    packages=find_namespace_packages(include=["fv3gfs.*"]),
     # Needed if building with NumPy.
     # This includes the NumPy headers when compiling.
     include_dirs=[get_include()],
     ext_modules=cythonize(ext_modules),
-    url="https://github.com/VulcanClimateModeling/fv3gfs-python",
+    url="https://github.com/VulcanClimateModeling/fv3gfs-wrapper",
     version=PACKAGE_VERSION,
     zip_safe=False,
 )
