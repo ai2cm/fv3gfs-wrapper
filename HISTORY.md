@@ -14,6 +14,7 @@ in the `coupler_nml` namelist.
 
 Minor changes:
 - added jenkins scripts under .jenkins
+- Dawn is removed from the fv3gfs-wrapper test image
 - Makefile in lib no longer depends on fv3gfs configuration files, since they were not actually being used.
 - CC used for `python setup.py build_ext --inplace` is now specified directly in the Makefile (default gcc), since docker was somehow using different compilers locally and in CI
 

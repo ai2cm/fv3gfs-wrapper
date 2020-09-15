@@ -1,7 +1,6 @@
 ARG FMS_IMAGE
 ARG ESMF_IMAGE
 ARG FORTRAN_ENV_IMAGE
-ARG DAWN_IMAGE=fv3gfs-dawn-build
 
 FROM $FMS_IMAGE AS fv3gfs-fms
 FROM $ESMF_IMAGE AS fv3gfs-esmf
@@ -76,48 +75,9 @@ COPY fv3gfs /fv3gfs-wrapper/fv3gfs
 RUN make -C /fv3gfs-wrapper build
 
 #-----------------------------------------------------------------------------
-FROM $FORTRAN_ENV_IMAGE AS fv3gfs-dawn-build
-
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y \
-    cmake \
-    libssl-dev \
-    libboost-all-dev \ 
-    clang \
-    clang-format \
-    clang-tidy \
-    llvm-9-dev \
-    libclang-9-dev \
-    libpython3-dev \
-    python3 \
-    python3-pip \
-    python3-numpy \
-    python3-nose \
-    python3-sphinx
-
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
-RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 10
-
-RUN pip install --no-cache-dir scikit-build && \
-    git clone https://github.com/MeteoSwiss-APN/dawn.git /usr/src/dawn && \
-    pip install --no-cache-dir /usr/src/dawn/dawn
-RUN pip wheel /usr/src/dawn/dawn
-RUN git clone --depth 1 -b fv3_validation https://github.com/eddie-c-davis/gt4py.git /usr/src/gt4py && \
-    pip install --no-cache-dir -e /usr/src/gt4py && \
-    cd /usr/src/gt4py && python -m gt4py.gt_src_manager install
-
-
-FROM $DAWN_IMAGE AS fv3gfs-dawn
-
-#-----------------------------------------------------------------------------
 FROM fv3gfs-wrapper-build AS fv3gfs-wrapper
 
-# Install Dawn and gt4py
-COPY --from=fv3gfs-dawn /usr/src/dawn /usr/src/dawn
-COPY --from=fv3gfs-dawn /dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
-COPY --from=fv3gfs-dawn /usr/src/gt4py /usr/src/gt4py
-RUN pip3 install --no-deps --no-cache-dir /usr/src/dawn/dawn4py-0.0.2-cp37-cp37m-linux_x86_64.whl
-RUN pip3 install --no-deps --no-cache-dir /usr/src/gt4py
+RUN pip3 install --no-deps --no-cache-dir git+https://github.com/GridTools/gt4py.git@db40777788863bfe87b9674b118e8bd5b8db0440#egg=gt4py
 
 # copy and install dependency packages
 COPY external /fv3gfs-wrapper/external
