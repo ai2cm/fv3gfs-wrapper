@@ -8,18 +8,15 @@ Breaking changes:
 - Removed many fv3util imports from fv3gfs, import those symbols from fv3util instead
 
 Major changes:
-- Use `cftime.datetime` objects to represent datetimes in fv3gfs-python and fv3util instead
-of `datetime.datetime` objects.  This results in times stored in a format compatible with
-the fortran model, and accurate internal representation of times with the calendar specified
+- Use `cftime.datetime` objects to represent datetimes in fv3gfs-python and fv3util instead of `datetime.datetime` objects.  This results in times stored in a format compatible with the fortran model, and accurate internal representation of times with the calendar specified
 in the `coupler_nml` namelist.
-- Fortran source updated to include new per-physics-component tendency diagnostics for
-temperature and specific humidity, and to ensure that the column moistening implied by
-nudging specific humidity is subtracted from the precipitation felt by the land surface
-model.
+- Fortran source updated to include new per-physics-component tendency diagnostics for temperature and specific humidity, and to ensure that the column moistening implied by nudging specific humidity is subtracted from the precipitation felt by the land surface model.
 
 Minor changes:
 - added jenkins scripts under .jenkins
 - Dawn is removed from the fv3gfs-wrapper test image
+- Makefile in lib no longer depends on fv3gfs configuration files, since they were not actually being used.
+- CC used for `python setup.py build_ext --inplace` is now specified directly in the Makefile (default gcc), since docker was somehow using different compilers locally and in CI
 
 v0.5.0 (2020-07-28)
 ------

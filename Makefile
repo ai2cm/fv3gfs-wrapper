@@ -1,11 +1,6 @@
 SHELL = /bin/sh
 
-ifndef FV3GFS_BUILD_DIR
-	FV3GFS_BUILD_DIR=$(shell pwd)/lib/external/FV3/
-endif
-ifneq ("$(wildcard $(FV3GFS_BUILD_DIR)/conf/configure.fv3)","")
-	include $(FV3GFS_BUILD_DIR)/conf/configure.fv3
-endif
+CC=gcc
 
 .PHONY: build clean clean-test clean-pyc clean-build clean-examples examples lint test coverage docs help docs-docker
 .DEFAULT_GOAL := help
@@ -119,7 +114,7 @@ release: dist ## package and upload a release
 
 build:
 	$(MAKE) -C lib
-	python3 setup.py build_ext --inplace
+	CC=$(CC) python3 setup.py build_ext --inplace
 
 dist: clean ## builds source and wheel package
 	$(MAKE) -C lib
