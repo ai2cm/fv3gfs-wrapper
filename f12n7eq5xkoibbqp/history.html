@@ -188,6 +188,7 @@ in the <cite>coupler_nml</cite> namelist.
 - Fortran source updated to include new per-physics-component tendency diagnostics for temperature and specific humidity, and to ensure that the column moistening implied by nudging specific humidity is subtracted from the precipitation felt by the land surface model.</p>
 <p>Minor changes:
 - added jenkins scripts under .jenkins
+- Dawn is removed from the fv3gfs-wrapper test image
 - Makefile in lib no longer depends on fv3gfs configuration files, since they were not actually being used.
 - CC used for <cite>python setup.py build_ext –inplace</cite> is now specified directly in the Makefile (default gcc), since docker was somehow using different compilers locally and in CI</p>
 </div>
