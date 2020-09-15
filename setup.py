@@ -56,7 +56,7 @@ requirements = [
     "netCDF4>=1.4.2",
     "numpy>=1.16",
     "pyyaml>=5",
-    f"fv3gfs-util>=0.5.1",
+    "fv3gfs-util>=0.5.0",
 ]
 
 test_requirements = []

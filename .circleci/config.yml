@@ -11,41 +11,6 @@ jobs:
       - run: sudo pip3 install black==19.10b0 flake8==3.7.8
       - run: make lint
 
-  test_python:
-    docker:
-      - image: circleci/python:3.7
-    working_directory: ~/repo
-
-    steps:
-      - checkout
-      - run:
-          name: "install MPI"
-          command: |
-            sudo apt-get update
-            sudo apt-get install libopenmpi3
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "external/fv3gfs-util/requirements.txt" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-      - run:
-          name: install dependencies
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip3 install -r external/fv3gfs-util/requirements.txt
-            pip3 install mpi4py==3.0.3
-      - save_cache:
-          paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "external/fv3gfs-util/requirements.txt" }}
-
-      - run:
-          name: run tests
-          command: |
-            bash .jenkins/actions/test_fv3util.sh
-
   build_default:
     machine:
       docker_layer_caching: true
@@ -61,7 +26,7 @@ jobs:
             echo $ENCODED_GCR_KEY | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS
       - add_ssh_keys:
           fingerprints:
-            - "31:b8:08:52:8e:57:56:7d:ee:4b:fe:15:7c:d7:06:9e"  # pull fv3gfs-util
+            - "dd:76:98:a1:2c:ec:29:0d:7e:3e:fd:57:c5:4e:a2:8f"  # github user key
       - run:
           name: "Pull submodules"
           command: |
@@ -172,14 +137,9 @@ workflows:
           filters:
             tags:
               only: /^v.*/
-      - test_python:
-          filters:
-            tags:
-              only: /^v.*/
       - build_default:
           requires:
             - lint
-            - test_python
           filters:
             tags:
               only: /^v.*/
