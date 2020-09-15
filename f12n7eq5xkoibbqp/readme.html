@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Readme &mdash; FV3GFS 0.4.3 documentation</title>
+  <title>Readme &mdash; FV3GFS 0.5.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.4.3
+                0.5.0
               </div>
             
           
@@ -92,7 +92,8 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Readme</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#fv3gfs">FV3GFS</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#checking-out">Checking out</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#local-machine-installation">Local Machine Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installation-for-clusters">Installation for Clusters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#building-docs">Building Docs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#iterative-development">Iterative development</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
@@ -103,7 +104,6 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="state.html">State</a></li>
-<li class="toctree-l1"><a class="reference internal" href="communication.html">Communication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developers Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
@@ -176,9 +176,9 @@
 <h1>Readme<a class="headerlink" href="#readme" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="fv3gfs">
 <h2>FV3GFS<a class="headerlink" href="#fv3gfs" title="Permalink to this headline">¶</a></h2>
-<p>fv3gfs-python (<cite>import fv3gfs</cite>), is a Python wrapper for the FV3GFS
+<p>fv3gfs-wrapper (<cite>import fv3gfs.wrapper</cite>), is a Python wrapper for the FV3GFS
 global climate model.</p>
-<p>See the [documentation](<a class="reference external" href="https://vulcanclimatemodeling.github.io/fv3gfs-python/f12n7eq5xkoibbqp/index.html">https://vulcanclimatemodeling.github.io/fv3gfs-python/f12n7eq5xkoibbqp/index.html</a>)
+<p>See the [documentation](<a class="reference external" href="https://vulcanclimatemodeling.github.io/fv3gfs-wrapper/f12n7eq5xkoibbqp/index.html">https://vulcanclimatemodeling.github.io/fv3gfs-wrapper/f12n7eq5xkoibbqp/index.html</a>)
 for more detailed instructions.</p>
 <div class="section" id="checking-out">
 <h3>Checking out<a class="headerlink" href="#checking-out" title="Permalink to this headline">¶</a></h3>
@@ -188,16 +188,31 @@ for more detailed instructions.</p>
 <li><p>Free software: BSD license</p></li>
 </ul>
 </div>
-<div class="section" id="installation">
-<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
-<p>The Docker image can be built using <cite>build_docker.sh</cite>, or built and then
-tested using <cite>test_docker.sh</cite> (which will use the existing build if present).
+<div class="section" id="local-machine-installation">
+<h3>Local Machine Installation<a class="headerlink" href="#local-machine-installation" title="Permalink to this headline">¶</a></h3>
+<p>The Docker image can be built using <cite>make build-docker</cite>, or built and then
+tested using <cite>make test-docker</cite> (which will use the existing build if present).
 The first time you build, both ESMF and FMS will be
 built, taking up quite a lot of time. On subsequent builds, these may be retrieved
 from cached images, if you allow caching on your system.</p>
 <p>On a host, the package can be built using <cite>make build</cite>, and then installed
 in development mode with <cite>pip install -e .</cite>.</p>
 <p>This package only supports linux and Python 3.5 or greater.</p>
+</div>
+<div class="section" id="installation-for-clusters">
+<h3>Installation for Clusters<a class="headerlink" href="#installation-for-clusters" title="Permalink to this headline">¶</a></h3>
+<p>The default installation method outlined above is suitable for running on a local
+computer or on a single cloud VM instance.  If you wish to run FV3 on multiple
+compute nodes (eg. on a cluster of multiple computers), the appropriate Docker
+image can be built using <cite>build_hpc_docker.sh</cite>.  An user will need to select the
+specific configuration (compiler, MPI implementation, GPU support) by setting
+the HPC_CONFIG variable in the script.  The user will also need to set the
+OUTPUT_IMAGE variable to specify where the final Docker image is to be written
+(a DockerHub image address can be used).</p>
+<p>Currently, there is support for the GNU 8 and 9 suite of compilers, the MPICH
+3.1.4 implementation of MPI and CUDA 10.1 for Nvidia GPU support.</p>
+<p>Note that <cite>build_hpc_docker.sh</cite> will build a new Docker image from scratch.  This
+build process takes approximately 20 minutes on a single cloud VM with 8 CPUs.</p>
 </div>
 <div class="section" id="building-docs">
 <h3>Building Docs<a class="headerlink" href="#building-docs" title="Permalink to this headline">¶</a></h3>
@@ -214,11 +229,11 @@ the model, keeping build artifacts between rebuilds. You can do this by running 
 docker image with bind-mounts into your local filesystem. Just be sure to <cite>make clean</cite>
 when you’re done to remove the build artifacts, or it may cause problems when you
 build the docker image.</p>
-<p>With the image already built by <cite>build_docker.sh</cite> or pulled using
-<cite>docker pull us.gcr.io/vcm-ml/fv3gfs-python</cite>, run <cite>dev_docker.sh</cite>. This will
+<p>With the image already built by <cite>make build-docker</cite> or pulled using
+<cite>docker pull us.gcr.io/vcm-ml/fv3gfs-wrapper</cite>, run <cite>dev_docker.sh</cite>. This will
 bind-mount the <cite>fv3gfs</cite>, <cite>lib</cite>, <cite>tests</cite>, <cite>external</cite>, and <cite>templates</cite> directories into the
 docker image. Inside the docker image, you can build or re-build the model with
-<cite>make build</cite> inside the <cite>/fv3gfs-python</cite> directory, and run the test suite with
+<cite>make build</cite> inside the <cite>/fv3gfs-wrapper</cite> directory, and run the test suite with
 <cite>make test</cite>.</p>
 <p>Re-building the model inside the image is necessary since your local
 filesystem won’t already have the build artifacts necessary to build
@@ -235,6 +250,8 @@ in the same way, using <cite>mpirun</cite>:</p>
 <p>Running these files requires them to be placed inside a valid run directory. This is
 done automatically if you run them using <cite>fv3run</cite>, as is done in
 the Makefile in that directory.</p>
+<p>Please note that the ‘–oversubscribe –allow-run-as-root –mca btl_vader_single_copy_mechanism none’ flags to mpirun
+are not needed if you are using the mpich-based Docker images built using the <cite>build_hpc_docker.sh</cite> script.</p>
 </div>
 </div>
 </div>

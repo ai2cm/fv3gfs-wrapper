@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>State &mdash; FV3GFS 0.4.3 documentation</title>
+  <title>State &mdash; FV3GFS 0.5.0 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Communication" href="communication.html" />
+    <link rel="next" title="Developers Notes" href="developers.html" />
     <link rel="prev" title="Usage" href="usage.html" /> 
 </head>
 
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.4.3
+                0.5.0
               </div>
             
           
@@ -97,7 +97,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#quantity">Quantity</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="communication.html">Communication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developers Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
@@ -172,63 +171,19 @@
 <h2>Getting/setting state<a class="headerlink" href="#getting-setting-state" title="Permalink to this headline">¶</a></h2>
 <p>In addition to just running the model the same as in Fortran, the Python wrapper allows you to interact
 with the model state while it is still running.
-This is done through <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.get_state()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.set_state()</span></code>.
+This is done through <a class="reference internal" href="api.html#fv3gfs.wrapper.get_state" title="fv3gfs.wrapper.get_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.get_state()</span></code></a> and <a class="reference internal" href="api.html#fv3gfs.wrapper.set_state" title="fv3gfs.wrapper.set_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.set_state()</span></code></a>.
 The getters will return Quantity objects which nominally have units information, but these aren’t guaranteed
 to be accurate and in some cases are indicated as missing.</p>
 <p>An example which gets and sets the model state to damp moisture is present in the examples folder of this repo.</p>
-<p>You should also keep in mind that the arrays used by <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.get_state()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.set_state()</span></code>
+<p>You should also keep in mind that the arrays used by <a class="reference internal" href="api.html#fv3gfs.wrapper.get_state" title="fv3gfs.wrapper.get_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.get_state()</span></code></a> and <a class="reference internal" href="api.html#fv3gfs.wrapper.set_state" title="fv3gfs.wrapper.set_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.set_state()</span></code></a>
 are domain-decomposed fields (as opposed to global fields).</p>
 </div>
 <div class="section" id="quantity">
 <h2>Quantity<a class="headerlink" href="#quantity" title="Permalink to this headline">¶</a></h2>
-<p>Data in <code class="docutils literal notranslate"><span class="pre">fv3gfs-python</span></code> is managed using a container type called <code class="xref py py-class docutils literal notranslate"><span class="pre">fv3gfs.Quantity</span></code>.
+<p>Data in <code class="docutils literal notranslate"><span class="pre">fv3gfs-wrapper</span></code> is managed using a container type called <code class="xref py py-class docutils literal notranslate"><span class="pre">fv3gfs.util.Quantity</span></code>.
 This stores metadata such as dimensions and units (in <code class="docutils literal notranslate"><span class="pre">quantity.dims</span></code> and <code class="docutils literal notranslate"><span class="pre">quantity.units</span></code>),
-and manages the “computational domain” of the data.</p>
-<p>When running a model on multiple
-processors (“ranks”), each process is responsible for a subset of the domain, called its
-“compute domain” or “computational domain”. Arrays may contain additional data in a “halo” of “ghost cells”
-which hold data from another rank’s compute domain to be used as inputs for
-the local rank. This data needs to be periodically retrieved from nearby ranks, as
-the local rank cannot compute the new values outside of its compute domain.</p>
-<p>A 3-by-3 array with one set of halo points would look something like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span>
-<span class="n">x</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="n">x</span>
-<span class="n">x</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="n">x</span>
-<span class="n">x</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="n">x</span>
-<span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span> <span class="n">x</span>
-</pre></div>
-</div>
-<p>where <cite>0</cite> values represent the compute domain, and <cite>x</cite> represents points in the halo.
-If you are interested in learning more, look up the “Ghost Cell Pattern” or
-“Halo Exchange”.</p>
-<p>Depending on optimization choices, it may also make sense to include
-filler data which serves only to align the computational domain into blocks within
-memory.</p>
-<p>If all of that sounded confusing, we agree! That’s why <code class="xref py py-class docutils literal notranslate"><span class="pre">fv3gfs.Quantity</span></code>
-abstracts away as much of this information as possible. If you perform indexing on the
-<code class="docutils literal notranslate"><span class="pre">view</span></code> attribute of quantity, the index will be applied within the computational
-domain:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">quantity</span><span class="o">.</span><span class="n">view</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.</span>  <span class="c1"># set all data this rank is responsible for to 0</span>
-<span class="n">quantity</span><span class="o">.</span><span class="n">view</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># set data not on the first dimension edge to 1</span>
-<span class="n">array</span> <span class="o">=</span> <span class="n">quantity</span><span class="o">.</span><span class="n">view</span><span class="p">[:]</span>  <span class="c1"># gives an array accessing just the compute domain</span>
-<span class="n">new_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">quantity</span><span class="o">.</span><span class="n">view</span><span class="p">[:])</span>  <span class="c1"># gives a *copy* of the compute domain</span>
-</pre></div>
-</div>
-<p>If you want to access data in ghost cells, instead of <code class="docutils literal notranslate"><span class="pre">.view</span></code> you should
-access <code class="docutils literal notranslate"><span class="pre">.data</span></code>, which is the underlying <code class="docutils literal notranslate"><span class="pre">ndarray</span></code>-like object used by the <code class="docutils literal notranslate"><span class="pre">Quantity</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">quantity</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.</span>  <span class="c1"># set all data this rank has, including ghost cells, to zero</span>
-<span class="n">quantity</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">quantity</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">3</span><span class="p">:</span><span class="n">quantity</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">==</span> <span class="mf">1.</span>  <span class="c1"># set the left three ghost cells to 1</span>
-<span class="n">array</span> <span class="o">=</span> <span class="n">quantity</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">quantity</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">quantity</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">quantity</span><span class="o">.</span><span class="n">extent</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>  <span class="c1"># same as quantity.view[:] for a 1D quantity</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">data</span></code> may be a numpy array or a cupy array. Both provide the same interface and
-can be used identically. If you would like to use the appropriate “numpy” package
-to manipulate your data, you can use <code class="docutils literal notranslate"><span class="pre">quantity.np</span></code>. For example, the following
-will give you the mean of your array, regardless of whether the data is on CPU or GPU,
-and regardless of whether halo values are present:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">quantity</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">quantity</span><span class="o">.</span><span class="n">view</span><span class="p">[:])</span>
-</pre></div>
-</div>
+and manages the “computational domain” of the data. See the fv3gfs-util documentation for
+full details about this object.</p>
 </div>
 </div>
 
@@ -240,7 +195,7 @@ and regardless of whether halo values are present:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="communication.html" class="btn btn-neutral float-right" title="Communication" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="developers.html" class="btn btn-neutral float-right" title="Developers Notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

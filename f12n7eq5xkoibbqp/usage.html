@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Usage &mdash; FV3GFS 0.4.3 documentation</title>
+  <title>Usage &mdash; FV3GFS 0.5.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.4.3
+                0.5.0
               </div>
             
           
@@ -94,14 +94,11 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#using-mpi">Using MPI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-the-model">Running the model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#nudging">Nudging</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#diagnostic-io">Diagnostic IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fv3gfs-util">fv3gfs-util</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#restart">Restart</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#loading-legacy-restarts">Loading legacy restarts</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="state.html">State</a></li>
-<li class="toctree-l1"><a class="reference internal" href="communication.html">Communication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developers Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
@@ -182,7 +179,7 @@
 errors that occur when running like this (these appear also in the pure Fortran model). If you’re running
 as root inside a Docker container, you need to add <code class="code docutils literal notranslate"><span class="pre">--allow-run-as-root</span></code>
 (this should be avoided outside of Docker).</p>
-<p>You also need to ensure that when the script executes model subroutines (e.g. <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.initialize()</span></code>), the current
+<p>You also need to ensure that when the script executes model subroutines (e.g. <a class="reference internal" href="api.html#fv3gfs.wrapper.initialize" title="fv3gfs.wrapper.initialize"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.initialize()</span></code></a>), the current
 working directory is a valid run directory. This can be done within the model script using the <code class="code docutils literal notranslate"><span class="pre">fv3config</span></code>
 package (as is done in the provided example scripts), or any other method you’d like to use.</p>
 <p>You additionally may need to extend the stack size using <cite>ulimit -s unlimited</cite>. Not doing this may result in a
@@ -192,71 +189,40 @@ segmentation fault. The docker image is set up to use this setting by default in
 <h2>Running the model<a class="headerlink" href="#running-the-model" title="Permalink to this headline">¶</a></h2>
 <p>Basic model operation can be seen in this short, self-explanatory example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
-<span class="kn">import</span> <span class="nn">fv3gfs</span>
+<span class="kn">from</span> <span class="nn">fv3gfs</span> <span class="kn">import</span> <span class="n">wrapper</span>
 
-<span class="n">fv3gfs</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">fv3gfs</span><span class="o">.</span><span class="n">get_step_count</span><span class="p">()):</span>
-    <span class="n">fv3gfs</span><span class="o">.</span><span class="n">step_dynamics</span><span class="p">()</span>
-    <span class="n">fv3gfs</span><span class="o">.</span><span class="n">step_physics</span><span class="p">()</span>
-    <span class="n">fv3gfs</span><span class="o">.</span><span class="n">save_intermediate_restart_if_enabled</span><span class="p">()</span>
-<span class="n">fv3gfs</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+<span class="n">wrapper</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">wrapper</span><span class="o">.</span><span class="n">get_step_count</span><span class="p">()):</span>
+    <span class="n">wrapper</span><span class="o">.</span><span class="n">step_dynamics</span><span class="p">()</span>
+    <span class="n">wrapper</span><span class="o">.</span><span class="n">step_physics</span><span class="p">()</span>
+    <span class="n">wrapper</span><span class="o">.</span><span class="n">save_intermediate_restart_if_enabled</span><span class="p">()</span>
+<span class="n">wrapper</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>This operation can be modified with getters and setters, described below, to read model state or
-insert new operations into the model. As of writing you do need to include both <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.step_dynamics()</span></code>
-and <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.step_physics()</span></code> in each iteration, in that order. <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.get_step_count()</span></code> gets the
+insert new operations into the model. As of writing you do need to include both <a class="reference internal" href="api.html#fv3gfs.wrapper.step_dynamics" title="fv3gfs.wrapper.step_dynamics"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.step_dynamics()</span></code></a>
+and <a class="reference internal" href="api.html#fv3gfs.wrapper.step_physics" title="fv3gfs.wrapper.step_physics"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.step_physics()</span></code></a> in each iteration, in that order. <a class="reference internal" href="api.html#fv3gfs.wrapper.get_step_count" title="fv3gfs.wrapper.get_step_count"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.get_step_count()</span></code></a> gets the
 number of times the Fortran code itself would execute the main loop before exiting.
-<code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.cleanup()</span></code> could be ommitted as far as memory cleanup is concerned, but it does write
+<a class="reference internal" href="api.html#fv3gfs.wrapper.cleanup" title="fv3gfs.wrapper.cleanup"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.cleanup()</span></code></a> could be ommitted as far as memory cleanup is concerned, but it does write
 final restart output and should be included if you want to maintain the normal behavior you would get
 in the Fortran model.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.step_physics()</span></code> call can be separated into two calls, <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.compute_physics()</span></code>
-and <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.apply_physics()</span></code> to allow modification of the model state in between these operations.
+<p>The <a class="reference internal" href="api.html#fv3gfs.wrapper.step_physics" title="fv3gfs.wrapper.step_physics"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.step_physics()</span></code></a> call can be separated into two calls, <a class="reference internal" href="api.html#fv3gfs.wrapper.compute_physics" title="fv3gfs.wrapper.compute_physics"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.compute_physics()</span></code></a>
+and <a class="reference internal" href="api.html#fv3gfs.wrapper.apply_physics" title="fv3gfs.wrapper.apply_physics"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.apply_physics()</span></code></a> to allow modification of the model state in between these operations.
 However care should be taken when doing this, because the physics and dynamics states are not
-consistent with each other before <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.apply_physics()</span></code> is called.</p>
+consistent with each other before <a class="reference internal" href="api.html#fv3gfs.wrapper.apply_physics" title="fv3gfs.wrapper.apply_physics"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.apply_physics()</span></code></a> is called.</p>
 </div>
 <p>Instead of using a Python script, it is also possible to get precisely the behavior of <code class="code docutils literal notranslate"><span class="pre">fv3.exe</span></code> using</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python -m fv3gfs.run
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python -m fv3gfs.wrapper.run
 </pre></div>
 </div>
 </div>
-<div class="section" id="nudging">
-<h2>Nudging<a class="headerlink" href="#nudging" title="Permalink to this headline">¶</a></h2>
-<p>Nudging functionality is provided by <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.apply_nudging()</span></code> and
-<code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.get_nudging_tendencies()</span></code>. The nudging tendencies can be stored to disk
-by the user, for example using a <code class="xref py py-class docutils literal notranslate"><span class="pre">fv3gfs.ZarrMonitor</span></code>. A runfile using this
-functionality can be found in the <cite>examples</cite> directory.</p>
-</div>
-<div class="section" id="diagnostic-io">
-<h2>Diagnostic IO<a class="headerlink" href="#diagnostic-io" title="Permalink to this headline">¶</a></h2>
-<p>State can be persisted to disk using either <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.write_state()</span></code> (described below)
-or <code class="xref py py-class docutils literal notranslate"><span class="pre">fv3gfs.ZarrMonitor</span></code>. The latter will coordinate between ranks to
-write state to a unified Zarr store. Initializing it requires passing grid information.
-This can be done directly from the namelist in a configuration dictionary like so:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">fv3gfs</span>
-<span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
-<span class="kn">import</span> <span class="nn">yaml</span>
-
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;fv3config.yml&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<span class="n">partitioner</span> <span class="o">=</span> <span class="n">fv3gfs</span><span class="o">.</span><span class="n">TilePartitioner</span><span class="o">.</span><span class="n">from_namelist</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;namelist&#39;</span><span class="p">])</span>
-</pre></div>
-</div>
-<p>Alternatively, the grid information can be specified manually:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">partitioner</span> <span class="o">=</span> <span class="n">fv3gfs</span><span class="o">.</span><span class="n">TilePartitioner</span><span class="p">(</span>
-    <span class="n">layout</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>Once you have a <code class="xref py py-class docutils literal notranslate"><span class="pre">fv3gfs.Partitioner</span></code>, the monitor can be created using any
-Zarr store:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zarr</span>
-<span class="n">store</span> <span class="o">=</span> <span class="n">zarr</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">DirectoryStore</span><span class="p">(</span><span class="s1">&#39;output_dir&#39;</span><span class="p">)</span>  <span class="c1"># relative or absolute path</span>
-<span class="n">ZarrMonitor</span><span class="p">(</span><span class="n">partitioner</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">mpi_comm</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Note this can be used with any directory store available in <code class="docutils literal notranslate"><span class="pre">zarr</span></code>.</p>
+<div class="section" id="fv3gfs-util">
+<h2>fv3gfs-util<a class="headerlink" href="#fv3gfs-util" title="Permalink to this headline">¶</a></h2>
+<p>Any functionality which can be used separately from the compiled Fortran model is included
+in a separate package, fv3gfs-util. We recommend reading the documentation for that package
+to see what tools it provides for use in your runfiles.</p>
 </div>
 <div class="section" id="restart">
 <h2>Restart<a class="headerlink" href="#restart" title="Permalink to this headline">¶</a></h2>
@@ -264,44 +230,45 @@ Zarr store:</p>
 from this state later. The FV3GFS Fortran model provides functionality to do so – we will describe
 functions to interface with these Fortran restarts further below.</p>
 <p>As a replacement, we provide a python-centric method for saving out and loading model state.
-Earlier we described <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.get_state()</span></code>, which takes in a list of names of quantities to retrieve
+Earlier we described <a class="reference internal" href="api.html#fv3gfs.wrapper.get_state" title="fv3gfs.wrapper.get_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.get_state()</span></code></a>, which takes in a list of names of quantities to retrieve
 from the Fortran state. Also provided is <cite>get_restart_names</cite>, which returns a list of quantity
 names you would need to write out to disk in order to smoothly reset the model state to that point.</p>
 <p>For example, if you ran:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">checkpoint_state</span> <span class="o">=</span> <span class="n">fv3gfs</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">fv3gfs</span><span class="o">.</span><span class="n">get_restart_names</span><span class="p">())</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">checkpoint_state</span> <span class="o">=</span> <span class="n">fv3gfs</span><span class="o">.</span><span class="n">wrapper</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">fv3gfs</span><span class="o">.</span><span class="n">wrapper</span><span class="o">.</span><span class="n">get_restart_names</span><span class="p">())</span>
 <span class="p">[</span><span class="n">time</span> <span class="n">steps</span><span class="p">,</span> <span class="n">model</span> <span class="n">operations</span><span class="p">,</span> <span class="n">etc</span><span class="o">.</span><span class="p">]</span>
-<span class="n">fv3gfs</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">checkpoint_state</span><span class="p">)</span>
+<span class="n">fv3gfs</span><span class="o">.</span><span class="n">wrapper</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">checkpoint_state</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>after calling <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.set_state()</span></code>, the model would be reset to the point
+<p>after calling <a class="reference internal" href="api.html#fv3gfs.wrapper.set_state" title="fv3gfs.wrapper.set_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.set_state()</span></code></a>, the model would be reset to the point
 where the checkpoint state was retrieved.</p>
 <p>The remaining step for restarting from disk is to be able to write model states to/from disk.
-For this, we have <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.write_state()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">read_state()</span></code>. Consider a model
+For this, we have <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.write_state()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.read_state()</span></code>. Consider a model
 script with a general structure as follows:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
-<span class="kn">import</span> <span class="nn">fv3gfs</span>
+<span class="kn">import</span> <span class="nn">fv3gfs.wrapper</span>
+<span class="kn">import</span> <span class="nn">fv3gfs.util</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="n">fv3gfs</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+<span class="n">fv3gfs</span><span class="o">.</span><span class="n">wrapper</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
 <span class="n">restart_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
     <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
     <span class="sa">f</span><span class="s1">&#39;RESTART/restart.rank</span><span class="si">{</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span><span class="si">}</span><span class="s1">.nc&#39;</span>
 <span class="p">)</span>
 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">restart_filename</span><span class="p">):</span>
-    <span class="n">restart_state</span> <span class="o">=</span> <span class="n">fv3gfs</span><span class="o">.</span><span class="n">read_state</span><span class="p">(</span><span class="n">restart_filename</span><span class="p">)</span>
-    <span class="n">fv3gfs</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">restart_state</span><span class="p">)</span>
+    <span class="n">restart_state</span> <span class="o">=</span> <span class="n">fv3gfs</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">read_state</span><span class="p">(</span><span class="n">restart_filename</span><span class="p">)</span>
+    <span class="n">fv3gfs</span><span class="o">.</span><span class="n">wrapper</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">restart_state</span><span class="p">)</span>
 
 <span class="c1"># ... continue to main loop and other parts of run script</span>
 
 <span class="c1"># after main loop is finished:</span>
-<span class="n">restart_state</span> <span class="o">=</span> <span class="n">fv3gfs</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">fv3gfs</span><span class="o">.</span><span class="n">get_restart_names</span><span class="p">())</span>
-<span class="n">fv3gfs</span><span class="o">.</span><span class="n">write_state</span><span class="p">(</span><span class="n">restart_state</span><span class="p">,</span> <span class="n">restart_filename</span><span class="p">)</span>
+<span class="n">restart_state</span> <span class="o">=</span> <span class="n">fv3gfs</span><span class="o">.</span><span class="n">wrapper</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">fv3gfs</span><span class="o">.</span><span class="n">wrapper</span><span class="o">.</span><span class="n">get_restart_names</span><span class="p">())</span>
+<span class="n">fv3gfs</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">write_state</span><span class="p">(</span><span class="n">restart_state</span><span class="p">,</span> <span class="n">restart_filename</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>In this script, if a restart file exists in the RESTART directory, it will be read in and overwrite
 the model state after the Fortran initialization routines take place. Each MPI rank
-(process) reads (with <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.read_state()</span></code>) or writes (with <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.write_state)</span>
-<span class="pre">a</span> <span class="pre">netCDF</span> <span class="pre">file</span> <span class="pre">with</span> <span class="pre">all</span> <span class="pre">of</span> <span class="pre">its</span> <span class="pre">restart</span> <span class="pre">data.</span> <span class="pre">:py:func:`fv3gfs.get_restart_names()</span></code> returns
+(process) reads (with <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.read_state()</span></code>) or writes (with <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.write_state)</span>
+<span class="pre">a</span> <span class="pre">netCDF</span> <span class="pre">file</span> <span class="pre">with</span> <span class="pre">all</span> <span class="pre">of</span> <span class="pre">its</span> <span class="pre">restart</span> <span class="pre">data.</span> <span class="pre">:py:func:`fv3gfs.wrapper.get_restart_names()</span></code> returns
 a list of all quantity names required to restart the model.</p>
 <p><code class="xref py py-func docutils literal notranslate"><span class="pre">save_intermediate_restart_if_enabled()</span></code>
 will call the portion of the normal Fortran main loop that checks how many timesteps have elapsed
@@ -311,15 +278,6 @@ have elapsed. <code class="xref py py-func docutils literal notranslate"><span c
 given label (instead of the model timestamp). <code class="xref py py-func docutils literal notranslate"><span class="pre">load_fortran_restart_folder()</span></code>
 will load restart files from the given directory, using the provided label if given (e.g. timestamp
 if Fortran intermediate restarts, or chosen saved label if using the wrapper direct-save routine).</p>
-</div>
-<div class="section" id="loading-legacy-restarts">
-<h2>Loading legacy restarts<a class="headerlink" href="#loading-legacy-restarts" title="Permalink to this headline">¶</a></h2>
-<p>A function <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.open_restart()</span></code> is available to load restart files that have
-been output by the Fortran code. This routine will handle
-loading the data on a single processor per tile and then distribute the data to other
-processes on the same tile. This may cause out-of-memory errors, which can be mitigated
-in a couple different ways through changes to the code base (e.g. loading a subset of
-the variables or levels at a time before distributing across ranks).</p>
 </div>
 </div>
 

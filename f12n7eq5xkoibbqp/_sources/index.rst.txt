@@ -12,7 +12,6 @@ Welcome to FV3GFS's documentation!
    installation
    usage
    state
-   communication
    developers
    api
    history

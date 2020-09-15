@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>API &mdash; FV3GFS 0.4.3 documentation</title>
+  <title>API &mdash; FV3GFS 0.5.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.4.3
+                0.5.0
               </div>
             
           
@@ -93,7 +93,6 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="state.html">State</a></li>
-<li class="toctree-l1"><a class="reference internal" href="communication.html">Communication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developers Notes</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
@@ -162,8 +161,168 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-fv3gfs">
-<span id="api"></span><h1>API<a class="headerlink" href="#module-fv3gfs" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-fv3gfs.wrapper">
+<span id="api"></span><h1>API<a class="headerlink" href="#module-fv3gfs.wrapper" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="fv3gfs.wrapper.initialize">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call initialization routines for the Fortran model.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.step">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">step</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform one dynamics-physics cycle of the Fortran model.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.step_dynamics">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">step_dynamics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.step_dynamics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform one physics step worth of dynamics in the Fortran model.</p>
+<p>Physics quantities are not updated by this routine.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.step_physics">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">step_physics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.step_physics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a physics step in the Fortran model.</p>
+<p>Equivalent to calling compute_physics() and apply_physics() in that order.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.save_intermediate_restart_if_enabled">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">save_intermediate_restart_if_enabled</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.save_intermediate_restart_if_enabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the Fortran model wants to do so on this timestep, write intermediate restart files.</p>
+<p>This function is used at the end of the Fortran main loop to replicate the
+intermediate restart behavior of the Fortran model.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.save_fortran_restart">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">save_fortran_restart</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.save_fortran_restart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trigger the Fortran model to write restart files.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.cleanup">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the Fortran cleanup routines, which clear memory and write final restart files.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.get_state">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">get_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.get_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary whose keys are quantity long names (with underscores instead of spaces)
+and values are Quantities containing that quantity’s data.</p>
+<p>Does not copy halo values, regardless of whether the halo is allocated.</p>
+<dl>
+<dt>Arguments:</dt><dd><p>names (list of str, optional): A list of names to get.
+state (dict, optional): If given, update this state in-place with any retrieved</p>
+<blockquote>
+<div><p>quantities, and update any pre-existing quantities in-place with Fortran
+values.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>allocator (fv3gfs.util.QuantityFactory, optional): if given, use this to construct</dt><dd><p>quantities. Otherwise use a QuantityFactory which uses the dimensions
+from the Fortran model with 3 allocated halo points.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>state (dict): state if given, otherwise a constructed state dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.set_state">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">set_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.set_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes in a dictionary whose keys are quantity long names (with underscores instead of spaces)
+and values are Quantity objects containing that quantity’s data. Sets the fortran state to
+those values.</p>
+<p>Assumes quantity units are equivalent to what is used in the fortran code.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>state (dict): values to set</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.get_n_ghost_cells">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">get_n_ghost_cells</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.get_n_ghost_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of ghost cells used by the Fortran dynamical core.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.get_step_count">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">get_step_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.get_step_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of physics steps the Fortran model would like to complete
+before exiting, based on its configuration.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.get_tracer_metadata">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">get_tracer_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.get_tracer_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict whose keys are tracer names and values are dictionaries with metadata.</p>
+<p>Metadata includes the keys ‘i_tracer’ (tracer index number in Fortran), ‘fortran_name’
+(the short name in Fortran), ‘units’, and a boolean ‘is_water’.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.compute_physics">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">compute_physics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.compute_physics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call physics routines in the Fortran model and update physics prognostic state.</p>
+<p>It is necessary to call apply_physics() after this to update the dynamical
+prognostic state with the output from the routines called by this function.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.apply_physics">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">apply_physics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.apply_physics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update dynamical prognostic state with output from physics routines.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.get_restart_names">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">get_restart_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.get_restart_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of variables names needed for a clean restart.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.open_restart">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">open_restart</code><span class="sig-paren">(</span><em class="sig-param">dirname: str</em>, <em class="sig-param">communicator: fv3gfs.util.communicator.CubedSphereCommunicator</em>, <em class="sig-param">label: str = ''</em>, <em class="sig-param">only_names: List[str] = None</em><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#fv3gfs.wrapper.open_restart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load restart files output by the Fortran model into a state dictionary.</p>
+<p>See <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.set_state()</span></code> if you would like to load the resulting state into
+the Fortran model.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>dirname: location of restart files, can be local or remote
+communicator: communication object for the cubed sphere
+label: prepended string on the restart files to load
+only_names (optional): list of standard names to load</p>
+</dd>
+<dt>Returns:</dt><dd><p>state: model state dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.set_state_mass_conserving">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">set_state_mass_conserving</code><span class="sig-paren">(</span><em class="sig-param">state: Mapping[str, fv3gfs.util.quantity.Quantity], fv3gfs=&lt;module 'fv3gfs.wrapper._wrapper' from '/fv3gfs-wrapper/fv3gfs/wrapper/_wrapper.cpython-37m-x86_64-linux-gnu.so'&gt;, pressure='pressure_thickness_of_atmospheric_layer'</em><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.set_state_mass_conserving" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the state in a mass conserving way</p>
+<dl>
+<dt>Args:</dt><dd><p>state: a state dictionary. Any water vapor species should have the following form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>        <span class="n">mass</span> <span class="n">condensate</span> <span class="ow">or</span> <span class="n">vapor</span>
+<span class="o">-------------------------------------------</span>
+<span class="n">mass</span> <span class="n">vapor</span> <span class="o">+</span> <span class="n">mass</span> <span class="n">condensate</span> <span class="o">+</span> <span class="n">mass</span> <span class="n">dry</span> <span class="n">air</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>fv3gfs: an object implementing get_state, set_state, and get_tracer_metadata.</dt><dd><p>Defaults to the Fortran wrapper, but can be overrided for testing purposes.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 
