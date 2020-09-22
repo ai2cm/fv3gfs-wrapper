@@ -30,24 +30,6 @@ in development mode with `pip install -e .`.
 
 This package only supports linux and Python 3.5 or greater.
 
-Installation for Clusters
--------------------------
-
-The default installation method outlined above is suitable for running on a local
-computer or on a single cloud VM instance.  If you wish to run FV3 on multiple
-compute nodes (eg. on a cluster of multiple computers), the appropriate Docker
-image can be built using `build_hpc_docker.sh`.  An user will need to select the
-specific configuration (compiler, MPI implementation, GPU support) by setting
-the HPC_CONFIG variable in the script.  The user will also need to set the 
-OUTPUT_IMAGE variable to specify where the final Docker image is to be written 
-(a DockerHub image address can be used).
-
-Currently, there is support for the GNU 8 and 9 suite of compilers, the MPICH
-3.1.4 implementation of MPI and CUDA 10.1 for Nvidia GPU support.
-
-Note that `build_hpc_docker.sh` will build a new Docker image from scratch.  This 
-build process takes approximately 20 minutes on a single cloud VM with 8 CPUs.
-
 Building Docs
 -------------
 
