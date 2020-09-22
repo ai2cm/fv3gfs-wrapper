@@ -6,7 +6,7 @@ FROM $FMS_IMAGE AS fv3gfs-fms
 FROM $ESMF_IMAGE AS fv3gfs-esmf
 
 #-----------------------------------------------------------------------------
-FROM ubuntu:19.10 as fv3config-inputdata
+FROM ubuntu:18.04 as fv3config-inputdata
 
 RUN apt-get update && \
     apt-get install -y python3 python3-pip wget && \
@@ -27,65 +27,82 @@ COPY requirements.txt /fv3gfs-wrapper/requirements.txt
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     libpython3-dev \
-    libopenmpi3 \
     python3-dev \
-    python3-setuptools \
     python3-pip \
     cython3 && \
-    pip3 install wheel && \
+    pip3 install wheel setuptools==50.3.0 && \
     pip3 install -r /fv3gfs-wrapper/requirements.txt  && \
     ln -s /bin/python3 /bin/python && \
     ln -s /bin/pip3 /bin/pip
 
+RUN wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz && \
+    tar xzf mpich-3.1.4.tar.gz && \
+    cd mpich-3.1.4 && \
+    ./configure --enable-fortran --enable-cxx --prefix=/usr --enable-fast=all,O3 --with-cuda=/usr/local/cuda && \
+    make -j4 && make install && ldconfig && \
+    cd .. && rm -rf mpich-3.1.4*
+
 #-----------------------------------------------------------------------------
 FROM fv3gfs-wrapper-env AS fv3gfs-wrapper-build
 
-ENV FMS_DIR=/fv3gfs-wrapper/lib/external/FMS
-ENV ESMF_DIR=/fv3gfs-wrapper/lib/external/esmf
-ENV ESMF_INC="-I${ESMF_DIR}/include -I${ESMF_DIR}/mod/modO3/Linux.gfortran.64.mpiuni.default/"
+ENV FMS_DIR=/fv3gfs-wrapper/lib/external/FMS \
+    ESMF_DIR=/fv3gfs-wrapper/lib/external/esmf 
 
-ENV FMS_LIB=${FMS_DIR}/libFMS/.libs/
-ENV ESMF_LIB=${ESMF_DIR}/lib/libO3/Linux.gfortran.64.mpiuni.default/
+ENV ESMF_INC="-I${ESMF_DIR}/include" \ 
+    FMS_LIB=${FMS_DIR}/libFMS/.libs/ \ 
+    ESMF_LIB=${ESMF_DIR}/lib  
+
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ESMF_LIB}:${FMS_LIB}
 
 ARG FV3GFS_BUILD_ROOT=/
 
 COPY --from=fv3gfs-fms /FMS $FMS_DIR
 COPY --from=fv3gfs-esmf /usr/local/esmf ${ESMF_DIR}
-
 COPY --from=fv3gfs-fms /FMS/libFMS/.libs/*.so* /lib64/
-COPY --from=fv3gfs-esmf /usr/local/esmf/lib/libO3/Linux.gfortran.64.mpiuni.default/*.so* /lib64/
+COPY --from=fv3gfs-esmf /usr/local/esmf/lib/*.so* /lib64/
 
 # copy wrapper and fortran sources
 # directory copy commands must be separate due to docker limitations
 COPY lib /fv3gfs-wrapper/lib
-COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/stochastic_physics /fv3gfs-wrapper/lib/external/stochastic_physics
-COPY --from=fv3gfs-fortran-build ${FV3GFS_BUILD_ROOT}/FV3 /fv3gfs-wrapper/lib/external/FV3
+COPY --from=fv3gfs-fortran-build /stochastic_physics/ /fv3gfs-wrapper/lib/external/stochastic_physics/
+COPY --from=fv3gfs-fortran-build /FV3/ /fv3gfs-wrapper/lib/external/FV3/
 
 RUN PREFIX=/usr/local make -C /fv3gfs-wrapper/lib/external/FV3 install
 
 COPY templates /fv3gfs-wrapper/templates
 COPY examples /fv3gfs-wrapper/examples
 COPY docs /fv3gfs-wrapper/docs
+
 # files can be copied in one line
 COPY fv3gfs/wrapper/dynamics_properties.json fv3gfs/wrapper/physics_properties.json /fv3gfs-wrapper/fv3gfs/wrapper/
 COPY fill_templates.py HISTORY.md LICENSE Makefile MANIFEST.in README.md setup.cfg setup.py /fv3gfs-wrapper/
 COPY fv3gfs /fv3gfs-wrapper/fv3gfs
 
-RUN make -C /fv3gfs-wrapper build
+#RUN make -C /fv3gfs-wrapper build
 
 #-----------------------------------------------------------------------------
 FROM fv3gfs-wrapper-build AS fv3gfs-wrapper
 
-RUN pip3 install --no-deps --no-cache-dir git+https://github.com/GridTools/gt4py.git@db40777788863bfe87b9674b118e8bd5b8db0440#egg=gt4py
+#RUN pip3 install --no-deps --no-cache-dir git+https://github.com/GridTools/gt4py.git@db40777788863bfe87b9674b118e8bd5b8db0440#egg=gt4py
+RUN pip3 install --no-deps --no-cache-dir git+https://github.com/SpiderMonkey1975/gt4py.git#egg=gt4py[cuda102]
 
 # copy and install dependency packages
+COPY fill_templates.py /fv3gfs-wrapper/fill_templates.py
+COPY templates/ /fv3gfs-wrapper/templates/
 COPY external /fv3gfs-wrapper/external
+COPY lib/ /fv3gfs-wrapper/lib/
+
 COPY requirements_local.txt /fv3gfs-wrapper/requirements_local.txt
-RUN cd /fv3gfs-wrapper && pip3 install --no-deps --no-cache-dir -r /fv3gfs-wrapper/requirements_local.txt
+RUN cd /fv3gfs-wrapper && \
+    export MPI=mpich && \
+    export LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} && \
+    make -C lib && \ 
+    pip3 install --no-deps --no-cache-dir -r /fv3gfs-wrapper/requirements_local.txt
 
 # cache model data
-ENV FV3CONFIG_CACHE_DIR=/inputdata
+ENV FV3CONFIG_CACHE_DIR=/inputdata \
+    LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+    MPI=mpich
 COPY --from=fv3config-inputdata /fv3config-cache $FV3CONFIG_CACHE_DIR/fv3config-cache
 
 RUN chmod -R 777 $FV3CONFIG_CACHE_DIR && \

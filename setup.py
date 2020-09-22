@@ -44,13 +44,14 @@ mpi_flavor = os.environ.get("MPI", "openmpi")
 if mpi_flavor == "openmpi":
     library_link_args += pkgconfig.libs("ompi-fort").split()
 else:
-    library_link_args += pkgconfig.libs("mpich-fort").split()
+#    library_link_args += pkgconfig.libs("mpich-fort").split()
+    library_link_args += ["-lmpich","-lmpifort","-lmpichcxx"] 
 
 # need to include math and c library
 library_link_args += ["-lmvec", "-lc"]
 
 requirements = [
-    "mpi4py>=3",
+    "mpi4py>=3.0.3",
     "cftime>=1.2.1",
     "xarray>=0.15.1",
     "netCDF4>=1.4.2",
