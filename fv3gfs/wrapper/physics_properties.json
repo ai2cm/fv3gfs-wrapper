@@ -204,6 +204,22 @@
         "dims": ["y", "x"]
     },
     {
+        "name": "ocean_surface_temperature",
+        "fortran_name": "tsfco",
+        "units": "degK",
+        "description": "surface skin temperature over ocean",
+        "container": "Sfcprop",
+        "dims": ["y", "x"]
+    },
+    {
+        "name": "land_surface_temperature",
+        "fortran_name": "tsfcl",
+        "units": "degK",
+        "description": "surface skin temperature over land",
+        "container": "Sfcprop",
+        "dims": ["y", "x"]
+    },
+    {
         "name": "water_equivalent_of_accumulated_snow_depth",
         "fortran_name": "weasd",
         "units": "kg/m^2",
