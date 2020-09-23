@@ -17,6 +17,7 @@ Minor changes:
 - Dawn is removed from the fv3gfs-wrapper test image
 - Makefile in lib no longer depends on fv3gfs configuration files, since they were not actually being used.
 - CC used for `python setup.py build_ext --inplace` is now specified directly in the Makefile (default gcc), since docker was somehow using different compilers locally and in CI
+- add `Sfcprop%tsfco` and `Sfcprop%tsfcl` to `physics_properties.json`
 
 v0.5.0 (2020-07-28)
 ------
