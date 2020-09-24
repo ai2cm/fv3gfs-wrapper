@@ -13,10 +13,13 @@ from ._wrapper import (
     get_tracer_metadata,
     compute_physics,
     apply_physics,
+    Flags,
 )
 from ._restart import get_restart_names, open_restart
 
 from .thermodynamics import set_state_mass_conserving
+
+flags = Flags()
 
 __version__ = "0.5.0"
 
