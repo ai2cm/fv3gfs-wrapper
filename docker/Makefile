@@ -1,6 +1,6 @@
 GCR_URL ?= us.gcr.io/vcm-ml
 TARGET ?= fv3gfs-wrapper
-TAG_NAME ?= fv3core
+TAG_NAME ?= latest
 DOCKERFILE ?= Dockerfile
 FORTRAN_ROOT ?= ../lib/external
 FORTRAN_DOCKERFILE ?= $(FORTRAN_ROOT)/docker/Dockerfile
