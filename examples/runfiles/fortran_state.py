@@ -1,5 +1,5 @@
 import fv3gfs.wrapper
-from fv3util import io
+from fv3gfs.util import io
 import mpi4py
 
 # May need to run 'ulimit -s unlimited' before running this example
