@@ -2,9 +2,9 @@
 	path = external/fv3config
 	url = git@github.com:VulcanClimateModeling/fv3config.git
 [submodule "lib/external"]
+	branch = single-dockerfile 
 	path = lib/external
 	url = git@github.com:VulcanClimateModeling/fv3gfs-fortran.git
-	branch = use-mpich-only
 [submodule "external/fv3gfs-util"]
 	path = external/fv3gfs-util
 	url = git@github.com:VulcanClimateModeling/fv3gfs-util.git

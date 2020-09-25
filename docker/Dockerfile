@@ -6,7 +6,7 @@ FROM $FMS_IMAGE AS fv3gfs-fms
 FROM $ESMF_IMAGE AS fv3gfs-esmf
 
 #-----------------------------------------------------------------------------
-FROM ubuntu:18.04 as fv3config-inputdata
+FROM ubuntu:19.10 as fv3config-inputdata
 
 RUN apt-get update && \
     apt-get install -y python3 python3-pip wget && \
@@ -38,7 +38,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz && \
     tar xzf mpich-3.1.4.tar.gz && \
     cd mpich-3.1.4 && \
-    ./configure --enable-fortran --enable-cxx --prefix=/usr --enable-fast=all,O3 --with-cuda=/usr/local/cuda && \
+    ./configure --enable-fortran --enable-cxx --prefix=/usr --enable-fast=all,O3 && \
     make -j4 && make install && ldconfig && \
     cd .. && rm -rf mpich-3.1.4*
 

@@ -30,7 +30,7 @@ export PRINT_HELP_PYSCRIPT
 
 BROWSER := python3 -c "$$BROWSER_PYSCRIPT"
 
-DOCKER_IMAGE?=us.gcr.io/vcm-ml/fv3gfs-wrapper:latest
+DOCKER_IMAGE?=us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu9-mpich314-nocuda
 
 PYTHON_FILES = $(shell git ls-files | grep -e 'py$$' | grep -v -e '__init__.py')
 PYTHON_INIT_FILES = $(shell git ls-files | grep '__init__.py')
@@ -101,7 +101,7 @@ docs-docker:
 	$(BROWSER) docs/_build/html/index.html
 
 build-docker:
-	BUILD_FROM_INTERMEDIATE=n $(MAKE) -C docker
+	BUILD_FROM_INTERMEDIATE=y $(MAKE) -C docker
 
 test-docker: build-docker
 	./test_docker.sh
