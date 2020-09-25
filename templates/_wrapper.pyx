@@ -346,6 +346,7 @@ class Flags:
         return {{item.name}}
 {% endfor %}
 
+flags = Flags()
 
 def initialize():
     """Call initialization routines for the Fortran model."""

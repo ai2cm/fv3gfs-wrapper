@@ -65,8 +65,17 @@ if __name__ == "__main__":
         properties["dim_colons"] = ", ".join(":" for dim in properties["dims"])
         dynamics_properties.append(properties)
 
-    for properties in flagstruct_data:
-        flagstruct_properties.append(properties)
+    for flag in flagstruct_data:
+        if flag["type_fortran"] == "integer":
+            flag["type_c"] = "c_int"
+            flag["type_cython"] = "int"
+        elif flag["type_fortran"] == "real":
+            flag["type_c"] = "c_double"
+            flag["type_cython"] = "REAL_t"
+        elif flag["type_fortran"] == "logical":
+            flag["type_c"] = "c_bool"
+            flag["type_cython"] = "bint"
+        flagstruct_properties.append(flag)
 
     if len(requested_templates) == 0:
         requested_templates = all_templates

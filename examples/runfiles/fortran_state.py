@@ -1,5 +1,5 @@
 import fv3gfs.wrapper
-from fv3gfs.util import io
+from fv3gfs.util import write_state
 import mpi4py
 
 # May need to run 'ulimit -s unlimited' before running this example
@@ -25,7 +25,6 @@ if __name__ == "__main__":
         "cloud_ice_mixing_ratio",
         "graupel_mixing_ratio",
         "ozone_mixing_ratio",
-        "cloud_fraction",
         "air_temperature",
         "pressure_thickness_of_atmospheric_layer",
         "vertical_thickness_of_atmospheric_layer",
@@ -51,7 +50,6 @@ if __name__ == "__main__":
         "eastward_wind",
         "northward_wind",
         "layer_mean_pressure_raised_to_power_of_kappa",
-        "turbulent_kinetic_energy",
         "time",
     ]
     comm = mpi4py.MPI.COMM_WORLD
@@ -63,5 +61,5 @@ if __name__ == "__main__":
         fv3gfs.wrapper.step_physics()
         fv3gfs.wrapper.save_intermediate_restart_if_enabled()
     state = fv3gfs.wrapper.get_state(names=save_names)
-    io.write_state(state, "outstate_{0}.nc".format(rank))
+    write_state(state, "outstate_{0}.nc".format(rank))
     fv3gfs.wrapper.cleanup()
