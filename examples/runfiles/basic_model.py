@@ -14,7 +14,6 @@ import fv3gfs.wrapper
 # mpirun -n 6 --allow-run-as-root --oversubscribe --mca btl_vader_single_copy_mechanism none python3 basic_model.py
 
 if __name__ == "__main__":
-
     fv3gfs.wrapper.initialize()
     for i in range(fv3gfs.wrapper.get_step_count()):
         fv3gfs.wrapper.step_dynamics()
