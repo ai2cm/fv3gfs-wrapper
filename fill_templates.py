@@ -15,7 +15,12 @@ dim_ranges = {
     "z_interface": "1:nz()+1",
 }
 
-all_templates = ("physics_data.F90", "_wrapper.pyx", "dynamics_data.F90")
+all_templates = (
+    "physics_data.F90",
+    "_wrapper.pyx",
+    "dynamics_data.F90",
+    "flagstruct_data.F90",
+)
 SETUP_DIR = os.path.dirname(os.path.abspath(__file__))
 PROPERTIES_DIR = os.path.join(SETUP_DIR, "fv3gfs/wrapper")
 
@@ -39,10 +44,14 @@ if __name__ == "__main__":
     dynamics_data = json.load(
         open(os.path.join(PROPERTIES_DIR, "dynamics_properties.json"))
     )
+    flagstruct_data = json.load(
+        open(os.path.join(PROPERTIES_DIR, "flagstruct_properties.json"))
+    )
 
     physics_2d_properties = []
     physics_3d_properties = []
     dynamics_properties = []
+    flagstruct_properties = []
 
     for properties in physics_data:
         if len(properties["dims"]) == 2:
@@ -56,6 +65,23 @@ if __name__ == "__main__":
         properties["dim_colons"] = ", ".join(":" for dim in properties["dims"])
         dynamics_properties.append(properties)
 
+    for flag in flagstruct_data:
+        if flag["type_fortran"] == "integer":
+            flag["type_c"] = "c_int"
+            flag["type_cython"] = "int"
+        elif flag["type_fortran"] == "real":
+            flag["type_c"] = "c_double"
+            flag["type_cython"] = "REAL_t"
+        elif flag["type_fortran"] == "logical":
+            flag["type_c"] = "c_bool"
+            flag["type_cython"] = "bint"
+        else:
+            unexpected_type = flag["type_fortran"]
+            raise NotImplementedError(
+                f"unexpected value for type_fortran: {unexpected_type}"
+            )
+        flagstruct_properties.append(flag)
+
     if len(requested_templates) == 0:
         requested_templates = all_templates
 
@@ -67,6 +93,7 @@ if __name__ == "__main__":
             physics_2d_properties=physics_2d_properties,
             physics_3d_properties=physics_3d_properties,
             dynamics_properties=dynamics_properties,
+            flagstruct_properties=flagstruct_properties,
         )
         with open(out_filename, "w") as f:
             f.write(result)
