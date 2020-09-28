@@ -18,7 +18,6 @@ def set_state_mass_conserving(
                             mass condensate or vapor
                     -------------------------------------------
                     mass vapor + mass condensate + mass dry air
-            
         fv3gfs: an object implementing get_state, set_state, and get_tracer_metadata.
             Defaults to the Fortran wrapper, but can be overrided for testing purposes.
     """
