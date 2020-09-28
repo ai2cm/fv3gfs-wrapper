@@ -11,7 +11,6 @@ def set_state_mass_conserving(
     pressure="pressure_thickness_of_atmospheric_layer",
 ):
     """Set the state in a mass conserving way
-    
     Args:
         state: a state dictionary. Any water vapor species should have the following form::
 
