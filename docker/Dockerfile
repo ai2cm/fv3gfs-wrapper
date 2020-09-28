@@ -1,12 +1,15 @@
+ARG BASE_IMAGE
+ARG MPI_IMAGE
 ARG FMS_IMAGE
 ARG ESMF_IMAGE
 ARG FORTRAN_ENV_IMAGE
 
+FROM $MPI_IMAGE AS fv3gfs-mpi
 FROM $FMS_IMAGE AS fv3gfs-fms
 FROM $ESMF_IMAGE AS fv3gfs-esmf
 
 #-----------------------------------------------------------------------------
-FROM ubuntu:19.10 as fv3config-inputdata
+FROM $BASE_IMAGE as fv3config-inputdata
 
 RUN apt-get update && \
     apt-get install -y python3 python3-pip wget && \
@@ -23,6 +26,7 @@ RUN mkdir -p /fv3config-cache/gs/vcm-fv3config && \
 FROM $FORTRAN_ENV_IMAGE as fv3gfs-wrapper-env
 
 COPY requirements.txt /fv3gfs-wrapper/requirements.txt
+COPY --from=fv3gfs-mpi /mpich-3.1.4 /mpich-3.1.4
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
@@ -35,12 +39,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ln -s /bin/python3 /bin/python && \
     ln -s /bin/pip3 /bin/pip
 
-RUN wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz && \
-    tar xzf mpich-3.1.4.tar.gz && \
-    cd mpich-3.1.4 && \
-    ./configure --enable-fortran --enable-cxx --prefix=/usr --enable-fast=all,O3 && \
-    make -j4 && make install && ldconfig && \
-    cd .. && rm -rf mpich-3.1.4*
+RUN cd /mpich-3.1.4 && \
+    make install && ldconfig
+#RUN wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz && \
+#    tar xzf mpich-3.1.4.tar.gz && \
+#    cd mpich-3.1.4 && \
+#    ./configure --enable-fortran --enable-cxx --prefix=/usr --enable-fast=all,O3 && \
+#    make -j4 && make install && ldconfig && \
+#    cd .. && rm -rf mpich-3.1.4*
 
 #-----------------------------------------------------------------------------
 FROM fv3gfs-wrapper-env AS fv3gfs-wrapper-build
@@ -83,8 +89,7 @@ COPY fv3gfs /fv3gfs-wrapper/fv3gfs
 #-----------------------------------------------------------------------------
 FROM fv3gfs-wrapper-build AS fv3gfs-wrapper
 
-#RUN pip3 install --no-deps --no-cache-dir git+https://github.com/GridTools/gt4py.git@db40777788863bfe87b9674b118e8bd5b8db0440#egg=gt4py
-RUN pip3 install --no-deps --no-cache-dir git+https://github.com/SpiderMonkey1975/gt4py.git#egg=gt4py[cuda102]
+RUN pip3 install --no-deps --no-cache-dir git+https://github.com/GridTools/gt4py.git@db40777788863bfe87b9674b118e8bd5b8db0440#egg=gt4py[cupy]
 
 # copy and install dependency packages
 COPY fill_templates.py /fv3gfs-wrapper/fill_templates.py

@@ -6,7 +6,15 @@ FORTRAN_ROOT ?= ../lib/external
 FORTRAN_DOCKERFILE ?= $(FORTRAN_ROOT)/docker/Dockerfile
 BUILD_FROM_INTERMEDIATE ?= y
 
-DEP_TAG_NAME ?= gnu9-mpich314-nocuda
+CUDA ?=n
+ifeq ($(CUDA),n)
+	BASE_IMAGE ?= ubuntu:19.10
+	DEP_TAG_NAME ?= gnu9-mpich314-nocuda
+else
+	BASE_IMAGE ?= nvidia/cuda:10.2-devel-ubuntu18.04
+	DEP_TAG_NAME ?= gnu8-mpich314-cuda102
+endif
+
 FV3GFS_WRAPPER_IMAGE = $(GCR_URL)/$(TARGET):$(DEP_TAG_NAME)
 MPI_IMAGE = $(GCR_URL)/mpi-build:$(DEP_TAG_NAME)
 FMS_IMAGE ?= $(GCR_URL)/fms-build:$(DEP_TAG_NAME)
@@ -23,7 +31,11 @@ EXPERIMENT ?= new
 RUNDIR_CONTAINER=/rundir
 RUNDIR_HOST=$(shell pwd)/rundir
 
-FV3GFS_WRAPPER_BUILD_ARGS = --build-arg FMS_IMAGE=$(FMS_IMAGE) --build-arg ESMF_IMAGE=$(ESMF_IMAGE) --build-arg FORTRAN_ENV_IMAGE=$(FORTRAN_IMAGE) --build-arg MPI_IMAGE=$(MPI_IMAGE)
+FV3GFS_WRAPPER_BUILD_ARGS  = --build-arg BASE_IMAGE=$(BASE_IMAGE) 
+FV3GFS_WRAPPER_BUILD_ARGS += --build-arg FMS_IMAGE=$(FMS_IMAGE) 
+FV3GFS_WRAPPER_BUILD_ARGS += --build-arg ESMF_IMAGE=$(ESMF_IMAGE) 
+FV3GFS_WRAPPER_BUILD_ARGS += --build-arg FORTRAN_ENV_IMAGE=$(FORTRAN_IMAGE) 
+FV3GFS_WRAPPER_BUILD_ARGS += --build-arg MPI_IMAGE=$(MPI_IMAGE)
 
 all: build_deps build
 
