@@ -75,6 +75,9 @@ if __name__ == "__main__":
         elif flag["type_fortran"] == "logical":
             flag["type_c"] = "c_bool"
             flag["type_cython"] = "bint"
+        else:
+            unexpected_type = flag["type_fortran"]
+            raise NotImplementedError(f"unexpected value for type_fortran: {unexpected_type}")
         flagstruct_properties.append(flag)
 
     if len(requested_templates) == 0:
