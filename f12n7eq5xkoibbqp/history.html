@@ -185,13 +185,15 @@
 <p>Major changes:
 - Use <cite>cftime.datetime</cite> objects to represent datetimes in fv3gfs-python and fv3util instead of <cite>datetime.datetime</cite> objects.  This results in times stored in a format compatible with the fortran model, and accurate internal representation of times with the calendar specified
 in the <cite>coupler_nml</cite> namelist.
-- Fortran source updated to include new per-physics-component tendency diagnostics for temperature and specific humidity, and to ensure that the column moistening implied by nudging specific humidity is subtracted from the precipitation felt by the land surface model.</p>
+- Fortran source updated to include new per-physics-component tendency diagnostics for temperature and specific humidity, and to ensure that the column moistening implied by nudging specific humidity is subtracted from the precipitation felt by the land surface model.
+- The wrapper now passes runtime flags similarly to physics and dynamics properties but in a class structure, so ptop is accessible as <cite>wrapper.flags.ptop</cite>.</p>
 <p>Minor changes:
 - added jenkins scripts under .jenkins
 - Dawn is removed from the fv3gfs-wrapper test image
 - Makefile in lib no longer depends on fv3gfs configuration files, since they were not actually being used.
 - CC used for <cite>python setup.py build_ext –inplace</cite> is now specified directly in the Makefile (default gcc), since docker was somehow using different compilers locally and in CI
-- add <cite>Sfcprop%tsfco</cite> and <cite>Sfcprop%tsfcl</cite> to <cite>physics_properties.json</cite></p>
+- add <cite>Sfcprop%tsfco</cite> and <cite>Sfcprop%tsfcl</cite> to <cite>physics_properties.json</cite>
+- added baroclinic and state-saving cases to <cite>examples/runfiles</cite></p>
 </div>
 <div class="section" id="v0-5-0-2020-07-28">
 <h2>v0.5.0 (2020-07-28)<a class="headerlink" href="#v0-5-0-2020-07-28" title="Permalink to this headline">¶</a></h2>
