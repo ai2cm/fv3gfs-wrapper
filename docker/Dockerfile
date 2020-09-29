@@ -83,7 +83,6 @@ COPY fv3gfs /fv3gfs-wrapper/fv3gfs
 FROM fv3gfs-wrapper-build AS fv3gfs-wrapper
 
 RUN pip3 install --no-deps --no-cache-dir git+https://github.com/GridTools/gt4py.git@db40777788863bfe87b9674b118e8bd5b8db0440#egg=gt4py$(GT4PY_CUDA) 
-#RUN pip3 install --no-deps --no-cache-dir git+https://github.com/GridTools/gt4py.git@db40777788863bfe87b9674b118e8bd5b8db0440#egg=gt4py 
 
 # copy and install dependency packages
 COPY fill_templates.py /fv3gfs-wrapper/fill_templates.py

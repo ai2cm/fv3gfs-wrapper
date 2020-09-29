@@ -10,6 +10,7 @@ def open_restart(
     only_names: List[str] = None,
 ) -> dict:
     """Load restart files output by the Fortran model into a state dictionary.
+
     See :py:func:`fv3gfs.set_state` if you would like to load the resulting state into
     the Fortran model.
 
