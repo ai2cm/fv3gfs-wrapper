@@ -32,7 +32,7 @@
     {
         "name": "accumulated_y_courant_number",
         "fortran_name": "cy",
-        "units": "unknown",
+        "units": "",
         "dims": ["z", "y", "x"]
     },
     {

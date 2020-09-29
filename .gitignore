@@ -113,3 +113,9 @@ ENV/
 # mypy
 .mypy_cache/
 .vscode
+
+# build artifacts in lib
+lib/_wrapper.pyx
+lib/physics_data.F90
+lib/dynamics_data.F90
+lib/flagstruct_data.F90
