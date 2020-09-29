@@ -11,7 +11,10 @@ real_type = np.float64
 SURFACE_PRECIPITATION_RATE = 'surface_precipitation_rate'
 MM_PER_M = 1000
 
+
 cdef extern:
+    void get_metadata_diagnostics(int* , int *, char*, char*, char*, char*)
+    void get_number_diagnostics(int *)
     void initialize_subroutine(int *comm)
     void do_step_subroutine()
     void cleanup_subroutine()
@@ -392,3 +395,35 @@ def save_fortran_restart():
 def cleanup():
     """Call the Fortran cleanup routines, which clear memory and write final restart files."""
     cleanup_subroutine()
+
+
+cdef object cstring_to_py(char * s):
+    cdef bytes buf = s
+    return s.encode("UTF-8")
+
+
+def get_diagnostic_info():
+    cdef int n, i, ax
+    cdef int axes[1]
+    cdef char name[128]
+    cdef char mod_name[128]
+    cdef char desc[128]
+    cdef char unit[128]
+    get_number_diagnostics(&n)
+
+    output = {}
+    for i in range(n):
+        get_metadata_diagnostics(&i, axes, mod_name, name, desc, unit)
+
+        ax = axes[0]
+
+        output[i] =  {
+            "axes": ax,
+            "mod_name": cstring_to_py(mod_name),
+            "name": cstring_to_py(name),
+            "desc": cstring_to_py(desc),
+            "unit": cstring_to_py(unit),
+        }
+
+    return output
+

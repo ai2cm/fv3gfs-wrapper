@@ -11,9 +11,12 @@ FC ?= mpif90
 
 .PHONY: clean cleanall fortran_libs
 
-all: coupler_lib.o dynamics_data.o physics_data.o $(TEMPLATES)
+all: coupler_lib.o dynamics_data.o physics_data.o diag_data.o $(TEMPLATES)
 
-dynamics_data.o: dynamics_data.F90
+%.o: %.F90
+	$(FC) $(FFLAGS)  -c $< -o $@
+
+%.o: %.f90
 	$(FC) $(FFLAGS)  -c $< -o $@
 
 physics_data.o: physics_data.F90 dynamics_data.o

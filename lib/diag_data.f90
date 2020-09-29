@@ -9,31 +9,22 @@ module physics_data_mod
     
     implicit none
 
-    type, bind(c) :: external_diag_c_t
-        integer(c_int) :: idx
-        integer(c_int) :: axes
-        character(c_char)    :: mod_name
-        character(c_char)   :: name
-        character(c_char)   :: desc
-        character(c_char)    :: unit
-    end type external_diag_c_t
-    
     contains
 
-    subroutine get_number_diagnostics(n)
+    subroutine get_number_diagnostics(n) bind(c)
         integer(c_int), intent(out) :: n
         n = size(IPD_Diag)
     end subroutine
 
-    subroutine get_metadata_diagnostics(idx, metadata)
+    subroutine get_metadata_diagnostics(idx, axes, mod_name, name, desc, unit) bind(c)
         integer(c_int), intent(in) :: idx
-        type(external_diag_c_t), intent(out) :: metadata
-        metadata%idx = idx
-        metadata%axes = IPD_Diag(idx)%axes
-        metadata%mod_name = trim(IPD_Diag(idx)%mod_name) // c_null_char
-        metadata%name = trim(IPD_Diag(idx)%name) // c_null_char
-        metadata%desc = trim(IPD_Diag(idx)%desc) // c_null_char
-        metadata%unit = trim(IPD_Diag(idx)%desc) // c_null_char
+        integer(c_int), intent(out) :: axes
+        character(c_char), intent(out) :: mod_name, name, desc, unit
+        axes = IPD_Diag(idx)%axes
+        mod_name = trim(IPD_Diag(idx)%mod_name) // c_null_char
+        name = trim(IPD_Diag(idx)%name) // c_null_char
+        desc = trim(IPD_Diag(idx)%desc) // c_null_char
+        unit = trim(IPD_Diag(idx)%unit) // c_null_char
     end subroutine
 
     

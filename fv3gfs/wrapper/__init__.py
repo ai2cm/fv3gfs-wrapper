@@ -13,6 +13,7 @@ from ._wrapper import (
     get_tracer_metadata,
     compute_physics,
     apply_physics,
+    get_diagnostic_info
 )
 from ._restart import get_restart_names, open_restart
 
