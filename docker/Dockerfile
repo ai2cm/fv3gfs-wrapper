@@ -3,6 +3,7 @@ ARG MPI_IMAGE
 ARG FMS_IMAGE
 ARG ESMF_IMAGE
 ARG FORTRAN_ENV_IMAGE
+ARG GT4PY_CUDA=" "
 
 FROM $MPI_IMAGE AS fv3gfs-mpi
 FROM $FMS_IMAGE AS fv3gfs-fms
@@ -41,12 +42,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN cd /mpich-3.1.4 && \
     make install && ldconfig
-#RUN wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz && \
-#    tar xzf mpich-3.1.4.tar.gz && \
-#    cd mpich-3.1.4 && \
-#    ./configure --enable-fortran --enable-cxx --prefix=/usr --enable-fast=all,O3 && \
-#    make -j4 && make install && ldconfig && \
-#    cd .. && rm -rf mpich-3.1.4*
 
 #-----------------------------------------------------------------------------
 FROM fv3gfs-wrapper-env AS fv3gfs-wrapper-build
@@ -87,7 +82,8 @@ COPY fv3gfs /fv3gfs-wrapper/fv3gfs
 #-----------------------------------------------------------------------------
 FROM fv3gfs-wrapper-build AS fv3gfs-wrapper
 
-RUN pip3 install --no-deps --no-cache-dir git+https://github.com/GridTools/gt4py.git@db40777788863bfe87b9674b118e8bd5b8db0440#egg=gt4py[cupy]
+RUN pip3 install --no-deps --no-cache-dir git+https://github.com/GridTools/gt4py.git@db40777788863bfe87b9674b118e8bd5b8db0440#egg=gt4py$(GT4PY_CUDA) 
+#RUN pip3 install --no-deps --no-cache-dir git+https://github.com/GridTools/gt4py.git@db40777788863bfe87b9674b118e8bd5b8db0440#egg=gt4py 
 
 # copy and install dependency packages
 COPY fill_templates.py /fv3gfs-wrapper/fill_templates.py

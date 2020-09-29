@@ -4,15 +4,17 @@ TAG_NAME ?= latest
 DOCKERFILE ?= Dockerfile
 FORTRAN_ROOT ?= ../lib/external
 FORTRAN_DOCKERFILE ?= $(FORTRAN_ROOT)/docker/Dockerfile
-BUILD_FROM_INTERMEDIATE ?= n
+BUILD_FROM_INTERMEDIATE ?=n
 
 CUDA ?=n
 ifeq ($(CUDA),n)
 	BASE_IMAGE ?=ubuntu:19.10
 	DEP_TAG_NAME ?= gnu9-mpich314-nocuda
+	GT4PY_CUDA=" "
 else
 	BASE_IMAGE ?=nvidia/cuda:10.2-devel-ubuntu18.04
 	DEP_TAG_NAME ?= gnu8-mpich314-cuda102
+	GT4PY_CUDA=[cuda]
 endif
 
 FV3GFS_WRAPPER_IMAGE = $(GCR_URL)/$(TARGET):$(DEP_TAG_NAME)
@@ -36,6 +38,7 @@ FV3GFS_WRAPPER_BUILD_ARGS += --build-arg FMS_IMAGE=$(FMS_IMAGE)
 FV3GFS_WRAPPER_BUILD_ARGS += --build-arg ESMF_IMAGE=$(ESMF_IMAGE) 
 FV3GFS_WRAPPER_BUILD_ARGS += --build-arg FORTRAN_ENV_IMAGE=$(FORTRAN_IMAGE) 
 FV3GFS_WRAPPER_BUILD_ARGS += --build-arg MPI_IMAGE=$(MPI_IMAGE)
+FV3GFS_WRAPPER_BUILD_ARGS += --build-arg GT4PY_CUDA=$(GT4PY_CUDA)
 
 all: build_deps build
 
