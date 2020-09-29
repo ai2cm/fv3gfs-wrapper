@@ -4,14 +4,14 @@ TAG_NAME ?= latest
 DOCKERFILE ?= Dockerfile
 FORTRAN_ROOT ?= ../lib/external
 FORTRAN_DOCKERFILE ?= $(FORTRAN_ROOT)/docker/Dockerfile
-BUILD_FROM_INTERMEDIATE ?= y
+BUILD_FROM_INTERMEDIATE ?= n
 
 CUDA ?=n
 ifeq ($(CUDA),n)
-	BASE_IMAGE ?= ubuntu:19.10
+	BASE_IMAGE ?=ubuntu:19.10
 	DEP_TAG_NAME ?= gnu9-mpich314-nocuda
 else
-	BASE_IMAGE ?= nvidia/cuda:10.2-devel-ubuntu18.04
+	BASE_IMAGE ?=nvidia/cuda:10.2-devel-ubuntu18.04
 	DEP_TAG_NAME ?= gnu8-mpich314-cuda102
 endif
 
@@ -40,14 +40,14 @@ FV3GFS_WRAPPER_BUILD_ARGS += --build-arg MPI_IMAGE=$(MPI_IMAGE)
 all: build_deps build
 
 build:
-	DOCKER_BUILDKIT=1 COMPILED_IMAGE=$(FORTRAN_IMAGE) COMPILE_TARGET=fv3gfs-build BUILD_FROM_INTERMEDIATE=$(BUILD_FROM_INTERMEDIATE) $(MAKE) -C ../lib/external build
+	COMPILED_IMAGE=$(FORTRAN_IMAGE) COMPILE_TARGET=fv3gfs-build BUILD_FROM_INTERMEDIATE=$(BUILD_FROM_INTERMEDIATE) $(MAKE) -C ../lib/external build
 	docker build -f $(DOCKERFILE) -t $(FV3GFS_WRAPPER_IMAGE) $(FV3GFS_WRAPPER_BUILD_ARGS) .. --target $(TARGET)
 
 build_deps:
 ifeq ($(BUILD_FROM_INTERMEDIATE),y)
-		$(MAKE) pull_deps
+	$(MAKE) pull_deps
 else
-	docker build -f $(FORTRAN_DOCKERFILE).full --target fv3gfs-mpi -t $(MPI_IMAGE) $(FORTRAN_ROOT)
+	docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-mpi -t $(MPI_IMAGE) $(FORTRAN_ROOT)
 	docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-fms -t $(FMS_IMAGE) $(FORTRAN_ROOT)
 	docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-esmf -t $(ESMF_IMAGE) $(FORTRAN_ROOT)
 endif

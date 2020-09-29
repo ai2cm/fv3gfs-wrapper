@@ -1,4 +1,4 @@
-ARG BASE_IMAGE
+ARG BASE_IMAGE=ubuntu:19.10
 ARG MPI_IMAGE
 ARG FMS_IMAGE
 ARG ESMF_IMAGE
@@ -83,8 +83,6 @@ COPY docs /fv3gfs-wrapper/docs
 COPY fv3gfs/wrapper/dynamics_properties.json fv3gfs/wrapper/physics_properties.json /fv3gfs-wrapper/fv3gfs/wrapper/
 COPY fill_templates.py HISTORY.md LICENSE Makefile MANIFEST.in README.md setup.cfg setup.py /fv3gfs-wrapper/
 COPY fv3gfs /fv3gfs-wrapper/fv3gfs
-
-#RUN make -C /fv3gfs-wrapper build
 
 #-----------------------------------------------------------------------------
 FROM fv3gfs-wrapper-build AS fv3gfs-wrapper

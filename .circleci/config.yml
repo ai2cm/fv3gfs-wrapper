@@ -138,8 +138,8 @@ workflows:
             tags:
               only: /^v.*/
       - build_default:
-              #requires:
-              # - lint
+              requires:
+               - lint
           filters:
             tags:
               only: /^v.*/
