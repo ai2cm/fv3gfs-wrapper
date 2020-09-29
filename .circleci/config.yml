@@ -80,7 +80,6 @@ jobs:
           then
               echo "pushing untagged image $GCR_IMAGE"
               docker push $GCR_IMAGE
-
               echo "pushing image $GCR_IMAGE:$CIRCLE_SHA1"
               docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_SHA1
               docker push $GCR_IMAGE:$CIRCLE_SHA1
@@ -91,8 +90,6 @@ jobs:
               docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_TAG
               docker push $GCR_IMAGE:$CIRCLE_TAG
           fi
-
-
       - run:
           name: "Delete data files"
           command: |
@@ -128,7 +125,6 @@ jobs:
             touch upload/.nojekyll
             mv docs/_build/html upload/f12n7eq5xkoibbqp
             gh-pages --dotfiles --dist upload
-
 workflows:
   version: 2
   tagged-build:
@@ -138,8 +134,8 @@ workflows:
             tags:
               only: /^v.*/
       - build_default:
-              requires:
-               - lint
+          requires:
+            - lint
           filters:
             tags:
               only: /^v.*/
