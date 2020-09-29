@@ -13,6 +13,7 @@ MM_PER_M = 1000
 
 
 cdef extern:
+    void get_diagnostic_3d(int*, int*, double *)
     void get_metadata_diagnostics(int* , int *, char*, char*, char*, char*)
     void get_number_diagnostics(int *)
     void initialize_subroutine(int *comm)
@@ -402,6 +403,26 @@ cdef object cstring_to_py(char * s):
     return s.encode("UTF-8")
 
 
+cdef _get_diagnostic_info(int i):
+    cdef int ax
+    cdef int axes[1]
+    cdef char name[128]
+    cdef char mod_name[128]
+    cdef char desc[128]
+    cdef char unit[128]
+
+    get_metadata_diagnostics(&i, axes, mod_name, name, desc, unit)
+    ax = axes[0]
+
+    return {
+        "axes": ax,
+        "mod_name": cstring_to_py(mod_name),
+        "name": cstring_to_py(name),
+        "desc": cstring_to_py(desc),
+        "unit": cstring_to_py(unit),
+    }
+
+
 def get_diagnostic_info():
     cdef int n, i, ax
     cdef int axes[1]
@@ -413,17 +434,34 @@ def get_diagnostic_info():
 
     output = {}
     for i in range(n):
-        get_metadata_diagnostics(&i, axes, mod_name, name, desc, unit)
-
-        ax = axes[0]
-
-        output[i] =  {
-            "axes": ax,
-            "mod_name": cstring_to_py(mod_name),
-            "name": cstring_to_py(name),
-            "desc": cstring_to_py(desc),
-            "unit": cstring_to_py(unit),
-        }
+        output[i] = _get_diagnostic_info(i)
 
     return output
+
+
+def get_diagnostic_data(int idx, allocator=None):
+
+    cdef int nz
+    cdef double[:,:,:] buf
+
+    if allocator is None:
+        allocator = get_quantity_factory()
+
+    info = _get_diagnostic_info(idx)
+
+    ndim = info["axes"]
+    units = info["unit"]
+    dims_2d = [fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM]
+    dims_3d = [fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM]
+    dims = dims_2d if ndim == 2 else dims_3d
+    dtype = np.float64
+
+    quantity = allocator.empty(dims, units, dtype=dtype)
+    with fv3gfs.util.recv_buffer(quantity.np.empty, quantity.view[:]) as array:
+        if array.ndim == 2:
+            array.shape = (1, ) + array.shape
+        buf  = array
+        get_diagnostic_3d(&idx, &nz, &buf[0, 0, 0])
+    return quantity
+
 
