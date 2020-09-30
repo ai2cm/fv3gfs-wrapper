@@ -27,7 +27,6 @@ relative_wrapper_build_filenames = [
     "lib/coupler_lib.o",
     "lib/physics_data.o",
     "lib/dynamics_data.o",
-    "lib/diag_data.o",
 ]
 
 wrapper_build_filenames = []

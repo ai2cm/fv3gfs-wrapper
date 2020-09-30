@@ -398,11 +398,6 @@ def cleanup():
     cleanup_subroutine()
 
 
-cdef object cstring_to_py(char * s):
-    cdef bytes buf = s
-    return s
-
-
 cdef _get_diagnostic_info(int i):
     cdef int ax
     cdef int axes[1]
@@ -429,7 +424,10 @@ def get_diagnostic_info():
 
     output = {}
     for i in range(n):
-        output[i] = _get_diagnostic_info(i)
+        try:
+            output[i] = _get_diagnostic_info(i)
+        except UnicodeDecodeError:
+            pass
 
     return output
 

@@ -117,6 +117,12 @@ contains
       num_cpld_calls_out = num_cpld_calls
     end subroutine get_num_cpld_calls
 
+    subroutine print_diag_info()
+        integer k
+        do k = 1, size(Atm%Diag)
+            print *, 'Axes', Atm%Diag(k)%axes, 'Index', k
+        end do
+    end
 
     subroutine module_init(comm) bind(c, name='initialize_subroutine')
         integer(c_int), intent(in) :: comm
@@ -136,6 +142,7 @@ contains
         termClock = mpp_clock_id( 'Termination' )
         call mpp_clock_begin(mainClock) !begin main loop
         nc = 1
+        ! call print_diag_info
 
     end subroutine module_init
 
@@ -542,10 +549,70 @@ if (restart_days > 0 .or. restart_secs > 0) intrm_rst = .true.
    call diag_manager_end (Time_atmos)
 
 !-----------------------------------------------------------------------
-
+ 
    end subroutine coupler_end
 
 !#######################################################################
+
+    subroutine get_number_diagnostics(n) bind(c)
+        integer(c_int), intent(out) :: n
+        n = size(Atm%Diag)
+    end subroutine
+
+    subroutine f_to_c_string(c, f)
+        character(len=*) f
+        character(kind=c_char, len=1), dimension(:) :: c
+        ! local
+        character(kind=c_char, len=128) trimmed
+        integer i
+
+        trimmed = trim(f) // c_null_char
+
+        do i=1, size(c)
+            c(i) = trimmed(i:i)
+        end do
+    end subroutine
+
+    subroutine get_metadata_diagnostics(idx, axes, mod_name, name, desc, unit) bind(c)
+        integer(c_int), intent(in) :: idx
+        integer(c_int), intent(out) :: axes
+        character(kind=c_char, len=1), dimension(128), intent(out) :: mod_name, name, desc, unit
+
+        ! local
+        integer i
+        axes = Atm%Diag(idx)%axes
+        call f_to_c_string(mod_name, Atm%Diag(idx)%mod_name) 
+        call f_to_c_string(name, Atm%Diag(idx)%name)
+        call f_to_c_string(desc, Atm%Diag(idx)%desc)
+        call f_to_c_string(unit, Atm%Diag(idx)%unit)
+    end subroutine
+
+    subroutine get_diagnostic_3d(idx, n, out) bind(c)
+        use dynamics_data_mod, only: i_start, i_end, j_start, j_end
+        use atmos_model_mod, only: Atm_block
+        integer(c_int), intent(in) :: idx, n
+        real(c_double), intent(out), dimension(i_start():i_end(), j_start():j_end(), n) :: out
+        ! locals
+        integer :: blocks_per_MPI_domain, i, j, k, i_block, i_column, axes
+
+        axes = Atm%Diag(idx)%axes
+
+        blocks_per_MPI_domain = Atm_block%nblks
+        do i_block = 1, blocks_per_MPI_domain ! blocks per MPI domain
+            do i_column = 1, Atm_block%blksz(i_block) ! points per block
+                i = Atm_block%index(i_block)%ii(i_column)
+                j = Atm_block%index(i_block)%jj(i_column)
+                if (axes == 3) then
+                    do k = 1, n
+                        out(i, j, k) = Atm%Diag(idx)%data(i_block)%var3(i_column, k)
+                    end do
+                else if (axes == 2) then
+                    out(i, j, 1) = Atm%Diag(idx)%data(i_block)%var2(i_column)
+                end if
+            enddo
+        enddo
+    end subroutine
+
 
 
 end module coupler_lib

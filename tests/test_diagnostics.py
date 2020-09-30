@@ -28,8 +28,8 @@ class DiagnosticTests(unittest.TestCase):
     def test_get_diag_info(self):
         output = fv3gfs.wrapper.get_diagnostic_info()
         assert len(output) > 0
-        self.assertTrue(False)
         for item in output:
+            print(output)
             self.assertIsInstance(item["axes"], int)
             self.assertIsInstance(item["mod_name"], str)
             self.assertIsInstance(item["name"], str)
