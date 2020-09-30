@@ -8,7 +8,7 @@ size = comm.Get_size()
 
 def get_tile_index(tile_rank=None, total_ranks=None):
     """Returns the tile number for a given rank and total number of ranks.
-    
+
     Uses the rank for the current MPI process, and total number of processes,
     by default.
     """

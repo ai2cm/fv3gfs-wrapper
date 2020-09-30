@@ -30,24 +30,6 @@ in development mode with `pip install -e .`.
 
 This package only supports linux and Python 3.5 or greater.
 
-Installation for Clusters
--------------------------
-
-The default installation method outlined above is suitable for running on a local
-computer or on a single cloud VM instance.  If you wish to run FV3 on multiple
-compute nodes (eg. on a cluster of multiple computers), the appropriate Docker
-image can be built using `build_hpc_docker.sh`.  An user will need to select the
-specific configuration (compiler, MPI implementation, GPU support) by setting
-the HPC_CONFIG variable in the script.  The user will also need to set the 
-OUTPUT_IMAGE variable to specify where the final Docker image is to be written 
-(a DockerHub image address can be used).
-
-Currently, there is support for the GNU 8 and 9 suite of compilers, the MPICH
-3.1.4 implementation of MPI and CUDA 10.1 for Nvidia GPU support.
-
-Note that `build_hpc_docker.sh` will build a new Docker image from scratch.  This 
-build process takes approximately 20 minutes on a single cloud VM with 8 CPUs.
-
 Building Docs
 -------------
 
@@ -67,7 +49,7 @@ when you're done to remove the build artifacts, or it may cause problems when yo
 build the docker image.
 
 With the image already built by `make build-docker` or pulled using
-`docker pull us.gcr.io/vcm-ml/fv3gfs-wrapper`, run `dev_docker.sh`. This will
+`docker pull us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu9-mpich314-nocuda`, run `dev_docker.sh`. This will
 bind-mount the `fv3gfs`, `lib`, `tests`, `external`, and `templates` directories into the
 docker image. Inside the docker image, you can build or re-build the model with
 `make build` inside the `/fv3gfs-wrapper` directory, and run the test suite with
@@ -84,11 +66,9 @@ Example run scripts are included in [`examples/runfiles`](https://github.com/Vul
 These run scripts act as a drop-in replacement for `fv3.exe`, and get executed
 in the same way, using `mpirun`:
 
-    mpirun -np 6 --oversubscribe --allow-run-as-root --mca btl_vader_single_copy_mechanism none python online_code.py
+    mpirun -np 6 python online_code.py
 
 Running these files requires them to be placed inside a valid run directory. This is
 done automatically if you run them using `fv3run`, as is done in
 the Makefile in that directory.
 
-Please note that the '--oversubscribe --allow-run-as-root --mca btl_vader_single_copy_mechanism none' flags to mpirun 
-are not needed if you are using the mpich-based Docker images built using the `build_hpc_docker.sh` script.

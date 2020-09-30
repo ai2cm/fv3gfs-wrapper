@@ -1,6 +1,7 @@
 SHELL = /bin/sh
 
 CC=gcc
+MPI=mpich
 
 .PHONY: build clean clean-test clean-pyc clean-build clean-examples examples lint test coverage docs help docs-docker
 .DEFAULT_GOAL := help
@@ -30,7 +31,7 @@ export PRINT_HELP_PYSCRIPT
 
 BROWSER := python3 -c "$$BROWSER_PYSCRIPT"
 
-DOCKER_IMAGE?=us.gcr.io/vcm-ml/fv3gfs-wrapper:latest
+DOCKER_IMAGE?=us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu9-mpich314-nocuda
 
 PYTHON_FILES = $(shell git ls-files | grep -e 'py$$' | grep -v -e '__init__.py')
 PYTHON_INIT_FILES = $(shell git ls-files | grep '__init__.py')
@@ -101,7 +102,7 @@ docs-docker:
 	$(BROWSER) docs/_build/html/index.html
 
 build-docker:
-	BUILD_FROM_INTERMEDIATE=y $(MAKE) -C docker
+	BUILD_FROM_INTERMEDIATE=$(BUILD_FROM_INTERMEDIATE) $(MAKE) -C docker
 
 test-docker: build-docker
 	./test_docker.sh
@@ -114,6 +115,7 @@ release: dist ## package and upload a release
 
 build:
 	$(MAKE) -C lib
+	export MPI=$(MPI)
 	CC=$(CC) python3 setup.py build_ext --inplace
 
 dist: clean ## builds source and wheel package
