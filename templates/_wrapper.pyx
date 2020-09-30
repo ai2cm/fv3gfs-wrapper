@@ -400,7 +400,7 @@ def cleanup():
 
 cdef object cstring_to_py(char * s):
     cdef bytes buf = s
-    return s.encode("UTF-8")
+    return s
 
 
 cdef _get_diagnostic_info(int i):
@@ -411,25 +411,20 @@ cdef _get_diagnostic_info(int i):
     cdef char desc[128]
     cdef char unit[128]
 
-    get_metadata_diagnostics(&i, axes, mod_name, name, desc, unit)
+    get_metadata_diagnostics(&i, axes, &mod_name[0], &name[0], &desc[0], &unit[0])
     ax = axes[0]
 
     return {
         "axes": ax,
-        "mod_name": cstring_to_py(mod_name),
-        "name": cstring_to_py(name),
-        "desc": cstring_to_py(desc),
-        "unit": cstring_to_py(unit),
+        "mod_name": mod_name,
+        "name": name,
+        "desc": desc,
+        "unit": unit
     }
 
 
 def get_diagnostic_info():
-    cdef int n, i, ax
-    cdef int axes[1]
-    cdef char name[128]
-    cdef char mod_name[128]
-    cdef char desc[128]
-    cdef char unit[128]
+    cdef int n
     get_number_diagnostics(&n)
 
     output = {}

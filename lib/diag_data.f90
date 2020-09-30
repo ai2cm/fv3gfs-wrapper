@@ -20,11 +20,14 @@ module physics_data_mod
         integer(c_int), intent(in) :: idx
         integer(c_int), intent(out) :: axes
         character(c_char), intent(out) :: mod_name, name, desc, unit
-        axes = IPD_Diag(idx)%axes
-        mod_name = trim(IPD_Diag(idx)%mod_name) // c_null_char
-        name = trim(IPD_Diag(idx)%name) // c_null_char
-        desc = trim(IPD_Diag(idx)%desc) // c_null_char
-        unit = trim(IPD_Diag(idx)%unit) // c_null_char
+
+
+        ! axes = IPD_Diag(idx)%axes
+        ! mod_name = trim(IPD_Diag(idx)%mod_name) // c_null_char
+        ! name = trim(IPD_Diag(idx)%name) // c_null_char
+        ! desc = trim(IPD_Diag(idx)%desc) // c_null_char
+        ! unit = trim(IPD_Diag(idx)%unit) // c_null_char
+        print *, 'Fortran Name', IPD_Diag(idx)%name, 'Index', idx
     end subroutine
 
     subroutine get_diagnostic_3d(idx, n, out) bind(c)
