@@ -425,10 +425,12 @@ def get_diagnostic_info():
     output = {}
     for i in range(n):
         try:
-            output[i] = _get_diagnostic_info(i)
+            info = _get_diagnostic_info(i)
         except UnicodeDecodeError:
-            pass
+            continue
 
+        if info["name"]:
+            output[i] = info
     return output
 
 

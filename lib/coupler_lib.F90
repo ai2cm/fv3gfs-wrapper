@@ -578,8 +578,6 @@ if (restart_days > 0 .or. restart_secs > 0) intrm_rst = .true.
         integer(c_int), intent(out) :: axes
         character(kind=c_char, len=1), dimension(128), intent(out) :: mod_name, name, desc, unit
 
-        ! local
-        integer i
         axes = Atm%Diag(idx)%axes
         call f_to_c_string(mod_name, Atm%Diag(idx)%mod_name) 
         call f_to_c_string(name, Atm%Diag(idx)%name)

@@ -28,22 +28,24 @@ class DiagnosticTests(unittest.TestCase):
     def test_get_diag_info(self):
         output = fv3gfs.wrapper.get_diagnostic_info()
         assert len(output) > 0
-        for item in output:
-            print(output)
+        for index, item in output.items():
             self.assertIsInstance(item["axes"], int)
             self.assertIsInstance(item["mod_name"], str)
+
             self.assertIsInstance(item["name"], str)
+            self.assertIsNot(item["name"], "")
+
             self.assertIsInstance(item["desc"], str)
             self.assertIsInstance(item["unit"], str)
 
-    def test_get_diagnostic_data(self):
-        info = fv3gfs.wrapper.get_diagnostic_info()
+    # def test_get_diagnostic_data(self):
+    #     info = fv3gfs.wrapper.get_diagnostic_info()
 
-        for idx, data in info.items():
-            quantity = fv3gfs.wrapper._wrapper.get_diagnostic_data(idx)
-            self.assertIsInstance(quantity, fv3gfs.util.Quantity)
-            assert quantity.view[:].ndim == data["axes"]
-            assert quantity.units == data["unit"]
+    #     for idx, data in info.items():
+    #         quantity = fv3gfs.wrapper._wrapper.get_diagnostic_data(idx)
+    #         self.assertIsInstance(quantity, fv3gfs.util.Quantity)
+    #         assert quantity.view[:].ndim == data["axes"]
+    #         assert quantity.units == data["unit"]
 
 
 if __name__ == "__main__":
