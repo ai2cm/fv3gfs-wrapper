@@ -1,6 +1,7 @@
 SHELL = /bin/sh
 
 CC=gcc
+MPI=mpich
 
 .PHONY: build clean clean-test clean-pyc clean-build clean-examples examples lint test coverage docs help docs-docker
 .DEFAULT_GOAL := help
@@ -114,6 +115,7 @@ release: dist ## package and upload a release
 
 build:
 	$(MAKE) -C lib
+	export MPI=$(MPI)
 	CC=$(CC) python3 setup.py build_ext --inplace
 
 dist: clean ## builds source and wheel package

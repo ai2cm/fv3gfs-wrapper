@@ -27,7 +27,6 @@ relative_wrapper_build_filenames = [
     "lib/coupler_lib.o",
     "lib/physics_data.o",
     "lib/dynamics_data.o",
-    "lib/flagstruct_data.o",
 ]
 
 wrapper_build_filenames = []
@@ -40,7 +39,12 @@ for relative_filename in relative_wrapper_build_filenames:
 library_link_args = []
 library_link_args.extend(wrapper_build_filenames)
 library_link_args += pkgconfig.libs("fv3").split()
-library_link_args += ["-lmpich", "-lmpifort", "-lmpichcxx"]
+
+mpi_flavor = os.environ.get("MPI", "openmpi")
+if mpi_flavor == "openmpi":
+    library_link_args += pkgconfig.libs("ompi-fort").split()
+else:
+    library_link_args += ["-lmpich", "-lmpifort", "-lmpichcxx"]
 
 # need to include math and c library
 library_link_args += ["-lmvec", "-lc"]
