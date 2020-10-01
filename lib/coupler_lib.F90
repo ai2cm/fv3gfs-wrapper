@@ -585,32 +585,44 @@ if (restart_days > 0 .or. restart_secs > 0) intrm_rst = .true.
         call f_to_c_string(unit, Atm%Diag(idx)%unit)
     end subroutine
 
-    subroutine get_diagnostic_3d(idx, n, out) bind(c)
+    subroutine get_diagnostic_3d(idx, out) bind(c)
+        use dynamics_data_mod, only: i_start, i_end, j_start, j_end, nz
+        use atmos_model_mod, only: Atm_block
+        integer(c_int), intent(in) :: idx
+        real(c_double), intent(out), dimension(i_start():i_end(), j_start():j_end(), nz()) :: out
+        ! locals
+        integer :: blocks_per_MPI_domain, i, j, k, i_block, i_column, axes, n
+        n = nz()
+        blocks_per_MPI_domain = Atm_block%nblks
+
+        do i_block = 1, blocks_per_MPI_domain ! blocks per MPI domain
+            do k=1, n
+                do i_column = 1, Atm_block%blksz(i_block) ! points per block
+                    i = Atm_block%index(i_block)%ii(i_column)
+                    j = Atm_block%index(i_block)%jj(i_column)
+                    out(i, j, n - k + 1) = Atm%Diag(idx)%data(i_block)%var3(i_column, k)
+                end do
+            enddo
+        enddo
+    end subroutine
+
+    subroutine get_diagnostic_2d(idx, out) bind(c)
         use dynamics_data_mod, only: i_start, i_end, j_start, j_end
         use atmos_model_mod, only: Atm_block
-        integer(c_int), intent(in) :: idx, n
-        real(c_double), intent(out), dimension(i_start():i_end(), j_start():j_end(), n) :: out
+        integer(c_int), intent(in) :: idx
+        real(c_double), intent(out), dimension(i_start():i_end(), j_start():j_end()) :: out
         ! locals
         integer :: blocks_per_MPI_domain, i, j, k, i_block, i_column, axes
-
-        axes = Atm%Diag(idx)%axes
 
         blocks_per_MPI_domain = Atm_block%nblks
         do i_block = 1, blocks_per_MPI_domain ! blocks per MPI domain
             do i_column = 1, Atm_block%blksz(i_block) ! points per block
                 i = Atm_block%index(i_block)%ii(i_column)
                 j = Atm_block%index(i_block)%jj(i_column)
-                if (axes == 3) then
-                    do k = 1, n
-                        out(i, j, k) = Atm%Diag(idx)%data(i_block)%var3(i_column, k)
-                    end do
-                else if (axes == 2) then
-                    out(i, j, 1) = Atm%Diag(idx)%data(i_block)%var2(i_column)
-                end if
+                out(i, j) = Atm%Diag(idx)%data(i_block)%var2(i_column)
             enddo
         enddo
     end subroutine
-
 
 
 end module coupler_lib

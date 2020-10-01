@@ -13,7 +13,8 @@ MM_PER_M = 1000
 
 
 cdef extern:
-    void get_diagnostic_3d(int*, int*, double *)
+    void get_diagnostic_3d(int*, double *)
+    void get_diagnostic_2d(int*, double *)
     void get_metadata_diagnostics(int* , int *, char*, char*, char*, char*)
     void get_number_diagnostics(int *)
     void initialize_subroutine(int *comm)
@@ -434,29 +435,31 @@ def get_diagnostic_info():
     return output
 
 
-def get_diagnostic_data(int idx, allocator=None):
+def get_diagnostic_data(int idx):
 
     cdef int nz
-    cdef double[:,:,:] buf
-
-    if allocator is None:
-        allocator = get_quantity_factory()
+    cdef double[:, :] buf_2d
+    cdef double[:, :, :] buf_3d
 
     info = _get_diagnostic_info(idx)
-
     ndim = info["axes"]
     units = info["unit"]
-    dims_2d = [fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM]
-    dims_3d = [fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM]
-    dims = dims_2d if ndim == 2 else dims_3d
+    shape = get_dimension_lengths()
     dtype = np.float64
 
-    quantity = allocator.empty(dims, units, dtype=dtype)
-    with fv3gfs.util.recv_buffer(quantity.np.empty, quantity.view[:]) as array:
-        if array.ndim == 2:
-            array.shape = (1, ) + array.shape
-        buf  = array
-        get_diagnostic_3d(&idx, &nz, &buf[0, 0, 0])
-    return quantity
+    if ndim == 3:
+        array = np.empty((shape['nz'], shape['ny'], shape['nx']), dtype=dtype)
+        buf_3d = array
+        get_diagnostic_3d(&idx, &buf_3d[0, 0, 0])
+        dims = [fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM]
+    elif ndim == 2:
+        array = np.empty((shape['ny'], shape['nx']), dtype=dtype)
+        buf_2d = array
+        get_diagnostic_2d(&idx, &buf_2d[0, 0])
+        dims = [fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM]
+
+
+    return fv3gfs.util.Quantity(array, dims, units=units)
+
 
 

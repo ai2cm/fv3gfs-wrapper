@@ -20,10 +20,8 @@ all: coupler_lib.o dynamics_data.o physics_data.o $(TEMPLATES)
 	$(FC) $(FFLAGS)  -c $< -o $@
 
 physics_data.o: physics_data.F90 dynamics_data.o
-	$(FC) $(FFLAGS)  -c $< -o $@
 
-coupler_lib.o: coupler_lib.F90
-	$(FC) $(FFLAGS)  -c $< -o $@
+coupler_lib.o: coupler_lib.F90 dynamics_data.o
 
 clean:
 	@echo "Cleaning ... "

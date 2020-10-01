@@ -84,26 +84,24 @@ class StdoutRedirector(object):
 
 def main(test_dir):
     rank = MPI.COMM_WORLD.Get_rank()
+    with open(os.path.join(test_dir, "default_config.yml"), "r") as f:
+        config = yaml.safe_load(f)
     rundir = os.path.join(test_dir, "rundir")
     if rank == 0:
-        with open(os.path.join(test_dir, "default_config.yml"), "r") as f:
-            config = yaml.safe_load(f)
         if os.path.isdir(rundir):
             shutil.rmtree(rundir)
         fv3config.write_run_directory(config, rundir)
-
     MPI.COMM_WORLD.barrier()
     original_path = os.getcwd()
     os.chdir(rundir)
     try:
-        fv3gfs.wrapper.initialize()
-        MPI.COMM_WORLD.barrier()
-        # if rank != 0:
-        #     kwargs = {"verbosity": 0}
-        # else:
-        #     kwargs = {"verbosity": 2}
-        kwargs = {}
-
+        with redirect_stdout(os.devnull):
+            fv3gfs.wrapper.initialize()
+            MPI.COMM_WORLD.barrier()
+        if rank != 0:
+            kwargs = {"verbosity": 0}
+        else:
+            kwargs = {"verbosity": 2}
         unittest.main(**kwargs)
     finally:
         os.chdir(original_path)
