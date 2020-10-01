@@ -1,9 +1,6 @@
 import unittest
-import yaml
 import os
-import shutil
 import numpy as np
-import fv3config
 import fv3gfs.wrapper
 import fv3gfs.util
 from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES

@@ -1,10 +1,7 @@
 import unittest
 import os
-import shutil
 from copy import deepcopy
-import yaml
 import numpy as np
-import fv3config
 import fv3gfs.wrapper
 from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
 import fv3gfs.util

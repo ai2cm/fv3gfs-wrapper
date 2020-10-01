@@ -1,9 +1,5 @@
 import unittest
-import yaml
 import os
-import shutil
-import numpy as np
-import fv3config
 import fv3gfs.wrapper
 import fv3gfs.util
 from mpi4py import MPI
