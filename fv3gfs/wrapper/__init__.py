@@ -14,10 +14,19 @@ from ._wrapper import (
     compute_physics,
     apply_physics,
     get_diagnostic_info,
+    get_diagnostic_data
 )
 from ._restart import get_restart_names, open_restart
 
 from .thermodynamics import set_state_mass_conserving
+
+
+def get_diagnostic_by_name(name, mod_name="gfs_phys"):
+    info = get_diagnostic_info()
+    for idx, meta in info.items():
+        if info["mod_name"] == mod_name and info["name"] == name:
+            return get_diagnostic_data(name)
+
 
 __version__ = "0.5.0"
 
