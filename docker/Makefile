@@ -3,7 +3,6 @@ TARGET ?= fv3gfs-wrapper
 TAG_NAME ?= latest
 DOCKERFILE ?= Dockerfile
 FORTRAN_ROOT ?= ../lib/external
-FORTRAN_DOCKERFILE ?= $(FORTRAN_ROOT)/docker/Dockerfile
 BUILD_FROM_INTERMEDIATE ?= n
 
 CUDA ?= n
