@@ -28,7 +28,7 @@ def get_diagnostic_by_name(
     info = get_diagnostic_info()
     for idx, meta in info.items():
         if meta["mod_name"] == mod_name and meta["name"] == name:
-            return get_diagnostic_data(name)
+            return get_diagnostic_data(idx)
     raise ValueError(f"There is no diagnostic {name} in module {mod_name}.")
 
 
