@@ -1,3 +1,4 @@
+import fv3gfs.util
 from ._wrapper import (
     initialize,
     step,
@@ -14,18 +15,21 @@ from ._wrapper import (
     compute_physics,
     apply_physics,
     get_diagnostic_info,
-    get_diagnostic_data
+    get_diagnostic_data,
 )
 from ._restart import get_restart_names, open_restart
 
 from .thermodynamics import set_state_mass_conserving
 
 
-def get_diagnostic_by_name(name, mod_name="gfs_phys"):
+def get_diagnostic_by_name(
+    name: str, mod_name: str = "gfs_phys"
+) -> fv3gfs.util.Quantity:
     info = get_diagnostic_info()
     for idx, meta in info.items():
-        if info["mod_name"] == mod_name and info["name"] == name:
+        if meta["mod_name"] == mod_name and meta["name"] == name:
             return get_diagnostic_data(name)
+    raise ValueError(f"There is no diagnostic {name} in module {mod_name}.")
 
 
 __version__ = "0.5.0"
