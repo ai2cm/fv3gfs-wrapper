@@ -25,6 +25,10 @@ The first time you build, both ESMF and FMS will be
 built, taking up quite a lot of time. On subsequent builds, these may be retrieved
 from cached images, if you allow caching on your system.
 
+The ESMF, FMS, MPICH, and Serialbox images can instead be retrieved from docker if you build with
+the flag `BUILD_FROM_INTERMEDIATE=y make build-docker`. This can greatly decrease
+build time.
+
 On a host, the package can be built using `make build`, and then installed
 in development mode with `pip install -e .`.
 
@@ -71,4 +75,3 @@ in the same way, using `mpirun`:
 Running these files requires them to be placed inside a valid run directory. This is
 done automatically if you run them using `fv3run`, as is done in
 the Makefile in that directory.
-

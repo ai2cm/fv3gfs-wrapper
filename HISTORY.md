@@ -12,6 +12,7 @@ Major changes:
 in the `coupler_nml` namelist.
 - Fortran source updated to include new per-physics-component tendency diagnostics for temperature and specific humidity, and to ensure that the column moistening implied by nudging specific humidity is subtracted from the precipitation felt by the land surface model.
 - The wrapper now passes runtime flags similarly to physics and dynamics properties but in a class structure, so ptop is accessible as `wrapper.flags.ptop`.
+- `build_deps` and `push_deps` make targets are removed from `docker/Makefile`. Use the make targets in fv3gfs-fortran instead.
 
 Minor changes:
 - added jenkins scripts under .jenkins
