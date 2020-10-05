@@ -186,7 +186,8 @@
 - Use <cite>cftime.datetime</cite> objects to represent datetimes in fv3gfs-python and fv3util instead of <cite>datetime.datetime</cite> objects.  This results in times stored in a format compatible with the fortran model, and accurate internal representation of times with the calendar specified
 in the <cite>coupler_nml</cite> namelist.
 - Fortran source updated to include new per-physics-component tendency diagnostics for temperature and specific humidity, and to ensure that the column moistening implied by nudging specific humidity is subtracted from the precipitation felt by the land surface model.
-- The wrapper now passes runtime flags similarly to physics and dynamics properties but in a class structure, so ptop is accessible as <cite>wrapper.flags.ptop</cite>.</p>
+- The wrapper now passes runtime flags similarly to physics and dynamics properties but in a class structure, so ptop is accessible as <cite>wrapper.flags.ptop</cite>.
+- <cite>build_deps</cite> and <cite>push_deps</cite> make targets are removed from <cite>docker/Makefile</cite>. Use the make targets in fv3gfs-fortran instead.</p>
 <p>Minor changes:
 - added jenkins scripts under .jenkins
 - Dawn is removed from the fv3gfs-wrapper test image
