@@ -164,6 +164,10 @@ cdef int set_3d_quantity(name, REAL_t[:, :, ::1] array, int nz, dict tracer_meta
     elif name in tracer_metadata:
         i_tracer = tracer_metadata[name]['i_tracer']
         set_tracer(&i_tracer, &array[0, 0, 0])
+    elif name == 'eastward_wind_tendency':
+        pass
+    elif name == 'northward_wind_tendency':
+        pass
     else:
         raise ValueError(f'no setter available for {name}')
     return 0

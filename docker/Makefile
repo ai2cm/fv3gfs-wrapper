@@ -46,19 +46,19 @@ build:
 	COMPILED_IMAGE=$(FORTRAN_IMAGE) COMPILE_TARGET=fv3gfs-build BUILD_FROM_INTERMEDIATE=$(BUILD_FROM_INTERMEDIATE) $(MAKE) -C ../lib/external build
 	docker build -f $(DOCKERFILE) -t $(FV3GFS_WRAPPER_IMAGE) $(FV3GFS_WRAPPER_BUILD_ARGS) .. --target $(TARGET)
 
-build_deps:
-ifeq ($(BUILD_FROM_INTERMEDIATE),y)
-	$(MAKE) pull_deps
-else
-	docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-mpi -t $(MPI_IMAGE) $(FORTRAN_ROOT)
-	docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-fms -t $(FMS_IMAGE) $(FORTRAN_ROOT)
-	docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-esmf -t $(ESMF_IMAGE) $(FORTRAN_ROOT)
-endif
+# build_deps:
+# ifeq ($(BUILD_FROM_INTERMEDIATE),y)
+# 	$(MAKE) pull_deps
+# else
+# 	docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-mpi -t $(MPI_IMAGE) $(FORTRAN_ROOT)
+# 	docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-fms -t $(FMS_IMAGE) $(FORTRAN_ROOT)
+# 	docker build -f $(FORTRAN_DOCKERFILE) --target fv3gfs-esmf -t $(ESMF_IMAGE) $(FORTRAN_ROOT)
+# endif
 
-push_deps:
-	docker push $(MPI_IMAGE)
-	docker push $(FMS_IMAGE)
-	docker push $(ESMF_IMAGE)
+# push_deps:
+# 	docker push $(MPI_IMAGE)
+# 	docker push $(FMS_IMAGE)
+# 	docker push $(ESMF_IMAGE)
 
 pull_deps:
 	docker pull $(MPI_IMAGE)
