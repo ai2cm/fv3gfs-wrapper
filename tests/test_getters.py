@@ -1,6 +1,7 @@
 import unittest
 import os
 import numpy as np
+import yaml
 import fv3gfs.wrapper
 import fv3gfs.util
 from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
@@ -10,6 +11,11 @@ from util import main
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 MM_PER_M = 1000
+
+
+def get_config():
+    with open("fv3config.yml") as f:
+        return yaml.safe_load(f)
 
 
 class GetterTests(unittest.TestCase):
@@ -85,6 +91,7 @@ class GetterTests(unittest.TestCase):
         )
         total_precip = state["total_precipitation"]
         precip_rate = state["surface_precipitation_rate"]
+        config = get_config()
         dt = config["namelist"]["coupler_nml"]["dt_atmos"]
         np.testing.assert_allclose(
             MM_PER_M * total_precip.view[:] / dt, precip_rate.view[:]
