@@ -81,7 +81,7 @@ source ./venv/bin/activate
 pip3 install --upgrade pip setuptools wheel
 pip3 install -r external/fv3gfs-util/requirements.txt
 if [ "${target}" == "gpu" ] ; then
-    pip3 install cupy-cuda101
+    pip3 install cupy-cuda102
 fi
 pip3 install -e external/fv3gfs-util
 deactivate

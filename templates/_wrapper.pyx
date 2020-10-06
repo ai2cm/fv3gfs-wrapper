@@ -5,8 +5,9 @@ cimport numpy as cnp
 import numpy as np
 import fv3gfs.util
 from mpi4py import MPI
-
 ctypedef cnp.double_t REAL_t
+ctypedef cnp.int_t INT_t
+ctypedef cnp.npy_bool BOOL_t
 real_type = np.float64
 SURFACE_PRECIPITATION_RATE = 'surface_precipitation_rate'
 MM_PER_M = 1000
@@ -52,6 +53,9 @@ cdef extern:
 {% for item in physics_3d_properties %}
     void get_{{ item.fortran_name }}(REAL_t *{{ item.fortran_name }}_out, int *nz)
     void set_{{ item.fortran_name }}(REAL_t *{{ item.fortran_name }}_in, int *nz)
+{% endfor %}
+{% for item in flagstruct_properties %}
+    void get_{{ item.fortran_name }}({{item.type_cython}} *{{ item.fortran_name }}_out)
 {% endfor %}
 
 cdef get_quantity_factory():
@@ -337,6 +341,17 @@ cpdef dict get_tracer_metadata():
 
     return out_dict
 
+
+class Flags:
+{% for item in flagstruct_properties %}
+    @property
+    def {{item.name}}(self):
+        cdef {{item.type_cython}} {{item.name}}
+        get_{{item.fortran_name}}(&{{item.name}})
+        return {{item.name}}
+{% endfor %}
+
+flags = Flags()
 
 def initialize():
     """Call initialization routines for the Fortran model."""

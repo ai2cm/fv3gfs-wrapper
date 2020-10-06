@@ -11,14 +11,14 @@ def set_state_mass_conserving(
     pressure="pressure_thickness_of_atmospheric_layer",
 ):
     """Set the state in a mass conserving way
-    
+
     Args:
         state: a state dictionary. Any water vapor species should have the following form::
 
                             mass condensate or vapor
                     -------------------------------------------
                     mass vapor + mass condensate + mass dry air
-            
+
         fv3gfs: an object implementing get_state, set_state, and get_tracer_metadata.
             Defaults to the Fortran wrapper, but can be overrided for testing purposes.
     """

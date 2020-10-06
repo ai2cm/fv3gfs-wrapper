@@ -16,6 +16,7 @@ from ._wrapper import (
     apply_physics,
     get_diagnostic_info,
     get_diagnostic_data,
+    flags,
 )
 from ._restart import get_restart_names, open_restart
 

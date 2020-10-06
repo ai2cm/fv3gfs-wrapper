@@ -11,8 +11,7 @@ RESTART_EXCLUDE_NAMES = [
 
 
 def get_restart_names():
-    """Return a list of variables names needed for a clean restart.
-    """
+    """Return a list of variables names needed for a clean restart."""
     dynamics_names = [p["name"] for p in DYNAMICS_PROPERTIES]
     physics_names = [p["name"] for p in PHYSICS_PROPERTIES]
     tracer_names = list(get_tracer_metadata().keys())

@@ -11,7 +11,7 @@ FC ?= mpif90
 
 .PHONY: clean cleanall fortran_libs
 
-all: coupler_lib.o dynamics_data.o physics_data.o $(TEMPLATES)
+all: coupler_lib.o dynamics_data.o physics_data.o flagstruct_data.o $(TEMPLATES)
 
 %.o: %.F90
 	$(FC) $(FFLAGS)  -c $< -o $@
@@ -22,6 +22,9 @@ all: coupler_lib.o dynamics_data.o physics_data.o $(TEMPLATES)
 physics_data.o: physics_data.F90 dynamics_data.o
 
 coupler_lib.o: coupler_lib.F90 dynamics_data.o
+
+flagstruct_data.o: flagstruct_data.F90 fortran_libs
+	$(FC) $(CPPDEFS) $(CPPFLAGS) $(FPPFLAGS) $(FFLAGS) $(OTHERFLAGS) $(OTHER_FFLAGS) $(ESMF_INC) -c $< -o $@
 
 clean:
 	@echo "Cleaning ... "
