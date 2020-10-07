@@ -4,6 +4,7 @@
 cimport numpy as cnp
 import numpy as np
 import fv3gfs.util
+from ._properties import DIM_NAMES
 from mpi4py import MPI
 ctypedef cnp.double_t REAL_t
 ctypedef cnp.int_t INT_t
@@ -135,6 +136,8 @@ def set_state(state):
     tracer_metadata = get_tracer_metadata()
     cdef set processed_names_set = set()
     for name, quantity in state.items():
+        if name != 'time':
+            quantity = quantity.transpose(DIM_NAMES[name])
         if name == 'time':
             set_time(state[name])
         elif len(quantity.dims) == 3:
