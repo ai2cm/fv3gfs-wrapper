@@ -281,6 +281,42 @@ prognostic state with the output from the routines called by this function.</p>
 <dd><p>Update dynamical prognostic state with output from physics routines.</p>
 </dd></dl>
 
+<dl class="class">
+<dt id="fv3gfs.wrapper.DiagnosticInfo">
+<em class="property">class </em><code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">DiagnosticInfo</code><span class="sig-paren">(</span><em class="sig-param">axes</em>, <em class="sig-param">module_name</em>, <em class="sig-param">name</em>, <em class="sig-param">description</em>, <em class="sig-param">unit</em><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.DiagnosticInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="method">
+<dt id="fv3gfs.wrapper.DiagnosticInfo.axes">
+<em class="property">property </em><code class="sig-name descname">axes</code><a class="headerlink" href="#fv3gfs.wrapper.DiagnosticInfo.axes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.wrapper.DiagnosticInfo.description">
+<em class="property">property </em><code class="sig-name descname">description</code><a class="headerlink" href="#fv3gfs.wrapper.DiagnosticInfo.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.wrapper.DiagnosticInfo.module_name">
+<em class="property">property </em><code class="sig-name descname">module_name</code><a class="headerlink" href="#fv3gfs.wrapper.DiagnosticInfo.module_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.wrapper.DiagnosticInfo.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#fv3gfs.wrapper.DiagnosticInfo.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fv3gfs.wrapper.DiagnosticInfo.unit">
+<em class="property">property </em><code class="sig-name descname">unit</code><a class="headerlink" href="#fv3gfs.wrapper.DiagnosticInfo.unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="function">
 <dt id="fv3gfs.wrapper.get_restart_names">
 <code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">get_restart_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.get_restart_names" title="Permalink to this definition">¶</a></dt>
@@ -321,6 +357,20 @@ only_names (optional): list of standard names to load</p>
 </dl>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.get_diagnostic_by_name">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">get_diagnostic_by_name</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">module_name: str = 'gfs_phys'</em><span class="sig-paren">)</span> &#x2192; fv3gfs.util.quantity.Quantity<a class="headerlink" href="#fv3gfs.wrapper.get_diagnostic_by_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a diagnostic field as a Quantity</p>
+<p>Currently, only supports diagnostics defined in the GFS_diagnostics.F90</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fv3gfs.wrapper.get_diagnostic_metadata_by_name">
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">get_diagnostic_metadata_by_name</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">module_name: str = 'gfs_phys'</em><span class="sig-paren">)</span> &#x2192; importlib._bootstrap.DiagnosticInfo<a class="headerlink" href="#fv3gfs.wrapper.get_diagnostic_metadata_by_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get diagnostic metadata by name</p>
+<p>Currently, only supports diagnostics defined in the GFS_diagnostics.F90</p>
 </dd></dl>
 
 </div>
