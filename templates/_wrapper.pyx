@@ -19,7 +19,7 @@ cdef extern:
     void get_diagnostic_3d(int*, double *)
     void get_diagnostic_2d(int*, double *)
     void get_metadata_diagnostics(int* , int *, char*, char*, char*, char*)
-    void get_number_diagnostics(int *)
+    void get_diagnostics_count(int *)
     void initialize_subroutine(int *comm)
     void do_step_subroutine()
     void cleanup_subroutine()

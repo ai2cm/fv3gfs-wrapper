@@ -1,3 +1,4 @@
+
 ! Created by  on 9/17/19.
 
 module coupler_lib
@@ -545,7 +546,7 @@ if (restart_days > 0 .or. restart_secs > 0) intrm_rst = .true.
 
 !#######################################################################
 
-    subroutine get_number_diagnostics(n) bind(c)
+    subroutine get_diagnostics_count(n) bind(c)
         integer(c_int), intent(out) :: n
         n = size(Atm%Diag)
     end subroutine
