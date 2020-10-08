@@ -137,7 +137,10 @@ def set_state(state):
     cdef set processed_names_set = set()
     for name, quantity in state.items():
         if name != 'time':
-            quantity = quantity.transpose(DIM_NAMES[name])
+            try:
+                quantity = quantity.transpose(DIM_NAMES[name])
+            except KeyError:
+                raise ValueError(f"no dimension info available for {name}")
         if name == 'time':
             set_time(state[name])
         elif len(quantity.dims) == 3:
