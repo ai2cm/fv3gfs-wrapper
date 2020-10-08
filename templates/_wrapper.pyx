@@ -444,7 +444,7 @@ cdef _get_diagnostic_info(int i) -> DiagnosticInfo:
     )
 
 
-def _get_diagnostic_info() - Mapping[int, DiagnosticInfo]:
+def _get_diagnostic_info() -> Mapping[int, DiagnosticInfo]:
     cdef int n
     get_number_diagnostics(&n)
 
@@ -454,7 +454,7 @@ def _get_diagnostic_info() - Mapping[int, DiagnosticInfo]:
             info = _get_diagnostic_info(i)
         except UnicodeDecodeError:
             # ignore errors when the names for a given array are not properly
-            # initialized, resulting non-unicode strings
+            # initialized, resulting non-unicode string
             continue
 
         if info.name:
