@@ -13,14 +13,15 @@ FC ?= mpif90
 
 all: coupler_lib.o dynamics_data.o physics_data.o flagstruct_data.o $(TEMPLATES)
 
-dynamics_data.o: dynamics_data.F90
+%.o: %.F90
+	$(FC) $(FFLAGS)  -c $< -o $@
+
+%.o: %.f90
 	$(FC) $(FFLAGS)  -c $< -o $@
 
 physics_data.o: physics_data.F90 dynamics_data.o
-	$(FC) $(FFLAGS)  -c $< -o $@
 
-coupler_lib.o: coupler_lib.F90
-	$(FC) $(FFLAGS)  -c $< -o $@
+coupler_lib.o: coupler_lib.F90 dynamics_data.o
 
 flagstruct_data.o: flagstruct_data.F90 fortran_libs
 	$(FC) $(CPPDEFS) $(CPPFLAGS) $(FPPFLAGS) $(FFLAGS) $(OTHERFLAGS) $(OTHER_FFLAGS) $(ESMF_INC) -c $< -o $@

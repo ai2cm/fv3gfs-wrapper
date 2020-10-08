@@ -1,15 +1,12 @@
 import unittest
 import os
-import shutil
 from copy import deepcopy
-import yaml
 import numpy as np
-import fv3config
 import fv3gfs.wrapper
 from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
 import fv3gfs.util
 from mpi4py import MPI
-from util import redirect_stdout
+from util import main
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -174,27 +171,4 @@ class SetterTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    rank = MPI.COMM_WORLD.Get_rank()
-    with open(os.path.join(test_dir, "default_config.yml"), "r") as f:
-        config = yaml.safe_load(f)
-    rundir = os.path.join(test_dir, "rundir")
-    if rank == 0:
-        if os.path.isdir(rundir):
-            shutil.rmtree(rundir)
-        fv3config.write_run_directory(config, rundir)
-    MPI.COMM_WORLD.barrier()
-    original_path = os.getcwd()
-    os.chdir(rundir)
-    try:
-        with redirect_stdout(os.devnull):
-            fv3gfs.wrapper.initialize()
-            MPI.COMM_WORLD.barrier()
-        if rank != 0:
-            kwargs = {"verbosity": 0}
-        else:
-            kwargs = {"verbosity": 2}
-        unittest.main(**kwargs)
-    finally:
-        os.chdir(original_path)
-        if rank == 0:
-            shutil.rmtree(rundir)
+    main(test_dir)
