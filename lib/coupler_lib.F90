@@ -117,13 +117,6 @@ contains
       num_cpld_calls_out = num_cpld_calls
     end subroutine get_num_cpld_calls
 
-    subroutine print_diag_info()
-        integer k
-        do k = 1, size(Atm%Diag)
-            print *, 'Axes', Atm%Diag(k)%axes, 'Index', k
-        end do
-    end
-
     subroutine module_init(comm) bind(c, name='initialize_subroutine')
         integer(c_int), intent(in) :: comm
         call mpp_init(localcomm=comm)
@@ -142,8 +135,6 @@ contains
         termClock = mpp_clock_id( 'Termination' )
         call mpp_clock_begin(mainClock) !begin main loop
         nc = 1
-        ! call print_diag_info
-
     end subroutine module_init
 
     subroutine do_dynamics() bind(c)

@@ -4,6 +4,8 @@
 cimport numpy as cnp
 import numpy as np
 import fv3gfs.util
+from typing import Mapping
+from dataclasses import dataclass
 from mpi4py import MPI
 ctypedef cnp.double_t REAL_t
 ctypedef cnp.int_t INT_t
@@ -414,7 +416,16 @@ def cleanup():
     cleanup_subroutine()
 
 
-cdef _get_diagnostic_info(int i):
+@dataclass
+class DiagnosticInfo:
+    axes: int
+    module_name: str
+    name: str
+    description: str
+    unit: str
+
+
+cdef _get_diagnostic_info(int i) -> DiagnosticInfo:
     cdef int ax
     cdef int axes[1]
     cdef char name[128]
@@ -424,17 +435,16 @@ cdef _get_diagnostic_info(int i):
 
     get_metadata_diagnostics(&i, axes, &mod_name[0], &name[0], &desc[0], &unit[0])
     ax = axes[0]
+    return DiagnosticInfo(
+        axes,
+        mod_name,
+        name,
+        desc,
+        unit
+    )
 
-    return {
-        "axes": ax,
-        "mod_name": mod_name,
-        "name": name,
-        "desc": desc,
-        "unit": unit
-    }
 
-
-def get_diagnostic_info():
+def _get_diagnostic_info() - Mapping[int, DiagnosticInfo]:
     cdef int n
     get_number_diagnostics(&n)
 
@@ -445,12 +455,12 @@ def get_diagnostic_info():
         except UnicodeDecodeError:
             continue
 
-        if info["name"]:
+        if info.name:
             output[i] = info
     return output
 
 
-def get_diagnostic_data(int idx):
+def _get_diagnostic_data(int idx):
 
     cdef int nz
     cdef double[:, :] buf_2d

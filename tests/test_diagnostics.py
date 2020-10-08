@@ -35,15 +35,17 @@ class DiagnosticTests(unittest.TestCase):
             self.assertIsInstance(item["unit"], str)
 
     def test_get_diagnostic_data(self):
-        info = fv3gfs.wrapper.get_diagnostic_info()
         names_to_get = ["tendency_of_air_temperature_due_to_microphysics", "ulwsfc"]
-
-        for idx, data in info.items():
-            if data["name"] in names_to_get:
-                quantity = fv3gfs.wrapper._wrapper.get_diagnostic_data(idx)
-                self.assertIsInstance(quantity, fv3gfs.util.Quantity)
-                assert quantity.view[:].ndim == data["axes"]
-                assert quantity.units == data["unit"]
+        for name in names_to_get:
+            quantity = fv3gfs.wrapper.get_diagnostic_by_name(
+                name, module_name="gfs_phys"
+            )
+            info = fv3gfs.wrapper.get_diagnostic_metadata_by_name(
+                name, module_name="gfs_phys"
+            )
+            self.assertIsInstance(quantity, fv3gfs.util.Quantity)
+            assert quantity.view[:].ndim == info.axes
+            assert quantity.units == info.unit
 
 
 if __name__ == "__main__":

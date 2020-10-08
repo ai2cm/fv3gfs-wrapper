@@ -205,7 +205,6 @@ namelist:
     z_slope_ice: true
     z_slope_liq: true
   gfs_physics_nml:
-    # needed for 3d diagnostics
     cal_pre: false
     cdmbgwd:
     - 3.5
@@ -231,6 +230,7 @@ namelist:
     isubc_lw: 2
     isubc_sw: 2
     ivegsrc: 1
+    # needed for 3d diagnostics
     ldiag3d: true
     lwhtr: true
     ncld: 5
