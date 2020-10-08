@@ -442,7 +442,7 @@ cdef _get_diagnostic_info_by_index(int i):
 
 def _get_diagnostic_info():
     cdef int n
-    get_number_diagnostics(&n)
+    get_diagnostics_count(&n)
 
     output = {}
     for i in range(n):
@@ -483,6 +483,5 @@ def _get_diagnostic_data(int idx):
 
 
     return fv3gfs.util.Quantity(array, dims, units=units)
-
 
 
