@@ -24,14 +24,14 @@ class DiagnosticTests(unittest.TestCase):
         output = fv3gfs.wrapper._get_diagnostic_info()
         assert len(output) > 0
         for index, item in output.items():
-            self.assertIsInstance(item["axes"], int)
-            self.assertIsInstance(item["mod_name"], str)
+            self.assertIsInstance(item.axes, int)
+            self.assertIsInstance(item.module_name, str)
 
-            self.assertIsInstance(item["name"], str)
-            self.assertIsNot(item["name"], "")
+            self.assertIsInstance(item.name, str)
+            self.assertIsNot(item.name, "")
 
-            self.assertIsInstance(item["desc"], str)
-            self.assertIsInstance(item["unit"], str)
+            self.assertIsInstance(item.description, str)
+            self.assertIsInstance(item.unit, str)
 
     def test_get_diagnostic_data(self):
         names_to_get = ["tendency_of_air_temperature_due_to_microphysics", "ulwsfc"]

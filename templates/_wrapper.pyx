@@ -5,7 +5,7 @@ cimport numpy as cnp
 import numpy as np
 import fv3gfs.util
 from typing import Mapping
-from dataclasses import dataclass
+from collections import namedtuple
 from mpi4py import MPI
 ctypedef cnp.double_t REAL_t
 ctypedef cnp.int_t INT_t
@@ -416,16 +416,12 @@ def cleanup():
     cleanup_subroutine()
 
 
-@dataclass
-class DiagnosticInfo:
-    axes: int
-    module_name: str
-    name: str
-    description: str
-    unit: str
+
+DiagnosticInfo = namedtuple(
+        'DiagnosticInfo', ['axes', 'module_name', 'name', 'description', 'unit'])
 
 
-cdef _get_diagnostic_info(int i) -> DiagnosticInfo:
+cdef _get_diagnostic_info_by_index(int i):
     cdef int ax
     cdef int axes[1]
     cdef char name[128]
@@ -436,22 +432,22 @@ cdef _get_diagnostic_info(int i) -> DiagnosticInfo:
     get_metadata_diagnostics(&i, axes, &mod_name[0], &name[0], &desc[0], &unit[0])
     ax = axes[0]
     return DiagnosticInfo(
-        axes,
-        mod_name,
-        name,
-        desc,
-        unit
+        int(axes[0]),
+        str(mod_name),
+        str(name),
+        str(desc),
+        str(unit)
     )
 
 
-def _get_diagnostic_info() -> Mapping[int, DiagnosticInfo]:
+def _get_diagnostic_info():
     cdef int n
     get_number_diagnostics(&n)
 
     output = {}
     for i in range(n):
         try:
-            info = _get_diagnostic_info(i)
+            info = _get_diagnostic_info_by_index(i)
         except UnicodeDecodeError:
             # ignore errors when the names for a given array are not properly
             # initialized, resulting non-unicode string
@@ -468,9 +464,9 @@ def _get_diagnostic_data(int idx):
     cdef double[:, :] buf_2d
     cdef double[:, :, :] buf_3d
 
-    info = _get_diagnostic_info(idx)
-    ndim = info["axes"]
-    units = info["unit"]
+    info = _get_diagnostic_info_by_index(idx)
+    ndim = info.axes
+    units = info.unit
     shape = get_dimension_lengths()
     dtype = np.float64
 
