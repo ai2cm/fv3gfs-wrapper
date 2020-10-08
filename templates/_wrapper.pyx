@@ -4,6 +4,8 @@
 cimport numpy as cnp
 import numpy as np
 import fv3gfs.util
+from typing import Mapping
+from collections import namedtuple
 from mpi4py import MPI
 ctypedef cnp.double_t REAL_t
 ctypedef cnp.int_t INT_t
@@ -12,7 +14,12 @@ real_type = np.float64
 SURFACE_PRECIPITATION_RATE = 'surface_precipitation_rate'
 MM_PER_M = 1000
 
+
 cdef extern:
+    void get_diagnostic_3d(int*, double *)
+    void get_diagnostic_2d(int*, double *)
+    void get_metadata_diagnostics(int* , int *, char*, char*, char*, char*)
+    void get_diagnostics_count(int *)
     void initialize_subroutine(int *comm)
     void do_step_subroutine()
     void cleanup_subroutine()
@@ -407,3 +414,74 @@ def save_fortran_restart():
 def cleanup():
     """Call the Fortran cleanup routines, which clear memory and write final restart files."""
     cleanup_subroutine()
+
+
+
+DiagnosticInfo = namedtuple(
+        'DiagnosticInfo', ['axes', 'module_name', 'name', 'description', 'unit'])
+
+
+cdef _get_diagnostic_info_by_index(int i):
+    cdef int ax
+    cdef int axes[1]
+    cdef char name[128]
+    cdef char mod_name[128]
+    cdef char desc[128]
+    cdef char unit[128]
+
+    get_metadata_diagnostics(&i, axes, &mod_name[0], &name[0], &desc[0], &unit[0])
+    ax = axes[0]
+    return DiagnosticInfo(
+        int(axes[0]),
+        str(mod_name),
+        str(name),
+        str(desc),
+        str(unit)
+    )
+
+
+def _get_diagnostic_info():
+    cdef int n
+    get_diagnostics_count(&n)
+
+    output = {}
+    for i in range(n):
+        try:
+            info = _get_diagnostic_info_by_index(i)
+        except UnicodeDecodeError:
+            # ignore errors when the names for a given array are not properly
+            # initialized, resulting non-unicode string
+            continue
+
+        if info.name:
+            output[i] = info
+    return output
+
+
+def _get_diagnostic_data(int idx):
+
+    cdef int nz
+    cdef double[:, :] buf_2d
+    cdef double[:, :, :] buf_3d
+
+    info = _get_diagnostic_info_by_index(idx)
+    ndim = info.axes
+    units = info.unit
+    shape = get_dimension_lengths()
+    dtype = np.float64
+
+    if ndim == 3:
+        array = np.empty((shape['nz'], shape['ny'], shape['nx']), dtype=dtype)
+        buf_3d = array
+        get_diagnostic_3d(&idx, &buf_3d[0, 0, 0])
+        dims = [fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM]
+    elif ndim == 2:
+        array = np.empty((shape['ny'], shape['nx']), dtype=dtype)
+        buf_2d = array
+        get_diagnostic_2d(&idx, &buf_2d[0, 0])
+        dims = [fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM]
+
+
+    return fv3gfs.util.Quantity(array, dims, units=units)
+
+

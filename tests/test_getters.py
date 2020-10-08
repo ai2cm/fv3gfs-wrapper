@@ -1,17 +1,21 @@
 import unittest
-import yaml
 import os
-import shutil
 import numpy as np
-import fv3config
+import yaml
 import fv3gfs.wrapper
 import fv3gfs.util
 from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
 from mpi4py import MPI
-from util import redirect_stdout
+
+from util import main
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 MM_PER_M = 1000
+
+
+def get_config():
+    with open("fv3config.yml") as f:
+        return yaml.safe_load(f)
 
 
 class GetterTests(unittest.TestCase):
@@ -87,6 +91,7 @@ class GetterTests(unittest.TestCase):
         )
         total_precip = state["total_precipitation"]
         precip_rate = state["surface_precipitation_rate"]
+        config = get_config()
         dt = config["namelist"]["coupler_nml"]["dt_atmos"]
         np.testing.assert_allclose(
             MM_PER_M * total_precip.view[:] / dt, precip_rate.view[:]
@@ -193,26 +198,4 @@ class TracerMetadataTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    rank = MPI.COMM_WORLD.Get_rank()
-    config = yaml.safe_load(open(os.path.join(test_dir, "default_config.yml"), "r"))
-    rundir = os.path.join(test_dir, "rundir")
-    if rank == 0:
-        if os.path.isdir(rundir):
-            shutil.rmtree(rundir)
-        fv3config.write_run_directory(config, rundir)
-    MPI.COMM_WORLD.barrier()
-    original_path = os.getcwd()
-    os.chdir(rundir)
-    try:
-        with redirect_stdout(os.devnull):
-            fv3gfs.wrapper.initialize()
-            MPI.COMM_WORLD.barrier()
-        if rank != 0:
-            kwargs = {"verbosity": 0}
-        else:
-            kwargs = {"verbosity": 2}
-        unittest.main(**kwargs)
-    finally:
-        os.chdir(original_path)
-        if rank == 0:
-            shutil.rmtree(rundir)
+    main(test_dir)
