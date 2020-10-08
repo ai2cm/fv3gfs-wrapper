@@ -136,16 +136,13 @@ def set_state(state):
     tracer_metadata = get_tracer_metadata()
     cdef set processed_names_set = set()
     for name, quantity in state.items():
-        if name != 'time':
-            try:
-                quantity = quantity.transpose(DIM_NAMES[name])
-            except KeyError:
-                raise ValueError(f"no dimension info available for {name}")
         if name == 'time':
             set_time(state[name])
         elif len(quantity.dims) == 3:
+            quantity = quantity.transpose(DIM_NAMES.get(name, [fv3gfs.util.Z_DIMS, fv3gfs.util.Y_DIMS, fv3gfs.util.X_DIMS]))
             set_3d_quantity(name, np.ascontiguousarray(quantity.view[:]), quantity.extent[0], tracer_metadata)
         elif len(quantity.dims) == 2:
+            quantity = quantity.transpose(DIM_NAMES.get(name, [fv3gfs.util.Y_DIMS, fv3gfs.util.X_DIMS]))
             set_2d_quantity(name, np.ascontiguousarray(quantity.view[:]))
         elif len(quantity.dims) == 1:
             set_1d_quantity(name, np.ascontiguousarray(quantity.view[:]))
@@ -341,9 +338,6 @@ cpdef dict get_tracer_metadata():
 
 
     return out_dict
-
-for name, properties in get_tracer_metadata().items():
-    DIM_NAMES[name] = properties["dims"]
 
 
 class Flags:
