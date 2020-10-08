@@ -339,6 +339,9 @@ cpdef dict get_tracer_metadata():
 
     return out_dict
 
+for name, properties in get_tracer_metadata.items():
+    DIM_NAMES[name] = properties["dims"]
+
 
 class Flags:
 {% for item in flagstruct_properties %}
