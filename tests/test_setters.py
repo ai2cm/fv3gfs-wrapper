@@ -62,19 +62,18 @@ class SetterTests(unittest.TestCase):
 
     def test_set_then_get_air_temperature(self):
         self._set_names_helper(["air_temperature"])
-    
 
     def test_set_then_get_transposed_air_temperature(self):
         self._set_names_one_at_a_time_helper(
             ["air_temperature"],
-            input_modifier = lambda quantity: fv3gfs.util.Quantity(
+            input_modifier=lambda quantity: fv3gfs.util.Quantity(
                 np.ascontiguousarray(quantity.data.transpose()),
                 dims=quantity.dims[::-1],
                 units=quantity.units,
                 origin=quantity.origin[::-1],
                 extent=quantity.extent[::-1],
                 gt4py_backend=quantity.gt4py_backend,
-            )
+            ),
         )
 
     def test_set_then_get_all_dynamics_names(self):
