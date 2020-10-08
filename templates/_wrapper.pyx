@@ -453,6 +453,8 @@ def _get_diagnostic_info() - Mapping[int, DiagnosticInfo]:
         try:
             info = _get_diagnostic_info(i)
         except UnicodeDecodeError:
+            # ignore errors when the names for a given array are not properly
+            # initialized, resulting non-unicode strings
             continue
 
         if info.name:
