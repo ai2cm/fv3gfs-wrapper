@@ -3,7 +3,6 @@ ARG MPI_IMAGE
 ARG FMS_IMAGE
 ARG ESMF_IMAGE
 ARG FORTRAN_ENV_IMAGE
-ARG GT4PY_CUDA=" "
 
 FROM $MPI_IMAGE AS fv3gfs-mpi
 FROM $FMS_IMAGE AS fv3gfs-fms
@@ -81,6 +80,8 @@ COPY fv3gfs /fv3gfs-wrapper/fv3gfs
 
 #-----------------------------------------------------------------------------
 FROM fv3gfs-wrapper-build AS fv3gfs-wrapper
+
+ARG GT4PY_CUDA=" "
 
 RUN pip3 install --no-deps --no-cache-dir git+https://github.com/GridTools/gt4py.git@db40777788863bfe87b9674b118e8bd5b8db0440#egg=gt4py$(GT4PY_CUDA) 
 
