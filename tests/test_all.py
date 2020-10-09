@@ -10,28 +10,33 @@ base_dir = os.path.dirname(os.path.realpath(__file__))
 # the test scripts we call that *do* need MPI.
 MPI.Finalize()
 
+# Check if we are running on Piz Daint
+if os.environ.get('DAINT'):
+    SLURM = True
+else:
+    SLURM = False
 
 class UsingMPITests(unittest.TestCase):
     def test_getters(self):
-        run_unittest_script(os.path.join(base_dir, "test_getters.py"))
+        run_unittest_script(os.path.join(base_dir, "test_getters.py"), slurm=SLURM)
 
     def test_setters(self):
-        run_unittest_script(os.path.join(base_dir, "test_setters.py"))
+        run_unittest_script(os.path.join(base_dir, "test_setters.py"), slurm=SLURM)
 
     def test_diagnostics(self):
-        run_unittest_script(os.path.join(base_dir, "test_diagnostics.py"))
+        run_unittest_script(os.path.join(base_dir, "test_diagnostics.py"), slurm=SLURM)
 
     def test_tracer_metadata(self):
-        run_unittest_script(os.path.join(base_dir, "test_tracer_metadata.py"))
+        run_unittest_script(os.path.join(base_dir, "test_tracer_metadata.py"), slurm=SLURM)
 
     def test_get_time_julian(self):
-        run_unittest_script(os.path.join(base_dir, "test_get_time.py"), "julian")
+        run_unittest_script(os.path.join(base_dir, "test_get_time.py"), "julian", slurm=SLURM)
 
     def test_get_time_thirty_day(self):
-        run_unittest_script(os.path.join(base_dir, "test_get_time.py"), "thirty_day")
+        run_unittest_script(os.path.join(base_dir, "test_get_time.py"), "thirty_day", slurm=SLURM)
 
     def test_get_time_noleap(self):
-        run_unittest_script(os.path.join(base_dir, "test_get_time.py"), "noleap")
+        run_unittest_script(os.path.join(base_dir, "test_get_time.py"), "noleap", slurm=SLURM)
 
 
 if __name__ == "__main__":

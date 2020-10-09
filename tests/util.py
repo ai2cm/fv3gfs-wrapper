@@ -14,18 +14,21 @@ from mpi4py import MPI
 libc = ctypes.CDLL(None)
 c_stdout = ctypes.c_void_p.in_dll(libc, "stdout")
 
-mpi_flags = [
-    "--allow-run-as-root",
-    "--oversubscribe",
-    "--mca",
-    "btl_vader_single_copy_mechanism",
-    "none",
-]
+#mpi_flags = [
+#    "--allow-run-as-root",
+#    "--oversubscribe",
+#    "--mca",
+#    "btl_vader_single_copy_mechanism",
+#    "none",
+#]
 
 
-def run_unittest_script(filename, *args, n_processes=6):
+def run_unittest_script(filename, *args, n_processes=6, slurm=False):
     python_args = ["python3", "-m", "mpi4py", filename] + list(args)
-    subprocess.check_call(["mpirun", "-n", str(n_processes)] + python_args)
+    if slurm:
+       subprocess.check_call(["srun", "-n", str(n_processes)] + python_args)
+    else:
+       subprocess.check_call(["mpirun", "-n", str(n_processes)] + python_args)
 
 
 def redirect_stdout(filename):
