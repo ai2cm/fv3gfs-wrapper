@@ -4,6 +4,7 @@
 cimport numpy as cnp
 import numpy as np
 import fv3gfs.util
+from ._properties import DIM_NAMES
 from typing import Mapping
 from collections import namedtuple
 from mpi4py import MPI
@@ -145,8 +146,20 @@ def set_state(state):
         if name == 'time':
             set_time(state[name])
         elif len(quantity.dims) == 3:
+            quantity = quantity.transpose(
+                DIM_NAMES.get(
+                    name,
+                    [fv3gfs.util.Z_DIMS, fv3gfs.util.Y_DIMS, fv3gfs.util.X_DIMS]
+                )
+            )
             set_3d_quantity(name, np.ascontiguousarray(quantity.view[:]), quantity.extent[0], tracer_metadata)
         elif len(quantity.dims) == 2:
+            quantity = quantity.transpose(
+                DIM_NAMES.get(
+                    name,
+                    [fv3gfs.util.Y_DIMS, fv3gfs.util.X_DIMS]
+                )
+            )
             set_2d_quantity(name, np.ascontiguousarray(quantity.view[:]))
         elif len(quantity.dims) == 1:
             set_1d_quantity(name, np.ascontiguousarray(quantity.view[:]))
@@ -284,12 +297,19 @@ def get_state(names, dict state=None, allocator=None):
     for tracer_name, tracer_data in get_tracer_metadata().items():
         i_tracer = tracer_data['i_tracer']
         if (tracer_name in input_names_set):
-            quantity = _get_quantity(state, tracer_name, allocator, [fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM], tracer_data["units"], dtype=real_type)
+            quantity = _get_quantity(
+                state, tracer_name, allocator,
+                [fv3gfs.util.Z_DIM, fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM],
+                tracer_data["units"], dtype=real_type
+            )
             with fv3gfs.util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_3d:
                 get_tracer(&i_tracer, &array_3d[0, 0, 0])
 
     if SURFACE_PRECIPITATION_RATE in input_names_set:
-        quantity = _get_quantity(state, SURFACE_PRECIPITATION_RATE, allocator, [fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM], "mm/s", dtype=real_type)
+        quantity = _get_quantity(
+            state, SURFACE_PRECIPITATION_RATE, allocator,
+            [fv3gfs.util.Y_DIM, fv3gfs.util.X_DIM], "mm/s", dtype=real_type
+        )
         get_physics_timestep_subroutine(&dt_physics)
         with fv3gfs.util.recv_buffer(quantity.np.empty, quantity.view[:]) as array_2d:
             get_tprcp(&array_2d[0, 0])

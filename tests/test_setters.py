@@ -63,6 +63,19 @@ class SetterTests(unittest.TestCase):
     def test_set_then_get_air_temperature(self):
         self._set_names_helper(["air_temperature"])
 
+    def test_set_then_get_transposed_air_temperature(self):
+        self._set_names_one_at_a_time_helper(
+            ["air_temperature"],
+            input_modifier=lambda quantity: fv3gfs.util.Quantity(
+                np.ascontiguousarray(quantity.data.transpose()),
+                dims=quantity.dims[::-1],
+                units=quantity.units,
+                origin=quantity.origin[::-1],
+                extent=quantity.extent[::-1],
+                gt4py_backend=quantity.gt4py_backend,
+            ),
+        )
+
     def test_set_then_get_all_dynamics_names(self):
         self._set_names_helper(self.dynamics_data.keys())
 
@@ -115,14 +128,19 @@ class SetterTests(unittest.TestCase):
                 replace_quantity = replace_state[name]
                 self.assert_values_equal(new_quantity, replace_quantity)
 
-    def _set_names_one_at_a_time_helper(self, name_list):
+    def _set_names_one_at_a_time_helper(self, name_list, input_modifier=None):
         old_state = fv3gfs.wrapper.get_state(names=name_list)
         self._check_gotten_state(old_state, name_list)
         for replace_name in name_list:
             with self.subTest(replace_name):
-                quantity = deepcopy(old_state[replace_name])
-                quantity.view[:] = np.random.uniform(size=quantity.extent)
-                replace_state = {replace_name: quantity}
+                target_quantity = deepcopy(old_state[replace_name])
+                target_quantity.view[:] = np.random.uniform(size=target_quantity.extent)
+                if input_modifier is not None:
+                    set_quantity = input_modifier(target_quantity)
+                else:
+                    set_quantity = target_quantity
+                replace_state = {replace_name: set_quantity}
+                target_state = {replace_name: target_quantity}
                 fv3gfs.wrapper.set_state(replace_state)
                 new_state = fv3gfs.wrapper.get_state(names=name_list)
                 self._check_gotten_state(new_state, name_list)
@@ -134,7 +152,7 @@ class SetterTests(unittest.TestCase):
                             ),
                             "quantity has not changed",
                         )
-                        self.assert_values_equal(new_quantity, replace_state[name])
+                        self.assert_values_equal(new_quantity, target_state[name])
                     else:
                         self.assert_values_equal(new_quantity, old_state[name])
                 old_state = new_state
