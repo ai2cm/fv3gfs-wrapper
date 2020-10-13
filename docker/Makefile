@@ -44,7 +44,7 @@ all: build_deps build
 
 build:
 	mkdir -p $(shell pwd)/configdata
-	gsutil -m rsync gs://vcm-fv3config/ $(shell pwd)/configdata
+	gsutil -u vcm-ml -m rsync gs://vcm-fv3config/ $(shell pwd)/configdata
 	COMPILED_IMAGE=$(FORTRAN_IMAGE) COMPILE_TARGET=fv3gfs-build BUILD_FROM_INTERMEDIATE=$(BUILD_FROM_INTERMEDIATE) $(MAKE) -C ../lib/external build
 	docker build -f $(DOCKERFILE) -t $(FV3GFS_WRAPPER_IMAGE) $(FV3GFS_WRAPPER_BUILD_ARGS) .. --target $(TARGET)
 
