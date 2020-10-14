@@ -1,7 +1,7 @@
 SHELL = /bin/sh
 
-CC=gcc
-MPI=mpich
+CC ?= gcc
+MPI ?= mpich
 
 .PHONY: build clean clean-test clean-pyc clean-build clean-examples examples lint test coverage docs help docs-docker
 .DEFAULT_GOAL := help
