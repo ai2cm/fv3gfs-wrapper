@@ -9,7 +9,7 @@ PROPERTIES_FILES = ../fv3gfs/wrapper/dynamics_properties.json ../fv3gfs/wrapper/
 FFLAGS += $(shell PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1 pkg-config fv3 --cflags)
 FC ?= mpif90
 
-.PHONY: clean cleanall fortran_libs
+.PHONY: clean cleanall
 
 all: coupler_lib.o dynamics_data.o physics_data.o flagstruct_data.o $(TEMPLATES)
 
@@ -23,7 +23,7 @@ physics_data.o: physics_data.F90 dynamics_data.o
 
 coupler_lib.o: coupler_lib.F90 dynamics_data.o
 
-flagstruct_data.o: flagstruct_data.F90 fortran_libs
+flagstruct_data.o: flagstruct_data.F90
 	$(FC) $(CPPDEFS) $(CPPFLAGS) $(FPPFLAGS) $(FFLAGS) $(OTHERFLAGS) $(OTHER_FFLAGS) $(ESMF_INC) -c $< -o $@
 
 clean:
