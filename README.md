@@ -10,7 +10,7 @@ for more detailed instructions.
 
 This is currently alpha development software used for research. If you would like to contribute to or collaborate on the software, please get in touch with jeremym@vulcan.com or another developer.
 
-Running the tests as they are currently written requires private credentials to google cloud services, as the data access is set to "requester pays". To run the tests and examples with your credentials, set an environment variable `GOOGLE_APPLICATION_CREDENTIALS` as a path to your JSON key file.  (E.g., `export GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json`) **Note**: your project will incur some data transfer charges if you run these examples.
+Running the tests as they are currently written requires private credentials to google cloud services, as the data access is set to "requester pays". To run the tests and examples with your credentials, set an environment variable `GOOGLE_APPLICATION_CREDENTIALS` as a path to your JSON key file.  (E.g., `export GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json`) **Note**: your project will incur some data transfer charges if you run these tests or examples.
 
 Checking out
 ------------
