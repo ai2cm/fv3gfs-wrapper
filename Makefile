@@ -32,6 +32,7 @@ export PRINT_HELP_PYSCRIPT
 BROWSER := python3 -c "$$BROWSER_PYSCRIPT"
 
 DOCKER_IMAGE?=us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu9-mpich314-nocuda
+BUILD_FROM_INTERMEDIATE=y
 
 PYTHON_FILES = $(shell git ls-files | grep -e 'py$$' | grep -v -e '__init__.py')
 PYTHON_INIT_FILES = $(shell git ls-files | grep '__init__.py')
@@ -73,14 +74,14 @@ public_examples:
 clean-examples:
 	$(MAKE) -C examples/runfiles clean
 
-lint:
+lint: ## check the code follows formatting standards
 	black --diff --check $(PYTHON_FILES) $(PYTHON_INIT_FILES)
 	flake8 $(PYTHON_FILES)
 	# ignore unused import error in __init__.py files
 	flake8 --ignore=F401 $(PYTHON_INIT_FILES)
 	@echo "LINTING SUCCESSFUL"
 
-reformat:
+reformat: ## use black to auto-format code
 	black $(PYTHON_FILES) $(PYTHON_INIT_FILES)
 
 test: ## run tests quickly with the default Python
@@ -97,14 +98,14 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
 
-docs-docker:
+docs-docker:  ## build documentation using docker
 	docker run --rm -v $(shell pwd)/docs:/fv3gfs-wrapper/docs -w /fv3gfs-wrapper $(DOCKER_IMAGE) make docs
 	$(BROWSER) docs/_build/html/index.html
 
-build-docker:
+build-docker:  ## build the docker image
 	BUILD_FROM_INTERMEDIATE=$(BUILD_FROM_INTERMEDIATE) $(MAKE) -C docker
 
-test-docker: build-docker
+test-docker: build-docker  ## test the docker image
 	./test_docker.sh
 
 servedocs: docs ## compile the docs watching for changes
@@ -113,7 +114,7 @@ servedocs: docs ## compile the docs watching for changes
 release: dist ## package and upload a release
 	twine upload dist/*
 
-build:
+build:  ## build the wrapper shared object file
 	$(MAKE) -C lib
 	export MPI=$(MPI)
 	CC=$(CC) python3 setup.py build_ext --inplace
