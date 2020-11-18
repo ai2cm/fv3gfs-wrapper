@@ -8,6 +8,10 @@ global climate model.
 See the [documentation](https://vulcanclimatemodeling.github.io/fv3gfs-wrapper/f12n7eq5xkoibbqp/index.html)
 for more detailed instructions.
 
+This is currently alpha development software used for research. If you would like to contribute to or collaborate on the software, please get in touch with jeremym@vulcan.com or another developer.
+
+Running the tests as they are currently written requires private credentials to google cloud services, as the data is set to "requester pays". If you run the examples, your project will incur data transfer charges. If you have these credentials, set an environment variable GOOGLE_APPLICATION_CREDENTIALS to your json key file when you run the tests and examples.
+
 Checking out
 ------------
 

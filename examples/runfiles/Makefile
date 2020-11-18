@@ -11,7 +11,14 @@ all: $(CASES) nudging fortran_state baroclinic
 public_examples: $(CASES) fortran_state baroclinic
 
 fv3run:
-	fv3run --runfile $(RUNFILE) --dockerimage $(DOCKER_IMAGE) $(CONFIG) $(OUTDIR)
+	write_run_directory $(CONFIG) $(OUTDIR)
+	cp $(RUNFILE) $(OUTDIR)/$(RUNFILE)
+	docker run -v $(GOOGLE_APPLICATION_CREDENTIALS):$(GOOGLE_APPLICATION_CREDENTIALS) \
+        --env GOOGLE_APPLICATION_CREDENTIALS=$(GOOGLE_APPLICATION_CREDENTIALS) \
+		-w /rundir \
+		-v $(shell pwd)/$(OUTDIR):/rundir \
+		$(DOCKER_IMAGE) \
+		mpirun -n 6 --allow-run-as-root --mca btl_vader_single_copy_mechanism none python3 $(RUNFILE)
 
 $(CASES): %:
 	RUNFILE=$@.py OUTDIR=$@_outdir $(MAKE) fv3run
