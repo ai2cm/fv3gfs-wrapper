@@ -181,7 +181,8 @@
 <div class="section" id="latest">
 <h2>latest<a class="headerlink" href="#latest" title="Permalink to this headline">¶</a></h2>
 <p>Breaking changes:
-- Removed many fv3util imports from fv3gfs, import those symbols from fv3util instead</p>
+- Removed many fv3util imports from fv3gfs, import those symbols from fv3gfs.util instead
+- Removed initial cache data from fv3gfs-wrapper image</p>
 <p>Major changes:
 - Use <cite>cftime.datetime</cite> objects to represent datetimes in fv3gfs-python and fv3util instead of <cite>datetime.datetime</cite> objects.  This results in times stored in a format compatible with the fortran model, and accurate internal representation of times with the calendar specified
 in the <cite>coupler_nml</cite> namelist.
