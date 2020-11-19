@@ -59,7 +59,7 @@ master_doc = "index"
 
 # General information about the project.
 project = u"fv3gfs-wrapper"
-copyright = u"2019, Vulcan Technologies, LLC"
+copyright = u"2019-2020, Vulcan Technologies, LLC"
 author = u"Vulcan Technologies, LLC"
 
 # The version info for the project you're documenting, acts as replacement
