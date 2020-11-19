@@ -35,8 +35,15 @@ import fv3gfs.wrapper
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
     "sphinx.ext.autosectionlabel",
+    "sphinx.ext.intersphinx",
 ]
+
+intersphinx_mapping = {
+    "fv3gfs.util": ("https://fv3gfs-util.readthedocs.io/en/latest/", None)
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -51,7 +58,7 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"FV3GFS"
+project = u"fv3gfs-wrapper"
 copyright = u"2019, Vulcan Technologies, LLC"
 author = u"Vulcan Technologies, LLC"
 
@@ -99,7 +106,7 @@ html_theme = "sphinx_rtd_theme"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+html_static_path = ["static"]
 
 
 # -- Options for HTMLHelp output ---------------------------------------
@@ -132,7 +139,7 @@ latex_documents = [
     (
         master_doc,
         "fv3gfs.tex",
-        u"FV3GFS Documentation",
+        u"fv3gfs-wrapper documentation",
         u"Vulcan Technologies, LLC",
         "manual",
     ),
@@ -143,7 +150,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "fv3gfs", u"FV3GFS Documentation", [author], 1)]
+man_pages = [(master_doc, "fv3gfs-wrapper", u"fv3gfs-wrapper documentation", [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------
@@ -154,10 +161,10 @@ man_pages = [(master_doc, "fv3gfs", u"FV3GFS Documentation", [author], 1)]
 texinfo_documents = [
     (
         master_doc,
-        "fv3gfs",
-        u"FV3GFS Documentation",
+        "fv3gfs-wrapper",
+        u"fv3gfs-wrapper documentation",
         author,
-        "fv3gfs",
+        "fv3gfs-wrapper",
         "Python wrapper of the FV3GFS global climate model.",
         "Miscellaneous",
     ),

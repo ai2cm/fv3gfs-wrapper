@@ -1,12 +1,10 @@
-
-FV3GFS
-======
-
 fv3gfs-wrapper (`import fv3gfs.wrapper`), is a Python wrapper for the FV3GFS
 global climate model.
 
-See the [documentation](https://vulcanclimatemodeling.github.io/fv3gfs-wrapper/f12n7eq5xkoibbqp/index.html)
+See the [documentation](https://vulcanclimatemodeling.github.io/fv3gfs-wrapper/index.html)
 for more detailed instructions.
+
+We also recommend you read the documentation for [fv3gfs-util](https://fv3gfs-util.readthedocs.io/en/latest/), which is used alongside fv3gfs-wrapper to provide Python model infrastructure and functionality.
 
 Checking out
 ------------
