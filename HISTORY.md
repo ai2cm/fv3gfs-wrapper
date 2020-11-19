@@ -5,7 +5,8 @@ latest
 ------
 
 Breaking changes:
-- Removed many fv3util imports from fv3gfs, import those symbols from fv3util instead
+- Removed many fv3util imports from fv3gfs, import those symbols from fv3gfs.util instead
+- Removed initial cache data from fv3gfs-wrapper image
 
 Major changes:
 - Use `cftime.datetime` objects to represent datetimes in fv3gfs-python and fv3util instead of `datetime.datetime` objects.  This results in times stored in a format compatible with the fortran model, and accurate internal representation of times with the calendar specified
