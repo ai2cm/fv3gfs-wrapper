@@ -1,7 +1,4 @@
-.. meta::
-   :robots: noindex, nofollow
 
-=====
 Usage
 =====
 
@@ -27,9 +24,8 @@ segmentation fault. The docker image is set up to use this setting by default in
 Running the model
 -----------------
 
-Basic model operation can be seen in this short, self-explanatory example::
+Basic model operation can be seen in this short, mostly self-explanatory example::
 
-    from mpi4py import MPI
     from fv3gfs import wrapper
 
     wrapper.initialize()
@@ -61,7 +57,7 @@ Instead of using a Python script, it is also possible to get precisely the behav
 
 
 fv3gfs-util
--------
+-----------
 
 Any functionality which can be used separately from the compiled Fortran model is included
 in a separate package, fv3gfs-util. We recommend reading the documentation for that package
@@ -116,7 +112,7 @@ script with a general structure as follows:
 
 In this script, if a restart file exists in the RESTART directory, it will be read in and overwrite
 the model state after the Fortran initialization routines take place. Each MPI rank
-(process) reads (with :py:func:`fv3gfs.util.read_state`) or writes (with :py:func:`fv3gfs.util.write_state)
+(process) reads (with :py:func:`fv3gfs.util.read_state`) or writes (with :py:func:`fv3gfs.util.write_state`)
 a netCDF file with all of its restart data. :py:func:`fv3gfs.wrapper.get_restart_names` returns
 a list of all quantity names required to restart the model.
 

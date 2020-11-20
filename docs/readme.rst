@@ -1,7 +1,3 @@
-.. meta::
-   :robots: noindex, nofollow
-
-======
 Readme
 ======
 
