@@ -4,11 +4,10 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
-  <meta content="noindex, nofollow" name="robots" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Usage &mdash; FV3GFS 0.5.0 documentation</title>
+  <title>Usage &mdash; fv3gfs-wrapper 0.5.0 documentation</title>
   
 
   
@@ -52,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> FV3GFS
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> fv3gfs-wrapper
           
 
           
@@ -117,7 +116,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">FV3GFS</a>
+          <a href="index.html">fv3gfs-wrapper</a>
         
       </nav>
 
@@ -187,9 +186,8 @@ segmentation fault. The docker image is set up to use this setting by default in
 </div>
 <div class="section" id="running-the-model">
 <h2>Running the model<a class="headerlink" href="#running-the-model" title="Permalink to this headline">¶</a></h2>
-<p>Basic model operation can be seen in this short, self-explanatory example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
-<span class="kn">from</span> <span class="nn">fv3gfs</span> <span class="kn">import</span> <span class="n">wrapper</span>
+<p>Basic model operation can be seen in this short, mostly self-explanatory example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fv3gfs</span> <span class="kn">import</span> <span class="n">wrapper</span>
 
 <span class="n">wrapper</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">wrapper</span><span class="o">.</span><span class="n">get_step_count</span><span class="p">()):</span>
@@ -242,7 +240,7 @@ names you would need to write out to disk in order to smoothly reset the model s
 <p>after calling <a class="reference internal" href="api.html#fv3gfs.wrapper.set_state" title="fv3gfs.wrapper.set_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.set_state()</span></code></a>, the model would be reset to the point
 where the checkpoint state was retrieved.</p>
 <p>The remaining step for restarting from disk is to be able to write model states to/from disk.
-For this, we have <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.write_state()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.read_state()</span></code>. Consider a model
+For this, we have <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.write_state" title="(in fv3gfs-util v0.5.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.write_state()</span></code></a> and <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.read_state" title="(in fv3gfs-util v0.5.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.read_state()</span></code></a>. Consider a model
 script with a general structure as follows:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
 <span class="kn">import</span> <span class="nn">fv3gfs.wrapper</span>
@@ -267,8 +265,8 @@ script with a general structure as follows:</p>
 </div>
 <p>In this script, if a restart file exists in the RESTART directory, it will be read in and overwrite
 the model state after the Fortran initialization routines take place. Each MPI rank
-(process) reads (with <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.read_state()</span></code>) or writes (with <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.write_state)</span>
-<span class="pre">a</span> <span class="pre">netCDF</span> <span class="pre">file</span> <span class="pre">with</span> <span class="pre">all</span> <span class="pre">of</span> <span class="pre">its</span> <span class="pre">restart</span> <span class="pre">data.</span> <span class="pre">:py:func:`fv3gfs.wrapper.get_restart_names()</span></code> returns
+(process) reads (with <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.read_state" title="(in fv3gfs-util v0.5.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.read_state()</span></code></a>) or writes (with <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.write_state" title="(in fv3gfs-util v0.5.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.write_state()</span></code></a>)
+a netCDF file with all of its restart data. <a class="reference internal" href="api.html#fv3gfs.wrapper.get_restart_names" title="fv3gfs.wrapper.get_restart_names"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.get_restart_names()</span></code></a> returns
 a list of all quantity names required to restart the model.</p>
 <p><code class="xref py py-func docutils literal notranslate"><span class="pre">save_intermediate_restart_if_enabled()</span></code>
 will call the portion of the normal Fortran main loop that checks how many timesteps have elapsed
@@ -302,7 +300,7 @@ if Fortran intermediate restarts, or chosen saved label if using the wrapper dir
   <div role="contentinfo">
     <p>
         
-        &copy; Copyright 2019, Vulcan Technologies, LLC
+        &copy; Copyright 2019-2020, Vulcan Technologies, LLC
 
     </p>
   </div>

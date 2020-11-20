@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Python Module Index &mdash; FV3GFS 0.5.0 documentation</title>
+  <title>Installation &mdash; fv3gfs-wrapper 0.5.0 documentation</title>
   
 
   
@@ -36,9 +36,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
- 
-
-
+    <link rel="next" title="Usage" href="usage.html" />
+    <link rel="prev" title="Readme" href="readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -52,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> FV3GFS
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> fv3gfs-wrapper
           
 
           
@@ -88,9 +87,14 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="readme.html">Readme</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#docker">Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#build">Build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#test">Test</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="state.html">State</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developers Notes</a></li>
@@ -111,7 +115,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">FV3GFS</a>
+          <a href="index.html">fv3gfs-wrapper</a>
         
       </nav>
 
@@ -142,10 +146,14 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Python Module Index</li>
+      <li>Installation</li>
     
     
       <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
@@ -157,29 +165,34 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-
-   <h1>Python Module Index</h1>
-
-   <div class="modindex-jumpbox">
-   <a href="#cap-f"><strong>f</strong></a>
-   </div>
-
-   <table class="indextable modindextable">
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-f"><td></td><td>
-       <strong>f</strong></td><td></td></tr>
-     <tr>
-       <td><img src="_static/minus.png" class="toggler"
-              id="toggle-1" style="display: none" alt="-" /></td>
-       <td>
-       <code class="xref">fv3gfs</code></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="api.html#module-fv3gfs.wrapper"><code class="xref">fv3gfs.wrapper</code></a></td><td>
-       <em></em></td></tr>
-   </table>
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="docker">
+<h2>Docker<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h2>
+<p>Installation onto your host machine is currently only supported using Docker.
+If you would like to run this package on your host directly, please consult
+the Dockerfile for the build process and attempt to replicate it as closely
+as possible on your machine.</p>
+</div>
+<div class="section" id="build">
+<h2>Build<a class="headerlink" href="#build" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>fv3gfs-wrapper</cite> docker image can be build with:: console</p>
+<blockquote>
+<div><p>$ build_docker.sh</p>
+</div></blockquote>
+<p>By default this will produce an image <code class="docutils literal notranslate"><span class="pre">us.gcr.io/vcm-ml/fv3gfs-wrapper:latest</span></code>. You can
+rename this image to whatever you like using <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">tag</span> <span class="pre">us.gcr.io/vcm-ml/fv3gfs-wrapper:latest</span> <span class="pre">&lt;new_name&gt;</span></code>.</p>
+</div>
+<div class="section" id="test">
+<h2>Test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h2>
+<p>You can easily build the docker image and then run all tests using:: console</p>
+<blockquote>
+<div><p>$ test_docker.sh</p>
+</div></blockquote>
+<p>If you would like more fine-grained control over the build and test process, you can
+run tests directly. Read <code class="docutils literal notranslate"><span class="pre">test_docker.sh</span></code> for usage examples.</p>
+</div>
+</div>
 
 
            </div>
@@ -187,13 +200,22 @@
           </div>
           <footer>
   
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="usage.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="readme.html" class="btn btn-neutral float-left" title="Readme" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
         
-        &copy; Copyright 2019, Vulcan Technologies, LLC
+        &copy; Copyright 2019-2020, Vulcan Technologies, LLC
 
     </p>
   </div>

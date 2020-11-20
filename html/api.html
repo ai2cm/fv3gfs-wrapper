@@ -4,11 +4,10 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
-  <meta content="noindex, nofollow" name="robots" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>API &mdash; FV3GFS 0.5.0 documentation</title>
+  <title>API &mdash; fv3gfs-wrapper 0.5.0 documentation</title>
   
 
   
@@ -52,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> FV3GFS
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> fv3gfs-wrapper
           
 
           
@@ -111,7 +110,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">FV3GFS</a>
+          <a href="index.html">fv3gfs-wrapper</a>
         
       </nav>
 
@@ -215,20 +214,23 @@ intermediate restart behavior of the Fortran model.</p>
 <dd><p>Returns a dictionary whose keys are quantity long names (with underscores instead of spaces)
 and values are Quantities containing that quantity’s data.</p>
 <p>Does not copy halo values, regardless of whether the halo is allocated.</p>
-<dl>
-<dt>Arguments:</dt><dd><p>names (list of str, optional): A list of names to get.
-state (dict, optional): If given, update this state in-place with any retrieved</p>
-<blockquote>
-<div><p>quantities, and update any pre-existing quantities in-place with Fortran
-values.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>allocator (fv3gfs.util.QuantityFactory, optional): if given, use this to construct</dt><dd><p>quantities. Otherwise use a QuantityFactory which uses the dimensions
-from the Fortran model with 3 allocated halo points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>names</strong> (<em>list of str</em><em>, </em><em>optional</em>) – A list of names to get.</p></li>
+<li><p><strong>state</strong> (<em>dict</em><em>, </em><em>optional</em>) – If given, update this state in-place with any retrieved
+quantities, and update any pre-existing quantities in-place with Fortran
+values.</p></li>
+<li><p><strong>allocator</strong> (<a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.QuantityFactory" title="(in fv3gfs-util v0.5.1)"><em>fv3gfs.util.QuantityFactory</em></a><em>, </em><em>optional</em>) – if given, use this to construct
+quantities. Otherwise use a QuantityFactory which uses the dimensions
+from the Fortran model with 3 allocated halo points.</p></li>
+</ul>
 </dd>
-</dl>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>state if given, otherwise a constructed state dictionary</p>
 </dd>
-<dt>Returns:</dt><dd><p>state (dict): state if given, otherwise a constructed state dictionary</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>state (dict)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -240,8 +242,9 @@ from the Fortran model with 3 allocated halo points.</p>
 and values are Quantity objects containing that quantity’s data. Sets the fortran state to
 those values.</p>
 <p>Assumes quantity units are equivalent to what is used in the fortran code.</p>
-<dl class="simple">
-<dt>Arguments:</dt><dd><p>state (dict): values to set</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>state</strong> (<em>dict</em>) – values to set</p>
 </dd>
 </dl>
 </dd></dl>
@@ -319,56 +322,64 @@ prognostic state with the output from the routines called by this function.</p>
 
 <dl class="function">
 <dt id="fv3gfs.wrapper.get_restart_names">
-<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">get_restart_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.get_restart_names" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">get_restart_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3gfs/wrapper/_restart/io.html#get_restart_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.wrapper.get_restart_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of variables names needed for a clean restart.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fv3gfs.wrapper.open_restart">
-<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">open_restart</code><span class="sig-paren">(</span><em class="sig-param">dirname: str</em>, <em class="sig-param">communicator: fv3gfs.util.communicator.CubedSphereCommunicator</em>, <em class="sig-param">label: str = ''</em>, <em class="sig-param">only_names: List[str] = None</em><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#fv3gfs.wrapper.open_restart" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">open_restart</code><span class="sig-paren">(</span><em class="sig-param">dirname: str</em>, <em class="sig-param">communicator: fv3gfs.util.communicator.CubedSphereCommunicator</em>, <em class="sig-param">label: str = ''</em>, <em class="sig-param">only_names: List[str] = None</em><span class="sig-paren">)</span> &#x2192; dict<a class="reference internal" href="_modules/fv3gfs/wrapper/_restart/legacy.html#open_restart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.wrapper.open_restart" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load restart files output by the Fortran model into a state dictionary.</p>
 <p>See <code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.set_state()</span></code> if you would like to load the resulting state into
 the Fortran model.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>dirname: location of restart files, can be local or remote
-communicator: communication object for the cubed sphere
-label: prepended string on the restart files to load
-only_names (optional): list of standard names to load</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dirname</strong> – location of restart files, can be local or remote</p></li>
+<li><p><strong>communicator</strong> – communication object for the cubed sphere</p></li>
+<li><p><strong>label</strong> – prepended string on the restart files to load</p></li>
+<li><p><strong>only_names</strong> (<em>optional</em>) – list of standard names to load</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>state: model state dictionary</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>model state dictionary</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>state</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fv3gfs.wrapper.set_state_mass_conserving">
-<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">set_state_mass_conserving</code><span class="sig-paren">(</span><em class="sig-param">state: Mapping[str, fv3gfs.util.quantity.Quantity], fv3gfs=&lt;module 'fv3gfs.wrapper._wrapper' from '/fv3gfs-wrapper/fv3gfs/wrapper/_wrapper.cpython-37m-x86_64-linux-gnu.so'&gt;, pressure='pressure_thickness_of_atmospheric_layer'</em><span class="sig-paren">)</span><a class="headerlink" href="#fv3gfs.wrapper.set_state_mass_conserving" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">set_state_mass_conserving</code><span class="sig-paren">(</span><em class="sig-param">state: Mapping[str, fv3gfs.util.quantity.Quantity], fv3gfs=&lt;module 'fv3gfs.wrapper._wrapper' from '/fv3gfs-wrapper/fv3gfs/wrapper/_wrapper.cpython-37m-x86_64-linux-gnu.so'&gt;, pressure='pressure_thickness_of_atmospheric_layer'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3gfs/wrapper/thermodynamics.html#set_state_mass_conserving"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.wrapper.set_state_mass_conserving" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the state in a mass conserving way</p>
-<dl>
-<dt>Args:</dt><dd><p>state: a state dictionary. Any water vapor species should have the following form:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>        <span class="n">mass</span> <span class="n">condensate</span> <span class="ow">or</span> <span class="n">vapor</span>
-<span class="o">-------------------------------------------</span>
-<span class="n">mass</span> <span class="n">vapor</span> <span class="o">+</span> <span class="n">mass</span> <span class="n">condensate</span> <span class="o">+</span> <span class="n">mass</span> <span class="n">dry</span> <span class="n">air</span>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> – <p>a state dictionary. Any water vapor species should have the following form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mass</span> <span class="n">condensate</span> <span class="ow">or</span> <span class="n">vapor</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt>fv3gfs: an object implementing get_state, set_state, and get_tracer_metadata.</dt><dd><p>Defaults to the Fortran wrapper, but can be overrided for testing purposes.</p>
-</dd>
-</dl>
+<p>mass vapor + mass condensate + mass dry air</p>
+</p></li>
+<li><p><strong>fv3gfs</strong> – an object implementing get_state, set_state, and get_tracer_metadata.
+Defaults to the Fortran wrapper, but can be overrided for testing purposes.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="fv3gfs.wrapper.get_diagnostic_by_name">
-<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">get_diagnostic_by_name</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">module_name: str = 'gfs_phys'</em><span class="sig-paren">)</span> &#x2192; fv3gfs.util.quantity.Quantity<a class="headerlink" href="#fv3gfs.wrapper.get_diagnostic_by_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">get_diagnostic_by_name</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">module_name: str = 'gfs_phys'</em><span class="sig-paren">)</span> &#x2192; fv3gfs.util.quantity.Quantity<a class="reference internal" href="_modules/fv3gfs/wrapper.html#get_diagnostic_by_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.wrapper.get_diagnostic_by_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a diagnostic field as a Quantity</p>
 <p>Currently, only supports diagnostics defined in the GFS_diagnostics.F90</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fv3gfs.wrapper.get_diagnostic_metadata_by_name">
-<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">get_diagnostic_metadata_by_name</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">module_name: str = 'gfs_phys'</em><span class="sig-paren">)</span> &#x2192; importlib._bootstrap.DiagnosticInfo<a class="headerlink" href="#fv3gfs.wrapper.get_diagnostic_metadata_by_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">get_diagnostic_metadata_by_name</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">module_name: str = 'gfs_phys'</em><span class="sig-paren">)</span> &#x2192; importlib._bootstrap.DiagnosticInfo<a class="reference internal" href="_modules/fv3gfs/wrapper.html#get_diagnostic_metadata_by_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.wrapper.get_diagnostic_metadata_by_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get diagnostic metadata by name</p>
 <p>Currently, only supports diagnostics defined in the GFS_diagnostics.F90</p>
 </dd></dl>
@@ -396,7 +407,7 @@ only_names (optional): list of standard names to load</p>
   <div role="contentinfo">
     <p>
         
-        &copy; Copyright 2019, Vulcan Technologies, LLC
+        &copy; Copyright 2019-2020, Vulcan Technologies, LLC
 
     </p>
   </div>

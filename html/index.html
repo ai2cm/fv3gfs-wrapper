@@ -4,11 +4,10 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
-  <meta content="noindex, nofollow" name="robots" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to FV3GFS’s documentation! &mdash; FV3GFS 0.5.0 documentation</title>
+  <title>fv3gfs-wrapper &mdash; fv3gfs-wrapper 0.5.0 documentation</title>
   
 
   
@@ -51,7 +50,7 @@
           
 
           
-            <a href="#" class="icon icon-home" alt="Documentation Home"> FV3GFS
+            <a href="#" class="icon icon-home" alt="Documentation Home"> fv3gfs-wrapper
           
 
           
@@ -110,7 +109,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">FV3GFS</a>
+          <a href="#">fv3gfs-wrapper</a>
         
       </nav>
 
@@ -141,7 +140,7 @@
     
       <li><a href="#" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Welcome to FV3GFS’s documentation!</li>
+      <li>fv3gfs-wrapper</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -160,13 +159,22 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="welcome-to-fv3gfs-s-documentation">
-<h1>Welcome to FV3GFS’s documentation!<a class="headerlink" href="#welcome-to-fv3gfs-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="fv3gfs-wrapper">
+<h1>fv3gfs-wrapper<a class="headerlink" href="#fv3gfs-wrapper" title="Permalink to this headline">¶</a></h1>
+<p>fv3gfs-wrapper (<code class="code docutils literal notranslate"><span class="pre">import</span> <span class="pre">fv3gfs.wrapper</span></code>), is a Python wrapper for the FV3GFS global climate model. It provides functions which can be used in a “runfile” to define a main loop and execute the Fortran FV3GFS model. In this runfile you can modify and extend the behavior of the model. We have several <a class="reference external" href="https://github.com/VulcanClimateModeling/fv3gfs-wrapper/tree/master/examples/runfiles">example runfiles</a> in the Github repository.</p>
+<p>Running the examples and tests requires using google cloud credentials to cover data transfer costs. This is described further in the <a class="reference internal" href="readme.html#readme"><span class="std std-ref">Readme</span></a>.</p>
+<p>At a high level, the wrapper can be thought of as a Fortran state, routines for evolving the Fortran state using the Fortran model, and routines to retrieve and set that state from Python.</p>
+<a class="reference internal image-reference" href="_images/flow_chart.png"><img alt="Diagram of main package features, showing separate boxes for Python State and Fortran State. Inside the Fortran state box are step_dynamics and step_physics routines. Joining the Python State and Fortran State boxes are get_state and set_state routines, with get_state flowing from Fortran to Python and set_state flowing from Python to Fortran." class="align-center" src="_images/flow_chart.png" style="width: 400px;" /></a>
+<p>Usage of the getters and setters is described in <a class="reference internal" href="state.html#state"><span class="std std-ref">State</span></a>. Details about the implementation of the features and the build system are included in our <a class="reference internal" href="developers.html#developers-notes"><span class="std std-ref">Developers Notes</span></a>.</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="readme.html">Readme</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="readme.html#fv3gfs">FV3GFS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#checking-out">Checking out</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#local-machine-installation">Local Machine Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#building-docs">Building Docs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#iterative-development">Iterative development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#usage">Usage</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
@@ -244,7 +252,7 @@
   <div role="contentinfo">
     <p>
         
-        &copy; Copyright 2019, Vulcan Technologies, LLC
+        &copy; Copyright 2019-2020, Vulcan Technologies, LLC
 
     </p>
   </div>

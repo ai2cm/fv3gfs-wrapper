@@ -4,11 +4,10 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
-  <meta content="noindex, nofollow" name="robots" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Developers Notes &mdash; FV3GFS 0.5.0 documentation</title>
+  <title>Developers Notes &mdash; fv3gfs-wrapper 0.5.0 documentation</title>
   
 
   
@@ -52,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> FV3GFS
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> fv3gfs-wrapper
           
 
           
@@ -118,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">FV3GFS</a>
+          <a href="index.html">fv3gfs-wrapper</a>
         
       </nav>
 
@@ -180,7 +179,7 @@ Any functionality that can be written to be independent of the wrapped Fortran m
 is put into <code class="docutils literal notranslate"><span class="pre">fv3gfs-util</span></code>. This makes it much easier to iterate on and test pure Python
 code for the model, as one can install the package onto the host system without needing
 to use Docker to handle Fortran dependencies. This also makes it possible for analysis
-codes to use the same routines used by the Fortran model.</p>
+codes to use the same routines used by the wrapped model.</p>
 <p>We recommend users and developers read the <cite>fv3gfs-util</cite> documentation as well to make
 full use of this package.</p>
 </div>
@@ -260,7 +259,7 @@ dependencies included in intermediate images.</p>
   <div role="contentinfo">
     <p>
         
-        &copy; Copyright 2019, Vulcan Technologies, LLC
+        &copy; Copyright 2019-2020, Vulcan Technologies, LLC
 
     </p>
   </div>

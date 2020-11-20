@@ -4,11 +4,10 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
-  <meta content="noindex, nofollow" name="robots" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Readme &mdash; FV3GFS 0.5.0 documentation</title>
+  <title>Readme &mdash; fv3gfs-wrapper 0.5.0 documentation</title>
   
 
   
@@ -38,7 +37,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Installation" href="installation.html" />
-    <link rel="prev" title="Welcome to FV3GFS’s documentation!" href="index.html" /> 
+    <link rel="prev" title="fv3gfs-wrapper" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -52,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> FV3GFS
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> fv3gfs-wrapper
           
 
           
@@ -90,14 +89,11 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Readme</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#fv3gfs">FV3GFS</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#checking-out">Checking out</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#local-machine-installation">Local Machine Installation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#building-docs">Building Docs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#iterative-development">Iterative development</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#checking-out">Checking out</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#local-machine-installation">Local Machine Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-docs">Building Docs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#iterative-development">Iterative development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
@@ -121,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">FV3GFS</a>
+          <a href="index.html">fv3gfs-wrapper</a>
         
       </nav>
 
@@ -173,16 +169,15 @@
             
   <div class="section" id="readme">
 <h1>Readme<a class="headerlink" href="#readme" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="fv3gfs">
-<h2>FV3GFS<a class="headerlink" href="#fv3gfs" title="Permalink to this headline">¶</a></h2>
 <p>fv3gfs-wrapper (<cite>import fv3gfs.wrapper</cite>), is a Python wrapper for the FV3GFS
 global climate model.</p>
-<p>See the [documentation](<a class="reference external" href="https://vulcanclimatemodeling.github.io/fv3gfs-wrapper/f12n7eq5xkoibbqp/index.html">https://vulcanclimatemodeling.github.io/fv3gfs-wrapper/f12n7eq5xkoibbqp/index.html</a>)
+<p>See the [documentation](<a class="reference external" href="https://vulcanclimatemodeling.github.io/fv3gfs-wrapper/index.html">https://vulcanclimatemodeling.github.io/fv3gfs-wrapper/index.html</a>)
 for more detailed instructions.</p>
+<p>We also recommend you read the documentation for [fv3gfs-util](<a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/">https://fv3gfs-util.readthedocs.io/en/latest/</a>), which is used alongside fv3gfs-wrapper to provide Python model infrastructure and functionality.</p>
 <p>This is currently alpha development software used for research. If you would like to contribute to or collaborate on the software, please get in touch with <a class="reference external" href="mailto:jeremym&#37;&#52;&#48;vulcan&#46;com">jeremym<span>&#64;</span>vulcan<span>&#46;</span>com</a> or another developer.</p>
 <p>Running the tests as they are currently written requires private credentials to google cloud services, as the data access is set to “requester pays”. To run the tests and examples with your credentials, set an environment variable <cite>GOOGLE_APPLICATION_CREDENTIALS</cite> as a path to your JSON key file.  (E.g., <cite>export GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json</cite>) <strong>Note</strong>: your project will incur some data transfer charges if you run these tests or examples.</p>
 <div class="section" id="checking-out">
-<h3>Checking out<a class="headerlink" href="#checking-out" title="Permalink to this headline">¶</a></h3>
+<h2>Checking out<a class="headerlink" href="#checking-out" title="Permalink to this headline">¶</a></h2>
 <p>This package uses submodules. After you check out the repository, you must run
 <cite>git submodule update –init –recursive</cite> in the root directory of this package.</p>
 <ul class="simple">
@@ -190,7 +185,7 @@ for more detailed instructions.</p>
 </ul>
 </div>
 <div class="section" id="local-machine-installation">
-<h3>Local Machine Installation<a class="headerlink" href="#local-machine-installation" title="Permalink to this headline">¶</a></h3>
+<h2>Local Machine Installation<a class="headerlink" href="#local-machine-installation" title="Permalink to this headline">¶</a></h2>
 <p>The Docker image can be built using <cite>make build-docker</cite>, or built and then
 tested using <cite>make test-docker</cite> (which will use the existing build if present).
 The first time you build, both ESMF and FMS will be
@@ -204,7 +199,7 @@ in development mode with <cite>pip install -e .</cite>.</p>
 <p>This package only supports linux and Python 3.5 or greater.</p>
 </div>
 <div class="section" id="building-docs">
-<h3>Building Docs<a class="headerlink" href="#building-docs" title="Permalink to this headline">¶</a></h3>
+<h2>Building Docs<a class="headerlink" href="#building-docs" title="Permalink to this headline">¶</a></h2>
 <p>Once the docker image is built, the documentation can be built and shown using:</p>
 <blockquote>
 <div><p>make docs-docker</p>
@@ -212,7 +207,7 @@ in development mode with <cite>pip install -e .</cite>.</p>
 <p>This will produce html documentation in <cite>docs/html</cite>.</p>
 </div>
 <div class="section" id="iterative-development">
-<h3>Iterative development<a class="headerlink" href="#iterative-development" title="Permalink to this headline">¶</a></h3>
+<h2>Iterative development<a class="headerlink" href="#iterative-development" title="Permalink to this headline">¶</a></h2>
 <p>When making changes to the Fortran source code, you may want to rebuild just part of
 the model, keeping build artifacts between rebuilds. You can do this by running the
 docker image with bind-mounts into your local filesystem. Just be sure to <cite>make clean</cite>
@@ -229,7 +224,7 @@ filesystem won’t already have the build artifacts necessary to build
 the compiled wrapper.</p>
 </div>
 <div class="section" id="usage">
-<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p>Example run scripts are included in [<cite>examples/runfiles</cite>](<a class="reference external" href="https://github.com/VulcanClimateModeling/fv3gfs/tree/master/sorc/fv3gfs.fd/cython_wrapper/examples/runfiles">https://github.com/VulcanClimateModeling/fv3gfs/tree/master/sorc/fv3gfs.fd/cython_wrapper/examples/runfiles</a>).
 These run scripts act as a drop-in replacement for <cite>fv3.exe</cite>, and get executed
 in the same way, using <cite>mpirun</cite>:</p>
@@ -239,7 +234,6 @@ in the same way, using <cite>mpirun</cite>:</p>
 <p>Running these files requires them to be placed inside a valid run directory. This is
 done automatically if you run them using <cite>fv3run</cite>, as is done in
 the Makefile in that directory.</p>
-</div>
 </div>
 </div>
 
@@ -254,7 +248,7 @@ the Makefile in that directory.</p>
         <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to FV3GFS’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="fv3gfs-wrapper" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -264,7 +258,7 @@ the Makefile in that directory.</p>
   <div role="contentinfo">
     <p>
         
-        &copy; Copyright 2019, Vulcan Technologies, LLC
+        &copy; Copyright 2019-2020, Vulcan Technologies, LLC
 
     </p>
   </div>
