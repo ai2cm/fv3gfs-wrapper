@@ -121,9 +121,8 @@ jobs:
       - run:
           name: Deploy docs to gh-pages branch
           command: |
-            mkdir upload
+            mv docs/_build/html upload
             touch upload/.nojekyll
-            mv docs/_build/html upload/
             gh-pages --dotfiles --dist upload
 workflows:
   version: 2
