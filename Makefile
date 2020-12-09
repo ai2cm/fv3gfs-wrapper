@@ -34,7 +34,7 @@ BROWSER := python3 -c "$$BROWSER_PYSCRIPT"
 DOCKER_IMAGE?=us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu9-mpich314-nocuda
 BUILD_FROM_INTERMEDIATE=y
 
-PYTHON_FILES = $(shell git ls-files | grep -e 'py$$' | grep -v -e '__init__.py')
+PYTHON_FILES = $(shell git ls-files | grep -e 'py$$' | grep -v -e '__init__.py' -e 'ipcluster_config.py')
 PYTHON_INIT_FILES = $(shell git ls-files | grep '__init__.py')
 
 help:

@@ -1,8 +1,8 @@
 # Configuration file for ipcluster.
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Application(SingletonConfigurable) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## This is an application.
 
 ## The date format used by logging formatters for %(asctime)s
@@ -26,9 +26,9 @@
 #  Default: False
 # c.Application.show_config_json = False
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # BaseIPythonApplication(Application) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## IPython: an enhanced interactive Python shell.
 
 ## Whether to create profile dir if it doesn't exist
@@ -43,7 +43,7 @@
 # c.BaseIPythonApplication.copy_config_files = False
 
 ## Path to an extra config file to load.
-#  
+#
 #  If specified, load this config file in addition to any other IPython config.
 #  Default: ''
 # c.BaseIPythonApplication.extra_config_file = ''
@@ -88,9 +88,9 @@
 #  Default: False
 # c.BaseIPythonApplication.verbose_crash = False
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # BaseParallelApplication(BaseIPythonApplication) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## IPython: an enhanced interactive Python shell.
 
 ## Whether to create profile dir if it doesn't exist
@@ -103,9 +103,9 @@
 
 ## String id to add to runtime files, to prevent name collisions when using
 #  multiple clusters with a single profile simultaneously.
-#  
+#
 #  When set, files will be named like: 'ipcontroller-<cluster_id>-engine.json'
-#  
+#
 #  Since this is text inserted into filenames, typical recommendations apply:
 #  Simple character strings are ideal, and spaces are not recommended (but should
 #  generally work).
@@ -120,7 +120,7 @@
 #  See also: BaseIPythonApplication.extra_config_file
 # c.BaseParallelApplication.extra_config_file = ''
 
-## 
+##
 #  See also: BaseIPythonApplication.ipython_dir
 # c.BaseParallelApplication.ipython_dir = ''
 
@@ -169,9 +169,9 @@ c.BaseParallelApplication.log_to_file = True
 #  Default: '/home/user/.ipython'
 # c.BaseParallelApplication.work_dir = '/home/user/.ipython'
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # IPClusterEngines(BaseParallelApplication) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Whether to create profile dir if it doesn't exist
 #  See also: BaseIPythonApplication.auto_create
 # c.IPClusterEngines.auto_create = False
@@ -205,12 +205,12 @@ c.BaseParallelApplication.log_to_file = True
 #  batch systems to launch your engines, such as PBS,SGE,MPI,etc. Each launcher
 #  class has its own set of configuration options, for making sure it will work
 #  in your environment.
-#  
+#
 #  You can also write your own launcher, and specify it's absolute import path,
 #  as in 'mymodule.launcher.FTLEnginesLauncher`.
-#  
+#
 #  IPython's bundled examples include:
-#  
+#
 #      Local : start engines locally as subprocesses [default]
 #      MPI : use mpiexec to launch engines in an MPI environment
 #      PBS : use PBS (qsub) to submit engines to a batch queue
@@ -223,23 +223,23 @@ c.BaseParallelApplication.log_to_file = True
 #      HTCondor : use HTCondor to submit engines to a batch queue
 #      Slurm : use Slurm to submit engines to a batch queue
 #      WindowsHPC : use Windows HPC
-#  
+#
 #  If you are using one of IPython's builtin launchers, you can specify just the
 #  prefix, e.g:
-#  
+#
 #      c.IPClusterEngines.engine_launcher_class = 'SSH'
-#  
+#
 #  or:
-#  
+#
 #      ipcluster start --engines=MPI
 #  Default: 'LocalEngineSetLauncher'
-c.IPClusterEngines.engine_launcher_class = 'MPI'
+c.IPClusterEngines.engine_launcher_class = "MPI"
 
 ## Path to an extra config file to load.
 #  See also: BaseIPythonApplication.extra_config_file
 # c.IPClusterEngines.extra_config_file = ''
 
-## 
+##
 #  See also: BaseIPythonApplication.ipython_dir
 # c.IPClusterEngines.ipython_dir = ''
 
@@ -292,9 +292,9 @@ c.IPClusterEngines.engine_launcher_class = 'MPI'
 #  See also: BaseParallelApplication.work_dir
 # c.IPClusterEngines.work_dir = '/home/user/.ipython'
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # IPClusterStart(IPClusterEngines) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## whether to create the profile_dir if it doesn't exist
 #  Default: True
 # c.IPClusterStart.auto_create = True
@@ -317,15 +317,15 @@ c.IPClusterEngines.engine_launcher_class = 'MPI'
 
 ## The class for launching a Controller. Change this value if you want your
 #  controller to also be launched by a batch system, such as PBS,SGE,MPI,etc.
-#  
+#
 #  Each launcher class has its own set of configuration options, for making sure
 #  it will work in your environment.
-#  
+#
 #  Note that using a batch launcher for the controller *does not* put it in the
 #  same batch job as the engines, so they will still start separately.
-#  
+#
 #  IPython's bundled examples include:
-#  
+#
 #      Local : start engines locally as subprocesses
 #      MPI : use mpiexec to launch the controller in an MPI universe
 #      PBS : use PBS (qsub) to submit the controller to a batch queue
@@ -335,20 +335,20 @@ c.IPClusterEngines.engine_launcher_class = 'MPI'
 #      Slurm : use Slurm to submit engines to a batch queue
 #      SSH : use SSH to start the controller
 #      WindowsHPC : use Windows HPC
-#  
+#
 #  If you are using one of IPython's builtin launchers, you can specify just the
 #  prefix, e.g:
-#  
+#
 #      c.IPClusterStart.controller_launcher_class = 'SSH'
-#  
+#
 #  or:
-#  
+#
 #      ipcluster start --controller=MPI
 #  Default: 'LocalControllerLauncher'
 # c.IPClusterStart.controller_launcher_class = 'LocalControllerLauncher'
 
 ## Set the location (hostname or ip) of the controller.
-#  
+#
 #  This is used by engines and clients to locate the controller when the
 #  controller listens on all interfaces
 #  Default: ''
@@ -382,7 +382,7 @@ c.IPClusterEngines.engine_launcher_class = 'MPI'
 #  See also: BaseIPythonApplication.extra_config_file
 # c.IPClusterStart.extra_config_file = ''
 
-## 
+##
 #  See also: BaseIPythonApplication.ipython_dir
 # c.IPClusterStart.ipython_dir = ''
 
@@ -438,14 +438,14 @@ c.IPClusterEngines.engine_launcher_class = 'MPI'
 #  See also: BaseParallelApplication.work_dir
 # c.IPClusterStart.work_dir = '/home/user/.ipython'
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # ProfileDir(LoggingConfigurable) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## An object to manage the profile directory and its resources.
-#  
+#
 #  The profile directory is used by all IPython applications, to manage
 #  configuration, logging and security.
-#  
+#
 #  This object knows how to find, create and manage these directories. This
 #  should be used by any code that wants to handle profiles.
 
@@ -454,9 +454,9 @@ c.IPClusterEngines.engine_launcher_class = 'MPI'
 #  Default: ''
 # c.ProfileDir.location = ''
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # LocalEngineSetLauncher(LocalEngineLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launch a set of engines as regular external processes.
 
 ## delay (in seconds) between starting each engine after the first. This can help
@@ -473,9 +473,9 @@ c.IPClusterEngines.engine_launcher_class = 'MPI'
 #  Default: ['/home/user/venv/bin/python', '-m', 'ipyparallel.engine']
 # c.LocalEngineSetLauncher.engine_cmd = ['/home/user/venv/bin/python', '-m', 'ipyparallel.engine']
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # MPILauncher(LocalProcessLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launch an external process using mpiexec.
 
 ## The command line arguments to pass to mpiexec.
@@ -484,16 +484,16 @@ c.MPILauncher.mpi_args = []
 
 ## The mpiexec command to use in starting the process.
 #  Default: ['mpiexec']
-c.MPILauncher.mpi_cmd = ['mpiexec']
+c.MPILauncher.mpi_cmd = ["mpiexec"]
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # MPIControllerLauncher(MPILauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launch a controller using mpiexec.
 
 ## command-line args to pass to ipcontroller
 #  Default: ['--log-level=20']
-c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
+c.MPIControllerLauncher.controller_args = ["--ip='*'", "--log-level=20"]
 
 ## Popen command to launch ipcontroller.
 #  Default: ['/home/user/venv/bin/python', '-m', 'ipyparallel.controller']
@@ -507,9 +507,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: MPILauncher.mpi_cmd
 # c.MPIControllerLauncher.mpi_cmd = ['mpiexec']
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # MPIEngineSetLauncher(MPILauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launch engines using mpiexec
 
 ## command-line arguments to pass to ipengine
@@ -528,11 +528,11 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: MPILauncher.mpi_cmd
 # c.MPIEngineSetLauncher.mpi_cmd = ['mpiexec']
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # SSHLauncher(LocalProcessLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## A minimal launcher for ssh.
-#  
+#
 #  To be useful this will probably have to be extended to use the ``sshx`` idea
 #  for environment variables.  There could be other things this needs as well.
 
@@ -572,9 +572,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  Default: ''
 # c.SSHLauncher.user = ''
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # SSHClusterLauncher(SSHLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## hostname on which to launch the program
 #  See also: SSHLauncher.hostname
 # c.SSHClusterLauncher.hostname = ''
@@ -584,7 +584,7 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 # c.SSHClusterLauncher.location = ''
 
 ## The remote profile_dir to use.
-#  
+#
 #  If not specified, use calling profile, stripping out possible leading homedir.
 #  Default: ''
 # c.SSHClusterLauncher.remote_profile_dir = ''
@@ -617,9 +617,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: SSHLauncher.user
 # c.SSHClusterLauncher.user = ''
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # SSHControllerLauncher(SSHClusterLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## command-line args to pass to ipcontroller
 #  Default: ['--log-level=20']
 # c.SSHControllerLauncher.controller_args = ['--log-level=20']
@@ -668,9 +668,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: SSHLauncher.user
 # c.SSHControllerLauncher.user = ''
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # SSHEngineLauncher(SSHClusterLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## command-line arguments to pass to ipengine
 #  Default: ['--log-level=20']
 # c.SSHEngineLauncher.engine_args = ['--log-level=20']
@@ -719,9 +719,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: SSHLauncher.user
 # c.SSHEngineLauncher.user = ''
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # SSHEngineSetLauncher(LocalEngineSetLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## delay (in seconds) between starting each engine after the first.
 #  See also: LocalEngineSetLauncher.delay
 # c.SSHEngineSetLauncher.delay = 0.1
@@ -739,11 +739,11 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  Default: {}
 # c.SSHEngineSetLauncher.engines = {}
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # SSHProxyEngineSetLauncher(SSHClusterLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launcher for calling `ipcluster engines` on a remote machine.
-#  
+#
 #  Requires that remote profile is already configured.
 
 ## hostname on which to launch the program
@@ -789,9 +789,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: SSHLauncher.user
 # c.SSHProxyEngineSetLauncher.user = ''
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # WindowsHPCLauncher(BaseLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## The command for submitting jobs.
 #  Default: 'job'
 # c.WindowsHPCLauncher.job_cmd = 'job'
@@ -809,9 +809,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  Default: ''
 # c.WindowsHPCLauncher.scheduler = ''
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # WindowsHPCControllerLauncher(WindowsHPCLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## The command for submitting jobs.
 #  See also: WindowsHPCLauncher.job_cmd
 # c.WindowsHPCControllerLauncher.job_cmd = 'job'
@@ -828,9 +828,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: WindowsHPCLauncher.scheduler
 # c.WindowsHPCControllerLauncher.scheduler = ''
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # WindowsHPCEngineSetLauncher(WindowsHPCLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## The command for submitting jobs.
 #  See also: WindowsHPCLauncher.job_cmd
 # c.WindowsHPCEngineSetLauncher.job_cmd = 'job'
@@ -847,15 +847,15 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: WindowsHPCLauncher.scheduler
 # c.WindowsHPCEngineSetLauncher.scheduler = ''
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # BatchSystemLauncher(BaseLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launch an external process using a batch system.
-#  
+#
 #  This class is designed to work with UNIX batch systems like PBS, LSF,
 #  GridEngine, etc.  The overall model is that there are different commands like
 #  qsub, qdel, etc. that handle the starting and stopping of the process.
-#  
+#
 #  This class also has the notion of a batch script. The ``batch_template``
 #  attribute can be set to a string that is a template for the batch script. This
 #  template is instantiated using string formatting. Thus the template can use
@@ -888,7 +888,7 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 # c.BatchSystemLauncher.job_id_regexp_group = 0
 
 ## Extra variables to pass to the template.
-#  
+#
 #  This lets you parameterize additional options, such as wall_time with a custom
 #  template.
 #  Default: {}
@@ -902,9 +902,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  Default: ['']
 # c.BatchSystemLauncher.submit_command = ['']
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # PBSLauncher(BatchSystemLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## A BatchSystemLauncher subclass for PBS.
 
 ## The filename of the instantiated batch script.
@@ -943,9 +943,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  Default: ['qsub']
 # c.PBSLauncher.submit_command = ['qsub']
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # PBSControllerLauncher(PBSLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launch a controller using PBS.
 
 ## batch file name for the controller job.
@@ -984,9 +984,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: PBSLauncher.submit_command
 # c.PBSControllerLauncher.submit_command = ['qsub']
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # PBSEngineSetLauncher(PBSLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launch Engines using PBS
 
 ## batch file name for the engine(s) job.
@@ -1025,9 +1025,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: PBSLauncher.submit_command
 # c.PBSEngineSetLauncher.submit_command = ['qsub']
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # SlurmLauncher(BatchSystemLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## A BatchSystemLauncher subclass for slurm.
 
 ## Slurm account to be used
@@ -1082,9 +1082,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  Default: ''
 # c.SlurmLauncher.timelimit = ''
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # SlurmControllerLauncher(SlurmLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launch a controller using Slurm.
 
 ## Slurm account to be used
@@ -1139,9 +1139,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: SlurmLauncher.timelimit
 # c.SlurmControllerLauncher.timelimit = ''
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # SlurmEngineSetLauncher(SlurmLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launch Engines using Slurm
 
 ## Slurm account to be used
@@ -1196,9 +1196,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: SlurmLauncher.timelimit
 # c.SlurmEngineSetLauncher.timelimit = ''
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # SGELauncher(PBSLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Sun GridEngine is a PBS clone with slightly different syntax
 
 ## The filename of the instantiated batch script.
@@ -1237,9 +1237,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: PBSLauncher.submit_command
 # c.SGELauncher.submit_command = ['qsub']
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # SGEControllerLauncher(SGELauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launch a controller using SGE.
 
 ## batch file name for the ipontroller job.
@@ -1278,9 +1278,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: PBSLauncher.submit_command
 # c.SGEControllerLauncher.submit_command = ['qsub']
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # SGEEngineSetLauncher(SGELauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launch Engines with SGE
 
 ## batch file name for the engine(s) job.
@@ -1319,9 +1319,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: PBSLauncher.submit_command
 # c.SGEEngineSetLauncher.submit_command = ['qsub']
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # LSFLauncher(BatchSystemLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## A BatchSystemLauncher subclass for LSF.
 
 ## The filename of the instantiated batch script.
@@ -1360,9 +1360,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  Default: ['bsub']
 # c.LSFLauncher.submit_command = ['bsub']
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # LSFControllerLauncher(LSFLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launch a controller using LSF.
 
 ## batch file name for the controller job.
@@ -1401,9 +1401,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: LSFLauncher.submit_command
 # c.LSFControllerLauncher.submit_command = ['bsub']
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # LSFEngineSetLauncher(LSFLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launch Engines using LSF
 
 ## batch file name for the engine(s) job.
@@ -1442,28 +1442,28 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: LSFLauncher.submit_command
 # c.LSFEngineSetLauncher.submit_command = ['bsub']
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # HTCondorLauncher(BatchSystemLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## A BatchSystemLauncher subclass for HTCondor.
-#  
+#
 #  HTCondor requires that we launch the ipengine/ipcontroller scripts rather that
 #  the python instance but otherwise is very similar to PBS.  This is because
 #  HTCondor destroys sys.executable when launching remote processes - a launched
 #  python process depends on sys.executable to effectively evaluate its module
 #  search paths. Without it, regardless of which python interpreter you launch
 #  you will get the to built in module search paths.
-#  
+#
 #  We use the ip{cluster, engine, controller} scripts as our executable to
 #  circumvent this - the mechanism of shebanged scripts means that the python
 #  binary will be launched with argv[0] set to the *location of the ip{cluster,
 #  engine, controller} scripts on the remote node*. This means you need to take
 #  care that:
-#  
+#
 #  a. Your remote nodes have their paths configured correctly, with the ipengine and ipcontroller
 #     of the python environment you wish to execute code in having top precedence.
 #  b. This functionality is untested on Windows.
-#  
+#
 #  If you need different behavior, consider making you own template.
 
 ## The filename of the instantiated batch script.
@@ -1502,9 +1502,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  Default: ['condor_submit']
 # c.HTCondorLauncher.submit_command = ['condor_submit']
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # HTCondorControllerLauncher(HTCondorLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launch a controller using HTCondor.
 
 ## batch file name for the controller job.
@@ -1543,9 +1543,9 @@ c.MPIControllerLauncher.controller_args = ["--ip='*'", '--log-level=20']
 #  See also: HTCondorLauncher.submit_command
 # c.HTCondorControllerLauncher.submit_command = ['condor_submit']
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # HTCondorEngineSetLauncher(HTCondorLauncher) configuration
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## Launch Engines using HTCondor
 
 ## batch file name for the engine(s) job.
