@@ -4,6 +4,7 @@ import json
 import fv3gfs.util
 import os
 from datetime import timedelta
+
 try:
     import sklearn_json
 except ModuleNotFoundError:
@@ -13,13 +14,13 @@ DIR = os.path.dirname(os.path.abspath(__file__))
 RF_FILENAME = os.path.join(DIR, "rf.json")
 SCALER_FILENAME = os.path.join(DIR, "scaler.npz")
 
+
 def get_random_forest():
-    with open(RF_FILENAME, 'r') as rf_file, open(SCALER_FILENAME, "rb") as scaler_file:
+    with open(RF_FILENAME, "r") as rf_file, open(SCALER_FILENAME, "rb") as scaler_file:
         return RandomForest(rf_file, scaler_file)
 
 
 class StandardScaler:
-
     def __init__(self, std_epsilon: np.float32 = 1e-12):
         """Standard scaler normalizer: normalizes via (x-mean)/std
         Args:
@@ -62,6 +63,7 @@ class StandardScaler:
         scaler.std = data.get("std")
         return scaler
 
+
 class RandomForest:
 
     inputs = ("air_temperature", "specific_humidity")
@@ -71,7 +73,7 @@ class RandomForest:
         self._nz = 79
         self._random_forest = sklearn_json.deserialize_model(model_dict)
         self._output_scaler = StandardScaler.load(scaler_file)
-    
+
     def _pack(self, state) -> np.ndarray:
         """Turn a state into a [sample, feature] array for ML"""
         inputs = []
@@ -80,19 +82,17 @@ class RandomForest:
             compute_domain = quantity.view[:]
             inputs.append(self._to_feature_array(compute_domain, quantity.dims))
         return np.concatenate(inputs, axis=1)
-    
+
     def _unpack(self, data: np.ndarray) -> Mapping[str, np.ndarray]:
         """
-        Turn a [sample, feature] array for ML into a mapping 
+        Turn a [sample, feature] array for ML into a mapping
         from state names to [sample, z] compute domain data
         """
         return {
-            name: data[:, i: i + self._nz]
-            for name, i in zip(
-                RandomForest.inputs, range(0, data.shape[1], self._nz)
-            )
+            name: data[:, i : i + self._nz]
+            for name, i in zip(RandomForest.inputs, range(0, data.shape[1], self._nz))
         }
-    
+
     def _to_feature_array(self, array, dims):
         if dims.index(fv3gfs.util.Z_DIM) != 0:
             raise ValueError(
@@ -102,9 +102,7 @@ class RandomForest:
         array = array.transpose()  # want last dimension to be vertical
         nz = array.shape[-1]
         if nz != self._nz:
-            raise ValueError(
-                f"model is trained for 79 vertical levels, array has {nz}"
-            )
+            raise ValueError(f"model is trained for 79 vertical levels, array has {nz}")
 
         n_samples = np.product(array.shape[:-1])
         array = array.reshape([n_samples, self._nz])
@@ -112,9 +110,10 @@ class RandomForest:
 
     def update(self, state, timestep: timedelta):
         input_data = self._pack(state)
-        output = self._output_scaler.denormalize(
-            self._random_forest.predict(input_data)
-        ) * timestep.total_seconds()
+        output = (
+            self._output_scaler.denormalize(self._random_forest.predict(input_data))
+            * timestep.total_seconds()
+        )
         compute_data = self._unpack(output)
         for name, array in compute_data.items():
             # transpose to put vertical at first dimension
