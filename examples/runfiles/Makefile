@@ -2,13 +2,13 @@
 RUNFILE ?=
 CONFIG ?= default.yml
 OUTDIR ?= outdir
-DOCKER_IMAGE ?= us.gcr.io/vcm-ml/fv3gfs-wrapper
+DOCKER_IMAGE ?= us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu9-mpich314-nocuda
 
 CASES=basic_model online_code
 
-all: $(CASES) nudging fortran_state baroclinic
+all: $(CASES) nudging fortran_state baroclinic random_forest
 
-public_examples: $(CASES) fortran_state baroclinic
+public_examples: $(CASES) fortran_state baroclinic random_forest
 
 fv3run:
 	write_run_directory $(CONFIG) $(OUTDIR)
@@ -18,7 +18,7 @@ fv3run:
 		-w /rundir \
 		-v $(shell pwd)/$(OUTDIR):/rundir \
 		$(DOCKER_IMAGE) \
-		mpirun -n 6 --allow-run-as-root --oversubscribe --mca btl_vader_single_copy_mechanism none python3 $(RUNFILE)
+		mpirun -n 6 python3 $(RUNFILE)
 
 $(CASES): %:
 	RUNFILE=$@.py OUTDIR=$@_outdir $(MAKE) fv3run
@@ -31,6 +31,9 @@ fortran_state:
 
 baroclinic:
 	RUNFILE=basic_model.py OUTDIR=baroclinic_outdir CONFIG=baroclinic.yml $(MAKE) fv3run
+
+random_forest:
+	RUNFILE=random_forest.py OUTDIR=random_forest_outdir CONFIG=c48.yml $(MAKE) fv3run
 
 clean:
 	$(RM) -rf outdir nudging_outdir basic_model_outdir online_code_outdir fortran_state_outdir baroclinic_outdir

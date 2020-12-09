@@ -78,6 +78,7 @@ sphinxcontrib-serializinghtml==1.1.4
 toml==0.10.1
 toolz==0.10.0
 typed-ast==1.4.1
+typing_extensions
 urllib3==1.25.10
 wcwidth==0.2.5
 websocket-client==0.57.0
@@ -85,3 +86,4 @@ xarray==0.16.0
 zarr==2.3.2
 zipp==0.5.2
 pkgconfig==1.5.0
+sklearn_json==0.1.0
