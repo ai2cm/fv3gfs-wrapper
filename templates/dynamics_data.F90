@@ -58,6 +58,16 @@ contains
     end subroutine get_{{ item.fortran_name }}
 {% endfor %}
 
+    ! subroutine set_u_dt(u_in) bind(c)
+    !     real(c_double), intent(in), dimension(i_start():i_end(), j_start():j_end()+1, 1:nz()) :: u_dt_in
+    !     u_dt(i_start():i_end(), j_start():j_end()+1, 1:nz()) = u_dt_in(i_start():i_end(), j_start():j_end()+1, 1:nz())
+    ! end subroutine set_u_dt
+
+    ! subroutine set_v_dt(v_in) bind(c)
+    !     real(c_double), intent(in), dimension(i_start():i_end()+1, j_start():j_end(), 1:nz()) :: v_dt_in
+    !     v_dt(i_start():i_end()+1, j_start():j_end(), 1:nz()) = v_dt_in(i_start():i_end()+1, j_start():j_end(), 1:nz())
+    ! end subroutine set_v_dt
+
     subroutine get_tracer_count(n_prognostic_tracers, n_total_tracers) bind(c)
         integer(c_int), intent(out) :: n_prognostic_tracers, n_total_tracers
         call get_number_tracers(MODEL_ATMOS, num_tracers=n_total_tracers, num_prog=n_prognostic_tracers)
