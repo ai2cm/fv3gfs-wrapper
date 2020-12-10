@@ -27,13 +27,13 @@
         "name": "accumulated_x_courant_number",
         "fortran_name": "cx",
         "units": "",
-        "dims": ["z", "y", "x"]
+        "dims": ["z", "y", "x_interface"]
     },
     {
         "name": "accumulated_y_courant_number",
         "fortran_name": "cy",
         "units": "",
-        "dims": ["z", "y", "x"]
+        "dims": ["z", "y_interface", "x"]
     },
     {
         "name": "eastward_wind",

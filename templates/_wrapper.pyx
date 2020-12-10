@@ -30,6 +30,8 @@ cdef extern:
     void set_u(REAL_t *u_in)
     void get_v(REAL_t *v_out)
     void set_v(REAL_t *v_in)
+    void set_u_dt(REAL_t *u_dt_in)
+    void set_v_dt(REAL_t *v_dt_in)
 {% for item in dynamics_properties %}
     void get_{{ item.fortran_name }}(REAL_t *{{ item.fortran_name }}_out)
     void set_{{ item.fortran_name }}(REAL_t *{{ item.fortran_name }}_in)
@@ -165,8 +167,10 @@ cdef int set_3d_quantity(name, REAL_t[:, :, ::1] array, int nz, dict tracer_meta
         i_tracer = tracer_metadata[name]['i_tracer']
         set_tracer(&i_tracer, &array[0, 0, 0])
     elif name == 'eastward_wind_tendency':
+        # set_u_dt(&array[0,0,0])
         pass
     elif name == 'northward_wind_tendency':
+        # set_v_dt(&array[0,0,0])
         pass
     else:
         raise ValueError(f'no setter available for {name}')
