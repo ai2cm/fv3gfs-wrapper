@@ -1,4 +1,6 @@
-This directory serves as an example of how you can run fv3gfs-wrapper in a parallel Jupyter notebook using Docker. Note this example is not regression tested. If it does not work with the latest version of this repository, please [open an issue](https://github.com/VulcanClimateModeling/fv3gfs-wrapper/issues/new).
+This directory serves as an example of how you can run fv3gfs-wrapper in a parallel Jupyter notebook using Docker.
+
+Note this proof-of-concept example is not regression tested, and is pinned to a specific version of the wrapper image. Using newer versions of the wrapper as a base image (using WRAPPER_IMAGE) may or may not work. If it does not work with the latest version of the wrapper, please [open an issue](https://github.com/VulcanClimateModeling/fv3gfs-wrapper/issues/new).
 
 This example builds an MPI-enabled Docker image by adding jupyter notebooks to the fv3gfs-wrapper image, and opens it with port forwarding. You can build this image with:
 

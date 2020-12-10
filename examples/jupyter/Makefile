@@ -1,4 +1,4 @@
-WRAPPER_IMAGE ?= us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu9-mpich314-nocuda
+WRAPPER_IMAGE ?= gcr.io/vcm-ml/fv3gfs-wrapper:v0.5.0-notebook_example
 NOTEBOOK_DIR ?= $(shell pwd)/notebooks
 
 JUPYTER_IMAGE = fv3gfs_jupyter
