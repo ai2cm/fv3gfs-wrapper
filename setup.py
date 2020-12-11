@@ -42,6 +42,7 @@ library_link_args.extend(wrapper_build_filenames)
 library_link_args += pkgconfig.libs("fv3").split()
 
 mpi_flavor = os.environ.get("MPI", "openmpi")
+print("MPI flavor", mpi_flavor)
 if mpi_flavor == "openmpi":
     library_link_args += pkgconfig.libs("ompi-fort").split()
 else:
@@ -106,6 +107,7 @@ setup(
     long_description=readme + "\n\n" + history,
     cmdclass={"build_ext": build_ext},
     packages=find_namespace_packages(include=["fv3gfs.*"]),
+    package_data={"fv3gfs.wrapper": ["*.json"]},
     # Needed if building with NumPy.
     # This includes the NumPy headers when compiling.
     include_dirs=[get_include()],
