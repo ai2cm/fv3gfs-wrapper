@@ -1,6 +1,6 @@
 module dynamics_data_mod
 
-use atmosphere_mod, only: Atm, mytile
+use atmosphere_mod, only: Atm, mytile, u_dt, v_dt, t_dt
 use tracer_manager_mod, only: get_tracer_names, get_number_tracers, get_tracer_index
 use field_manager_mod,  only: MODEL_ATMOS
 use iso_c_binding
@@ -58,15 +58,36 @@ contains
     end subroutine get_{{ item.fortran_name }}
 {% endfor %}
 
-    ! subroutine set_u_dt(u_in) bind(c)
-    !     real(c_double), intent(in), dimension(i_start():i_end(), j_start():j_end()+1, 1:nz()) :: u_dt_in
-    !     u_dt(i_start():i_end(), j_start():j_end()+1, 1:nz()) = u_dt_in(i_start():i_end(), j_start():j_end()+1, 1:nz())
-    ! end subroutine set_u_dt
+    subroutine set_u_dt(u_in) bind(c)
+        real(c_double), intent(in), dimension(i_start():i_end(), j_start():j_end()+1, 1:nz()) :: u_dt_in
+        u_dt(i_start():i_end(), j_start():j_end()+1, 1:nz()) = u_dt_in(i_start():i_end(), j_start():j_end()+1, 1:nz())
+    end subroutine set_u_dt
 
-    ! subroutine set_v_dt(v_in) bind(c)
-    !     real(c_double), intent(in), dimension(i_start():i_end()+1, j_start():j_end(), 1:nz()) :: v_dt_in
-    !     v_dt(i_start():i_end()+1, j_start():j_end(), 1:nz()) = v_dt_in(i_start():i_end()+1, j_start():j_end(), 1:nz())
-    ! end subroutine set_v_dt
+    subroutine get_u_dt(u_dt_out) bind(c)
+        real(c_double), intent(out), dimension(i_start():i_end(), j_start():j_end()+1, 1:nz()) :: u_dt_out
+        u_dt_out(i_start():i_end(), j_start():j_end()+1, 1:nz()) = Atm(mytile)%u_dt(i_start():i_end(), j_start():j_end()+1, 1:nz())
+    end subroutine get_u_dt
+
+    subroutine set_v_dt(v_in) bind(c)
+        real(c_double), intent(in), dimension(i_start():i_end()+1, j_start():j_end(), 1:nz()) :: v_dt_in
+        v_dt(i_start():i_end()+1, j_start():j_end(), 1:nz()) = v_dt_in(i_start():i_end()+1, j_start():j_end(), 1:nz())
+    end subroutine set_v_dt
+
+    subroutine get_v_dt(v_dt_out) bind(c)
+        real(c_double), intent(out), dimension(i_start():i_end(), j_start():j_end()+1, 1:nz()) :: v_dt_out
+        v_dt_out(i_start():i_end(), j_start():j_end()+1, 1:nz()) = Atm(mytile)%v_dt(i_start():i_end(), j_start():j_end()+1, 1:nz())
+    end subroutine get_v_dt
+
+    subroutine set_t_dt(v_in) bind(c)
+        real(c_double), intent(in), dimension(i_start():i_end(), j_start():j_end(), 1:nz()) :: t_dt_in
+        t_dt(i_start():i_end(), j_start():j_end(), 1:nz()) = t_dt_in(i_start():i_end(), j_start():j_end(), 1:nz())
+    end subroutine set_t_dt
+
+    subroutine get_t_dt(t_dt_out) bind(c)
+        real(c_double), intent(out), dimension(i_start():i_end(), j_start():j_end(), 1:nz()) :: t_dt_out
+        t_dt_out(i_start():i_end(), j_start():j_end(), 1:nz()) = Atm(mytile)%t_dt(i_start():i_end(), j_start():j_end(), 1:nz())
+    end subroutine get_t_dt
+
 
     subroutine get_tracer_count(n_prognostic_tracers, n_total_tracers) bind(c)
         integer(c_int), intent(out) :: n_prognostic_tracers, n_total_tracers
