@@ -43,6 +43,7 @@ FV3GFS_WRAPPER_BUILD_ARGS += --build-arg GT4PY_CUDA=$(GT4PY_CUDA)
 all: build_deps build
 
 build:
+	gsutil -u vcm-ml cp -r gs://vcm-fv3config/ $(shell pwd)/
 	COMPILED_IMAGE=$(FORTRAN_IMAGE) COMPILE_TARGET=fv3gfs-build BUILD_FROM_INTERMEDIATE=$(BUILD_FROM_INTERMEDIATE) $(MAKE) -C ../lib/external build
 	docker build -f $(DOCKERFILE) -t $(FV3GFS_WRAPPER_IMAGE) $(FV3GFS_WRAPPER_BUILD_ARGS) .. --target $(TARGET)
 
