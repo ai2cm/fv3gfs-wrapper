@@ -20,7 +20,11 @@ class SetterTests(unittest.TestCase):
         self.tracer_data = fv3gfs.wrapper.get_tracer_metadata()
         self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
         self.physics_data = {entry["name"]: entry for entry in PHYSICS_PROPERTIES}
-        self.hardcoded_tendency_names = ["eastward_wind_tendency_due_to_physics", "northward_wind_tendency_due_to_physics", "temperature_tendency_due_to_physics"]
+        self.hardcoded_tendency_names = [
+            "eastward_wind_tendency_due_to_physics",
+            "northward_wind_tendency_due_to_physics",
+            "temperature_tendency_due_to_physics",
+        ]
 
     def setUp(self):
         pass

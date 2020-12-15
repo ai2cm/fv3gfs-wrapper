@@ -21,7 +21,11 @@ class GetterTests(unittest.TestCase):
         self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
         self.physics_data = {entry["name"]: entry for entry in PHYSICS_PROPERTIES}
         self.mpi_comm = MPI.COMM_WORLD
-        self.hardcoded_tendency_names = ["eastward_wind_tendency_due_to_physics", "northward_wind_tendency_due_to_physics", "temperature_tendency_due_to_physics"]
+        self.hardcoded_tendency_names = [
+            "eastward_wind_tendency_due_to_physics",
+            "northward_wind_tendency_due_to_physics",
+            "temperature_tendency_due_to_physics",
+        ]
 
     def setUp(self):
         pass
