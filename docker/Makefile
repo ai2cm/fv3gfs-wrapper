@@ -7,7 +7,7 @@ BUILD_FROM_INTERMEDIATE ?= n
 
 CUDA ?= n
 ifeq ($(CUDA),n)
-	BASE_IMAGE ?=ubuntu:19.10
+	BASE_IMAGE ?=ubuntu:18.04
 	DEP_TAG_NAME ?= gnu9-mpich314-nocuda
 	GT4PY_CUDA = " "
 else
