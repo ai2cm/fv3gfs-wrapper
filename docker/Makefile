@@ -12,7 +12,7 @@ ifeq ($(CUDA),n)
 	GT4PY_CUDA = " "
 else
 	BASE_IMAGE ?=nvidia/cuda:10.2-devel-ubuntu18.04
-	DEP_TAG_NAME ?= gnu8-mpich314-cuda102
+	DEP_TAG_NAME ?= gnu7-mpich314-cuda102
 	GT4PY_CUDA = [cuda]
 endif
 
