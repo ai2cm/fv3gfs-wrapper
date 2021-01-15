@@ -32,7 +32,7 @@ export PRINT_HELP_PYSCRIPT
 BROWSER := python3 -c "$$BROWSER_PYSCRIPT"
 
 DOCKER_IMAGE?=us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu7-mpich314-nocuda
-BUILD_FROM_INTERMEDIATE=n
+BUILD_FROM_INTERMEDIATE=y
 
 PYTHON_FILES = $(shell git ls-files | grep -e 'py$$' | grep -v -e '__init__.py')
 PYTHON_INIT_FILES = $(shell git ls-files | grep '__init__.py')
