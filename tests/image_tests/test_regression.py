@@ -15,14 +15,6 @@ STDOUT_FILENAME = "stdout.log"
 STDERR_FILENAME = "stderr.log"
 MODEL_IMAGE = "us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu7-mpich314-nocuda"
 MD5SUM_FILENAME = "md5.txt"
-MPI_FLAGS = [
-    "--oversubscribe",
-    "--allow-run-as-root",
-    "--use-hwthread-cpus",
-    "--mca",
-    "btl_vader_single_copy_mechanism",
-    "none",
-]
 
 USE_LOCAL_ARCHIVE = True
 
@@ -84,7 +76,6 @@ def run_model(config, run_dir, model_image):
             "-n",
             "6",
         ]
-        + MPI_FLAGS
         + ["python3", "-m", "mpi4py", "-m", "fv3gfs.wrapper.run"]
     )
 
