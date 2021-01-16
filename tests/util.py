@@ -14,7 +14,7 @@ from mpi4py import MPI
 libc = ctypes.CDLL(None)
 c_stdout = ctypes.c_void_p.in_dll(libc, "stdout")
 
-mpi_flags = [
+openmpi_flags = [
     "--allow-run-as-root",
     "--oversubscribe",
     "--mca",
