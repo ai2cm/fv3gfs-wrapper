@@ -11,12 +11,12 @@ import yaml
 # If you're running in our prepared docker container, you definitely need to do this
 
 # Run using mpirun -n 6 python3 basic_model.py
-# mpirun flags that may be useful:
+# mpirun flags that may be useful if using openmpi rather than mpich:
 #     for docker:  --allow-run-as-root
 #     for CircleCI: --oversubscribe
 #     to silence a certain inconsequential MPI error: --mca btl_vader_single_copy_mechanism none
 
-# All together:
+# All together for openmpi:
 # mpirun -n 6 --allow-run-as-root --oversubscribe --mca btl_vader_single_copy_mechanism none python3 online_code.py
 
 rundir_basename = "rundir"
