@@ -14,14 +14,6 @@ from mpi4py import MPI
 libc = ctypes.CDLL(None)
 c_stdout = ctypes.c_void_p.in_dll(libc, "stdout")
 
-openmpi_flags = [
-    "--allow-run-as-root",
-    "--oversubscribe",
-    "--mca",
-    "btl_vader_single_copy_mechanism",
-    "none",
-]
-
 
 def run_unittest_script(filename, *args, n_processes=6):
     python_args = ["python3", "-m", "mpi4py", filename] + list(args)
