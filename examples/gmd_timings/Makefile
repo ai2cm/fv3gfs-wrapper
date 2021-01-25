@@ -5,6 +5,7 @@ RUNFILE?=
 RUNDIR?=
 
 all: baseline validation random_forest mpi_communication
+.PHONY: enter run clean baseline validation random_forest mpi_communication
 
 enter:
 	docker run -v $(shell pwd):/workdir -w /workdir -it $(DOCKER_IMAGE) bash
@@ -14,6 +15,7 @@ rundir:
 	tar -xvf c48_6h.tar.gz
 
 run: rundir
+	$(RM) -r $(RUNDIR)
 	cp -r rundir $(RUNDIR)
 	cp $(RUNFILE) $(RUNDIR)/
 	cd $(RUNDIR) && time mpirun -n 6 python3 $(RUNFILE)

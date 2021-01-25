@@ -7,15 +7,15 @@ ROOT = 0
 if __name__ == "__main__":
     fv3gfs.wrapper.initialize()
     # MPI4py requires a receive "buffer" array to store incoming data
-    min_surface_temperature = np.array(0)
+    min_surface_temperature = np.array(0.0)
     for i in range(fv3gfs.wrapper.get_step_count()):
         fv3gfs.wrapper.step_dynamics()
         fv3gfs.wrapper.step_physics()
-        
+
         # Retrieve model minimum surface temperature
         state = fv3gfs.wrapper.get_state(["surface_temperature"])
         MPI.COMM_WORLD.Reduce(
-            state["air_temperature"].data,
+            state["surface_temperature"].view[:].min(),
             min_surface_temperature,
             root=ROOT,
             op=MPI.MIN,
