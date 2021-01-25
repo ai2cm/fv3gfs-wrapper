@@ -1,5 +1,6 @@
 version: 2.1
 orbs:
+  gcp-cli: circleci/gcp-cli@2.1.0
   gcp-gcr: circleci/gcp-gcr@0.6.1
 jobs:
 
@@ -19,6 +20,8 @@ jobs:
       GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-wrapper
       GOOGLE_APPLICATION_CREDENTIALS: /tmp/key.json
     steps:
+      - gcp-cli/install:
+        version: 323.0.0
       - checkout
       - run:
           name: "save gcloud key for gcsfs"
@@ -69,10 +72,6 @@ jobs:
           name: "Build documentation"
           command: |
             make docs-docker
-      - run:
-          name: "Enable Python 2 for google cloud tools"
-          command: |
-            pyenv global 2.7.12
       - gcp-gcr/gcr-auth
       - run: |
           echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://gcr.io

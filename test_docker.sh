@@ -3,7 +3,7 @@
 set -e
 
 if [ -z "$DOCKER_IMAGE" ]; then
-    DOCKER_IMAGE=us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu9-mpich314-nocuda
+    DOCKER_IMAGE=us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu7-mpich314-nocuda
 fi
 
 pytest ./tests/image_tests/*.py
