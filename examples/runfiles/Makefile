@@ -2,7 +2,7 @@
 RUNFILE ?=
 CONFIG ?= default.yml
 OUTDIR ?= outdir
-DOCKER_IMAGE ?= us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu9-mpich314-nocuda
+DOCKER_IMAGE ?= us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu7-mpich314-nocuda
 
 CASES=basic_model online_code
 
