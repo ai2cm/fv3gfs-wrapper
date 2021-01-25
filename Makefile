@@ -31,6 +31,7 @@ export PRINT_HELP_PYSCRIPT
 
 BROWSER := python3 -c "$$BROWSER_PYSCRIPT"
 
+# This must be updated if the tag used in docker/Makefile is changed
 DOCKER_IMAGE?=us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu7-mpich314-nocuda
 BUILD_FROM_INTERMEDIATE=y
 

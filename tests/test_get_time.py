@@ -1,8 +1,6 @@
 """Example usage:
 
-$ mpirun -n 6 --allow-run-as-root \
-     --oversubscribe \
-     --mca btl_vader_single_copy_mechanism none \
+$ mpirun -n 6  \
      python3 -m mpi4py test_get_time.py noleap
 
 Note the argument specifying the calendar type at the end of the command
