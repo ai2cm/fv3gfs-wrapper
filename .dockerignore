@@ -2,3 +2,4 @@ test_docker.sh
 run_docker.sh
 tests/*workdir
 tests/logs
+examples/jupyter

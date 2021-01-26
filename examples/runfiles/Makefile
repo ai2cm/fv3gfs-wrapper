@@ -6,9 +6,9 @@ DOCKER_IMAGE ?= us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu7-mpich314-nocuda
 
 CASES=basic_model online_code
 
-all: $(CASES) nudging fortran_state baroclinic
+all: $(CASES) nudging fortran_state baroclinic random_forest
 
-public_examples: $(CASES) fortran_state baroclinic
+public_examples: $(CASES) fortran_state baroclinic random_forest
 
 fv3run:
 	write_run_directory $(CONFIG) $(OUTDIR)
@@ -31,6 +31,9 @@ fortran_state:
 
 baroclinic:
 	RUNFILE=basic_model.py OUTDIR=baroclinic_outdir CONFIG=baroclinic.yml $(MAKE) fv3run
+
+random_forest:
+	RUNFILE=random_forest.py OUTDIR=random_forest_outdir CONFIG=c48.yml $(MAKE) fv3run
 
 clean:
 	$(RM) -rf outdir nudging_outdir basic_model_outdir online_code_outdir fortran_state_outdir baroclinic_outdir

@@ -101,6 +101,7 @@ setup(
     ],
     install_requires=requirements,
     tests_require=test_requirements,
+    extras_require={"examples": ["sklearn_json"]},
     name="fv3gfs-wrapper",
     license="BSD license",
     long_description=readme + "\n\n" + history,
