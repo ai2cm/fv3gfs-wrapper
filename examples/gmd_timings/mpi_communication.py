@@ -21,7 +21,8 @@ if __name__ == "__main__":
             op=MPI.MIN,
         )
         if MPI.COMM_WORLD.Get_rank() == ROOT:
-            print(f"Minimum surface temperature: {min_surface_temperature}")
+            units = state["surface_temperature"].units
+            print(f"Minimum surface temperature: {min_surface_temperature} {units}")
 
         fv3gfs.wrapper.save_intermediate_restart_if_enabled()
     fv3gfs.wrapper.cleanup()
