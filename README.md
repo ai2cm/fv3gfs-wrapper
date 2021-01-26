@@ -1,12 +1,14 @@
-
-FV3GFS
-======
-
 fv3gfs-wrapper (`import fv3gfs.wrapper`), is a Python wrapper for the FV3GFS
 global climate model.
 
-See the [documentation](https://vulcanclimatemodeling.github.io/fv3gfs-wrapper/f12n7eq5xkoibbqp/index.html)
+See the [documentation](https://vulcanclimatemodeling.github.io/fv3gfs-wrapper/index.html)
 for more detailed instructions.
+
+We also recommend you read the documentation for [fv3gfs-util](https://fv3gfs-util.readthedocs.io/en/latest/), which is used alongside fv3gfs-wrapper to provide Python model infrastructure and functionality.
+
+This is currently alpha development software used for research. If you would like to contribute to or collaborate on the software, please get in touch with jeremym@vulcan.com or another developer.
+
+Running the tests as they are currently written requires private credentials to google cloud services, as the data access is set to "requester pays". To run the tests and examples with your credentials, set an environment variable `GOOGLE_APPLICATION_CREDENTIALS` as a path to your JSON key file.  (E.g., `export GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json`) **Note**: your project will incur some data transfer charges if you run these tests or examples.
 
 Checking out
 ------------
@@ -53,7 +55,7 @@ when you're done to remove the build artifacts, or it may cause problems when yo
 build the docker image.
 
 With the image already built by `make build-docker` or pulled using
-`docker pull us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu9-mpich314-nocuda`, run `dev_docker.sh`. This will
+`docker pull us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu7-mpich314-nocuda`, run `dev_docker.sh`. This will
 bind-mount the `fv3gfs`, `lib`, `tests`, `external`, and `templates` directories into the
 docker image. Inside the docker image, you can build or re-build the model with
 `make build` inside the `/fv3gfs-wrapper` directory, and run the test suite with

@@ -20,6 +20,7 @@ from ._wrapper import (
     DiagnosticInfo,
 )
 from ._restart import get_restart_names, open_restart
+from . import examples
 
 from .thermodynamics import set_state_mass_conserving
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE=us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu9-mpich314-nocuda
+IMAGE=us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu7-mpich314-nocuda
 
 MOUNTS="-v $(pwd):/fv3gfs-wrapper"
 

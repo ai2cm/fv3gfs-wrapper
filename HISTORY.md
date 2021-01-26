@@ -5,7 +5,8 @@ latest
 ------
 
 Breaking changes:
-- Removed many fv3util imports from fv3gfs, import those symbols from fv3util instead
+- Removed many fv3util imports from fv3gfs, import those symbols from fv3gfs.util instead
+- Removed initial cache data from fv3gfs-wrapper image
 
 Major changes:
 - Use `cftime.datetime` objects to represent datetimes in fv3gfs-python and fv3util instead of `datetime.datetime` objects.  This results in times stored in a format compatible with the fortran model, and accurate internal representation of times with the calendar specified
@@ -13,6 +14,7 @@ in the `coupler_nml` namelist.
 - Fortran source updated to include new per-physics-component tendency diagnostics for temperature and specific humidity, and to ensure that the column moistening implied by nudging specific humidity is subtracted from the precipitation felt by the land surface model.
 - The wrapper now passes runtime flags similarly to physics and dynamics properties but in a class structure, so ptop is accessible as `wrapper.flags.ptop`.
 - `build_deps` and `push_deps` make targets are removed from `docker/Makefile`. Use the make targets in fv3gfs-fortran instead.
+- Added `fv3gfs.wrapper.examples` module with an example random forest corrector model, which can be enabled if the dependency extras option `sklearn_json` is selected.
 
 Minor changes:
 - added jenkins scripts under .jenkins
@@ -21,6 +23,7 @@ Minor changes:
 - CC used for `python setup.py build_ext --inplace` is now specified directly in the Makefile (default gcc), since docker was somehow using different compilers locally and in CI
 - add `Sfcprop%tsfco` and `Sfcprop%tsfcl` to `physics_properties.json`
 - added baroclinic and state-saving cases to `examples/runfiles`
+- added GMD paper examples with timings to `examples/gmd_timings`
 
 v0.5.0 (2020-07-28)
 ------

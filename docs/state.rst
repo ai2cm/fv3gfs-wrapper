@@ -1,8 +1,3 @@
-.. meta::
-   :robots: noindex, nofollow
-
-.. _state-overview:
-=====
 State
 =====
 
@@ -25,5 +20,7 @@ Quantity
 
 Data in ``fv3gfs-wrapper`` is managed using a container type called :py:class:`fv3gfs.util.Quantity`.
 This stores metadata such as dimensions and units (in ``quantity.dims`` and ``quantity.units``),
-and manages the "computational domain" of the data. See the fv3gfs-util documentation for
+and manages the "computational domain" of the data. See the `fv3gfs-util`_ documentation for
 full details about this object.
+
+.. _`fv3gfs-util`: https://fv3gfs-util.readthedocs.io/en/latest/

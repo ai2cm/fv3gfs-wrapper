@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=ubuntu:19.10
+ARG BASE_IMAGE=ubuntu:18.04
 ARG MPI_IMAGE
 ARG FMS_IMAGE
 ARG ESMF_IMAGE
@@ -7,20 +7,6 @@ ARG FORTRAN_ENV_IMAGE
 FROM $MPI_IMAGE AS fv3gfs-mpi
 FROM $FMS_IMAGE AS fv3gfs-fms
 FROM $ESMF_IMAGE AS fv3gfs-esmf
-
-#-----------------------------------------------------------------------------
-FROM $BASE_IMAGE as fv3config-inputdata
-
-RUN apt-get update && \
-    apt-get install -y python3 python3-pip wget && \
-    pip3 install --no-cache-dir gsutil
-RUN mkdir -p /fv3config-cache/gs/vcm-fv3config && \
-    gsutil -m cp -r gs://vcm-fv3config/ /fv3config-cache/gs && \
-    rm -rf /fv3config-cache/gs/vcm-fv3config/data/base_forcing/v1.0 \
-        /fv3config-cache/gs/vcm-fv3config/data/orographic_data/v1.0/C384 \
-        /fv3config-cache/gs/vcm-fv3config/data/orographic_data/v1.0/C96 \
-        /fv3config-cache/orographic_data/C384 \
-        /fv3config-cache/base_forcing
 
 #-----------------------------------------------------------------------------
 FROM $FORTRAN_ENV_IMAGE as fv3gfs-wrapper-env
@@ -81,10 +67,6 @@ COPY fv3gfs /fv3gfs-wrapper/fv3gfs
 #-----------------------------------------------------------------------------
 FROM fv3gfs-wrapper-build AS fv3gfs-wrapper
 
-ARG GT4PY_CUDA=" "
-
-RUN pip3 install --no-deps --no-cache-dir git+https://github.com/GridTools/gt4py.git@db40777788863bfe87b9674b118e8bd5b8db0440#egg=gt4py$(GT4PY_CUDA) 
-
 # copy and install dependency packages
 COPY fill_templates.py /fv3gfs-wrapper/fill_templates.py
 COPY templates/ /fv3gfs-wrapper/templates/
@@ -98,13 +80,12 @@ RUN cd /fv3gfs-wrapper && \
     make -C lib && \ 
     pip3 install --no-deps --no-cache-dir -r /fv3gfs-wrapper/requirements_local.txt
 
-# cache model data
-ENV FV3CONFIG_CACHE_DIR=/inputdata \
+ENV FV3CONFIG_CACHE_DIR=/fv3config-cache \
     LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
     MPI=mpich
-COPY --from=fv3config-inputdata /fv3config-cache $FV3CONFIG_CACHE_DIR/fv3config-cache
 
-RUN chmod -R 777 $FV3CONFIG_CACHE_DIR && \
+RUN mkdir $FV3CONFIG_CACHE_DIR && \
+    chmod -R 777 $FV3CONFIG_CACHE_DIR && \
     echo "ulimit -s unlimited" >> /etc/bash.bashrc && \
     mkdir /outdir && \
     chmod -R 777 /outdir

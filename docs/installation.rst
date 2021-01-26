@@ -1,9 +1,6 @@
-.. meta::
-   :robots: noindex, nofollow
-
 .. highlight:: shell
 
-============
+
 Installation
 ============
 
