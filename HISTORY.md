@@ -23,6 +23,7 @@ Minor changes:
 - CC used for `python setup.py build_ext --inplace` is now specified directly in the Makefile (default gcc), since docker was somehow using different compilers locally and in CI
 - add `Sfcprop%tsfco` and `Sfcprop%tsfcl` to `physics_properties.json`
 - added baroclinic and state-saving cases to `examples/runfiles`
+- added GMD paper examples with timings to `examples/gmd_timings`
 
 v0.5.0 (2020-07-28)
 ------
