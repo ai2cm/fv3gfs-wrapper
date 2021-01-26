@@ -42,7 +42,6 @@ library_link_args.extend(wrapper_build_filenames)
 library_link_args += pkgconfig.libs("fv3").split()
 
 mpi_flavor = os.environ.get("MPI", "openmpi")
-print("MPI flavor", mpi_flavor)
 if mpi_flavor == "openmpi":
     library_link_args += pkgconfig.libs("ompi-fort").split()
 else:
