@@ -1,8 +1,8 @@
 History
 =======
 
-latest
-------
+v0.6.0 (2021-01-27)
+-------------------
 
 Breaking changes:
 - Removed many fv3util imports from fv3gfs, import those symbols from fv3gfs.util instead
@@ -26,7 +26,7 @@ Minor changes:
 - added GMD paper examples with timings to `examples/gmd_timings`
 
 v0.5.0 (2020-07-28)
-------
+-------------------
 
 Breaking changes:
 - fixed a bug where atmosphere hybrid coordinates were incorrectly marked as cell center variables, and were missing one point
