@@ -53,6 +53,6 @@ def get_diagnostic_metadata_by_name(
     raise ValueError(f"There is no diagnostic {name} in module {module_name}.")
 
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 __all__ = list(key for key in locals().keys() if not key.startswith("_"))
