@@ -1,10 +1,12 @@
+# This module contains a useful routine for plotting a 2D Quantity written by
+# Jeremy McGibbon.
 import matplotlib.pyplot as plt
 import numpy as np
 
 
 from fv3gfs.util import (
-    TilePartitioner, CubedSpherePartitioner, CubedSphereCommunicator, Quantity,
-    X_DIM, Y_DIM, Z_DIM, X_INTERFACE_DIM, Y_INTERFACE_DIM
+    TilePartitioner, CubedSpherePartitioner, CubedSphereCommunicator,
+    X_DIM, Y_DIM
 )
 
 
