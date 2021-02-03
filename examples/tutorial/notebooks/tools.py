@@ -5,18 +5,31 @@ import numpy as np
 
 
 from fv3gfs.util import (
-    TilePartitioner, CubedSpherePartitioner, CubedSphereCommunicator,
-    X_DIM, Y_DIM
+    TilePartitioner,
+    CubedSpherePartitioner,
+    CubedSphereCommunicator,
+    X_DIM,
+    Y_DIM,
 )
 
 
 def get_X_Y(shape):
     """Get coordinate locations for plotting a global field as a flattened cube."""
-    X = np.zeros([shape[0], shape[1] + 1, shape[2] + 1]) + np.arange(0, shape[1] + 1)[None, :, None]
-    Y = np.zeros([shape[0], shape[1] + 1, shape[2] + 1]) + np.arange(0, shape[2] + 1)[None, None, :]
+    X = (
+        np.zeros([shape[0], shape[1] + 1, shape[2] + 1])
+        + np.arange(0, shape[1] + 1)[None, :, None]
+    )
+    Y = (
+        np.zeros([shape[0], shape[1] + 1, shape[2] + 1])
+        + np.arange(0, shape[2] + 1)[None, None, :]
+    )
     # offset and rotate the data for each rank, with zero at the "center"
     for tile, shift_x, shift_y, n_rotations in [
-        (1, 1, 0, 0), (2, 0, 1, -1), (3, 2, 0, 1), (4, -1, 0, 1), (5, 0, -1, 0)
+        (1, 1, 0, 0),
+        (2, 0, 1, -1),
+        (3, 2, 0, 1),
+        (4, -1, 0, 1),
+        (5, 0, -1, 0),
     ]:
         X[tile, :, :] += shift_x * shape[1]
         Y[tile, :, :] += shift_y * shape[2]
@@ -28,10 +41,7 @@ def get_X_Y(shape):
 def plot_global(quantity, mpi_comm_world, vmin, vmax, layout=(1, 1)):
     """Plot a quantity globally on the root rank as a flattened cube."""
     cube = CubedSphereCommunicator(
-        mpi_comm_world,
-        CubedSpherePartitioner(
-            TilePartitioner(layout)
-        ),
+        mpi_comm_world, CubedSpherePartitioner(TilePartitioner(layout)),
     )
     assert quantity.dims == (Y_DIM, X_DIM), "example written to plot 2D fields"
     global_quantity = cube.gather(quantity)
@@ -45,5 +55,5 @@ def plot_global(quantity, mpi_comm_world, vmin, vmax, layout=(1, 1)):
                 global_quantity.view[tile, :, :].T,
                 vmin=vmin,
                 vmax=vmax,
-        )
+            )
         plt.colorbar(im)
