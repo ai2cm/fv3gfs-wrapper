@@ -12,6 +12,8 @@ from ._wrapper import (
     get_n_ghost_cells,
     get_step_count,
     get_tracer_metadata,
+    compute_radiation,
+    compute_non_radiation_physics,
     compute_physics,
     apply_physics,
     _get_diagnostic_info,

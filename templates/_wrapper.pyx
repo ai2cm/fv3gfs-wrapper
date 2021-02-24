@@ -25,6 +25,8 @@ cdef extern:
     void do_step_subroutine()
     void cleanup_subroutine()
     void do_dynamics()
+    void compute_atmos_radiation_subroutine()
+    void compute_atmos_physics_subroutine()
     void compute_physics_subroutine()
     void apply_physics_subroutine()
     void save_intermediate_restart_if_enabled_subroutine()
@@ -402,6 +404,25 @@ def step_physics():
     Equivalent to calling compute_physics() and apply_physics() in that order."""
     compute_physics_subroutine()
     apply_physics_subroutine()
+
+
+def compute_radiation():
+    """Call radiation routines in the Fortran model and update physics prognostic state.
+
+    It is necessary to call both compute_non_radiation_physics() and apply_physics() after
+    this to update the dynamical prognostic state with the output from the routines called
+    by this function.
+    """
+    compute_atmos_radiation_subroutine()
+
+
+def compute_non_radiation_physics():
+    """Call non-radiation subroutines in the Fortran model and update physics prognostic state.
+
+    It is necessary to call apply_physics() after this to update the dynamical prognostic state
+    with output from the routines called by this function.
+    """
+    compute_atmos_physics_subroutine()
 
 
 def compute_physics():
