@@ -47,7 +47,10 @@ in the Fortran model.
     The :py:func:`fv3gfs.wrapper.step_physics` call can be separated into two calls, :py:func:`fv3gfs.wrapper.compute_physics`
     and :py:func:`fv3gfs.wrapper.apply_physics` to allow modification of the model state in between these operations.
     However care should be taken when doing this, because the physics and dynamics states are not
-    consistent with each other before :py:func:`fv3gfs.wrapper.apply_physics` is called.
+    consistent with each other before :py:func:`fv3gfs.wrapper.apply_physics` is called.  For finer granularity still,
+    :py:func:`fv3gfs.wrapper.compute_physics` can be split into two calls, :py:func:`fv3gfs.wrapper.compute_radiation` and
+    :py:func:`fv3gfs.wrapper.compute_non_radiation_physics`, allowing modification of the model state between the radiation
+    and rest of the model physics.
 
 Instead of using a Python script, it is also possible to get precisely the behavior of :code:`fv3.exe` using
 

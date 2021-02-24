@@ -20,6 +20,8 @@ use time_manager_mod,  only: time_type, set_calendar_type, set_time,    &
  
 use  atmos_model_mod,  only: atmos_model_init, atmos_model_end,  &
                              update_atmos_model_dynamics,        &
+                             update_atmos_radiation,             &
+                             update_atmos_physics,               &
                              update_atmos_radiation_physics,     &
                              update_atmos_model_state,           &
                              atmos_data_type, atmos_model_restart
@@ -142,6 +144,14 @@ contains
         Time_atmos = Time_atmos + Time_step_atmos
         call update_atmos_model_dynamics (Atm)
     end subroutine do_dynamics
+
+    subroutine compute_atmos_radiation_subroutine() bind(c)
+        call update_atmos_radiation (Atm)
+    end subroutine compute_atmos_radiation_subroutine
+
+    subroutine compute_atmos_physics_subroutine() bind(c)
+        call update_atmos_physics (Atm)
+    end subroutine compute_atmos_physics_subroutine
 
     subroutine compute_physics_subroutine() bind(c)
         call update_atmos_radiation_physics (Atm)

@@ -15,6 +15,7 @@ STDOUT_FILENAME = "stdout.log"
 STDERR_FILENAME = "stderr.log"
 MODEL_IMAGE = "us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu7-mpich314-nocuda"
 MD5SUM_FILENAME = "md5.txt"
+RUN_SCRIPTS = ["fv3gfs.wrapper.run", "fv3gfs.wrapper._run_with_split_physics"]
 
 USE_LOCAL_ARCHIVE = True
 
@@ -41,14 +42,15 @@ def config(request):
         return yaml.safe_load(config_file)
 
 
-def test_regression(config, model_image, reference_dir):
+@pytest.mark.parametrize("run_script", RUN_SCRIPTS)
+def test_regression(config, model_image, reference_dir, run_script):
     run_name = config["experiment_name"]
     run_reference_dir = os.path.join(reference_dir, run_name)
     run_dir = os.path.join(OUTPUT_DIR, run_name)
     if os.path.isdir(run_dir):
         shutil.rmtree(run_dir)
     os.makedirs(run_dir)
-    run_model(config, run_dir, model_image)
+    run_model(config, run_dir, model_image, run_script)
     md5sum_filename = os.path.join(run_reference_dir, MD5SUM_FILENAME)
     if not os.path.isfile(md5sum_filename):
         assert False, (
@@ -61,7 +63,7 @@ def test_regression(config, model_image, reference_dir):
     shutil.rmtree(run_dir)
 
 
-def run_model(config, run_dir, model_image):
+def run_model(config, run_dir, model_image, run_script):
     fv3config.write_run_directory(config, run_dir)
     subprocess.check_call(
         [
@@ -76,7 +78,7 @@ def run_model(config, run_dir, model_image):
             "-n",
             "6",
         ]
-        + ["python3", "-m", "mpi4py", "-m", "fv3gfs.wrapper.run"]
+        + ["python3", "-m", "mpi4py", "-m", run_script]
     )
 
 
