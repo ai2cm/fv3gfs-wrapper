@@ -9,15 +9,18 @@ import unittest
 import shutil
 import fv3config
 import fv3gfs.wrapper
+import platform
 from mpi4py import MPI
 
 libc = ctypes.CDLL(None)
-c_stdout = ctypes.c_void_p.in_dll(libc, "stdout")
+# c_stdout = ctypes.c_void_p.in_dll(libc, "stdout")
 
 
 def run_unittest_script(filename, *args, n_processes=6):
-    python_args = ["python3", "-m", "mpi4py", filename] + list(args)
-    subprocess.check_call(["mpirun", "-n", str(n_processes)] + python_args)
+    python_args = [sys.executable, "-m", "mpi4py", filename] + list(args)
+    cmd =["mpirun", "-n", str(n_processes)] + python_args 
+    print("running:", ' '.join(cmd))
+    subprocess.check_call(cmd)
 
 
 def redirect_stdout(filename):
@@ -64,7 +67,7 @@ class StdoutRedirector(object):
     def _redirect_stdout(self, to_file_descriptor):
         """Redirect stdout to the given file descriptor."""
         # Flush the C-level buffer stdout
-        libc.fflush(c_stdout)
+        # libc.fflush(c_stdout)
         # Flush and close sys.stdout - also closes the file descriptor (fd)
         sys.stdout.close()
         # Make self._stdout_file_descriptor point to the same file as to_file_descriptor
@@ -79,6 +82,8 @@ def main(test_dir):
     with open(os.path.join(test_dir, "default_config.yml"), "r") as f:
         config = yaml.safe_load(f)
     rundir = os.path.join(test_dir, "rundir")
+    print("PID,", os.getpid())
+    import time
     if rank == 0:
         if os.path.isdir(rundir):
             shutil.rmtree(rundir)
@@ -87,9 +92,9 @@ def main(test_dir):
     original_path = os.getcwd()
     os.chdir(rundir)
     try:
-        with redirect_stdout(os.devnull):
-            fv3gfs.wrapper.initialize()
-            MPI.COMM_WORLD.barrier()
+        # with redirect_stdout(os.devnull):
+        fv3gfs.wrapper.initialize()
+        MPI.COMM_WORLD.barrier()
         if rank != 0:
             kwargs = {"verbosity": 0}
         else:
