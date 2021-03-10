@@ -115,7 +115,7 @@
     {
         "name": "average_albedo_surface",
         "fortran_name": "sfalb",
-        "units": "W/m^2",
+        "units": "",
         "container": "Radtend",
         "dims": ["y", "x"]
     },
