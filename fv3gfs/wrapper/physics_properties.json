@@ -113,6 +113,13 @@
         "dims": ["y", "x"]
     },
     {
+        "name": "average_albedo_surface",
+        "fortran_name": "sfalb",
+        "units": "W/m^2",
+        "container": "Radtend",
+        "dims": ["y", "x"]
+    },
+    {
         "name": "total_sky_downward_shortwave_flux_at_top_of_atmosphere",
         "fortran_name": "topfsw",
         "fortran_subname": "dnfxc",
