@@ -1,10 +1,10 @@
 import unittest
 import os
 import shutil
+import fv3gfs.wrapper
 import yaml
 from mpi4py import MPI
 import fv3config
-import fv3gfs.wrapper
 from util import redirect_stdout
 
 test_dir = os.path.dirname(os.path.abspath(__file__))

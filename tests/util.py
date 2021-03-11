@@ -4,11 +4,11 @@ import tempfile
 import io
 import ctypes
 import subprocess
+import fv3gfs.wrapper
 import yaml
 import unittest
 import shutil
 import fv3config
-import fv3gfs.wrapper
 import platform
 from mpi4py import MPI
 

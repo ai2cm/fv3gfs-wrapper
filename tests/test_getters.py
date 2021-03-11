@@ -1,8 +1,8 @@
 import unittest
 import os
+import fv3gfs.wrapper
 import numpy as np
 import yaml
-import fv3gfs.wrapper
 import fv3gfs.util
 from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
 from mpi4py import MPI

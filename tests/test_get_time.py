@@ -14,9 +14,9 @@ import unittest
 import yaml
 import os
 import shutil
+import fv3gfs.wrapper
 import cftime
 import fv3config
-import fv3gfs.wrapper
 from mpi4py import MPI
 from util import redirect_stdout
 

@@ -1,4 +1,5 @@
-import fv3gfs.util
+# this import must happen before fv3gfs.util or weird segfaults will happen
+# This is probably caused by the order of dynamic loading
 from ._wrapper import (
     initialize,
     step,
@@ -19,6 +20,7 @@ from ._wrapper import (
     flags,
     DiagnosticInfo,
 )
+import fv3gfs.util
 from ._restart import get_restart_names, open_restart
 from . import examples
 
