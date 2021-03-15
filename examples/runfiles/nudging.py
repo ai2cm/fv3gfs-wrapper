@@ -5,7 +5,7 @@ import fv3gfs.wrapper
 from mpi4py import MPI
 
 
-REFERENCE_DIR = "gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/"
+REFERENCE_DIR = "gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/"
 TENDENCY_OUT_FILENAME = "nudging_tendencies.nc"
 RUN_DIR = os.path.dirname(os.path.realpath(__file__))
 
