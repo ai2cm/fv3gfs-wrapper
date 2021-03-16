@@ -1,6 +1,20 @@
 History
 =======
 
+Unreleased
+----------
+
+Minor changes:
+- Added getters and setters for `Statein%adjsfcdlw_override`,
+  `Statein%adjsfcdsw_override`, and `Statein%adjsfcnsw_override`.  These
+  correspond to the downward longwave radiative flux at the surface, the
+  downward shortwave radiative flux at the surface, and the net shortwave
+  radiative flux at the surface, respectively.  Note they are only available if
+  the `gfs_physics_nml.override_surface_radiative_fluxes` namelist parameter is
+  set to `.true.`.
+- Added getter and setter for `Radtend%sfalb`, the average albedo at the
+  surface.
+
 v0.6.0 (2021-01-27)
 -------------------
 
