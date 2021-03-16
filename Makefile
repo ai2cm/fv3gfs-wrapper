@@ -104,11 +104,9 @@ docs-docker:  ## build documentation using docker
 	$(BROWSER) docs/_build/html/index.html
 
 build-docker:  ## build the docker image
-	write_run_directory tests/image_tests/config/baroclinic.yml baroclinic
 	BUILD_FROM_INTERMEDIATE=$(BUILD_FROM_INTERMEDIATE) $(MAKE) -C docker
 
 test-docker: build-docker  ## test the docker image
-	write_run_directory tests/image_tests/config/baroclinic.yml baroclinic
 	./test_docker.sh
 
 servedocs: docs ## compile the docs watching for changes
