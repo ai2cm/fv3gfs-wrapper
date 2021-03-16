@@ -12,7 +12,7 @@ Minor changes:
   radiative flux at the surface, respectively.  Note they are only available if
   the `gfs_physics_nml.override_surface_radiative_fluxes` namelist parameter is
   set to `.true.`.
-- Added getter and setter for `Radtend%sfalb`, the average albedo at the
+- Added getter and setter for `Radtend%sfalb`, the average albedo of the
   surface.
 
 v0.6.0 (2021-01-27)
