@@ -15,7 +15,9 @@ class FlagsTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(FlagsTest, self).__init__(*args, **kwargs)
         self.flagstruct_data = {entry["name"]: entry for entry in FLAGSTRUCT_PROPERTIES}
-        self.gfs_control_data = {entry["name"]: entry for entry in GFS_CONTROL_PROPERTIES}
+        self.gfs_control_data = {
+            entry["name"]: entry for entry in GFS_CONTROL_PROPERTIES
+        }
         self.mpi_comm = MPI.COMM_WORLD
 
     def setUp(self):
@@ -51,6 +53,7 @@ class FlagsTest(unittest.TestCase):
         """Test that getting a boolean flag produces its expected result."""
         result = fv3gfs.wrapper.flags.override_surface_radiative_fluxes
         self.assertFalse(result)
+
 
 if __name__ == "__main__":
     main(test_dir)
