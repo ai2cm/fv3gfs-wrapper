@@ -33,6 +33,9 @@ class UsingMPITests(unittest.TestCase):
     def test_get_time_noleap(self):
         run_unittest_script(os.path.join(base_dir, "test_get_time.py"), "noleap")
 
+    def test_flags(self):
+        run_unittest_script(os.path.join(base_dir, "test_flags.py"))
+
 
 if __name__ == "__main__":
     unittest.main()

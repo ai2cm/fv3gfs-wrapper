@@ -23,6 +23,16 @@ all_templates = (
 )
 SETUP_DIR = os.path.dirname(os.path.abspath(__file__))
 PROPERTIES_DIR = os.path.join(SETUP_DIR, "fv3gfs/wrapper")
+FORTRAN_TO_C_TYPES = {
+    "integer": {"type_c": "c_int", "type_cython": "int"},
+    "real": {"type_c": "c_double", "type_cython": "REAL_t"},
+    "logical": {"type_c": "c_int", "type_cython": "bint"},
+}
+OVERRIDING_FLUXES = [
+    "total_sky_downward_longwave_flux_at_surface_override",
+    "total_sky_downward_shortwave_flux_at_surface_override",
+    "total_sky_net_shortwave_flux_at_surface_override",
+]
 
 
 def get_dim_range_string(dim_list):
@@ -47,11 +57,15 @@ if __name__ == "__main__":
     flagstruct_data = json.load(
         open(os.path.join(PROPERTIES_DIR, "flagstruct_properties.json"))
     )
+    gfs_control_data = json.load(
+        open(os.path.join(PROPERTIES_DIR, "gfs_control_properties.json"))
+    )
 
     physics_2d_properties = []
     physics_3d_properties = []
     dynamics_properties = []
     flagstruct_properties = []
+    gfs_control_properties = []
 
     for properties in physics_data:
         if len(properties["dims"]) == 2:
@@ -66,21 +80,26 @@ if __name__ == "__main__":
         dynamics_properties.append(properties)
 
     for flag in flagstruct_data:
-        if flag["type_fortran"] == "integer":
-            flag["type_c"] = "c_int"
-            flag["type_cython"] = "int"
-        elif flag["type_fortran"] == "real":
-            flag["type_c"] = "c_double"
-            flag["type_cython"] = "REAL_t"
-        elif flag["type_fortran"] == "logical":
-            flag["type_c"] = "c_bool"
-            flag["type_cython"] = "bint"
+        type_fortran = flag["type_fortran"]
+        if type_fortran in FORTRAN_TO_C_TYPES:
+            flag.update(FORTRAN_TO_C_TYPES[type_fortran])
         else:
             unexpected_type = flag["type_fortran"]
             raise NotImplementedError(
                 f"unexpected value for type_fortran: {unexpected_type}"
             )
         flagstruct_properties.append(flag)
+
+    for flag in gfs_control_data:
+        type_fortran = flag["type_fortran"]
+        if type_fortran in FORTRAN_TO_C_TYPES:
+            flag.update(FORTRAN_TO_C_TYPES[type_fortran])
+        else:
+            unexpected_type = flag["type_fortran"]
+            raise NotImplementedError(
+                f"unexpected value for type_fortran: {unexpected_type}"
+            )
+        gfs_control_properties.append(flag)
 
     if len(requested_templates) == 0:
         requested_templates = all_templates
@@ -94,6 +113,8 @@ if __name__ == "__main__":
             physics_3d_properties=physics_3d_properties,
             dynamics_properties=dynamics_properties,
             flagstruct_properties=flagstruct_properties,
+            gfs_control_properties=gfs_control_properties,
+            overriding_fluxes=OVERRIDING_FLUXES,
         )
         with open(out_filename, "w") as f:
             f.write(result)

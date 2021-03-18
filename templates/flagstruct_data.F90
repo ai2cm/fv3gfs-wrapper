@@ -11,7 +11,7 @@ contains
 {% for item in flagstruct_properties %}
     {% if item.fortran_name == "do_adiabatic_init" %}
     subroutine get_do_adiabatic_init(do_adiabatic_init_out) bind(c)
-        logical(c_bool), intent(out) :: do_adiabatic_init_out
+        logical(c_int), intent(out) :: do_adiabatic_init_out
         do_adiabatic_init_out = do_adiabatic_init
     end subroutine get_do_adiabatic_init
     {% else %}

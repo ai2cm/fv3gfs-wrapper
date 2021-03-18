@@ -9,6 +9,12 @@ with open(os.path.join(DIR, "dynamics_properties.json"), "r") as f:
 with open(os.path.join(DIR, "physics_properties.json"), "r") as f:
     PHYSICS_PROPERTIES = json.load(f)
 
+with open(os.path.join(DIR, "flagstruct_properties.json"), "r") as f:
+    FLAGSTRUCT_PROPERTIES = json.load(f)
+
+with open(os.path.join(DIR, "gfs_control_properties.json"), "r") as f:
+    GFS_CONTROL_PROPERTIES = json.load(f)
+
 DIM_NAMES = {
     properties["name"]: properties["dims"]
     for properties in DYNAMICS_PROPERTIES + PHYSICS_PROPERTIES

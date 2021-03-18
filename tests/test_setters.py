@@ -9,6 +9,11 @@ from mpi4py import MPI
 from util import main
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
+OVERRIDING_FLUXES = [
+    "total_sky_downward_longwave_flux_at_surface_override",
+    "total_sky_downward_shortwave_flux_at_surface_override",
+    "total_sky_net_shortwave_flux_at_surface_override",
+]
 
 
 class SetterTests(unittest.TestCase):
@@ -16,7 +21,11 @@ class SetterTests(unittest.TestCase):
         super(SetterTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.wrapper.get_tracer_metadata()
         self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
-        self.physics_data = {entry["name"]: entry for entry in PHYSICS_PROPERTIES}
+        self.physics_data = {
+            entry["name"]: entry
+            for entry in PHYSICS_PROPERTIES
+            if entry["name"] not in OVERRIDING_FLUXES
+        }
 
     def setUp(self):
         pass

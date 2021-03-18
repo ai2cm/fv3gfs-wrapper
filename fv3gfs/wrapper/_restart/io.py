@@ -7,6 +7,9 @@ RESTART_EXCLUDE_NAMES = [
     "convective_cloud_fraction",
     "convective_cloud_top_pressure",
     "convective_cloud_bottom_pressure",
+    "total_sky_downward_longwave_flux_at_surface_override",
+    "total_sky_downward_shortwave_flux_at_surface_override",
+    "total_sky_net_shortwave_flux_at_surface_override",
 ]
 
 

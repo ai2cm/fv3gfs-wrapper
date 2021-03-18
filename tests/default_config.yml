@@ -244,7 +244,7 @@ namelist:
     swhtr: true
     trans_trac: true
     use_ufo: true
-    override_surface_radiative_fluxes: true
+#    override_surface_radiative_fluxes: true
   interpolator_nml:
     interp_method: conserve_great_circle
   nam_stochy:
