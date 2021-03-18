@@ -1,5 +1,6 @@
 import unittest
 import os
+import sys
 from copy import deepcopy
 import numpy as np
 import fv3gfs.wrapper
@@ -15,7 +16,7 @@ OVERRIDING_FLUXES = [
     "total_sky_downward_shortwave_flux_at_surface_override",
     "total_sky_net_shortwave_flux_at_surface_override",
 ]
-ALLOCATED_PHYSICS_PROPERTIES = [
+PHYSICS_PROPERTIES_MINUS_OVERRIDING_FLUXES = [
     entry for entry in PHYSICS_PROPERTIES if entry["name"] not in OVERRIDING_FLUXES
 ]
 
@@ -30,9 +31,13 @@ class SetterTests(unittest.TestCase):
         super(SetterTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.wrapper.get_tracer_metadata()
         self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
-        self.physics_data = {
-            entry["name"]: entry for entry in ALLOCATED_PHYSICS_PROPERTIES
-        }
+        if fv3gfs.wrapper.flags.override_surface_radiative_fluxes:
+            self.physics_data = {entry["name"]: entry for entry in PHYSICS_PROPERTIES}
+        else:
+            self.physics_data = {
+                entry["name"]: entry
+                for entry in PHYSICS_PROPERTIES_MINUS_OVERRIDING_FLUXES
+            }
 
     def setUp(self):
         pass
@@ -195,10 +200,35 @@ class SetterTests(unittest.TestCase):
             fv3gfs.wrapper.set_state({name: quantity})
 
     def test_set_unallocated_overriding_surface_fluxes(self):
+        if fv3gfs.wrapper.flags.override_surface_radiative_fluxes:
+            self.skipTest("Memory is allocated for the overriding fluxes in this case.")
         for name in OVERRIDING_FLUXES:
             with self.subTest(name):
                 self._set_unallocated_overriding_surface_flux_helper(name)
 
 
+def get_override_surface_radiative_fluxes():
+    """A crude way of parameterizing the setter tests for different values of
+    gfs_physics_nml.override_surface_radiative_fluxes.
+
+    See https://stackoverflow.com/questions/11380413/python-unittest-passing-arguments.
+    """
+    if len(sys.argv) != 2:
+        raise ValueError(
+            "test_setters.py requires a single argument "
+            "be passed through the command line."
+        )
+    override_surface_radiative_fluxes = sys.argv.pop()
+
+    # Convert string argument to bool.
+    return override_surface_radiative_fluxes == "True"
+
+
 if __name__ == "__main__":
-    main(test_dir)
+    with open(os.path.join(test_dir, "default_config.yml"), "r") as f:
+        config = yaml.safe_load(f)
+    override_surface_radiative_fluxes = get_override_surface_radiative_fluxes()
+    config["namelist"]["gfs_physics_nml"][
+        "override_surface_radiative_fluxes"
+    ] = override_surface_radiative_fluxes
+    main(test_dir, config)

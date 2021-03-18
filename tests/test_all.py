@@ -16,7 +16,13 @@ class UsingMPITests(unittest.TestCase):
         run_unittest_script(os.path.join(base_dir, "test_getters.py"))
 
     def test_setters(self):
-        run_unittest_script(os.path.join(base_dir, "test_setters.py"))
+        run_unittest_script(os.path.join(base_dir, "test_setters.py"), "False")
+
+    def test_setters_override_surface_radiative_fluxes(self):
+        run_unittest_script(os.path.join(base_dir, "test_setters.py"), "True")
+
+    def test_setters_override_surface_radiative_fluxes(self):
+        run_unittest_script(os.path.join(base_dir, "test_overriding_fluxes_in_diagnostics.py"))
 
     def test_diagnostics(self):
         run_unittest_script(os.path.join(base_dir, "test_diagnostics.py"))

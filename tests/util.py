@@ -74,10 +74,11 @@ class StdoutRedirector(object):
         sys.stdout = io.TextIOWrapper(os.fdopen(self._stdout_file_descriptor, "wb"))
 
 
-def main(test_dir):
+def main(test_dir, config=None):
     rank = MPI.COMM_WORLD.Get_rank()
-    with open(os.path.join(test_dir, "default_config.yml"), "r") as f:
-        config = yaml.safe_load(f)
+    if config is None:
+        with open(os.path.join(test_dir, "default_config.yml"), "r") as f:
+            config = yaml.safe_load(f)
     rundir = os.path.join(test_dir, "rundir")
     if rank == 0:
         if os.path.isdir(rundir):
