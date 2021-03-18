@@ -113,7 +113,7 @@
         "dims": ["y", "x"]
     },
     {
-        "name": "average_albedo_surface",
+        "name": "surface_diffused_shortwave_albedo",
         "fortran_name": "sfalb",
         "units": "",
         "container": "Radtend",
