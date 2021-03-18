@@ -204,7 +204,6 @@ cdef int set_2d_quantity(name, REAL_t[:, ::1] array) except -1:
 {% for item in physics_2d_properties %}
     {% if item.name in overriding_fluxes %}
     elif name == '{{ item.name }}':
-        print(flags.override_surface_radiative_fluxes)
         raise fv3gfs.util.InvalidQuantityError('Overriding surface fluxes can only be set if gfs_physics_nml.override_surface_radiative_fluxes is set to .true.')
         if flags.override_surface_radiative_fluxes:
             set_{{ item.fortran_name }}{% if "fortran_subname" in item %}_{{ item.fortran_subname }}{% endif %}(&array[0, 0])
@@ -276,7 +275,6 @@ def get_state(names, dict state=None, allocator=None):
 {% for item in physics_2d_properties %}
     {% if item.name in overriding_fluxes %}
     if '{{ item.name }}' in input_names_set:
-        print(flags.override_surface_radiative_fluxes)
         raise fv3gfs.util.InvalidQuantityError('Overriding surface fluxes can only be accessed if gfs_physics_nml.override_surface_radiative_fluxes is set to .true.')
         if flags.override_surface_radiative_fluxes:
             quantity = _get_quantity(state, "{{ item.name }}", allocator, {{ item.dims | safe }}, "{{ item.units }}", dtype=real_type)

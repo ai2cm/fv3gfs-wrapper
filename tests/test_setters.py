@@ -7,6 +7,7 @@ from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
 import fv3gfs.util
 from mpi4py import MPI
 from util import main
+import yaml
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 OVERRIDING_FLUXES = [
@@ -14,6 +15,12 @@ OVERRIDING_FLUXES = [
     "total_sky_downward_shortwave_flux_at_surface_override",
     "total_sky_net_shortwave_flux_at_surface_override",
 ]
+ALLOCATED_PHYSICS_PROPERTIES = [entry for entry in PHYSICS_PROPERTIES if entry["name"] not in OVERRIDING_FLUXES]
+
+
+def get_config():
+    with open("fv3config.yml") as f:
+        return yaml.safe_load(f)
 
 
 class SetterTests(unittest.TestCase):
@@ -21,11 +28,7 @@ class SetterTests(unittest.TestCase):
         super(SetterTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.wrapper.get_tracer_metadata()
         self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
-        self.physics_data = {
-            entry["name"]: entry
-            for entry in PHYSICS_PROPERTIES
-            if entry["name"] not in OVERRIDING_FLUXES
-        }
+        self.physics_data = {entry["name"]: entry for entry in ALLOCATED_PHYSICS_PROPERTIES}
 
     def setUp(self):
         pass
@@ -176,6 +179,19 @@ class SetterTests(unittest.TestCase):
 
     def assert_values_equal(self, quantity1, quantity2):
         self.assertTrue(quantity1.np.all(quantity1.view[:] == quantity2.view[:]))
+
+    def _set_unallocated_overriding_surface_flux_helper(self, name):
+        config = get_config()
+        sizer = fv3gfs.util.SubtileGridSizer.from_namelist(config["namelist"])
+        factory = fv3gfs.util.QuantityFactory(sizer, np)
+        quantity = factory.zeros(["x", "y"], units="W/m**2")
+        with self.assertRaisesRegex(fv3gfs.util.InvalidQuantityError, "Overriding surface"):
+            fv3gfs.wrapper.set_state({name: quantity})
+
+    def test_set_unallocated_overriding_surface_fluxes(self):
+        for name in OVERRIDING_FLUXES:
+            with self.subTest(name):
+                self._set_unallocated_overriding_surface_flux_helper(name)
 
 
 if __name__ == "__main__":
