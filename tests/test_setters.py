@@ -15,7 +15,9 @@ OVERRIDING_FLUXES = [
     "total_sky_downward_shortwave_flux_at_surface_override",
     "total_sky_net_shortwave_flux_at_surface_override",
 ]
-ALLOCATED_PHYSICS_PROPERTIES = [entry for entry in PHYSICS_PROPERTIES if entry["name"] not in OVERRIDING_FLUXES]
+ALLOCATED_PHYSICS_PROPERTIES = [
+    entry for entry in PHYSICS_PROPERTIES if entry["name"] not in OVERRIDING_FLUXES
+]
 
 
 def get_config():
@@ -28,7 +30,9 @@ class SetterTests(unittest.TestCase):
         super(SetterTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.wrapper.get_tracer_metadata()
         self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
-        self.physics_data = {entry["name"]: entry for entry in ALLOCATED_PHYSICS_PROPERTIES}
+        self.physics_data = {
+            entry["name"]: entry for entry in ALLOCATED_PHYSICS_PROPERTIES
+        }
 
     def setUp(self):
         pass
@@ -185,7 +189,9 @@ class SetterTests(unittest.TestCase):
         sizer = fv3gfs.util.SubtileGridSizer.from_namelist(config["namelist"])
         factory = fv3gfs.util.QuantityFactory(sizer, np)
         quantity = factory.zeros(["x", "y"], units="W/m**2")
-        with self.assertRaisesRegex(fv3gfs.util.InvalidQuantityError, "Overriding surface"):
+        with self.assertRaisesRegex(
+            fv3gfs.util.InvalidQuantityError, "Overriding surface"
+        ):
             fv3gfs.wrapper.set_state({name: quantity})
 
     def test_set_unallocated_overriding_surface_fluxes(self):
