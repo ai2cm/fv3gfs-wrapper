@@ -43,9 +43,18 @@ class OverridingFluxDiagnosticsTests(unittest.TestCase):
         # We need to step the model to fill the diagnostics buckets.
         fv3gfs.wrapper.step()
 
-        expected_DSWRFI = replace_state["total_sky_downward_shortwave_flux_at_surface_override"].view[:]
-        expected_DLWRFI = replace_state["total_sky_downward_longwave_flux_at_surface_override"].view[:]
-        expected_USWRFI = replace_state["total_sky_downward_shortwave_flux_at_surface_override"].view[:] - replace_state["total_sky_net_shortwave_flux_at_surface_override"].view[:]
+        expected_DSWRFI = replace_state[
+            "total_sky_downward_shortwave_flux_at_surface_override"
+        ].view[:]
+        expected_DLWRFI = replace_state[
+            "total_sky_downward_longwave_flux_at_surface_override"
+        ].view[:]
+        expected_USWRFI = (
+            replace_state["total_sky_downward_shortwave_flux_at_surface_override"].view[
+                :
+            ]
+            - replace_state["total_sky_net_shortwave_flux_at_surface_override"].view[:]
+        )
 
         result_DSWRFI = fv3gfs.wrapper.get_diagnostic_by_name("DSWRFI").view[:]
         result_DLWRFI = fv3gfs.wrapper.get_diagnostic_by_name("DLWRFI").view[:]
