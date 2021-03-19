@@ -17,9 +17,22 @@ test_dir = os.path.dirname(os.path.abspath(__file__))
 ) = OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
 
 
-class OverridingFluxDiagnosticsTests(unittest.TestCase):
+def randomly_override_surface_radiative_fluxes():
+    old_state = fv3gfs.wrapper.get_state(names=OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES)
+    replace_state = deepcopy(old_state)
+    for name, quantity in replace_state.items():
+        quantity.view[:] = np.random.uniform(size=quantity.extent)
+    fv3gfs.wrapper.set_state(replace_state)
+    return replace_state
+
+
+def get_state_single_variable(name):
+    return fv3gfs.wrapper.get_state([name])[name].view[:]
+
+
+class OverridingSurfaceRadiativeFluxTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
-        super(OverridingFluxDiagnosticsTests, self).__init__(*args, **kwargs)
+        super(OverridingSurfaceRadiativeFluxTests, self).__init__(*args, **kwargs)
 
     def setUp(self):
         pass
@@ -27,14 +40,26 @@ class OverridingFluxDiagnosticsTests(unittest.TestCase):
     def tearDown(self):
         MPI.COMM_WORLD.barrier()
 
-    def test_overriding_fluxes_are_propagated_diagnostics(self):
-        old_state = fv3gfs.wrapper.get_state(
-            names=OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
+    def test_overriding_fluxes_change_model_state(self):
+        checkpoint_state = fv3gfs.wrapper.get_state(fv3gfs.wrapper.get_restart_names())
+
+        fv3gfs.wrapper.step()
+        temperature_with_default_override = get_state_single_variable("air_temperature")
+
+        # Restore state to original checkpoint; modify the radiative fluxes;
+        # step the model again.
+        fv3gfs.wrapper.set_state(checkpoint_state)
+        randomly_override_surface_radiative_fluxes()
+        fv3gfs.wrapper.step()
+        temperature_with_random_override = get_state_single_variable("air_temperature")
+
+        # We expect these states to differ.
+        assert not np.array_equal(
+            temperature_with_default_override, temperature_with_random_override
         )
-        replace_state = deepcopy(old_state)
-        for name, quantity in replace_state.items():
-            quantity.view[:] = np.random.uniform(size=quantity.extent)
-        fv3gfs.wrapper.set_state(replace_state)
+
+    def test_overriding_fluxes_are_propagated_diagnostics(self):
+        replace_state = randomly_override_surface_radiative_fluxes()
 
         # We need to step the model to fill the diagnostics buckets.
         fv3gfs.wrapper.step()
