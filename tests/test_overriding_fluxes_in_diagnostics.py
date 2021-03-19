@@ -1,10 +1,8 @@
 import unittest
 import os
-import sys
 from copy import deepcopy
 import numpy as np
 import fv3gfs.wrapper
-from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
 import fv3gfs.util
 from mpi4py import MPI
 from util import main
