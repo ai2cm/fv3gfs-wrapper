@@ -15,11 +15,10 @@ from util import main
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 MM_PER_M = 1000
-DEFAULT_PHYSICS_PROPERTIES = [
-    entry
-    for entry in PHYSICS_PROPERTIES
-    if entry["name"] not in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
-]
+DEFAULT_PHYSICS_PROPERTIES = []
+for entry in PHYSICS_PROPERTIES:
+    if entry["name"] not in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES:
+        DEFAULT_PHYSICS_PROPERTIES.append(entry)
 
 
 def get_config():
@@ -27,14 +26,16 @@ def get_config():
         return yaml.safe_load(f)
 
 
+def generate_data_dict(properties):
+    return {entry["name"]: entry for entry in properties}
+
+
 class GetterTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(GetterTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.wrapper.get_tracer_metadata()
-        self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
-        self.physics_data = {
-            entry["name"]: entry for entry in DEFAULT_PHYSICS_PROPERTIES
-        }
+        self.dynamics_data = generate_data_dict(DYNAMICS_PROPERTIES)
+        self.physics_data = generate_data_dict(DEFAULT_PHYSICS_PROPERTIES)
         self.mpi_comm = MPI.COMM_WORLD
 
     def setUp(self):

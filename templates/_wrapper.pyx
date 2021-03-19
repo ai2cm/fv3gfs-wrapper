@@ -400,6 +400,11 @@ class Flags:
         get_{{item.fortran_name}}(&{{item.name}})
         return {{item.name}}
 {% endfor %}
+    @property
+    def dt_atmos(self):
+        cdef int dt_atmos
+        get_physics_timestep_subroutine(&dt_atmos)
+        return dt_atmos
 
 flags = Flags()
 

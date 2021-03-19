@@ -15,4 +15,3 @@ module gfs_control_data_mod
     {% endfor %}
         
 end module gfs_control_data_mod
-    

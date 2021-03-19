@@ -10,13 +10,11 @@ from util import main
 import yaml
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
-DOWNWARD_LONGWAVE = (
-    "override_for_time_adjusted_total_sky_downward_longwave_flux_at_surface"
-)
-DOWNWARD_SHORTWAVE = (
-    "override_for_time_adjusted_total_sky_downward_shortwave_flux_at_surface"
-)
-NET_SHORTWAVE = "override_for_time_adjusted_total_sky_net_shortwave_flux_at_surface"
+(
+    DOWNWARD_LONGWAVE,
+    DOWNWARD_SHORTWAVE,
+    NET_SHORTWAVE,
+) = OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
 
 
 class OverridingFluxDiagnosticsTests(unittest.TestCase):
@@ -41,6 +39,7 @@ class OverridingFluxDiagnosticsTests(unittest.TestCase):
         # We need to step the model to fill the diagnostics buckets.
         fv3gfs.wrapper.step()
 
+        timestep = fv3gfs.wrapper.flags.dt_atmos
         expected_DSWRFI = replace_state[DOWNWARD_SHORTWAVE].view[:]
         expected_DLWRFI = replace_state[DOWNWARD_LONGWAVE].view[:]
         expected_USWRFI = (
@@ -48,10 +47,16 @@ class OverridingFluxDiagnosticsTests(unittest.TestCase):
             - replace_state[NET_SHORTWAVE].view[:]
         )
 
+        result_DSWRF = fv3gfs.wrapper.get_diagnostic_by_name("DSWRF").view[:]
+        result_DLWRF = fv3gfs.wrapper.get_diagnostic_by_name("DLWRF").view[:]
+        result_USWRF = fv3gfs.wrapper.get_diagnostic_by_name("USWRF").view[:]
         result_DSWRFI = fv3gfs.wrapper.get_diagnostic_by_name("DSWRFI").view[:]
         result_DLWRFI = fv3gfs.wrapper.get_diagnostic_by_name("DLWRFI").view[:]
         result_USWRFI = fv3gfs.wrapper.get_diagnostic_by_name("USWRFI").view[:]
 
+        np.testing.assert_allclose(result_DSWRF, timestep * expected_DSWRFI)
+        np.testing.assert_allclose(result_DLWRF, timestep * expected_DLWRFI)
+        np.testing.assert_allclose(result_USWRF, timestep * expected_USWRFI)
         np.testing.assert_allclose(result_DSWRFI, expected_DSWRFI)
         np.testing.assert_allclose(result_DLWRFI, expected_DLWRFI)
         np.testing.assert_allclose(result_USWRFI, expected_USWRFI)

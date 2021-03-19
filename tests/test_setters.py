@@ -15,11 +15,10 @@ from util import main
 import yaml
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_PHYSICS_PROPERTIES = [
-    entry
-    for entry in PHYSICS_PROPERTIES
-    if entry["name"] not in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
-]
+DEFAULT_PHYSICS_PROPERTIES = []
+for entry in PHYSICS_PROPERTIES:
+    if entry["name"] not in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES:
+        DEFAULT_PHYSICS_PROPERTIES.append(entry)
 
 
 def get_config():
@@ -27,17 +26,19 @@ def get_config():
         return yaml.safe_load(f)
 
 
+def generate_data_dict(properties):
+    return {entry["name"]: entry for entry in properties}
+
+
 class SetterTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(SetterTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.wrapper.get_tracer_metadata()
-        self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
+        self.dynamics_data = generate_data_dict(DYNAMICS_PROPERTIES)
         if fv3gfs.wrapper.flags.override_surface_radiative_fluxes:
-            self.physics_data = {entry["name"]: entry for entry in PHYSICS_PROPERTIES}
+            self.physics_data = generate_data_dict(PHYSICS_PROPERTIES)
         else:
-            self.physics_data = {
-                entry["name"]: entry for entry in DEFAULT_PHYSICS_PROPERTIES
-            }
+            self.physics_data = generate_data_dict(DEFAULT_PHYSICS_PROPERTIES)
 
     def setUp(self):
         pass

@@ -1,5 +1,6 @@
 import unittest
 import os
+import numpy as np
 import fv3gfs.wrapper
 import fv3gfs.util
 from fv3gfs.wrapper._properties import FLAGSTRUCT_PROPERTIES, GFS_CONTROL_PROPERTIES
@@ -49,10 +50,27 @@ class FlagsTest(unittest.TestCase):
                 expected_type = FORTRAN_TO_PYTHON_TYPE[data["type_fortran"]]
                 self.assertIsInstance(result, expected_type)
 
+    def test_ptop(self):
+        """Test that getting a real flag produces its expected result."""
+        result = fv3gfs.wrapper.flags.ptop
+        expected = 64.247
+        np.testing.assert_allclose(result, expected)
+
+    def test_n_split(self):
+        """Test that getting an integer flag produces its expected result."""
+        result = fv3gfs.wrapper.flags.n_split
+        expected = 6
+        self.assertEqual(result, expected)
+
     def test_override_surface_radiative_fluxes(self):
         """Test that getting a boolean flag produces its expected result."""
         result = fv3gfs.wrapper.flags.override_surface_radiative_fluxes
         self.assertFalse(result)
+
+    def test_dt_atmos(self):
+        result = fv3gfs.wrapper.flags.dt_atmos
+        expected = 900
+        self.assertEqual(result, expected)
 
 
 if __name__ == "__main__":
