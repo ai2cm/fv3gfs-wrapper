@@ -40,6 +40,21 @@ class OverridingSurfaceRadiativeFluxTests(unittest.TestCase):
     def tearDown(self):
         MPI.COMM_WORLD.barrier()
 
+    def test_resetting_to_checkpoint_allows_for_exact_restart(self):
+        checkpoint_state = fv3gfs.wrapper.get_state(fv3gfs.wrapper.get_restart_names())
+
+        # Run the model forward a timestep and save the temperature.
+        fv3gfs.wrapper.step()
+        expected = get_state_single_variable("air_temperature")
+
+        # Restore state to original checkpoint; step the model forward again.
+        # Check that the temperature is identical as after the first time we
+        # took a step.
+        fv3gfs.wrapper.set_state(checkpoint_state)
+        fv3gfs.wrapper.step()
+        result = get_state_single_variable("air_temperature")
+        np.testing.assert_equal(result, expected)
+
     def test_overriding_fluxes_changes_model_state(self):
         checkpoint_state = fv3gfs.wrapper.get_state(fv3gfs.wrapper.get_restart_names())
 
