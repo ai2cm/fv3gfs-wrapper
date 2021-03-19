@@ -60,9 +60,6 @@ cdef extern:
 {% for item in flagstruct_properties %}
     void get_{{ item.fortran_name }}({{item.type_cython}} *{{ item.fortran_name }}_out)
 {% endfor %}
-{% for item in gfs_control_properties %}
-    void get_{{ item.fortran_name }}({{item.type_cython}} *{{ item.fortran_name }}_out)
-{% endfor %}
 
 cdef get_quantity_factory():
     cdef int nx, ny, nz, nz_soil
@@ -387,13 +384,6 @@ cpdef dict get_tracer_metadata():
 
 class Flags:
 {% for item in flagstruct_properties %}
-    @property
-    def {{item.name}}(self):
-        cdef {{item.type_cython}} {{item.name}}
-        get_{{item.fortran_name}}(&{{item.name}})
-        return {{item.name}}
-{% endfor %}
-{% for item in gfs_control_properties %}
     @property
     def {{item.name}}(self):
         cdef {{item.type_cython}} {{item.name}}

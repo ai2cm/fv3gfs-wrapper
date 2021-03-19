@@ -17,7 +17,7 @@ test_dir = os.path.dirname(os.path.abspath(__file__))
 ) = OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
 
 
-def randomly_override_surface_radiative_fluxes():
+def override_surface_radiative_fluxes_with_random_values():
     old_state = fv3gfs.wrapper.get_state(names=OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES)
     replace_state = deepcopy(old_state)
     for name, quantity in replace_state.items():
@@ -49,7 +49,7 @@ class OverridingSurfaceRadiativeFluxTests(unittest.TestCase):
         # Restore state to original checkpoint; modify the radiative fluxes;
         # step the model again.
         fv3gfs.wrapper.set_state(checkpoint_state)
-        randomly_override_surface_radiative_fluxes()
+        override_surface_radiative_fluxes_with_random_values()
         fv3gfs.wrapper.step()
         temperature_with_random_override = get_state_single_variable("air_temperature")
 
@@ -59,7 +59,7 @@ class OverridingSurfaceRadiativeFluxTests(unittest.TestCase):
         )
 
     def test_overriding_fluxes_are_propagated_to_diagnostics(self):
-        replace_state = randomly_override_surface_radiative_fluxes()
+        replace_state = override_surface_radiative_fluxes_with_random_values()
 
         # We need to step the model to fill the diagnostics buckets.
         fv3gfs.wrapper.step()

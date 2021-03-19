@@ -3,7 +3,7 @@ import os
 import numpy as np
 import fv3gfs.wrapper
 import fv3gfs.util
-from fv3gfs.wrapper._properties import FLAGSTRUCT_PROPERTIES, GFS_CONTROL_PROPERTIES
+from fv3gfs.wrapper._properties import FLAGSTRUCT_PROPERTIES
 from mpi4py import MPI
 
 from util import main
@@ -20,7 +20,6 @@ class FlagsTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(FlagsTest, self).__init__(*args, **kwargs)
         self.flagstruct_data = generate_data_dict(FLAGSTRUCT_PROPERTIES)
-        self.gfs_control_data = generate_data_dict(GFS_CONTROL_PROPERTIES)
         self.mpi_comm = MPI.COMM_WORLD
 
     def setUp(self):
@@ -31,19 +30,11 @@ class FlagsTest(unittest.TestCase):
 
     def test_flagstruct_properties_present_in_metadata(self):
         """Test that some small subset of flagstruct names are in the data dictionary"""
-        for name in ["do_adiabatic_init", "n_split"]:
+        for name in ["do_adiabatic_init", "override_surface_radiative_fluxes"]:
             self.assertIn(name, self.flagstruct_data.keys())
-
-    def test_gfs_control_properties_present_in_metadata(self):
-        """Test that some small subset of gfs_control names are in the data dictionary"""
-        for name in ["override_surface_radiative_fluxes"]:
-            self.assertIn(name, self.gfs_control_data.keys())
 
     def test_get_all_flagstruct_properties(self):
         self._get_all_properties_helper(self.flagstruct_data)
-
-    def test_get_all_gfs_control_properties(self):
-        self._get_all_properties_helper(self.gfs_control_data)
 
     def _get_all_properties_helper(self, properties):
         for name, data in properties.items():

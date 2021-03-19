@@ -93,7 +93,6 @@ if __name__ == "__main__":
         dynamics_properties.append(properties)
 
     flagstruct_properties = assign_types_to_flags(flagstruct_data)
-    gfs_control_properties = assign_types_to_flags(gfs_control_data)
 
     if len(requested_templates) == 0:
         requested_templates = all_templates
@@ -107,7 +106,6 @@ if __name__ == "__main__":
             physics_3d_properties=physics_3d_properties,
             dynamics_properties=dynamics_properties,
             flagstruct_properties=flagstruct_properties,
-            gfs_control_properties=gfs_control_properties,
             overriding_fluxes=OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES,
         )
         with open(out_filename, "w") as f:
