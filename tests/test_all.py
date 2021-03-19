@@ -28,7 +28,7 @@ class UsingMPITests(unittest.TestCase):
         _run_unittest_script("test_setters.py", "True")
 
     def test_overrides_for_surface_radiative_fluxes_modify_diagnostics(self):
-        _run_unittest_script("test_overrides_for_surface_fluxes_diagnostics.py")
+        _run_unittest_script("test_overrides_for_surface_radiative_fluxes.py")
 
     def test_diagnostics(self):
         _run_unittest_script("test_diagnostics.py")

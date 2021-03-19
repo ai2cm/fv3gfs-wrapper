@@ -40,7 +40,7 @@ class OverridingSurfaceRadiativeFluxTests(unittest.TestCase):
     def tearDown(self):
         MPI.COMM_WORLD.barrier()
 
-    def test_overriding_fluxes_change_model_state(self):
+    def test_overriding_fluxes_changes_model_state(self):
         checkpoint_state = fv3gfs.wrapper.get_state(fv3gfs.wrapper.get_restart_names())
 
         fv3gfs.wrapper.step()
@@ -58,7 +58,7 @@ class OverridingSurfaceRadiativeFluxTests(unittest.TestCase):
             temperature_with_default_override, temperature_with_random_override
         )
 
-    def test_overriding_fluxes_are_propagated_diagnostics(self):
+    def test_overriding_fluxes_are_propagated_to_diagnostics(self):
         replace_state = randomly_override_surface_radiative_fluxes()
 
         # We need to step the model to fill the diagnostics buckets.
