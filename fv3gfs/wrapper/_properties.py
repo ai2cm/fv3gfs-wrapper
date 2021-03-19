@@ -18,7 +18,7 @@ with open(os.path.join(DIR, "gfs_control_properties.json"), "r") as f:
 OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES = [
     "override_for_time_adjusted_total_sky_downward_longwave_flux_at_surface",
     "override_for_time_adjusted_total_sky_downward_shortwave_flux_at_surface",
-    "override_for_time_adjusted_total_sky_net_shortwave_flux_at_surface"
+    "override_for_time_adjusted_total_sky_net_shortwave_flux_at_surface",
 ]
 
 DIM_NAMES = {

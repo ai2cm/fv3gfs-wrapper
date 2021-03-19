@@ -4,7 +4,11 @@ import sys
 from copy import deepcopy
 import numpy as np
 import fv3gfs.wrapper
-from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES, OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
+from fv3gfs.wrapper._properties import (
+    DYNAMICS_PROPERTIES,
+    PHYSICS_PROPERTIES,
+    OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES,
+)
 import fv3gfs.util
 from mpi4py import MPI
 from util import main
@@ -12,7 +16,9 @@ import yaml
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_PHYSICS_PROPERTIES = [
-    entry for entry in PHYSICS_PROPERTIES if entry["name"] not in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
+    entry
+    for entry in PHYSICS_PROPERTIES
+    if entry["name"] not in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
 ]
 
 
@@ -30,8 +36,7 @@ class SetterTests(unittest.TestCase):
             self.physics_data = {entry["name"]: entry for entry in PHYSICS_PROPERTIES}
         else:
             self.physics_data = {
-                entry["name"]: entry
-                for entry in DEFAULT_PHYSICS_PROPERTIES
+                entry["name"]: entry for entry in DEFAULT_PHYSICS_PROPERTIES
             }
 
     def setUp(self):

@@ -4,7 +4,11 @@ import numpy as np
 import yaml
 import fv3gfs.wrapper
 import fv3gfs.util
-from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES, OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
+from fv3gfs.wrapper._properties import (
+    DYNAMICS_PROPERTIES,
+    PHYSICS_PROPERTIES,
+    OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES,
+)
 from mpi4py import MPI
 
 from util import main
@@ -12,7 +16,9 @@ from util import main
 test_dir = os.path.dirname(os.path.abspath(__file__))
 MM_PER_M = 1000
 DEFAULT_PHYSICS_PROPERTIES = [
-    entry for entry in PHYSICS_PROPERTIES if entry["name"] not in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
+    entry
+    for entry in PHYSICS_PROPERTIES
+    if entry["name"] not in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
 ]
 
 
@@ -162,9 +168,7 @@ class GetterTests(unittest.TestCase):
         self.assertEqual(len(name_list), len(state.keys()))
 
     def _get_unallocated_name_helper(self, name):
-        with self.assertRaisesRegex(
-            fv3gfs.util.InvalidQuantityError, "Overriding"
-        ):
+        with self.assertRaisesRegex(fv3gfs.util.InvalidQuantityError, "Overriding"):
             fv3gfs.wrapper.get_state(names=[name])
 
     def test_unallocated_physics_properties(self):

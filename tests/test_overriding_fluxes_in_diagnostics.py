@@ -10,8 +10,12 @@ from util import main
 import yaml
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
-DOWNWARD_LONGWAVE = "override_for_time_adjusted_total_sky_downward_longwave_flux_at_surface"
-DOWNWARD_SHORTWAVE = "override_for_time_adjusted_total_sky_downward_shortwave_flux_at_surface"
+DOWNWARD_LONGWAVE = (
+    "override_for_time_adjusted_total_sky_downward_longwave_flux_at_surface"
+)
+DOWNWARD_SHORTWAVE = (
+    "override_for_time_adjusted_total_sky_downward_shortwave_flux_at_surface"
+)
 NET_SHORTWAVE = "override_for_time_adjusted_total_sky_net_shortwave_flux_at_surface"
 
 
@@ -26,7 +30,9 @@ class OverridingFluxDiagnosticsTests(unittest.TestCase):
         MPI.COMM_WORLD.barrier()
 
     def test_overriding_fluxes_are_propagated_diagnostics(self):
-        old_state = fv3gfs.wrapper.get_state(names=OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES)
+        old_state = fv3gfs.wrapper.get_state(
+            names=OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
+        )
         replace_state = deepcopy(old_state)
         for name, quantity in replace_state.items():
             quantity.view[:] = np.random.uniform(size=quantity.extent)
@@ -37,7 +43,8 @@ class OverridingFluxDiagnosticsTests(unittest.TestCase):
 
         expected_DSWRFI = replace_state[DOWNWARD_SHORTWAVE].view[:]
         expected_DLWRFI = replace_state[DOWNWARD_LONGWAVE].view[:]
-        expected_USWRFI = (replace_state[DOWNWARD_SHORTWAVE].view[:]
+        expected_USWRFI = (
+            replace_state[DOWNWARD_SHORTWAVE].view[:]
             - replace_state[NET_SHORTWAVE].view[:]
         )
 
