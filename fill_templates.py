@@ -72,9 +72,6 @@ if __name__ == "__main__":
     flagstruct_data = json.load(
         open(os.path.join(PROPERTIES_DIR, "flagstruct_properties.json"))
     )
-    gfs_control_data = json.load(
-        open(os.path.join(PROPERTIES_DIR, "gfs_control_properties.json"))
-    )
 
     physics_2d_properties = []
     physics_3d_properties = []
