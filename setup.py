@@ -28,7 +28,6 @@ relative_wrapper_build_filenames = [
     "lib/physics_data.o",
     "lib/dynamics_data.o",
     "lib/flagstruct_data.o",
-    "lib/gfs_control_data.o",
 ]
 
 wrapper_build_filenames = []
