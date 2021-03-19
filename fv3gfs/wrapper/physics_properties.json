@@ -464,21 +464,21 @@
         "dims": ["z_soil", "y", "x"]
     },
     {
-        "name": "total_sky_downward_longwave_flux_at_surface_override",
+        "name": "override_for_time_adjusted_total_sky_downward_longwave_flux_at_surface",
         "fortran_name": "adjsfcdlw_override",
         "units": "W/m^2",
         "container": "Statein",
         "dims": ["y", "x"]
     },
     {
-        "name": "total_sky_downward_shortwave_flux_at_surface_override",
+        "name": "override_for_time_adjusted_total_sky_downward_shortwave_flux_at_surface",
         "fortran_name": "adjsfcdsw_override",
         "units": "W/m^2",
         "container": "Statein",
         "dims": ["y", "x"]
     },
     {
-        "name": "total_sky_net_shortwave_flux_at_surface_override",
+        "name": "override_for_time_adjusted_total_sky_net_shortwave_flux_at_surface",
         "fortran_name": "adjsfcnsw_override",
         "units": "W/m^2",
         "container": "Statein",

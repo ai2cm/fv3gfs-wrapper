@@ -14,5 +14,5 @@ module gfs_control_data_mod
     end subroutine get_{{ item.fortran_name }}
     {% endfor %}
         
-    end module gfs_control_data_mod
+end module gfs_control_data_mod
     

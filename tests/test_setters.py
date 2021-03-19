@@ -4,20 +4,15 @@ import sys
 from copy import deepcopy
 import numpy as np
 import fv3gfs.wrapper
-from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
+from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES, OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
 import fv3gfs.util
 from mpi4py import MPI
 from util import main
 import yaml
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
-OVERRIDING_FLUXES = [
-    "total_sky_downward_longwave_flux_at_surface_override",
-    "total_sky_downward_shortwave_flux_at_surface_override",
-    "total_sky_net_shortwave_flux_at_surface_override",
-]
-PHYSICS_PROPERTIES_MINUS_OVERRIDING_FLUXES = [
-    entry for entry in PHYSICS_PROPERTIES if entry["name"] not in OVERRIDING_FLUXES
+DEFAULT_PHYSICS_PROPERTIES = [
+    entry for entry in PHYSICS_PROPERTIES if entry["name"] not in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
 ]
 
 
@@ -36,7 +31,7 @@ class SetterTests(unittest.TestCase):
         else:
             self.physics_data = {
                 entry["name"]: entry
-                for entry in PHYSICS_PROPERTIES_MINUS_OVERRIDING_FLUXES
+                for entry in DEFAULT_PHYSICS_PROPERTIES
             }
 
     def setUp(self):
@@ -189,22 +184,20 @@ class SetterTests(unittest.TestCase):
     def assert_values_equal(self, quantity1, quantity2):
         self.assertTrue(quantity1.np.all(quantity1.view[:] == quantity2.view[:]))
 
-    def _set_unallocated_overriding_surface_flux_helper(self, name):
+    def _set_unallocated_override_for_radiative_surface_flux(self, name):
         config = get_config()
         sizer = fv3gfs.util.SubtileGridSizer.from_namelist(config["namelist"])
         factory = fv3gfs.util.QuantityFactory(sizer, np)
         quantity = factory.zeros(["x", "y"], units="W/m**2")
-        with self.assertRaisesRegex(
-            fv3gfs.util.InvalidQuantityError, "Overriding surface"
-        ):
+        with self.assertRaisesRegex(fv3gfs.util.InvalidQuantityError, "Overriding"):
             fv3gfs.wrapper.set_state({name: quantity})
 
-    def test_set_unallocated_overriding_surface_fluxes(self):
+    def test_set_unallocated_override_for_radiative_surface_flux(self):
         if fv3gfs.wrapper.flags.override_surface_radiative_fluxes:
             self.skipTest("Memory is allocated for the overriding fluxes in this case.")
-        for name in OVERRIDING_FLUXES:
+        for name in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES:
             with self.subTest(name):
-                self._set_unallocated_overriding_surface_flux_helper(name)
+                self._set_unallocated_override_for_radiative_surface_flux(name)
 
 
 def get_override_surface_radiative_fluxes():

@@ -4,20 +4,15 @@ import numpy as np
 import yaml
 import fv3gfs.wrapper
 import fv3gfs.util
-from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
+from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES, OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
 from mpi4py import MPI
 
 from util import main
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 MM_PER_M = 1000
-OVERRIDING_FLUXES = [
-    "total_sky_downward_longwave_flux_at_surface_override",
-    "total_sky_downward_shortwave_flux_at_surface_override",
-    "total_sky_net_shortwave_flux_at_surface_override",
-]
-ALLOCATED_PHYSICS_PROPERTIES = [
-    entry for entry in PHYSICS_PROPERTIES if entry["name"] not in OVERRIDING_FLUXES
+DEFAULT_PHYSICS_PROPERTIES = [
+    entry for entry in PHYSICS_PROPERTIES if entry["name"] not in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
 ]
 
 
@@ -32,7 +27,7 @@ class GetterTests(unittest.TestCase):
         self.tracer_data = fv3gfs.wrapper.get_tracer_metadata()
         self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
         self.physics_data = {
-            entry["name"]: entry for entry in ALLOCATED_PHYSICS_PROPERTIES
+            entry["name"]: entry for entry in DEFAULT_PHYSICS_PROPERTIES
         }
         self.mpi_comm = MPI.COMM_WORLD
 
@@ -168,12 +163,12 @@ class GetterTests(unittest.TestCase):
 
     def _get_unallocated_name_helper(self, name):
         with self.assertRaisesRegex(
-            fv3gfs.util.InvalidQuantityError, "Overriding surface"
+            fv3gfs.util.InvalidQuantityError, "Overriding"
         ):
             fv3gfs.wrapper.get_state(names=[name])
 
     def test_unallocated_physics_properties(self):
-        for name in OVERRIDING_FLUXES:
+        for name in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES:
             with self.subTest(name):
                 self._get_unallocated_name_helper(name)
 
