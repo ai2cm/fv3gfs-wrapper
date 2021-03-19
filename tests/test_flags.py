@@ -12,13 +12,15 @@ test_dir = os.path.dirname(os.path.abspath(__file__))
 FORTRAN_TO_PYTHON_TYPE = {"integer": int, "real": float, "logical": bool}
 
 
+def generate_data_dict(properties):
+    return {entry["name"]: entry for entry in properties}
+
+
 class FlagsTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(FlagsTest, self).__init__(*args, **kwargs)
-        self.flagstruct_data = {entry["name"]: entry for entry in FLAGSTRUCT_PROPERTIES}
-        self.gfs_control_data = {
-            entry["name"]: entry for entry in GFS_CONTROL_PROPERTIES
-        }
+        self.flagstruct_data = generate_data_dict(FLAGSTRUCT_PROPERTIES)
+        self.gfs_control_data = generate_data_dict(GFS_CONTROL_PROPERTIES)
         self.mpi_comm = MPI.COMM_WORLD
 
     def setUp(self):
