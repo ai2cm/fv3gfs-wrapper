@@ -11,6 +11,7 @@ RESTART_EXCLUDE_NAMES = [
     "convective_cloud_fraction",
     "convective_cloud_top_pressure",
     "convective_cloud_bottom_pressure",
+    "prescribed_sst",
 ] + OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
 
 

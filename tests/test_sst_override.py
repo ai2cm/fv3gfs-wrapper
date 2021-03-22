@@ -11,8 +11,8 @@ from util import get_default_config, main
 test_dir = os.path.dirname(os.path.abspath(__file__))
 
 
-def override_ocean_surface_temperature_with_random_values():
-    old_state = fv3gfs.wrapper.get_state(names=["ocean_surface_temperature"])
+def prescribe_sea_surface_temperature_with_random_values():
+    old_state = fv3gfs.wrapper.get_state(names=["prescribed_sst"])
     replace_state = deepcopy(old_state)
     for name, quantity in replace_state.items():
         quantity.view[:] = np.random.uniform(size=quantity.extent)
@@ -49,7 +49,7 @@ class OverridingSSTTests(unittest.TestCase):
         result = get_state_single_variable("air_temperature")
         np.testing.assert_equal(result, expected)
 
-    def test_overriding_sst_changes_model_state(self):
+    def test_prescribing_sst_changes_model_state(self):
         checkpoint_state = fv3gfs.wrapper.get_state(fv3gfs.wrapper.get_restart_names())
 
         fv3gfs.wrapper.step()
@@ -58,7 +58,7 @@ class OverridingSSTTests(unittest.TestCase):
         # Restore state to original checkpoint; modify the SST;
         # step the model again.
         fv3gfs.wrapper.set_state(checkpoint_state)
-        override_ocean_surface_temperature_with_random_values()
+        prescribe_sea_surface_temperature_with_random_values()
         fv3gfs.wrapper.step()
         temperature_with_random_override = get_state_single_variable("air_temperature")
 
@@ -70,4 +70,5 @@ class OverridingSSTTests(unittest.TestCase):
 
 if __name__ == "__main__":
     config = get_default_config()
+    config["namelist"]["gfs_physics_nml"]["prescribe_sst_from_wrapper"] = True
     main(test_dir, config)

@@ -40,7 +40,7 @@ class UsingMPITests(unittest.TestCase):
     def test_flags(self):
         run_unittest_script("test_flags.py")
 
-    def test_getters(self):
+    def test_sst_override(self):
         run_unittest_script("test_sst_override.py")
 
 

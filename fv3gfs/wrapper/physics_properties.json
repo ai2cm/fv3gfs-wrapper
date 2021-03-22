@@ -483,5 +483,12 @@
         "units": "W/m^2",
         "container": "Statein",
         "dims": ["y", "x"]
+    },
+    {
+        "name": "prescribed_sst",
+        "fortran_name": "sst_from_wrapper",
+        "units": "K",
+        "container": "Statein",
+        "dims": ["y", "x"]
     }
 ]
