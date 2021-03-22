@@ -11,23 +11,14 @@ from fv3gfs.wrapper._properties import (
 )
 import fv3gfs.util
 from mpi4py import MPI
-from util import main
-import yaml
+from util import get_current_config, get_default_config, generate_data_dict, main
+
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_PHYSICS_PROPERTIES = []
 for entry in PHYSICS_PROPERTIES:
     if entry["name"] not in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES:
         DEFAULT_PHYSICS_PROPERTIES.append(entry)
-
-
-def get_config():
-    with open("fv3config.yml") as f:
-        return yaml.safe_load(f)
-
-
-def generate_data_dict(properties):
-    return {entry["name"]: entry for entry in properties}
 
 
 class SetterTests(unittest.TestCase):
@@ -191,7 +182,7 @@ class SetterTests(unittest.TestCase):
         self.assertTrue(quantity1.np.all(quantity1.view[:] == quantity2.view[:]))
 
     def _set_unallocated_override_for_radiative_surface_flux(self, name):
-        config = get_config()
+        config = get_current_config()
         sizer = fv3gfs.util.SubtileGridSizer.from_namelist(config["namelist"])
         factory = fv3gfs.util.QuantityFactory(sizer, np)
         quantity = factory.zeros(["x", "y"], units="W/m**2")
@@ -215,17 +206,18 @@ def get_override_surface_radiative_fluxes():
     if len(sys.argv) != 2:
         raise ValueError(
             "test_setters.py requires a single argument "
-            "be passed through the command line."
+            "be passed through the command line, indicating the value of "
+            "the gfs_physics_nml.override_surface_radiative_fluxes flag "
+            "('true' or 'false')."
         )
-    override_surface_radiative_fluxes = sys.argv.pop()
+    override_surface_radiative_fluxes = sys.argv.pop().lower()
 
     # Convert string argument to bool.
-    return override_surface_radiative_fluxes == "True"
+    return override_surface_radiative_fluxes == "true"
 
 
 if __name__ == "__main__":
-    with open(os.path.join(test_dir, "default_config.yml"), "r") as f:
-        config = yaml.safe_load(f)
+    config = get_default_config()
     override_surface_radiative_fluxes = get_override_surface_radiative_fluxes()
     config["namelist"]["gfs_physics_nml"][
         "override_surface_radiative_fluxes"

@@ -11,14 +11,11 @@ is required.  Valid calendars are:
  """
 import sys
 import unittest
-import yaml
 import os
-import shutil
 import cftime
-import fv3config
 import fv3gfs.wrapper
 from mpi4py import MPI
-from util import redirect_stdout
+from util import get_default_config, main
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -64,28 +61,7 @@ def set_calendar_type():
 
 
 if __name__ == "__main__":
-    rank = MPI.COMM_WORLD.Get_rank()
     calendar = set_calendar_type()
-    config = yaml.safe_load(open(os.path.join(test_dir, "default_config.yml"), "r"))
+    config = get_default_config()
     config["namelist"]["coupler_nml"]["calendar"] = calendar
-    rundir = os.path.join(test_dir, "rundir")
-    if rank == 0:
-        if os.path.isdir(rundir):
-            shutil.rmtree(rundir)
-        fv3config.write_run_directory(config, rundir)
-    MPI.COMM_WORLD.barrier()
-    original_path = os.getcwd()
-    os.chdir(rundir)
-    try:
-        with redirect_stdout(os.devnull):
-            fv3gfs.wrapper.initialize()
-            MPI.COMM_WORLD.barrier()
-        if rank != 0:
-            kwargs = {"verbosity": 0}
-        else:
-            kwargs = {"verbosity": 2}
-        unittest.main(**kwargs)
-    finally:
-        os.chdir(original_path)
-        if rank == 0:
-            shutil.rmtree(rundir)
+    main(test_dir, config)

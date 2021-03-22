@@ -6,8 +6,8 @@ import numpy as np
 import fv3gfs.wrapper
 import fv3gfs.util
 from mpi4py import MPI
-from util import main
-import yaml
+from util import get_default_config, main
+
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 (
@@ -103,7 +103,6 @@ class OverridingSurfaceRadiativeFluxTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    with open(os.path.join(test_dir, "default_config.yml"), "r") as f:
-        config = yaml.safe_load(f)
+    config = get_default_config()
     config["namelist"]["gfs_physics_nml"]["override_surface_radiative_fluxes"] = True
     main(test_dir, config)

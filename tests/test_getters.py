@@ -1,7 +1,6 @@
 import unittest
 import os
 import numpy as np
-import yaml
 import fv3gfs.wrapper
 import fv3gfs.util
 from fv3gfs.wrapper._properties import (
@@ -10,8 +9,8 @@ from fv3gfs.wrapper._properties import (
     OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES,
 )
 from mpi4py import MPI
+from util import get_current_config, get_default_config, generate_data_dict, main
 
-from util import main
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 MM_PER_M = 1000
@@ -19,15 +18,6 @@ DEFAULT_PHYSICS_PROPERTIES = []
 for entry in PHYSICS_PROPERTIES:
     if entry["name"] not in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES:
         DEFAULT_PHYSICS_PROPERTIES.append(entry)
-
-
-def get_config():
-    with open("fv3config.yml") as f:
-        return yaml.safe_load(f)
-
-
-def generate_data_dict(properties):
-    return {entry["name"]: entry for entry in properties}
 
 
 class GetterTests(unittest.TestCase):
@@ -103,7 +93,7 @@ class GetterTests(unittest.TestCase):
         )
         total_precip = state["total_precipitation"]
         precip_rate = state["surface_precipitation_rate"]
-        config = get_config()
+        config = get_current_config()
         dt = config["namelist"]["coupler_nml"]["dt_atmos"]
         np.testing.assert_allclose(
             MM_PER_M * total_precip.view[:] / dt, precip_rate.view[:]
@@ -219,4 +209,5 @@ class TracerMetadataTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    main(test_dir)
+    config = get_default_config()
+    main(test_dir, config)

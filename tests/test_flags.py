@@ -6,14 +6,10 @@ import fv3gfs.util
 from fv3gfs.wrapper._properties import FLAGSTRUCT_PROPERTIES
 from mpi4py import MPI
 
-from util import main
+from util import get_default_config, generate_data_dict, main
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 FORTRAN_TO_PYTHON_TYPE = {"integer": int, "real": float, "logical": bool}
-
-
-def generate_data_dict(properties):
-    return {entry["name"]: entry for entry in properties}
 
 
 class FlagsTest(unittest.TestCase):
@@ -67,4 +63,5 @@ class FlagsTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    main(test_dir)
+    config = get_default_config()
+    main(test_dir, config)

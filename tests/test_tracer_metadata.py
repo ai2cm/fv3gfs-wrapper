@@ -1,11 +1,7 @@
 import unittest
 import os
-import shutil
-import yaml
-from mpi4py import MPI
-import fv3config
 import fv3gfs.wrapper
-from util import redirect_stdout
+from util import get_default_config, main
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 rundir = os.path.join(test_dir, "rundir")
@@ -81,8 +77,7 @@ class TracerMetadataTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    with open(os.path.join(test_dir, "default_config.yml"), "r") as f:
-        config = yaml.safe_load(f)
+    config = get_default_config()
     config[
         "initial_conditions"
     ] = "gs://vcm-fv3config/data/initial_conditions/c12_restart_initial_conditions/v1.0"
@@ -92,23 +87,4 @@ if __name__ == "__main__":
     config["namelist"]["fv_core_nml"]["mountain"] = True
     config["namelist"]["fv_core_nml"]["warm_start"] = True
     config["namelist"]["fv_core_nml"]["na_init"] = 0
-    if MPI.COMM_WORLD.Get_rank() == 0:
-        if os.path.isdir(rundir):
-            shutil.rmtree(rundir)
-        fv3config.write_run_directory(config, rundir)
-    MPI.COMM_WORLD.barrier()
-    original_path = os.getcwd()
-    os.chdir(rundir)
-    try:
-        with redirect_stdout(os.devnull):
-            fv3gfs.wrapper.initialize()
-            MPI.COMM_WORLD.barrier()
-        if MPI.COMM_WORLD.Get_rank() != 0:
-            kwargs = {"verbosity": 0}
-        else:
-            kwargs = {"verbosity": 2}
-        unittest.main(**kwargs)
-    finally:
-        os.chdir(original_path)
-        if MPI.COMM_WORLD.Get_rank() == 0:
-            shutil.rmtree(rundir)
+    main(test_dir, config)

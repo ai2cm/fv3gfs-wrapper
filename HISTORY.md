@@ -7,13 +7,19 @@ Unreleased
 Minor changes:
 - Added getters and setters for `Statein%adjsfcdlw_override`,
   `Statein%adjsfcdsw_override`, and `Statein%adjsfcnsw_override`.  These
-  correspond to the downward longwave radiative flux at the surface, the
-  downward shortwave radiative flux at the surface, and the net shortwave
-  radiative flux at the surface, respectively.  Note they are only available if
-  the `gfs_physics_nml.override_surface_radiative_fluxes` namelist parameter is
-  set to `.true.`.
-- Added getter and setter for `Radtend%sfalb`, the average albedo of the
-  surface.
+  correspond to the time adjusted total sky downward longwave radiative flux at
+  the surface, the time adjusted total sky downward shortwave radiative flux at
+  the surface, and the time adjusted total sky net shortwave radiative flux at
+  the surface, respectively.  Note they are only available if the
+  `gfs_physics_nml.override_surface_radiative_fluxes` namelist parameter is set
+  to `.true.`.
+- Added getter and setter for `Radtend%sfalb`, the surface diffused shortwave
+  albedo.
+- Added flags for the physics timestep, `dt_atmos`, and namelist flag for
+  overriding the surface radiative fluxes, `override_surface_radiative_fluxes`,
+  to the `Flags` class.
+- Fixed a bug in the implementation of boolean flags that prevented them from
+  working properly; to date the only flag this impacted was `do_adiabatic_init`.
 
 v0.6.0 (2021-01-27)
 -------------------
