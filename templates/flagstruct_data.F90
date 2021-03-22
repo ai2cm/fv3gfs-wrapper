@@ -1,6 +1,7 @@
 module flagstruct_data_mod
 
 use atmosphere_mod, only: Atm, mytile
+use atmos_model_mod, only: IPD_Control
 use fv_nwp_nudge_mod, only: do_adiabatic_init
 use iso_c_binding
 
@@ -11,7 +12,7 @@ contains
 {% for item in flagstruct_properties %}
     {% if item.fortran_name == "do_adiabatic_init" %}
     subroutine get_do_adiabatic_init(do_adiabatic_init_out) bind(c)
-        logical(c_bool), intent(out) :: do_adiabatic_init_out
+        logical(c_int), intent(out) :: do_adiabatic_init_out
         do_adiabatic_init_out = do_adiabatic_init
     end subroutine get_do_adiabatic_init
     {% else %}
@@ -21,6 +22,8 @@ contains
         {{ item.fortran_name }}_out = Atm(mytile)%flagstruct%{{ item.fortran_name }}
         {% elif item.location == "Atm" %}
         {{ item.fortran_name }}_out = Atm(mytile)%{{ item.fortran_name }}
+        {% elif item.location == "IPD_Control" %}
+        {{ item.fortran_name }}_out = IPD_Control%{{ item.fortran_name }}
         {% endif %}
     end subroutine get_{{ item.fortran_name }}
     {% endif %}

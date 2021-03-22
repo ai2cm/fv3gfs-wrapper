@@ -13,9 +13,11 @@ from mpi4py import MPI
 
 libc = ctypes.CDLL(None)
 c_stdout = ctypes.c_void_p.in_dll(libc, "stdout")
+base_dir = os.path.dirname(os.path.realpath(__file__))
 
 
-def run_unittest_script(filename, *args, n_processes=6):
+def run_unittest_script(script_name, *args, n_processes=6):
+    filename = os.path.join(base_dir, script_name)
     python_args = ["python3", "-m", "mpi4py", filename] + list(args)
     subprocess.check_call(["mpirun", "-n", str(n_processes)] + python_args)
 
@@ -74,10 +76,8 @@ class StdoutRedirector(object):
         sys.stdout = io.TextIOWrapper(os.fdopen(self._stdout_file_descriptor, "wb"))
 
 
-def main(test_dir):
+def main(test_dir, config):
     rank = MPI.COMM_WORLD.Get_rank()
-    with open(os.path.join(test_dir, "default_config.yml"), "r") as f:
-        config = yaml.safe_load(f)
     rundir = os.path.join(test_dir, "rundir")
     if rank == 0:
         if os.path.isdir(rundir):
@@ -99,3 +99,17 @@ def main(test_dir):
         os.chdir(original_path)
         if rank == 0:
             shutil.rmtree(rundir)
+
+
+def get_default_config():
+    with open(os.path.join(base_dir, "default_config.yml"), "r") as f:
+        return yaml.safe_load(f)
+
+
+def get_current_config():
+    with open("fv3config.yml") as f:
+        return yaml.safe_load(f)
+
+
+def generate_data_dict(properties):
+    return {entry["name"]: entry for entry in properties}
