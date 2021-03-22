@@ -12,7 +12,7 @@ test_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 def prescribe_sea_surface_temperature_with_random_values():
-    old_state = fv3gfs.wrapper.get_state(names=["prescribed_sst"])
+    old_state = fv3gfs.wrapper.get_state(names=["ocean_surface_temperature"])
     replace_state = deepcopy(old_state)
     for name, quantity in replace_state.items():
         quantity.view[:] = np.random.uniform(size=quantity.extent)

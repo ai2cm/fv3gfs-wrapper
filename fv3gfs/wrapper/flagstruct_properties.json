@@ -34,5 +34,11 @@
         "fortran_name" : "override_surface_radiative_fluxes",
         "location" : "IPD_Control",
         "type_fortran": "logical"
+    },
+    {
+        "name": "prescribe_sst_from_wrapper",
+        "fortran_name" : "prescribe_sst_from_wrapper",
+        "location" : "IPD_Control",
+        "type_fortran": "logical"
     }
 ]
