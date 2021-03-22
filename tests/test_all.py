@@ -14,10 +14,10 @@ class UsingMPITests(unittest.TestCase):
         run_unittest_script("test_getters.py")
 
     def test_setters_default(self):
-        run_unittest_script("test_setters.py", "False")
+        run_unittest_script("test_setters.py", "false")
 
     def test_setters_while_overriding_surface_radiative_fluxes(self):
-        run_unittest_script("test_setters.py", "True")
+        run_unittest_script("test_setters.py", "true")
 
     def test_overrides_for_surface_radiative_fluxes_modify_diagnostics(self):
         run_unittest_script("test_overrides_for_surface_radiative_fluxes.py")
