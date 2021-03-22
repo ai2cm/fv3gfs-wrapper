@@ -51,8 +51,7 @@ class PrescribeSSTTests(unittest.TestCase):
             "air_temperature"
         )
 
-        # If the SST modification were working properly, we would expect these
-        # states to differ.
+        # We expect these states to differ.
         assert not np.array_equal(
             air_temperature_from_default_ocean_temperature,
             air_temperature_from_prescribed_ocean_temperature,
