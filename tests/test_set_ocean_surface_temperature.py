@@ -53,19 +53,24 @@ class PrescribeSSTTests(unittest.TestCase):
         checkpoint_state = fv3gfs.wrapper.get_state(fv3gfs.wrapper.get_restart_names())
 
         fv3gfs.wrapper.step()
-        air_temperature_from_default_ocean_temperature = get_state_single_variable("air_temperature")
+        air_temperature_from_default_ocean_temperature = get_state_single_variable(
+            "air_temperature"
+        )
 
         # Restore state to original checkpoint; modify the SST;
         # step the model again.
         fv3gfs.wrapper.set_state(checkpoint_state)
         prescribe_sea_surface_temperature_with_random_values()
         fv3gfs.wrapper.step()
-        air_temperature_from_prescribed_ocean_temperature = get_state_single_variable("air_temperature")
+        air_temperature_from_prescribed_ocean_temperature = get_state_single_variable(
+            "air_temperature"
+        )
 
         # If the SST modification were working properly, we would expect these
         # states to differ.
         assert not np.array_equal(
-            air_temperature_from_default_ocean_temperature, air_temperature_from_prescribed_ocean_temperature
+            air_temperature_from_default_ocean_temperature,
+            air_temperature_from_prescribed_ocean_temperature,
         )
 
 
