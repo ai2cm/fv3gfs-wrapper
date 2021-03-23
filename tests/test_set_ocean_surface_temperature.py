@@ -48,7 +48,7 @@ class PrescribeSSTTests(unittest.TestCase):
         )
 
         # We expect these states to differ.
-        assert not np.array_equal(
+        assert not np.assert_allclose(
             air_temperature_from_default_ocean_temperature,
             air_temperature_from_prescribed_ocean_temperature,
         )
@@ -69,5 +69,5 @@ class PrescribeSSTTests(unittest.TestCase):
 
 if __name__ == "__main__":
     config = get_default_config()
-    config["namelist"]["gfs_physics_nml"]["override_ocean_surface_temperature"] = True
+    config["namelist"]["gfs_physics_nml"]["use_climatological_sst"] = False
     main(test_dir, config)
