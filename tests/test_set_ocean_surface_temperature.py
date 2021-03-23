@@ -48,7 +48,7 @@ class PrescribeSSTTests(unittest.TestCase):
         )
 
         # We expect these states to differ.
-        assert not np.assert_allclose(
+        assert not np.isclose(
             air_temperature_from_default_ocean_temperature,
             air_temperature_from_prescribed_ocean_temperature,
         )
