@@ -124,3 +124,7 @@ def replace_state_with_random_values(names):
         quantity.view[:] = np.random.uniform(size=quantity.extent)
     fv3gfs.wrapper.set_state(replace_state)
     return replace_state
+
+
+def get_state_single_variable(name):
+    return fv3gfs.wrapper.get_state([name])[name].view[:]

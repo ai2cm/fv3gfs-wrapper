@@ -5,7 +5,7 @@ import numpy as np
 import fv3gfs.wrapper
 import fv3gfs.util
 from mpi4py import MPI
-from util import get_default_config, main, replace_state_with_random_values
+from util import get_default_config, get_state_single_variable, main, replace_state_with_random_values
 
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
@@ -14,10 +14,6 @@ test_dir = os.path.dirname(os.path.abspath(__file__))
     DOWNWARD_SHORTWAVE,
     NET_SHORTWAVE,
 ) = OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
-
-
-def get_state_single_variable(name):
-    return fv3gfs.wrapper.get_state([name])[name].view[:]
 
 
 class OverridingSurfaceRadiativeFluxTests(unittest.TestCase):
