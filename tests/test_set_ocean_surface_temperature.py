@@ -24,6 +24,11 @@ def get_state_single_variable(name):
     return fv3gfs.wrapper.get_state([name])[name].view[:]
 
 
+def mask_non_ocean_values(field):
+    is_ocean = np.isclose(get_state_single_variable(["land_sea_mask"]), 0.0)
+    return np.where(is_ocean, field, np.nan)
+
+
 class PrescribeSSTTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(PrescribeSSTTests, self).__init__(*args, **kwargs)
@@ -57,8 +62,18 @@ class PrescribeSSTTests(unittest.TestCase):
             air_temperature_from_prescribed_ocean_temperature,
         )
 
+    def test_prescribing_sst_changes_surface_temperature_diagnostic(self):
+        replaced_state = prescribe_sea_surface_temperature_with_random_values()
+        prescribed_sst = replaced_state["ocean_surface_temperature"]
+        fv3gfs.wrapper.step()
+        surface_temperature_diagnostic = fv3gfs.wrapper.get_diagnostic_by_name("tsfc")
+
+        # Over the ocean we expect these results to be equal.
+        result = mask_non_ocean_values(surface_temperature_diagnostic)
+        expected = mask_non_ocean_values(prescribed_sst)
+        np.testing.assert_allclose(result, expected)
 
 if __name__ == "__main__":
     config = get_default_config()
-    config["namelist"]["gfs_physics_nml"]["prescribe_sst_from_wrapper"] = True
+    config["namelist"]["gfs_physics_nml"]["override_sea_surface_temperature"] = True
     main(test_dir, config)
