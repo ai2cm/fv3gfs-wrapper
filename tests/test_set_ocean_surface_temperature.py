@@ -1,23 +1,13 @@
 import unittest
 import os
-from copy import deepcopy
 import numpy as np
 import fv3gfs.wrapper
 import fv3gfs.util
 from mpi4py import MPI
-from util import get_default_config, main
+from util import get_default_config, main, replace_state_with_random_values
 
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
-
-
-def prescribe_sea_surface_temperature_with_random_values():
-    old_state = fv3gfs.wrapper.get_state(names=["ocean_surface_temperature"])
-    replace_state = deepcopy(old_state)
-    for name, quantity in replace_state.items():
-        quantity.view[:] = np.random.uniform(size=quantity.extent)
-    fv3gfs.wrapper.set_state(replace_state)
-    return replace_state
 
 
 def get_state_single_variable(name):
@@ -50,7 +40,7 @@ class PrescribeSSTTests(unittest.TestCase):
         # Restore state to original checkpoint; modify the SST;
         # step the model again.
         fv3gfs.wrapper.set_state(checkpoint_state)
-        prescribe_sea_surface_temperature_with_random_values()
+        replace_state_with_random_values(["ocean_surface_temperature"])
         fv3gfs.wrapper.step()
         air_temperature_from_prescribed_ocean_temperature = get_state_single_variable(
             "air_temperature"
@@ -63,7 +53,7 @@ class PrescribeSSTTests(unittest.TestCase):
         )
 
     def test_prescribing_sst_changes_surface_temperature_diagnostic(self):
-        replaced_state = prescribe_sea_surface_temperature_with_random_values()
+        replaced_state = replace_state_with_random_values(["ocean_surface_temperature"])
         prescribed_sst = replaced_state["ocean_surface_temperature"].view[:]
         fv3gfs.wrapper.step()
         surface_temperature_diagnostic = fv3gfs.wrapper.get_diagnostic_by_name(
@@ -78,5 +68,5 @@ class PrescribeSSTTests(unittest.TestCase):
 
 if __name__ == "__main__":
     config = get_default_config()
-    config["namelist"]["gfs_physics_nml"]["override_sea_surface_temperature"] = True
+    config["namelist"]["gfs_physics_nml"]["override_ocean_surface_temperature"] = True
     main(test_dir, config)
