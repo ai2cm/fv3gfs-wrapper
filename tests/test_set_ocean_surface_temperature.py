@@ -15,9 +15,9 @@ from util import (
 test_dir = os.path.dirname(os.path.abspath(__file__))
 
 
-def select_ocean_values(field):
+def select_ocean_values(*fields):
     is_ocean = np.isclose(get_state_single_variable("land_sea_mask"), 0.0)
-    return field[is_ocean]
+    return (field[is_ocean] for field in fields)
 
 
 class PrescribeSSTTests(unittest.TestCase):
@@ -62,8 +62,7 @@ class PrescribeSSTTests(unittest.TestCase):
             "tsfc", module_name="gfs_sfc"
         ).view[:]
 
-        result = select_ocean_values(surface_temperature_diagnostic)
-        expected = select_ocean_values(prescribed_sst)
+        result, expected = select_ocean_values(surface_temperature_diagnostic, prescribed_sst)
         np.testing.assert_allclose(result, expected)
 
 
