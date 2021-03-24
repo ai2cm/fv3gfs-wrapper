@@ -15,9 +15,9 @@ from util import (
 test_dir = os.path.dirname(os.path.abspath(__file__))
 
 
-def mask_non_ocean_values(field):
+def select_ocean_values(field):
     is_ocean = np.isclose(get_state_single_variable("land_sea_mask"), 0.0)
-    return np.where(is_ocean, field, np.nan)
+    return field[is_ocean]
 
 
 class PrescribeSSTTests(unittest.TestCase):
@@ -33,13 +33,15 @@ class PrescribeSSTTests(unittest.TestCase):
     def test_prescribing_sst_changes_model_state(self):
         checkpoint_state = fv3gfs.wrapper.get_state(fv3gfs.wrapper.get_restart_names())
 
+        # If we do not set the sea surface temperature and
+        # use_climatological_sst is set to .false., the sea surface temperature
+        # will remain at what it was set to in the initial conditions for the
+        # duration of the run.
         fv3gfs.wrapper.step()
         air_temperature_from_default_ocean_temperature = get_state_single_variable(
             "air_temperature"
         )
 
-        # Restore state to original checkpoint; modify the SST;
-        # step the model again.
         fv3gfs.wrapper.set_state(checkpoint_state)
         replace_state_with_random_values(["ocean_surface_temperature"])
         fv3gfs.wrapper.step()
@@ -47,7 +49,6 @@ class PrescribeSSTTests(unittest.TestCase):
             "air_temperature"
         )
 
-        # We expect these states to differ.
         assert not np.allclose(
             air_temperature_from_default_ocean_temperature,
             air_temperature_from_prescribed_ocean_temperature,
@@ -61,9 +62,8 @@ class PrescribeSSTTests(unittest.TestCase):
             "tsfc", module_name="gfs_sfc"
         ).view[:]
 
-        # Over the ocean we expect these results to be equal.
-        result = mask_non_ocean_values(surface_temperature_diagnostic)
-        expected = mask_non_ocean_values(prescribed_sst)
+        result = select_ocean_values(surface_temperature_diagnostic)
+        expected = select_ocean_values(prescribed_sst)
         np.testing.assert_allclose(result, expected)
 
 
