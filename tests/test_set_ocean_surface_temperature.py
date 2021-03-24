@@ -62,7 +62,9 @@ class PrescribeSSTTests(unittest.TestCase):
             "tsfc", module_name="gfs_sfc"
         ).view[:]
 
-        result, expected = select_ocean_values(surface_temperature_diagnostic, prescribed_sst)
+        result, expected = select_ocean_values(
+            surface_temperature_diagnostic, prescribed_sst
+        )
         np.testing.assert_allclose(result, expected)
 
 
