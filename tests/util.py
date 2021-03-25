@@ -7,8 +7,10 @@ import subprocess
 import yaml
 import unittest
 import shutil
+import numpy as np
 import fv3config
 import fv3gfs.wrapper
+from copy import deepcopy
 from mpi4py import MPI
 
 libc = ctypes.CDLL(None)
@@ -113,3 +115,16 @@ def get_current_config():
 
 def generate_data_dict(properties):
     return {entry["name"]: entry for entry in properties}
+
+
+def replace_state_with_random_values(names):
+    old_state = fv3gfs.wrapper.get_state(names=names)
+    replace_state = deepcopy(old_state)
+    for name, quantity in replace_state.items():
+        quantity.view[:] = np.random.uniform(size=quantity.extent)
+    fv3gfs.wrapper.set_state(replace_state)
+    return replace_state
+
+
+def get_state_single_variable(name):
+    return fv3gfs.wrapper.get_state([name])[name].view[:]
