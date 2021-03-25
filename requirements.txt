@@ -35,7 +35,7 @@ hypothesis==4.37.0
 idna==2.8
 imagesize==1.2.0
 importlib-metadata==0.19
-Jinja2==2.10.3
+Jinja2==2.11.3
 kubernetes==10.0.1
 MarkupSafe==1.1.1
 monotonic==1.5
