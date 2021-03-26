@@ -48,6 +48,6 @@ def set_state_mass_conserving(
 
         for v in water_not_in_input:
             # conserve mass of species not specified in input state
-            state[v] = state[v] * delp_old / delp_new
+            state[v] = old_state[v] * delp_old / delp_new
 
     fv3gfs.set_state(state)
