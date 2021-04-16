@@ -143,10 +143,6 @@ jobs:
       - run: |
           nix-env -iA cachix -f https://cachix.org/api/v1/install
           cachix use vulcanclimatemodeling
-          nix-build -j 4 shell.nix | cachix push vulcanclimatemodeling
-          # cleanup the output of nix-build so the test build command doesn't
-          # rebuild
-          rm -f result
       - run:
           name: Test
           command: nix-shell test.nix --run "python tests/test_all.py"
