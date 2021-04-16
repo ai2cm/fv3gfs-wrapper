@@ -59,6 +59,7 @@ buildPythonPackage rec {
       echo "RUNNING"
       make -C lib
       export CC="${gfortran}/bin/gcc";
+      export FC="${gfortran}/bin/gfortran"
       '';
 
       propagatedBuildInputs = [
