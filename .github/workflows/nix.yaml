@@ -13,6 +13,5 @@ jobs:
     - uses: cachix/cachix-action@v9
       with:
         name: vulcanclimatemodeling
-    - run: nix-env -if shell.nix
-    - run: python tests/test_all.py
+    - run: nix-shell test.nix --run "python tests/test_all.py"
 

@@ -106,5 +106,10 @@ let
     wrapper = self.callPackage ./default.nix { };
   };
   python3 = pkgs.python3.override { inherit packageOverrides; };
-in python3.pkgs.wrapper
+in 
+  {
+    wrapper = python3.pkgs.wrapper;
+    pkgs = pkgs;
+    python = python3;
+  }
 
