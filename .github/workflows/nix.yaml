@@ -10,7 +10,9 @@ jobs:
     - uses: cachix/install-nix-action@v13
       with:
         nix_path: nixpkgs=channel:nixos-unstable
-    - run: cachix use vulcanclimatemodeling
+    - uses: cachix/cachix-action@v9
+      with:
+        name: vulcanclimatemodeling
     - run: nix-env -if shell.nix
     - run: python tests/test_all.py
 
