@@ -28,5 +28,11 @@
         "fortran_name" : "do_adiabatic_init",
         "location" : "do_adiabatic_init",
         "type_fortran": "logical"
+    },
+    {
+        "name": "override_surface_radiative_fluxes",
+        "fortran_name" : "override_surface_radiative_fluxes",
+        "location" : "IPD_Control",
+        "type_fortran": "logical"
     }
 ]

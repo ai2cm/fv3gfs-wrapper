@@ -5,7 +5,7 @@ import fv3gfs.util
 import time
 from mpi4py import MPI
 
-from util import main
+from util import get_default_config, main
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -49,4 +49,5 @@ class DiagnosticTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    main(test_dir)
+    config = get_default_config()
+    main(test_dir, config)

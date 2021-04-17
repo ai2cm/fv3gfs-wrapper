@@ -8,15 +8,22 @@ import fv3gfs.wrapper
 import yaml
 import unittest
 import shutil
+import numpy as np
 import fv3config
-import platform
-from mpi4py import MPI
 
-libc = ctypes.CDLL(None)
+import fv3gfs.wrapper
+from mpi4py import MPI
+from copy import deepcopy
+
+# this is not portable
+# libc = ctypes.CDLL(None)
 # c_stdout = ctypes.c_void_p.in_dll(libc, "stdout")
 
+base_dir = os.path.dirname(os.path.realpath(__file__))
 
-def run_unittest_script(filename, *args, n_processes=6):
+
+def run_unittest_script(script_name, *args, n_processes=6):
+    filename = os.path.join(base_dir, script_name)
     python_args = [sys.executable, "-m", "mpi4py", filename] + list(args)
     cmd =["mpirun", "-n", str(n_processes)] + python_args 
     print("running:", ' '.join(cmd))
@@ -77,10 +84,8 @@ class StdoutRedirector(object):
         sys.stdout = io.TextIOWrapper(os.fdopen(self._stdout_file_descriptor, "wb"))
 
 
-def main(test_dir):
+def main(test_dir, config):
     rank = MPI.COMM_WORLD.Get_rank()
-    with open(os.path.join(test_dir, "default_config.yml"), "r") as f:
-        config = yaml.safe_load(f)
     rundir = os.path.join(test_dir, "rundir")
     print("PID,", os.getpid())
     import time
@@ -104,3 +109,30 @@ def main(test_dir):
         os.chdir(original_path)
         if rank == 0:
             shutil.rmtree(rundir)
+
+
+def get_default_config():
+    with open(os.path.join(base_dir, "default_config.yml"), "r") as f:
+        return yaml.safe_load(f)
+
+
+def get_current_config():
+    with open("fv3config.yml") as f:
+        return yaml.safe_load(f)
+
+
+def generate_data_dict(properties):
+    return {entry["name"]: entry for entry in properties}
+
+
+def replace_state_with_random_values(names):
+    old_state = fv3gfs.wrapper.get_state(names=names)
+    replace_state = deepcopy(old_state)
+    for name, quantity in replace_state.items():
+        quantity.view[:] = np.random.uniform(size=quantity.extent)
+    fv3gfs.wrapper.set_state(replace_state)
+    return replace_state
+
+
+def get_state_single_variable(name):
+    return fv3gfs.wrapper.get_state([name])[name].view[:]

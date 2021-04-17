@@ -4,122 +4,122 @@ experiment_name: default
 forcing: gs://vcm-fv3config/data/base_forcing/v1.1/
 initial_conditions:
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_core.res.tile1.nc
   target_location: INPUT
   target_name: fv_core.res.tile1.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_core.res.tile2.nc
   target_location: INPUT
   target_name: fv_core.res.tile2.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_core.res.tile3.nc
   target_location: INPUT
   target_name: fv_core.res.tile3.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_core.res.tile4.nc
   target_location: INPUT
   target_name: fv_core.res.tile4.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_core.res.tile5.nc
   target_location: INPUT
   target_name: fv_core.res.tile5.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_core.res.tile6.nc
   target_location: INPUT
   target_name: fv_core.res.tile6.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.sfc_data.tile1.nc
   target_location: INPUT
   target_name: sfc_data.tile1.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.sfc_data.tile2.nc
   target_location: INPUT
   target_name: sfc_data.tile2.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.sfc_data.tile3.nc
   target_location: INPUT
   target_name: sfc_data.tile3.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.sfc_data.tile4.nc
   target_location: INPUT
   target_name: sfc_data.tile4.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.sfc_data.tile5.nc
   target_location: INPUT
   target_name: sfc_data.tile5.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.sfc_data.tile6.nc
   target_location: INPUT
   target_name: sfc_data.tile6.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_tracer.res.tile1.nc
   target_location: INPUT
   target_name: fv_tracer.res.tile1.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_tracer.res.tile2.nc
   target_location: INPUT
   target_name: fv_tracer.res.tile2.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_tracer.res.tile3.nc
   target_location: INPUT
   target_name: fv_tracer.res.tile3.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_tracer.res.tile4.nc
   target_location: INPUT
   target_name: fv_tracer.res.tile4.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_tracer.res.tile5.nc
   target_location: INPUT
   target_name: fv_tracer.res.tile5.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_tracer.res.tile6.nc
   target_location: INPUT
   target_name: fv_tracer.res.tile6.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_srf_wnd.res.tile1.nc
   target_location: INPUT
   target_name: fv_srf_wnd.res.tile1.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_srf_wnd.res.tile2.nc
   target_location: INPUT
   target_name: fv_srf_wnd.res.tile2.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_srf_wnd.res.tile3.nc
   target_location: INPUT
   target_name: fv_srf_wnd.res.tile3.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_srf_wnd.res.tile4.nc
   target_location: INPUT
   target_name: fv_srf_wnd.res.tile4.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_srf_wnd.res.tile5.nc
   target_location: INPUT
   target_name: fv_srf_wnd.res.tile5.nc
 - copy_method: copy
-  source_location: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
+  source_location: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48/20160801.001500
   source_name: 20160801.001500.fv_srf_wnd.res.tile6.nc
   target_location: INPUT
   target_name: fv_srf_wnd.res.tile6.nc
@@ -420,7 +420,7 @@ namelist:
     fvmxl: 99999
     ldebug: false
 nudging:
-  restarts_path: gs://vcm-ml-data/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48
+  restarts_path: gs://vcm-ml-intermediate/2020-01-16-X-SHiELD-2019-12-02-pressure-coarsened-rundirs/restarts/C48
   timescale_hours:
     air_temperature: 3
     x_wind: 24

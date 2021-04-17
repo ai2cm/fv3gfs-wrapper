@@ -1,22 +1,41 @@
 import unittest
 import os
+import sys
 from copy import deepcopy
 import fv3gfs.wrapper
 import numpy as np
-from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
+from fv3gfs.wrapper._properties import (
+    DYNAMICS_PROPERTIES,
+    PHYSICS_PROPERTIES,
+    OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES,
+)
 import fv3gfs.util
 from mpi4py import MPI
-from util import main
+from util import (
+    get_current_config,
+    get_default_config,
+    generate_data_dict,
+    main,
+    replace_state_with_random_values,
+)
+
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_PHYSICS_PROPERTIES = []
+for entry in PHYSICS_PROPERTIES:
+    if entry["name"] not in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES:
+        DEFAULT_PHYSICS_PROPERTIES.append(entry)
 
 
 class SetterTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(SetterTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.wrapper.get_tracer_metadata()
-        self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
-        self.physics_data = {entry["name"]: entry for entry in PHYSICS_PROPERTIES}
+        self.dynamics_data = generate_data_dict(DYNAMICS_PROPERTIES)
+        if fv3gfs.wrapper.flags.override_surface_radiative_fluxes:
+            self.physics_data = generate_data_dict(PHYSICS_PROPERTIES)
+        else:
+            self.physics_data = generate_data_dict(DEFAULT_PHYSICS_PROPERTIES)
 
     def setUp(self):
         pass
@@ -115,12 +134,7 @@ class SetterTests(unittest.TestCase):
         self._set_names_one_at_a_time_helper(name_list)
 
     def _set_all_names_at_once_helper(self, name_list):
-        old_state = fv3gfs.wrapper.get_state(names=name_list)
-        self._check_gotten_state(old_state, name_list)
-        replace_state = deepcopy(old_state)
-        for name, quantity in replace_state.items():
-            quantity.view[:] = np.random.uniform(size=quantity.extent)
-        fv3gfs.wrapper.set_state(replace_state)
+        replace_state = replace_state_with_random_values(name_list)
         new_state = fv3gfs.wrapper.get_state(names=name_list)
         self._check_gotten_state(new_state, name_list)
         for name, new_quantity in new_state.items():
@@ -168,6 +182,45 @@ class SetterTests(unittest.TestCase):
     def assert_values_equal(self, quantity1, quantity2):
         self.assertTrue(quantity1.np.all(quantity1.view[:] == quantity2.view[:]))
 
+    def _set_unallocated_override_for_radiative_surface_flux(self, name):
+        config = get_current_config()
+        sizer = fv3gfs.util.SubtileGridSizer.from_namelist(config["namelist"])
+        factory = fv3gfs.util.QuantityFactory(sizer, np)
+        quantity = factory.zeros(["x", "y"], units="W/m**2")
+        with self.assertRaisesRegex(fv3gfs.util.InvalidQuantityError, "Overriding"):
+            fv3gfs.wrapper.set_state({name: quantity})
+
+    def test_set_unallocated_override_for_radiative_surface_flux(self):
+        if fv3gfs.wrapper.flags.override_surface_radiative_fluxes:
+            self.skipTest("Memory is allocated for the overriding fluxes in this case.")
+        for name in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES:
+            with self.subTest(name):
+                self._set_unallocated_override_for_radiative_surface_flux(name)
+
+
+def get_override_surface_radiative_fluxes():
+    """A crude way of parameterizing the setter tests for different values of
+    gfs_physics_nml.override_surface_radiative_fluxes.
+
+    See https://stackoverflow.com/questions/11380413/python-unittest-passing-arguments.
+    """
+    if len(sys.argv) != 2:
+        raise ValueError(
+            "test_setters.py requires a single argument "
+            "be passed through the command line, indicating the value of "
+            "the gfs_physics_nml.override_surface_radiative_fluxes flag "
+            "('true' or 'false')."
+        )
+    override_surface_radiative_fluxes = sys.argv.pop().lower()
+
+    # Convert string argument to bool.
+    return override_surface_radiative_fluxes == "true"
+
 
 if __name__ == "__main__":
-    main(test_dir)
+    config = get_default_config()
+    override_surface_radiative_fluxes = get_override_surface_radiative_fluxes()
+    config["namelist"]["gfs_physics_nml"][
+        "override_surface_radiative_fluxes"
+    ] = override_surface_radiative_fluxes
+    main(test_dir, config)

@@ -2,28 +2,31 @@ import unittest
 import os
 import fv3gfs.wrapper
 import numpy as np
-import yaml
+import fv3gfs.wrapper
 import fv3gfs.util
-from fv3gfs.wrapper._properties import DYNAMICS_PROPERTIES, PHYSICS_PROPERTIES
+from fv3gfs.wrapper._properties import (
+    DYNAMICS_PROPERTIES,
+    PHYSICS_PROPERTIES,
+    OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES,
+)
 from mpi4py import MPI
+from util import get_current_config, get_default_config, generate_data_dict, main
 
-from util import main
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 MM_PER_M = 1000
-
-
-def get_config():
-    with open("fv3config.yml") as f:
-        return yaml.safe_load(f)
+DEFAULT_PHYSICS_PROPERTIES = []
+for entry in PHYSICS_PROPERTIES:
+    if entry["name"] not in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES:
+        DEFAULT_PHYSICS_PROPERTIES.append(entry)
 
 
 class GetterTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(GetterTests, self).__init__(*args, **kwargs)
         self.tracer_data = fv3gfs.wrapper.get_tracer_metadata()
-        self.dynamics_data = {entry["name"]: entry for entry in DYNAMICS_PROPERTIES}
-        self.physics_data = {entry["name"]: entry for entry in PHYSICS_PROPERTIES}
+        self.dynamics_data = generate_data_dict(DYNAMICS_PROPERTIES)
+        self.physics_data = generate_data_dict(DEFAULT_PHYSICS_PROPERTIES)
         self.mpi_comm = MPI.COMM_WORLD
 
     def setUp(self):
@@ -91,7 +94,7 @@ class GetterTests(unittest.TestCase):
         )
         total_precip = state["total_precipitation"]
         precip_rate = state["surface_precipitation_rate"]
-        config = get_config()
+        config = get_current_config()
         dt = config["namelist"]["coupler_nml"]["dt_atmos"]
         np.testing.assert_allclose(
             MM_PER_M * total_precip.view[:] / dt, precip_rate.view[:]
@@ -156,6 +159,15 @@ class GetterTests(unittest.TestCase):
                 self.assertIn(name, state)
         self.assertEqual(len(name_list), len(state.keys()))
 
+    def _get_unallocated_name_helper(self, name):
+        with self.assertRaisesRegex(fv3gfs.util.InvalidQuantityError, "Overriding"):
+            fv3gfs.wrapper.get_state(names=[name])
+
+    def test_unallocated_physics_properties(self):
+        for name in OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES:
+            with self.subTest(name):
+                self._get_unallocated_name_helper(name)
+
 
 class TracerMetadataTests(unittest.TestCase):
     def test_tracer_index_is_one_based(self):
@@ -198,4 +210,5 @@ class TracerMetadataTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    main(test_dir)
+    config = get_default_config()
+    main(test_dir, config)
