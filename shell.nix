@@ -102,14 +102,54 @@ let
     mpi4py = (super.mpi4py.override { mpi = pkgs.mpich; }).overridePythonAttrs {
       doCheck = false;
     };
-
-    wrapper = self.callPackage ./default.nix { };
   };
   python3 = pkgs.python3.override { inherit packageOverrides; };
-in 
-  {
-    wrapper = python3.pkgs.wrapper;
-    pkgs = pkgs;
-    python = python3;
-  }
+in with pkgs;
+mkShell {
+  # environmental variables needed for the wrapper
+  venvDir = "./.venv";
+  buildInputs = [
+    # compiled dependencies
+    fms
+    esmf
+    nceplibs
+    netcdf
+    netcdffortran
+    lapack
+    blas
+    # this is key: https://discourse.nixos.org/t/building-shared-libraries-with-fortran/11876/2
+    gfortran.cc.lib
+    fv3
+    mpich
+    python3.pkgs.venvShellHook
+    python3.pkgs.pkgconfig
+
+  ] ++ lib.optional stdenv.isDarwin llvmPackages.openmp;
+
+  nativeBuildInputs = [
+    pkg-config
+    mpich
+    python3.pkgs.jinja2
+    python3.pkgs.cython
+    gfortran
+  ];
+
+  preShellHook = ''
+    export CC="${gfortran}/bin/gcc";
+    export FC="${gfortran}/bin/gfortran"
+    export PKG_CONFIG_PATH="${fv3}/lib/pkgconfig";
+    export MPI=mpich
+  '';
+
+  propagatedBuildInputs = with python3.pkgs; [
+    python3
+    gcsfs
+    fv3config
+    mpi4py
+    numpy
+    pyyaml
+    netcdf4
+    fv3gfs-util
+  ];
+}
 
