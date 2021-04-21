@@ -39,7 +39,6 @@ buildPythonPackage rec {
           blas
           # this is key: https://discourse.nixos.org/t/building-shared-libraries-with-fortran/11876/2
           gfortran.cc.lib
-          gfortran
           cython
           fv3
           mpich
@@ -52,6 +51,8 @@ buildPythonPackage rec {
           mpich
           gcsfs
           fv3config
+          gfortran
+          gfortran.cc
       ];
 
 
