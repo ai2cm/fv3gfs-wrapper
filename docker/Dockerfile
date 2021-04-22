@@ -36,4 +36,6 @@ RUN mkdir $FV3CONFIG_CACHE_DIR && \
 COPY tests /fv3gfs-wrapper/tests
 
 # interactive shell by default
-CMD ["bash"]
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]

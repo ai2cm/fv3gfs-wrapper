@@ -104,7 +104,7 @@ docs-docker:  ## build documentation using docker
 	$(BROWSER) docs/_build/html/index.html
 
 build-docker:  ## build the docker image
-	BUILD_FROM_INTERMEDIATE=$(BUILD_FROM_INTERMEDIATE) $(MAKE) -C docker
+	docker build -f docker/Dockerfile -t us.gcr.io/vcm-ml/fv3gfs-wrapper .
 
 test-docker: build-docker  ## test the docker image
 	./test_docker.sh
