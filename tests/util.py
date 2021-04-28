@@ -2,7 +2,7 @@ import sys
 import os
 import tempfile
 import io
-import ctypes # noqa
+import ctypes  # noqa
 import subprocess
 import fv3gfs.wrapper
 import yaml
