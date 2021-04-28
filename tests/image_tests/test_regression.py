@@ -13,17 +13,11 @@ CONFIG_DIR = os.path.join(TEST_DIR, "config")
 SUBMIT_JOB_FILENAME = os.path.join(TEST_DIR, "run_files/submit_job.sh")
 STDOUT_FILENAME = "stdout.log"
 STDERR_FILENAME = "stderr.log"
-MODEL_IMAGE = "us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu7-mpich314-nocuda"
 MD5SUM_FILENAME = "md5.txt"
 
 USE_LOCAL_ARCHIVE = True
 
 config_filenames = os.listdir(CONFIG_DIR)
-
-
-@pytest.fixture
-def model_image():
-    return MODEL_IMAGE
 
 
 @pytest.fixture
@@ -41,14 +35,14 @@ def config(request):
         return yaml.safe_load(config_file)
 
 
-def test_regression(config, model_image, reference_dir):
+def test_regression(config, reference_dir):
     run_name = config["experiment_name"]
     run_reference_dir = os.path.join(reference_dir, run_name)
     run_dir = os.path.join(OUTPUT_DIR, run_name)
     if os.path.isdir(run_dir):
         shutil.rmtree(run_dir)
     os.makedirs(run_dir)
-    run_model(config, run_dir, model_image)
+    run_model(config, run_dir)
     md5sum_filename = os.path.join(run_reference_dir, MD5SUM_FILENAME)
     if not os.path.isfile(md5sum_filename):
         assert False, (
@@ -61,22 +55,11 @@ def test_regression(config, model_image, reference_dir):
     shutil.rmtree(run_dir)
 
 
-def run_model(config, run_dir, model_image):
+def run_model(config, run_dir):
     fv3config.write_run_directory(config, run_dir)
     subprocess.check_call(
-        [
-            "docker",
-            "run",
-            "-v",
-            f"{run_dir}:/rundir",
-            "--workdir",
-            "/rundir",
-            MODEL_IMAGE,
-            "mpirun",
-            "-n",
-            "6",
-        ]
-        + ["python3", "-m", "mpi4py", "-m", "fv3gfs.wrapper.run"]
+        ["mpirun", "-n", "6", "python3", "-m", "mpi4py", "-m", "fv3gfs.wrapper.run"],
+        cwd=run_dir,
     )
 
 
