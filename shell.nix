@@ -138,6 +138,7 @@ mkShell {
     export FC="${gfortran}/bin/gfortran"
     export PKG_CONFIG_PATH="${fv3}/lib/pkgconfig";
     export MPI=mpich
+    export PYTHONPATH=$(pwd):$PYTHONPATH
   '';
 
   propagatedBuildInputs = with python3.pkgs; [
