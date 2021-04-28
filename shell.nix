@@ -123,7 +123,6 @@ mkShell {
     mpich
     python3.pkgs.venvShellHook
     python3.pkgs.pkgconfig
-
   ] ++ lib.optional stdenv.isDarwin llvmPackages.openmp;
 
   nativeBuildInputs = [
@@ -150,6 +149,7 @@ mkShell {
     pyyaml
     netcdf4
     fv3gfs-util
+    pytest
   ];
 }
 
