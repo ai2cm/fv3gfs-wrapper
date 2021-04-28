@@ -1,7 +1,7 @@
+import fv3gfs.wrapper
 import fv3gfs.util
 import numpy as np
 
-import fv3gfs.wrapper
 
 import pytest
 

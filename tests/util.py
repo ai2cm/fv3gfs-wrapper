@@ -2,26 +2,31 @@ import sys
 import os
 import tempfile
 import io
-import ctypes
+import ctypes  # noqa
 import subprocess
+import fv3gfs.wrapper
 import yaml
 import unittest
 import shutil
 import numpy as np
 import fv3config
-import fv3gfs.wrapper
-from copy import deepcopy
-from mpi4py import MPI
 
-libc = ctypes.CDLL(None)
-c_stdout = ctypes.c_void_p.in_dll(libc, "stdout")
+from mpi4py import MPI
+from copy import deepcopy
+
+# this is not portable
+# libc = ctypes.CDLL(None)
+# c_stdout = ctypes.c_void_p.in_dll(libc, "stdout")
+
 base_dir = os.path.dirname(os.path.realpath(__file__))
 
 
 def run_unittest_script(script_name, *args, n_processes=6):
     filename = os.path.join(base_dir, script_name)
-    python_args = ["python3", "-m", "mpi4py", filename] + list(args)
-    subprocess.check_call(["mpirun", "-n", str(n_processes)] + python_args)
+    python_args = [sys.executable, "-m", "mpi4py", filename] + list(args)
+    cmd = ["mpirun", "-n", str(n_processes)] + python_args
+    print("running:", " ".join(cmd))
+    subprocess.check_call(cmd)
 
 
 def redirect_stdout(filename):
@@ -68,7 +73,7 @@ class StdoutRedirector(object):
     def _redirect_stdout(self, to_file_descriptor):
         """Redirect stdout to the given file descriptor."""
         # Flush the C-level buffer stdout
-        libc.fflush(c_stdout)
+        # libc.fflush(c_stdout)
         # Flush and close sys.stdout - also closes the file descriptor (fd)
         sys.stdout.close()
         # Make self._stdout_file_descriptor point to the same file as to_file_descriptor
@@ -81,6 +86,8 @@ class StdoutRedirector(object):
 def main(test_dir, config):
     rank = MPI.COMM_WORLD.Get_rank()
     rundir = os.path.join(test_dir, "rundir")
+    print("PID,", os.getpid())
+
     if rank == 0:
         if os.path.isdir(rundir):
             shutil.rmtree(rundir)
@@ -89,9 +96,9 @@ def main(test_dir, config):
     original_path = os.getcwd()
     os.chdir(rundir)
     try:
-        with redirect_stdout(os.devnull):
-            fv3gfs.wrapper.initialize()
-            MPI.COMM_WORLD.barrier()
+        # with redirect_stdout(os.devnull):
+        fv3gfs.wrapper.initialize()
+        MPI.COMM_WORLD.barrier()
         if rank != 0:
             kwargs = {"verbosity": 0}
         else:

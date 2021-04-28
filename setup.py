@@ -1,6 +1,7 @@
 import os
 from setuptools import setup, find_namespace_packages
 from distutils.extension import Extension
+import platform
 
 # Specify these build requirements in pyproject.toml
 # https://www.python.org/dev/peps/pep-0518/
@@ -42,13 +43,16 @@ library_link_args.extend(wrapper_build_filenames)
 library_link_args += pkgconfig.libs("fv3").split()
 
 mpi_flavor = os.environ.get("MPI", "openmpi")
+print("MPI flavor", mpi_flavor)
 if mpi_flavor == "openmpi":
     library_link_args += pkgconfig.libs("ompi-fort").split()
 else:
     library_link_args += ["-lmpich", "-lmpifort", "-lmpichcxx"]
 
-# need to include math and c library
-library_link_args += ["-lmvec", "-lc"]
+# need to include math and c library if not on darwin
+library_link_args += ["-lc"]
+if platform.system() != "Darwin":
+    library_link_args += ["-lmvec"]
 
 requirements = [
     "mpi4py>=3.0.3",

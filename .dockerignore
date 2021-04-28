@@ -3,3 +3,4 @@ run_docker.sh
 tests/*workdir
 tests/logs
 examples/jupyter
+tests/image_tests/output

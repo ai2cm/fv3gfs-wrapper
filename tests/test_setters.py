@@ -2,8 +2,8 @@ import unittest
 import os
 import sys
 from copy import deepcopy
-import numpy as np
 import fv3gfs.wrapper
+import numpy as np
 from fv3gfs.wrapper._properties import (
     DYNAMICS_PROPERTIES,
     PHYSICS_PROPERTIES,

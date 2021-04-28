@@ -1,7 +1,7 @@
 import unittest
 import os
-import numpy as np
 import fv3gfs.wrapper
+import numpy as np
 import fv3gfs.util
 from fv3gfs.wrapper._properties import (
     DYNAMICS_PROPERTIES,

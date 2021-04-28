@@ -12,8 +12,8 @@ is required.  Valid calendars are:
 import sys
 import unittest
 import os
-import cftime
 import fv3gfs.wrapper
+import cftime
 from mpi4py import MPI
 from util import get_default_config, main
 

@@ -86,7 +86,8 @@ reformat: ## use black to auto-format code
 	black $(PYTHON_FILES) $(PYTHON_INIT_FILES)
 
 test: ## run tests quickly with the default Python
-	bash tests/run_tests.sh
+	pytest ./tests/image_tests/*.py
+	pytest ./tests/test_all.py
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source fv3gfs setup.py test
@@ -104,7 +105,7 @@ docs-docker:  ## build documentation using docker
 	$(BROWSER) docs/_build/html/index.html
 
 build-docker:  ## build the docker image
-	BUILD_FROM_INTERMEDIATE=$(BUILD_FROM_INTERMEDIATE) $(MAKE) -C docker
+	docker build -f docker/Dockerfile -t us.gcr.io/vcm-ml/fv3gfs-wrapper .
 
 test-docker: build-docker  ## test the docker image
 	./test_docker.sh
