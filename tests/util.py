@@ -25,8 +25,8 @@ base_dir = os.path.dirname(os.path.realpath(__file__))
 def run_unittest_script(script_name, *args, n_processes=6):
     filename = os.path.join(base_dir, script_name)
     python_args = [sys.executable, "-m", "mpi4py", filename] + list(args)
-    cmd =["mpirun", "-n", str(n_processes)] + python_args 
-    print("running:", ' '.join(cmd))
+    cmd = ["mpirun", "-n", str(n_processes)] + python_args
+    print("running:", " ".join(cmd))
     subprocess.check_call(cmd)
 
 
@@ -89,6 +89,7 @@ def main(test_dir, config):
     rundir = os.path.join(test_dir, "rundir")
     print("PID,", os.getpid())
     import time
+
     if rank == 0:
         if os.path.isdir(rundir):
             shutil.rmtree(rundir)

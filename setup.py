@@ -52,7 +52,7 @@ else:
 # need to include math and c library if not on darwin
 library_link_args += ["-lc"]
 if platform.system() != "Darwin":
-    library_link_args += ["-lmvec"] 
+    library_link_args += ["-lmvec"]
 
 requirements = [
     "mpi4py>=3.0.3",
