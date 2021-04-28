@@ -2,7 +2,7 @@ import sys
 import os
 import tempfile
 import io
-import ctypes
+import ctypes # noqa
 import subprocess
 import fv3gfs.wrapper
 import yaml
@@ -11,7 +11,6 @@ import shutil
 import numpy as np
 import fv3config
 
-import fv3gfs.wrapper
 from mpi4py import MPI
 from copy import deepcopy
 
@@ -88,7 +87,6 @@ def main(test_dir, config):
     rank = MPI.COMM_WORLD.Get_rank()
     rundir = os.path.join(test_dir, "rundir")
     print("PID,", os.getpid())
-    import time
 
     if rank == 0:
         if os.path.isdir(rundir):

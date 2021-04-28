@@ -2,7 +2,6 @@ import unittest
 import os
 import fv3gfs.wrapper
 import fv3gfs.util
-import time
 from mpi4py import MPI
 
 from util import get_default_config, main
