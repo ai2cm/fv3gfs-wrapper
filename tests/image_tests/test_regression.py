@@ -64,6 +64,7 @@ def test_fv3_wrapper_regression(regtest, tmpdir, config):
     assert len(md5_from_dir_only_nc(fv3_rundir)) > 0
 
     # regression test the wrapper checksums
+    # update by running tests with 'pytest --regtest-reset'
     md5s_wrapper = md5_from_dir_only_nc(wrapper_rundir)
     for key in sorted(md5s_wrapper):
         print(key, md5s_wrapper[key], file=regtest)
