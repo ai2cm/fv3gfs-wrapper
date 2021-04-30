@@ -51,7 +51,7 @@ def test_md5_from_dir(tmpdir):
     assert orig_md5 != md5_from_dir(tmpdir)
 
 
-def test_regression(tmpdir, config):
+def test_fv3_wrapper_regression(regtest, tmpdir, config):
     fv3_rundir = tmpdir.join("fv3")
     wrapper_rundir = tmpdir.join("wrapper")
 
@@ -62,6 +62,11 @@ def test_regression(tmpdir, config):
 
     # just make sure there are some outputs
     assert len(md5_from_dir_only_nc(fv3_rundir)) > 0
+
+    # regression test the wrapper checksums
+    md5s_wrapper = md5_from_dir_only_nc(wrapper_rundir)
+    for key in sorted(md5s_wrapper):
+        print(key, md5s_wrapper[key], file=regtest)
 
 
 def run_fv3(config, run_dir):
