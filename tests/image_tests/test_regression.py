@@ -30,7 +30,8 @@ def md5_from_dir(dir_):
                         break
                     md5.update(buf)
 
-            md5s[file] = md5.hexdigest()
+            relpath_to_root = os.path.relpath(root, start=dir_)
+            md5s[os.path.join(relpath_to_root, file)] = md5.hexdigest()
     return md5s
 
 
@@ -51,6 +52,12 @@ def test_md5_from_dir(tmpdir):
     assert orig_md5 != md5_from_dir(tmpdir)
 
 
+def test_md5_from_dir_subdirs(tmpdir):
+    tmpdir.mkdir("subdir").join("a").open("w").write("hello")
+    md5s = md5_from_dir(tmpdir)
+    assert "subdir/a" in md5s
+
+
 def test_fv3_wrapper_regression(regtest, tmpdir, config):
     fv3_rundir = tmpdir.join("fv3")
     wrapper_rundir = tmpdir.join("wrapper")
@@ -67,6 +74,7 @@ def test_fv3_wrapper_regression(regtest, tmpdir, config):
     # update by running tests with 'pytest --regtest-reset'
     md5s_wrapper = md5_from_dir_only_nc(wrapper_rundir)
     for key in sorted(md5s_wrapper):
+        print(key)
         print(key, md5s_wrapper[key], file=regtest)
 
 
