@@ -1,37 +1,14 @@
 import os
 import yaml
-import shutil
 import subprocess
 import pytest
 import fv3config
+import hashlib
 
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
-REFERENCE_DIR = os.path.join(TEST_DIR, "reference")
-OUTPUT_DIR = os.path.join(TEST_DIR, "output")
 CONFIG_DIR = os.path.join(TEST_DIR, "config")
-SUBMIT_JOB_FILENAME = os.path.join(TEST_DIR, "run_files/submit_job.sh")
-STDOUT_FILENAME = "stdout.log"
-STDERR_FILENAME = "stderr.log"
-MODEL_IMAGE = "us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu7-mpich314-nocuda"
-MD5SUM_FILENAME = "md5.txt"
-
-USE_LOCAL_ARCHIVE = True
-
 config_filenames = os.listdir(CONFIG_DIR)
-
-
-@pytest.fixture
-def model_image():
-    return MODEL_IMAGE
-
-
-@pytest.fixture
-def reference_dir(request):
-    refdir = request.config.getoption("--refdir")
-    if refdir is None:
-        refdir = os.path.join(TEST_DIR, "reference/circleci")
-    return refdir
 
 
 @pytest.fixture(params=config_filenames)
@@ -41,53 +18,76 @@ def config(request):
         return yaml.safe_load(config_file)
 
 
-def test_regression(config, model_image, reference_dir):
-    run_name = config["experiment_name"]
-    run_reference_dir = os.path.join(reference_dir, run_name)
-    run_dir = os.path.join(OUTPUT_DIR, run_name)
-    if os.path.isdir(run_dir):
-        shutil.rmtree(run_dir)
-    os.makedirs(run_dir)
-    run_model(config, run_dir, model_image)
-    md5sum_filename = os.path.join(run_reference_dir, MD5SUM_FILENAME)
-    if not os.path.isfile(md5sum_filename):
-        assert False, (
-            f"reference md5sum does not exist, "
-            f"you can create it with `bash set_reference.sh {reference_dir}`"
-            " after running the model and generating the output directories."
-        )
-    else:
-        check_md5sum(run_dir, md5sum_filename)
-    shutil.rmtree(run_dir)
+def md5_from_dir(dir_):
+    md5s = {}
+    for root, dirs, files in os.walk(str(dir_)):
+        for file in files:
+            with open(os.path.join(root, file), "rb") as f:
+                md5 = hashlib.md5()
+                while True:
+                    buf = f.read(2048)
+                    if not buf:
+                        break
+                    md5.update(buf)
+
+            relpath_to_root = os.path.relpath(root, start=dir_)
+            md5s[os.path.join(relpath_to_root, file)] = md5.hexdigest()
+    return md5s
 
 
-def run_model(config, run_dir, model_image):
-    fv3config.write_run_directory(config, run_dir)
+def md5_from_dir_only_nc(dir_):
+    return {
+        file: hash for file, hash in md5_from_dir(dir_).items() if file.endswith(".nc")
+    }
+
+
+def test_md5_from_dir(tmpdir):
+    tmpdir.join("a").open("w").write("hello")
+    tmpdir.join("b").open("w").write("world")
+
+    orig_md5 = md5_from_dir(tmpdir)
+    assert orig_md5 == md5_from_dir(tmpdir)
+
+    tmpdir.join("b").open("w").write("world updated")
+    assert orig_md5 != md5_from_dir(tmpdir)
+
+
+def test_md5_from_dir_subdirs(tmpdir):
+    tmpdir.mkdir("subdir").join("a").open("w").write("hello")
+    md5s = md5_from_dir(tmpdir)
+    assert "subdir/a" in md5s
+
+
+def test_fv3_wrapper_regression(regtest, tmpdir, config):
+    fv3_rundir = tmpdir.join("fv3")
+    wrapper_rundir = tmpdir.join("wrapper")
+
+    run_fv3(config, fv3_rundir)
+    run_wrapper(config, wrapper_rundir)
+
+    assert md5_from_dir_only_nc(fv3_rundir) == md5_from_dir_only_nc(wrapper_rundir)
+
+    # just make sure there are some outputs
+    assert len(md5_from_dir_only_nc(fv3_rundir)) > 0
+
+    # regression test the wrapper checksums
+    # update by running tests with 'pytest --regtest-reset'
+    md5s_wrapper = md5_from_dir_only_nc(wrapper_rundir)
+    for key in sorted(md5s_wrapper):
+        print(key)
+        print(key, md5s_wrapper[key], file=regtest)
+
+
+def run_fv3(config, run_dir):
+    fv3config.write_run_directory(config, str(run_dir))
     subprocess.check_call(
-        [
-            "docker",
-            "run",
-            "-v",
-            f"{run_dir}:/rundir",
-            "--workdir",
-            "/rundir",
-            MODEL_IMAGE,
-            "mpirun",
-            "-n",
-            "6",
-        ]
-        + ["python3", "-m", "mpi4py", "-m", "fv3gfs.wrapper.run"]
+        ["mpirun", "-n", "6", "fv3.exe"], cwd=run_dir,
     )
 
 
-def check_md5sum(run_dir, md5sum_filename):
-    subprocess.check_call(["md5sum", "-c", md5sum_filename], cwd=run_dir)
-
-
-def write_run_directory(config, dirname):
-    fv3config.write_run_directory(config, dirname)
-    shutil.copy(SUBMIT_JOB_FILENAME, os.path.join(dirname, "submit_job.sh"))
-
-
-if __name__ == "__main__":
-    pytest.main()
+def run_wrapper(config, run_dir):
+    fv3config.write_run_directory(config, str(run_dir))
+    subprocess.check_call(
+        ["mpirun", "-n", "6", "python3", "-m", "mpi4py", "-m", "fv3gfs.wrapper.run"],
+        cwd=run_dir,
+    )
