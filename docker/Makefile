@@ -14,7 +14,7 @@ all: build
 
 build_fv3gfs-fortran:
 	# Currently this build depends on the build artifacts produced by the
-	# fv3gfs-wrapper
+	# fv3gfs-fortran submodule
 	COMPILED_IMAGE=$(FORTRAN_IMAGE) \
 		COMPILE_TARGET=fv3gfs-build \
 		BUILD_FROM_INTERMEDIATE=$(BUILD_FROM_INTERMEDIATE) \
