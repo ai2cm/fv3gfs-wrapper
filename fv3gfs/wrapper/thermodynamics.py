@@ -47,7 +47,8 @@ def set_state_mass_conserving(
         state[pressure] = Quantity(delp_new, units=delp_old.units, dims=delp_old.dims)
 
         for v in water_not_in_input:
-            # conserve mass of species not specified in input state
-            state[v] = old_state[v] * delp_old / delp_new
+            # conserve mass of water species not specified in input state
+            conserved_v = old_state[v].view[:] * delp_old.view[:] / delp_new.view[:]
+            state[v] = Quantity(conserved_v, old_state[v].dims, old_state[v].units)
 
     fv3gfs.set_state(state)
