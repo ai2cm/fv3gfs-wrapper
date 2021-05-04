@@ -22,7 +22,7 @@ build_fv3gfs_fortran:
 		GCR_URL=$(GCR_URL) \
 		$(MAKE) -C ../lib/external build
 
-build: build_fv3gfs-fortran
+build: build_fv3gfs_fortran
 	docker build -f Dockerfile \
 		-t $(FV3GFS_WRAPPER_IMAGE) \
 		--build-arg FMS_IMAGE=$(FMS_IMAGE)  \
