@@ -11,7 +11,13 @@ from fv3gfs.wrapper._properties import (
 )
 import fv3gfs.util
 from mpi4py import MPI
-from util import get_current_config, get_default_config, generate_data_dict, main
+from util import (
+    get_current_config,
+    get_default_config,
+    generate_data_dict,
+    main,
+    replace_state_with_random_values,
+)
 
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
@@ -128,12 +134,7 @@ class SetterTests(unittest.TestCase):
         self._set_names_one_at_a_time_helper(name_list)
 
     def _set_all_names_at_once_helper(self, name_list):
-        old_state = fv3gfs.wrapper.get_state(names=name_list)
-        self._check_gotten_state(old_state, name_list)
-        replace_state = deepcopy(old_state)
-        for name, quantity in replace_state.items():
-            quantity.view[:] = np.random.uniform(size=quantity.extent)
-        fv3gfs.wrapper.set_state(replace_state)
+        replace_state = replace_state_with_random_values(name_list)
         new_state = fv3gfs.wrapper.get_state(names=name_list)
         self._check_gotten_state(new_state, name_list)
         for name, new_quantity in new_state.items():
