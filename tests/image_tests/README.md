@@ -1,11 +1,10 @@
-Reference files exist in subdirectories of `reference`, e.g. `reference/circleci` for
-the baseline checksums used in Circle CI. This directory is a symbolic link to the same
-reference directory in the `fv3gfs-fortran` repo. These tests check regression against
-the fortran version of the model.
-
-Regression outputs should not be updated because of changes to this repository. They
-should instead be updated as necessary when updating `fv3gfs-fortran`.
-
 Test configurations are stored in `config` as fv3config yaml files. Adding new
 yaml files to this directory will add new regression tests automatically. This directory
 is also a symbolic link into the `fv3gfs-fortran` repo.
+
+These tests use pytest-regtest to manage regression data. Some changes are
+expected to break bit-for-bit compatibility. Examples include updating a
+compiler version or changing compiler flags. In these cases, the checksums
+can be updated by running
+
+    pytest --regtest-reset <path to this dir>/test_regression.py

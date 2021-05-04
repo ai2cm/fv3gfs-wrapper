@@ -1,12 +1,16 @@
 import unittest
 import os
-from copy import deepcopy
 from fv3gfs.wrapper._properties import OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
 import numpy as np
 import fv3gfs.wrapper
 import fv3gfs.util
 from mpi4py import MPI
-from util import get_default_config, main
+from util import (
+    get_default_config,
+    get_state_single_variable,
+    main,
+    replace_state_with_random_values,
+)
 
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
@@ -15,19 +19,6 @@ test_dir = os.path.dirname(os.path.abspath(__file__))
     DOWNWARD_SHORTWAVE,
     NET_SHORTWAVE,
 ) = OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
-
-
-def override_surface_radiative_fluxes_with_random_values():
-    old_state = fv3gfs.wrapper.get_state(names=OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES)
-    replace_state = deepcopy(old_state)
-    for name, quantity in replace_state.items():
-        quantity.view[:] = np.random.uniform(size=quantity.extent)
-    fv3gfs.wrapper.set_state(replace_state)
-    return replace_state
-
-
-def get_state_single_variable(name):
-    return fv3gfs.wrapper.get_state([name])[name].view[:]
 
 
 class OverridingSurfaceRadiativeFluxTests(unittest.TestCase):
@@ -64,7 +55,7 @@ class OverridingSurfaceRadiativeFluxTests(unittest.TestCase):
         # Restore state to original checkpoint; modify the radiative fluxes;
         # step the model again.
         fv3gfs.wrapper.set_state(checkpoint_state)
-        override_surface_radiative_fluxes_with_random_values()
+        replace_state_with_random_values(OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES)
         fv3gfs.wrapper.step()
         temperature_with_random_override = get_state_single_variable("air_temperature")
 
@@ -74,7 +65,9 @@ class OverridingSurfaceRadiativeFluxTests(unittest.TestCase):
         )
 
     def test_overriding_fluxes_are_propagated_to_diagnostics(self):
-        replace_state = override_surface_radiative_fluxes_with_random_values()
+        replace_state = replace_state_with_random_values(
+            OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
+        )
 
         # We need to step the model to fill the diagnostics buckets.
         fv3gfs.wrapper.step()

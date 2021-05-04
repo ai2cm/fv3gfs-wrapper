@@ -6,9 +6,7 @@ if [ -z "$DOCKER_IMAGE" ]; then
     DOCKER_IMAGE=us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu7-mpich314-nocuda
 fi
 
-pytest ./tests/image_tests/*.py
-
-if [[ "GOOGLE_APPLICATION_CREDENTIALS" == "" ]]
+if [[ "$GOOGLE_APPLICATION_CREDENTIALS" == "" ]]
 then
     docker run -it $DOCKER_IMAGE bash -c "cd /fv3gfs-wrapper; make test"
 else
