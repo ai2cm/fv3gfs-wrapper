@@ -12,7 +12,7 @@ FORTRAN_IMAGE = fv3gfs-fortran-build
 
 all: build
 
-build_fv3gfs-fortran:
+build_fv3gfs_fortran:
 	# Currently this build depends on the build artifacts produced by the
 	# fv3gfs-fortran submodule
 	COMPILED_IMAGE=$(FORTRAN_IMAGE) \
