@@ -71,7 +71,3 @@ def test_set_state_mass_conserving_water_added():
         pressure="delp",
     )
     np.testing.assert_allclose(mock.state["delp"].view[:], 2)
-
-
-def test_demonstrate_broken_test():
-    assert 0 == 1
