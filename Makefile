@@ -86,8 +86,7 @@ reformat: ## use black to auto-format code
 	black $(PYTHON_FILES) $(PYTHON_INIT_FILES)
 
 test: ## run tests quickly with the default Python
-	pytest ./tests/image_tests/*.py
-	pytest ./tests/test_all.py
+	pytest tests
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source fv3gfs setup.py test
