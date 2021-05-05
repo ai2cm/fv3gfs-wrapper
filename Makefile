@@ -87,7 +87,7 @@ reformat: ## use black to auto-format code
 
 test: ## run tests quickly with the default Python
 	pytest tests/pytest
-	pytest tests/test_all.py
+	pytest tests/test_all_mpi_requiring.py
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source fv3gfs setup.py test
