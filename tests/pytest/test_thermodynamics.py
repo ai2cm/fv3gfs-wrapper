@@ -14,6 +14,7 @@ class MockFv3GFS:
 
         self.dims = dims
         self.one = one
+        self.state = {}
 
     def get_state(self, names):
 

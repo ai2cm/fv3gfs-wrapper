@@ -61,7 +61,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -f .coverage
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
-	rm -fr tests/image_tests/output/*
+	rm -fr tests/pytest/output/*
 
 clean-lib:
 	$(MAKE) -C lib clean
@@ -86,8 +86,8 @@ reformat: ## use black to auto-format code
 	black $(PYTHON_FILES) $(PYTHON_INIT_FILES)
 
 test: ## run tests quickly with the default Python
-	pytest ./tests/image_tests/*.py
-	pytest ./tests/test_all.py
+	pytest tests/pytest
+	pytest tests/test_all_mpi_requiring.py
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source fv3gfs setup.py test
