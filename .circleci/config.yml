@@ -17,7 +17,7 @@ jobs:
       docker_layer_caching: true
       image: ubuntu-1604:201903-01
     environment:
-      GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-wrapper
+      GCR_IMAGE: us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu7-mpich314-nocuda
       GOOGLE_APPLICATION_CREDENTIALS: /tmp/key.json
     steps:
       - gcp-cli/install:
@@ -78,15 +78,15 @@ jobs:
           then
               echo "pushing untagged image $GCR_IMAGE"
               docker push $GCR_IMAGE
-              echo "pushing image $GCR_IMAGE:$CIRCLE_SHA1"
-              docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_SHA1
-              docker push $GCR_IMAGE:$CIRCLE_SHA1
+              echo "pushing image $GCR_IMAGE-$CIRCLE_SHA1"
+              docker tag $GCR_IMAGE $GCR_IMAGE-$CIRCLE_SHA1
+              docker push $GCR_IMAGE-$CIRCLE_SHA1
           fi
           if [[ ! -z "$CIRCLE_TAG" ]]
           then
-              echo "pushing tagged image $GCR_IMAGE:$CIRCLE_TAG"
-              docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_TAG
-              docker push $GCR_IMAGE:$CIRCLE_TAG
+              echo "pushing tagged image $GCR_IMAGE-$CIRCLE_TAG"
+              docker tag $GCR_IMAGE $GCR_IMAGE-$CIRCLE_TAG
+              docker push $GCR_IMAGE-$CIRCLE_TAG
           fi
       - run:
           name: "Delete data files"
