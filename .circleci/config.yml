@@ -54,6 +54,7 @@ jobs:
       - restore_cache:
           keys:
             - v1-fv3config-cache
+      - gcp-gcr/gcr-auth
       - run: 
           name: "Compile model and perform model tests"
           command: |
@@ -71,7 +72,6 @@ jobs:
           name: "Build documentation"
           command: |
             make docs-docker
-      - gcp-gcr/gcr-auth
       - run: |
           echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://gcr.io
           if [[ "$CIRCLE_BRANCH" == "master" ]]
