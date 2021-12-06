@@ -27,6 +27,7 @@ jobs:
           name: "save gcloud key for gcsfs"
           command: |
             echo $ENCODED_GCR_KEY | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS
+            echo "export GCLOUD_SERVICE_KEY=\$(echo \$ENCODED_GCR_KEY | base64 --decode)" >> $BASH_ENV
       - add_ssh_keys:
           fingerprints:
             - "dd:76:98:a1:2c:ec:29:0d:7e:3e:fd:57:c5:4e:a2:8f"  # github user key
