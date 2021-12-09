@@ -9,7 +9,7 @@ Sphinx==1.8.5
 twine==1.14.0
 Click==7.0
 f90nml>=1.1.0
-fv3config==0.5.1
+fv3config==0.8.0
 appdirs>=1.4.0
 requests
 sphinx_rtd_theme
