@@ -54,6 +54,7 @@ jobs:
       - restore_cache:
           keys:
             - v1-fv3config-cache
+      - gcp-gcr/gcr-auth
       - run: 
           name: "Compile model and perform model tests"
           command: |
@@ -71,22 +72,21 @@ jobs:
           name: "Build documentation"
           command: |
             make docs-docker
-      - gcp-gcr/gcr-auth
       - run: |
           echo "$ENCODED_GCR_KEY" | base64 --decode | docker login --username _json_key --password-stdin https://gcr.io
           if [[ "$CIRCLE_BRANCH" == "master" ]]
           then
               echo "pushing untagged image $GCR_IMAGE"
               docker push $GCR_IMAGE
-              echo "pushing image $GCR_IMAGE:$CIRCLE_SHA1"
-              docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_SHA1
-              docker push $GCR_IMAGE:$CIRCLE_SHA1
+              echo "pushing image $GCR_IMAGE-$CIRCLE_SHA1"
+              docker tag $GCR_IMAGE $GCR_IMAGE-$CIRCLE_SHA1
+              docker push $GCR_IMAGE-$CIRCLE_SHA1
           fi
           if [[ ! -z "$CIRCLE_TAG" ]]
           then
-              echo "pushing tagged image $GCR_IMAGE:$CIRCLE_TAG"
-              docker tag $GCR_IMAGE $GCR_IMAGE:$CIRCLE_TAG
-              docker push $GCR_IMAGE:$CIRCLE_TAG
+              echo "pushing tagged image $GCR_IMAGE-$CIRCLE_TAG"
+              docker tag $GCR_IMAGE $GCR_IMAGE-$CIRCLE_TAG
+              docker push $GCR_IMAGE-$CIRCLE_TAG
           fi
       - run:
           name: "Delete data files"
