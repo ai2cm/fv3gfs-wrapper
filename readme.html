@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Readme &mdash; fv3gfs-wrapper 0.5.0 documentation</title>
+  <title>Readme &mdash; fv3gfs-wrapper 0.6.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -214,7 +214,7 @@ docker image with bind-mounts into your local filesystem. Just be sure to <cite>
 when you’re done to remove the build artifacts, or it may cause problems when you
 build the docker image.</p>
 <p>With the image already built by <cite>make build-docker</cite> or pulled using
-<cite>docker pull us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu9-mpich314-nocuda</cite>, run <cite>dev_docker.sh</cite>. This will
+<cite>docker pull us.gcr.io/vcm-ml/fv3gfs-wrapper:gnu7-mpich314-nocuda</cite>, run <cite>dev_docker.sh</cite>. This will
 bind-mount the <cite>fv3gfs</cite>, <cite>lib</cite>, <cite>tests</cite>, <cite>external</cite>, and <cite>templates</cite> directories into the
 docker image. Inside the docker image, you can build or re-build the model with
 <cite>make build</cite> inside the <cite>/fv3gfs-wrapper</cite> directory, and run the test suite with

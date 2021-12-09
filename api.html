@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>API &mdash; fv3gfs-wrapper 0.5.0 documentation</title>
+  <title>API &mdash; fv3gfs-wrapper 0.6.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -221,7 +221,7 @@ and values are Quantities containing that quantity’s data.</p>
 <li><p><strong>state</strong> (<em>dict</em><em>, </em><em>optional</em>) – If given, update this state in-place with any retrieved
 quantities, and update any pre-existing quantities in-place with Fortran
 values.</p></li>
-<li><p><strong>allocator</strong> (<a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.QuantityFactory" title="(in fv3gfs-util v0.5.1)"><em>fv3gfs.util.QuantityFactory</em></a><em>, </em><em>optional</em>) – if given, use this to construct
+<li><p><strong>allocator</strong> (<a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.QuantityFactory" title="(in fv3gfs-util v0.6.0)"><em>fv3gfs.util.QuantityFactory</em></a><em>, </em><em>optional</em>) – if given, use this to construct
 quantities. Otherwise use a QuantityFactory which uses the dimensions
 from the Fortran model with 3 allocated halo points.</p></li>
 </ul>
@@ -352,7 +352,7 @@ the Fortran model.</p>
 
 <dl class="function">
 <dt id="fv3gfs.wrapper.set_state_mass_conserving">
-<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">set_state_mass_conserving</code><span class="sig-paren">(</span><em class="sig-param">state: Mapping[str, fv3gfs.util.quantity.Quantity], fv3gfs=&lt;module 'fv3gfs.wrapper._wrapper' from '/fv3gfs-wrapper/fv3gfs/wrapper/_wrapper.cpython-37m-x86_64-linux-gnu.so'&gt;, pressure='pressure_thickness_of_atmospheric_layer'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3gfs/wrapper/thermodynamics.html#set_state_mass_conserving"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.wrapper.set_state_mass_conserving" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fv3gfs.wrapper.</code><code class="sig-name descname">set_state_mass_conserving</code><span class="sig-paren">(</span><em class="sig-param">state: Mapping[str, fv3gfs.util.quantity.Quantity], fv3gfs=&lt;module 'fv3gfs.wrapper._wrapper' from '/fv3gfs-wrapper/fv3gfs/wrapper/_wrapper.cpython-36m-x86_64-linux-gnu.so'&gt;, pressure='pressure_thickness_of_atmospheric_layer'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fv3gfs/wrapper/thermodynamics.html#set_state_mass_conserving"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fv3gfs.wrapper.set_state_mass_conserving" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the state in a mass conserving way</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

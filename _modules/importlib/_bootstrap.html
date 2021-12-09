@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>importlib._bootstrap &mdash; fv3gfs-wrapper 0.5.0 documentation</title>
+  <title>importlib._bootstrap &mdash; fv3gfs-wrapper 0.6.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -681,18 +681,6 @@
 
                 <span class="n">loader</span> <span class="o">=</span> <span class="n">_NamespaceLoader</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">_NamespaceLoader</span><span class="p">)</span>
                 <span class="n">loader</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">submodule_search_locations</span>
-                <span class="n">spec</span><span class="o">.</span><span class="n">loader</span> <span class="o">=</span> <span class="n">loader</span>
-                <span class="c1"># While the docs say that module.__file__ is not set for</span>
-                <span class="c1"># built-in modules, and the code below will avoid setting it if</span>
-                <span class="c1"># spec.has_location is false, this is incorrect for namespace</span>
-                <span class="c1"># packages.  Namespace packages have no location, but their</span>
-                <span class="c1"># __spec__.origin is None, and thus their module.__file__</span>
-                <span class="c1"># should also be None for consistency.  While a bit of a hack,</span>
-                <span class="c1"># this is the best place to ensure this consistency.</span>
-                <span class="c1">#</span>
-                <span class="c1"># See # https://docs.python.org/3/library/importlib.html#importlib.abc.Loader.load_module</span>
-                <span class="c1"># and bpo-32305</span>
-                <span class="n">module</span><span class="o">.</span><span class="vm">__file__</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">module</span><span class="o">.</span><span class="n">__loader__</span> <span class="o">=</span> <span class="n">loader</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
@@ -1299,24 +1287,33 @@
 
     <span class="c1"># Directly load built-in modules needed during bootstrap.</span>
     <span class="n">self_module</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">builtin_name</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;_thread&#39;</span><span class="p">,</span> <span class="s1">&#39;_warnings&#39;</span><span class="p">,</span> <span class="s1">&#39;_weakref&#39;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">builtin_name</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;_warnings&#39;</span><span class="p">,):</span>
         <span class="k">if</span> <span class="n">builtin_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
             <span class="n">builtin_module</span> <span class="o">=</span> <span class="n">_builtin_from_name</span><span class="p">(</span><span class="n">builtin_name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">builtin_module</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">builtin_name</span><span class="p">]</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="n">self_module</span><span class="p">,</span> <span class="n">builtin_name</span><span class="p">,</span> <span class="n">builtin_module</span><span class="p">)</span>
 
+    <span class="c1"># Directly load the _thread module (needed during bootstrap).</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">thread_module</span> <span class="o">=</span> <span class="n">_builtin_from_name</span><span class="p">(</span><span class="s1">&#39;_thread&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="c1"># Python was built without threads</span>
+        <span class="n">thread_module</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">self_module</span><span class="p">,</span> <span class="s1">&#39;_thread&#39;</span><span class="p">,</span> <span class="n">thread_module</span><span class="p">)</span>
+
+    <span class="c1"># Directly load the _weakref module (needed during bootstrap).</span>
+    <span class="n">weakref_module</span> <span class="o">=</span> <span class="n">_builtin_from_name</span><span class="p">(</span><span class="s1">&#39;_weakref&#39;</span><span class="p">)</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">self_module</span><span class="p">,</span> <span class="s1">&#39;_weakref&#39;</span><span class="p">,</span> <span class="n">weakref_module</span><span class="p">)</span>
+
 
 <span class="k">def</span> <span class="nf">_install</span><span class="p">(</span><span class="n">sys_module</span><span class="p">,</span> <span class="n">_imp_module</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Install importers for builtin and frozen modules&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Install importlib as the implementation of import.&quot;&quot;&quot;</span>
     <span class="n">_setup</span><span class="p">(</span><span class="n">sys_module</span><span class="p">,</span> <span class="n">_imp_module</span><span class="p">)</span>
 
     <span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BuiltinImporter</span><span class="p">)</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">FrozenImporter</span><span class="p">)</span>
 
-
-<span class="k">def</span> <span class="nf">_install_external_importers</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Install importers that require external filesystem access&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_bootstrap_external</span>
     <span class="kn">import</span> <span class="nn">_frozen_importlib_external</span>
     <span class="n">_bootstrap_external</span> <span class="o">=</span> <span class="n">_frozen_importlib_external</span>

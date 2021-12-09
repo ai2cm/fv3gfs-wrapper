@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>History &mdash; fv3gfs-wrapper 0.5.0 documentation</title>
+  <title>History &mdash; fv3gfs-wrapper 0.6.0 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -94,7 +94,8 @@
 <li class="toctree-l1"><a class="reference internal" href="developers.html">Developers Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">History</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#latest">latest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#unreleased">Unreleased</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-6-0-2021-01-27">v0.6.0 (2021-01-27)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-5-0-2020-07-28">v0.5.0 (2020-07-28)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-4-3-2020-05-15">v0.4.3 (2020-05-15)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-4-2-2020-05-12">v0.4.2 (2020-05-12)</a></li>
@@ -177,8 +178,31 @@
             
   <div class="section" id="history">
 <h1>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="latest">
-<h2>latest<a class="headerlink" href="#latest" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="unreleased">
+<h2>Unreleased<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
+<p>Minor changes:
+- Added getters and setters for <cite>Statein%adjsfcdlw_override</cite>,</p>
+<blockquote>
+<div><p><cite>Statein%adjsfcdsw_override</cite>, and <cite>Statein%adjsfcnsw_override</cite>.  These
+correspond to the time adjusted total sky downward longwave radiative flux at
+the surface, the time adjusted total sky downward shortwave radiative flux at
+the surface, and the time adjusted total sky net shortwave radiative flux at
+the surface, respectively.  Note they are only available if the
+<cite>gfs_physics_nml.override_surface_radiative_fluxes</cite> namelist parameter is set
+to <cite>.true.</cite>.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Added getter and setter for <cite>Radtend%sfalb</cite>, the surface diffused shortwave
+albedo.</p></li>
+<li><p>Added flags for the physics timestep, <cite>dt_atmos</cite>, and namelist flag for
+overriding the surface radiative fluxes, <cite>override_surface_radiative_fluxes</cite>,
+to the <cite>Flags</cite> class.</p></li>
+<li><p>Fixed a bug in the implementation of boolean flags that prevented them from
+working properly; to date the only flag this impacted was <cite>do_adiabatic_init</cite>.</p></li>
+</ul>
+</div>
+<div class="section" id="v0-6-0-2021-01-27">
+<h2>v0.6.0 (2021-01-27)<a class="headerlink" href="#v0-6-0-2021-01-27" title="Permalink to this headline">¶</a></h2>
 <p>Breaking changes:
 - Removed many fv3util imports from fv3gfs, import those symbols from fv3gfs.util instead
 - Removed initial cache data from fv3gfs-wrapper image</p>
@@ -187,14 +211,16 @@
 in the <cite>coupler_nml</cite> namelist.
 - Fortran source updated to include new per-physics-component tendency diagnostics for temperature and specific humidity, and to ensure that the column moistening implied by nudging specific humidity is subtracted from the precipitation felt by the land surface model.
 - The wrapper now passes runtime flags similarly to physics and dynamics properties but in a class structure, so ptop is accessible as <cite>wrapper.flags.ptop</cite>.
-- <cite>build_deps</cite> and <cite>push_deps</cite> make targets are removed from <cite>docker/Makefile</cite>. Use the make targets in fv3gfs-fortran instead.</p>
+- <cite>build_deps</cite> and <cite>push_deps</cite> make targets are removed from <cite>docker/Makefile</cite>. Use the make targets in fv3gfs-fortran instead.
+- Added <cite>fv3gfs.wrapper.examples</cite> module with an example random forest corrector model, which can be enabled if the dependency extras option <cite>sklearn_json</cite> is selected.</p>
 <p>Minor changes:
 - added jenkins scripts under .jenkins
 - Dawn is removed from the fv3gfs-wrapper test image
 - Makefile in lib no longer depends on fv3gfs configuration files, since they were not actually being used.
 - CC used for <cite>python setup.py build_ext –inplace</cite> is now specified directly in the Makefile (default gcc), since docker was somehow using different compilers locally and in CI
 - add <cite>Sfcprop%tsfco</cite> and <cite>Sfcprop%tsfcl</cite> to <cite>physics_properties.json</cite>
-- added baroclinic and state-saving cases to <cite>examples/runfiles</cite></p>
+- added baroclinic and state-saving cases to <cite>examples/runfiles</cite>
+- added GMD paper examples with timings to <cite>examples/gmd_timings</cite></p>
 </div>
 <div class="section" id="v0-5-0-2020-07-28">
 <h2>v0.5.0 (2020-07-28)<a class="headerlink" href="#v0-5-0-2020-07-28" title="Permalink to this headline">¶</a></h2>

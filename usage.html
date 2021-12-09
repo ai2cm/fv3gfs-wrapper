@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Usage &mdash; fv3gfs-wrapper 0.5.0 documentation</title>
+  <title>Usage &mdash; fv3gfs-wrapper 0.6.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -240,7 +240,7 @@ names you would need to write out to disk in order to smoothly reset the model s
 <p>after calling <a class="reference internal" href="api.html#fv3gfs.wrapper.set_state" title="fv3gfs.wrapper.set_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.set_state()</span></code></a>, the model would be reset to the point
 where the checkpoint state was retrieved.</p>
 <p>The remaining step for restarting from disk is to be able to write model states to/from disk.
-For this, we have <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.write_state" title="(in fv3gfs-util v0.5.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.write_state()</span></code></a> and <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.read_state" title="(in fv3gfs-util v0.5.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.read_state()</span></code></a>. Consider a model
+For this, we have <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.write_state" title="(in fv3gfs-util v0.6.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.write_state()</span></code></a> and <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.read_state" title="(in fv3gfs-util v0.6.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.read_state()</span></code></a>. Consider a model
 script with a general structure as follows:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
 <span class="kn">import</span> <span class="nn">fv3gfs.wrapper</span>
@@ -265,7 +265,7 @@ script with a general structure as follows:</p>
 </div>
 <p>In this script, if a restart file exists in the RESTART directory, it will be read in and overwrite
 the model state after the Fortran initialization routines take place. Each MPI rank
-(process) reads (with <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.read_state" title="(in fv3gfs-util v0.5.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.read_state()</span></code></a>) or writes (with <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.write_state" title="(in fv3gfs-util v0.5.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.write_state()</span></code></a>)
+(process) reads (with <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.read_state" title="(in fv3gfs-util v0.6.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.read_state()</span></code></a>) or writes (with <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.write_state" title="(in fv3gfs-util v0.6.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.write_state()</span></code></a>)
 a netCDF file with all of its restart data. <a class="reference internal" href="api.html#fv3gfs.wrapper.get_restart_names" title="fv3gfs.wrapper.get_restart_names"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.get_restart_names()</span></code></a> returns
 a list of all quantity names required to restart the model.</p>
 <p><code class="xref py py-func docutils literal notranslate"><span class="pre">save_intermediate_restart_if_enabled()</span></code>

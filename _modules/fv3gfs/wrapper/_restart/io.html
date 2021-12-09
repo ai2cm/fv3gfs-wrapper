@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fv3gfs.wrapper._restart.io &mdash; fv3gfs-wrapper 0.5.0 documentation</title>
+  <title>fv3gfs.wrapper._restart.io &mdash; fv3gfs-wrapper 0.6.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -160,7 +160,11 @@
             
   <h1>Source code for fv3gfs.wrapper._restart.io</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">.._wrapper</span> <span class="kn">import</span> <span class="n">get_tracer_metadata</span>
-<span class="kn">from</span> <span class="nn">.._properties</span> <span class="kn">import</span> <span class="n">DYNAMICS_PROPERTIES</span><span class="p">,</span> <span class="n">PHYSICS_PROPERTIES</span>
+<span class="kn">from</span> <span class="nn">.._properties</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DYNAMICS_PROPERTIES</span><span class="p">,</span>
+    <span class="n">PHYSICS_PROPERTIES</span><span class="p">,</span>
+    <span class="n">OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># these variables are found not to be needed for smooth restarts</span>
 <span class="c1"># later we could represent this as a key in the dynamics/physics properties</span>
@@ -168,7 +172,7 @@
     <span class="s2">&quot;convective_cloud_fraction&quot;</span><span class="p">,</span>
     <span class="s2">&quot;convective_cloud_top_pressure&quot;</span><span class="p">,</span>
     <span class="s2">&quot;convective_cloud_bottom_pressure&quot;</span><span class="p">,</span>
-<span class="p">]</span>
+<span class="p">]</span> <span class="o">+</span> <span class="n">OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES</span>
 
 
 <div class="viewcode-block" id="get_restart_names"><a class="viewcode-back" href="../../../../api.html#fv3gfs.wrapper.get_restart_names">[docs]</a><span class="k">def</span> <span class="nf">get_restart_names</span><span class="p">():</span>
