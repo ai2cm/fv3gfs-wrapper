@@ -25,7 +25,7 @@ v0.6.0 (2021-01-27)
 -------------------
 
 Breaking changes:
-- Removed many fv3util imports from fv3gfs, import those symbols from fv3gfs.util instead
+- Removed many fv3util imports from fv3gfs, import those symbols from pace.util instead
 - Removed initial cache data from fv3gfs-wrapper image
 
 Major changes:

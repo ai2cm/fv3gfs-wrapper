@@ -1,7 +1,7 @@
 import numpy as np
 from typing import BinaryIO, TextIO, Mapping
 import json
-import fv3gfs.util
+import pace.util
 import os
 from datetime import timedelta
 
@@ -94,7 +94,7 @@ class RandomForest:
         }
 
     def _to_feature_array(self, array, dims):
-        if dims.index(fv3gfs.util.Z_DIM) != 0:
+        if dims.index(pace.util.Z_DIM) != 0:
             raise ValueError(
                 "Example is written for data whose first dimension "
                 "is the vertical, received dimensions {dims}"

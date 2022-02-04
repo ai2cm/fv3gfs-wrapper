@@ -1,5 +1,5 @@
 from mpi4py import MPI
-import fv3gfs.util
+import pace.util
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -16,4 +16,4 @@ def get_tile_index(tile_rank=None, total_ranks=None):
         tile_rank = rank
     if total_ranks is None:
         total_ranks = size
-    return fv3gfs.util.get_tile_index(tile_rank, total_ranks)
+    return pace.util.get_tile_index(tile_rank, total_ranks)

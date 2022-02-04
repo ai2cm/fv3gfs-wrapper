@@ -1,4 +1,4 @@
-import fv3gfs.util
+import pace.util
 from ._wrapper import (
     initialize,
     step,
@@ -27,7 +27,7 @@ from .thermodynamics import set_state_mass_conserving
 
 def get_diagnostic_by_name(
     name: str, module_name: str = "gfs_phys"
-) -> fv3gfs.util.Quantity:
+) -> pace.util.Quantity:
     """Get a diagnostic field as a Quantity
 
     Currently, only supports diagnostics defined in the GFS_diagnostics.F90

@@ -1,5 +1,5 @@
 import fv3gfs.wrapper
-from fv3gfs.util import write_state
+from pace.util import write_state
 import mpi4py
 
 # May need to run 'ulimit -s unlimited' before running this example

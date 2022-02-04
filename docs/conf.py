@@ -42,7 +42,7 @@ extensions = [
 ]
 
 intersphinx_mapping = {
-    "fv3gfs.util": ("https://fv3gfs-util.readthedocs.io/en/latest/", None)
+    "pace.util": ("https://pace-util.readthedocs.io/en/latest/", None)
 }
 
 # Add any paths that contain templates here, relative to this directory.

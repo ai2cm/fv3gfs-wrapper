@@ -3,7 +3,7 @@ import os
 from fv3gfs.wrapper._properties import OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES
 import numpy as np
 import fv3gfs.wrapper
-import fv3gfs.util
+import pace.util
 from mpi4py import MPI
 from util import (
     get_default_config,

@@ -1,7 +1,7 @@
 import unittest
 import os
 import fv3gfs.wrapper
-import fv3gfs.util
+import pace.util
 from mpi4py import MPI
 
 from util import get_default_config, main
@@ -42,7 +42,7 @@ class DiagnosticTests(unittest.TestCase):
             info = fv3gfs.wrapper.get_diagnostic_metadata_by_name(
                 name, module_name="gfs_phys"
             )
-            self.assertIsInstance(quantity, fv3gfs.util.Quantity)
+            self.assertIsInstance(quantity, pace.util.Quantity)
             assert quantity.view[:].ndim == info.axes
             assert quantity.units == info.unit
 

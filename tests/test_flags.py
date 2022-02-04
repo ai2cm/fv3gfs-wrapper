@@ -2,7 +2,7 @@ import unittest
 import os
 import numpy as np
 import fv3gfs.wrapper
-import fv3gfs.util
+import pace.util
 from fv3gfs.wrapper._properties import FLAGSTRUCT_PROPERTIES
 from mpi4py import MPI
 
