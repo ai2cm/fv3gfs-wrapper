@@ -20,9 +20,7 @@ class MockFv3GFS:
 
         state = {
             "delp": pace.util.Quantity(self.one, units="Pa", dims=self.dims),
-            "specific_humidity": pace.util.Quantity(
-                self.one, units="", dims=self.dims
-            ),
+            "specific_humidity": pace.util.Quantity(self.one, units="", dims=self.dims),
             "cloud_water_mixing_ratio": pace.util.Quantity(
                 self.one, units="", dims=self.dims
             ),
