@@ -23,7 +23,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(".."))  # noqa
 
-import fv3gfs.wrapper
+import fv3gfs.wrapper  # noqa: E402
 
 # -- General configuration ---------------------------------------------
 

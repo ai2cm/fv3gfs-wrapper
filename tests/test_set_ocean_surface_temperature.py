@@ -2,7 +2,6 @@ import unittest
 import os
 import numpy as np
 import fv3gfs.wrapper
-import pace.util
 from mpi4py import MPI
 from util import (
     get_default_config,
