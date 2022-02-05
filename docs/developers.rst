@@ -6,18 +6,18 @@ Developers Notes
 Here are some fairly informal notes about the build system and package organization
 structure for the ``fv3gfs-wrapper`` wrapper.
 
-``fv3gfs-util`` Package
+``pace-util`` Package
 -----------------------
 
 Much of the functionality used to write run scripts in ``fv3gfs-wrapper`` is split out
-into a package called ``fv3gfs-util``.
+into a package called ``pace-util``.
 Any functionality that can be written to be independent of the wrapped Fortran model
-is put into ``fv3gfs-util``. This makes it much easier to iterate on and test pure Python
+is put into ``pace-util``. This makes it much easier to iterate on and test pure Python
 code for the model, as one can install the package onto the host system without needing
 to use Docker to handle Fortran dependencies. This also makes it possible for analysis
 codes to use the same routines used by the wrapped model.
 
-We recommend users and developers read the `fv3gfs-util` documentation as well to make
+We recommend users and developers read the `pace-util` documentation as well to make
 full use of this package.
 
 Templates

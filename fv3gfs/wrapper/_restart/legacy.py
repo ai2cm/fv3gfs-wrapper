@@ -1,11 +1,11 @@
 from typing import List
-import fv3gfs.util
+import pace.util
 from .. import _wrapper
 
 
 def open_restart(
     dirname: str,
-    communicator: fv3gfs.util.CubedSphereCommunicator,
+    communicator: pace.util.CubedSphereCommunicator,
     label: str = "",
     only_names: List[str] = None,
 ) -> dict:
@@ -24,7 +24,7 @@ def open_restart(
         state: model state dictionary
     """
     tracer_properties = _wrapper.get_tracer_metadata()
-    return fv3gfs.util.open_restart(
+    return pace.util.open_restart(
         dirname,
         communicator,
         label=label,

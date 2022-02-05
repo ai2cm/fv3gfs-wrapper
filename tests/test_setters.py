@@ -9,7 +9,7 @@ from fv3gfs.wrapper._properties import (
     PHYSICS_PROPERTIES,
     OVERRIDES_FOR_SURFACE_RADIATIVE_FLUXES,
 )
-import fv3gfs.util
+import pace.util
 from mpi4py import MPI
 from util import (
     get_current_config,
@@ -85,7 +85,7 @@ class SetterTests(unittest.TestCase):
     def test_set_then_get_transposed_air_temperature(self):
         self._set_names_one_at_a_time_helper(
             ["air_temperature"],
-            input_modifier=lambda quantity: fv3gfs.util.Quantity(
+            input_modifier=lambda quantity: pace.util.Quantity(
                 np.ascontiguousarray(quantity.data.transpose()),
                 dims=quantity.dims[::-1],
                 units=quantity.units,
@@ -123,7 +123,7 @@ class SetterTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             fv3gfs.wrapper.set_state(
                 {
-                    "non_quantity": fv3gfs.util.Quantity(
+                    "non_quantity": pace.util.Quantity(
                         np.array([0.0]), dims=["dim1"], units=""
                     )
                 }
@@ -174,7 +174,7 @@ class SetterTests(unittest.TestCase):
     def _check_gotten_state(self, state, name_list):
         for name, value in state.items():
             self.assertIsInstance(name, str)
-            self.assertIsInstance(value, fv3gfs.util.Quantity)
+            self.assertIsInstance(value, pace.util.Quantity)
         for name in name_list:
             self.assertIn(name, state)
         self.assertEqual(len(name_list), len(state.keys()))
@@ -184,10 +184,10 @@ class SetterTests(unittest.TestCase):
 
     def _set_unallocated_override_for_radiative_surface_flux(self, name):
         config = get_current_config()
-        sizer = fv3gfs.util.SubtileGridSizer.from_namelist(config["namelist"])
-        factory = fv3gfs.util.QuantityFactory(sizer, np)
+        sizer = pace.util.SubtileGridSizer.from_namelist(config["namelist"])
+        factory = pace.util.QuantityFactory(sizer, np)
         quantity = factory.zeros(["x", "y"], units="W/m**2")
-        with self.assertRaisesRegex(fv3gfs.util.InvalidQuantityError, "Overriding"):
+        with self.assertRaisesRegex(pace.util.InvalidQuantityError, "Overriding"):
             fv3gfs.wrapper.set_state({name: quantity})
 
     def test_set_unallocated_override_for_radiative_surface_flux(self):

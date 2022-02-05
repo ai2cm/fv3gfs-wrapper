@@ -2,7 +2,7 @@ import unittest
 import os
 import numpy as np
 import fv3gfs.wrapper
-import fv3gfs.util
+import pace.util
 from fv3gfs.wrapper._properties import (
     DYNAMICS_PROPERTIES,
     PHYSICS_PROPERTIES,
@@ -57,7 +57,7 @@ class GetterTests(unittest.TestCase):
         state = fv3gfs.wrapper.get_state(names=["air_temperature"])
         self.assertIn("air_temperature", state.keys())
         quantity = state["air_temperature"]
-        self.assertIsInstance(quantity, fv3gfs.util.Quantity)
+        self.assertIsInstance(quantity, pace.util.Quantity)
 
         self.assertEqual(quantity.units, "degK")
         self.assertTrue(quantity.np.all(quantity.view[:] > 150.0))
@@ -68,7 +68,7 @@ class GetterTests(unittest.TestCase):
         state = fv3gfs.wrapper.get_state(names=["surface_geopotential"])
         self.assertIn("surface_geopotential", state.keys())
         quantity = state["surface_geopotential"]
-        self.assertIsInstance(quantity, fv3gfs.util.Quantity)
+        self.assertIsInstance(quantity, pace.util.Quantity)
 
         self.assertEqual(quantity.units, "m^2 s^-2")
 
@@ -77,7 +77,7 @@ class GetterTests(unittest.TestCase):
         state = fv3gfs.wrapper.get_state(names=["soil_temperature"])
         self.assertIn("soil_temperature", state.keys())
         quantity = state["soil_temperature"]
-        self.assertIsInstance(quantity, fv3gfs.util.Quantity)
+        self.assertIsInstance(quantity, pace.util.Quantity)
 
         self.assertEqual(quantity.units, "degK")
 
@@ -152,14 +152,14 @@ class GetterTests(unittest.TestCase):
         for name, value in state.items():
             with self.subTest(name):
                 self.assertIsInstance(name, str)
-                self.assertIsInstance(value, fv3gfs.util.Quantity)
+                self.assertIsInstance(value, pace.util.Quantity)
         for name in name_list:
             with self.subTest(name):
                 self.assertIn(name, state)
         self.assertEqual(len(name_list), len(state.keys()))
 
     def _get_unallocated_name_helper(self, name):
-        with self.assertRaisesRegex(fv3gfs.util.InvalidQuantityError, "Overriding"):
+        with self.assertRaisesRegex(pace.util.InvalidQuantityError, "Overriding"):
             fv3gfs.wrapper.get_state(names=[name])
 
     def test_unallocated_physics_properties(self):

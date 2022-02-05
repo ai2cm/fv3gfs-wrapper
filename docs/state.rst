@@ -18,9 +18,9 @@ are domain-decomposed fields (as opposed to global fields).
 Quantity
 --------
 
-Data in ``fv3gfs-wrapper`` is managed using a container type called :py:class:`fv3gfs.util.Quantity`.
+Data in ``fv3gfs-wrapper`` is managed using a container type called :py:class:`pace.util.Quantity`.
 This stores metadata such as dimensions and units (in ``quantity.dims`` and ``quantity.units``),
-and manages the "computational domain" of the data. See the `fv3gfs-util`_ documentation for
+and manages the "computational domain" of the data. See the `pace-util`_ documentation for
 full details about this object.
 
-.. _`fv3gfs-util`: https://fv3gfs-util.readthedocs.io/en/latest/
+.. _`pace-util`: https://pace-util.readthedocs.io/en/latest/

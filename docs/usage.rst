@@ -56,11 +56,11 @@ Instead of using a Python script, it is also possible to get precisely the behav
     $ python -m fv3gfs.wrapper.run
 
 
-fv3gfs-util
+pace-util
 -----------
 
 Any functionality which can be used separately from the compiled Fortran model is included
-in a separate package, fv3gfs-util. We recommend reading the documentation for that package
+in a separate package, pace-util. We recommend reading the documentation for that package
 to see what tools it provides for use in your runfiles.
 
 Restart
@@ -85,14 +85,14 @@ after calling :py:func:`fv3gfs.wrapper.set_state`, the model would be reset to t
 where the checkpoint state was retrieved.
 
 The remaining step for restarting from disk is to be able to write model states to/from disk.
-For this, we have :py:func:`fv3gfs.util.write_state` and :py:func:`fv3gfs.util.read_state`. Consider a model
+For this, we have :py:func:`pace.util.write_state` and :py:func:`pace.util.read_state`. Consider a model
 script with a general structure as follows:
 
 .. code-block:: python
 
     from mpi4py import MPI
     import fv3gfs.wrapper
-    import fv3gfs.util
+    import pace.util
     import os
 
     fv3gfs.wrapper.initialize()
@@ -101,18 +101,18 @@ script with a general structure as follows:
         f'RESTART/restart.rank{MPI.COMM_WORLD.Get_rank()}.nc'
     )
     if os.path.isfile(restart_filename):
-        restart_state = fv3gfs.util.read_state(restart_filename)
+        restart_state = pace.util.read_state(restart_filename)
         fv3gfs.wrapper.set_state(restart_state)
 
     # ... continue to main loop and other parts of run script
 
     # after main loop is finished:
     restart_state = fv3gfs.wrapper.get_state(fv3gfs.wrapper.get_restart_names())
-    fv3gfs.util.write_state(restart_state, restart_filename)
+    pace.util.write_state(restart_state, restart_filename)
 
 In this script, if a restart file exists in the RESTART directory, it will be read in and overwrite
 the model state after the Fortran initialization routines take place. Each MPI rank
-(process) reads (with :py:func:`fv3gfs.util.read_state`) or writes (with :py:func:`fv3gfs.util.write_state`)
+(process) reads (with :py:func:`pace.util.read_state`) or writes (with :py:func:`pace.util.write_state`)
 a netCDF file with all of its restart data. :py:func:`fv3gfs.wrapper.get_restart_names` returns
 a list of all quantity names required to restart the model.
 

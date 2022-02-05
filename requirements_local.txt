@@ -1,2 +1,1 @@
--e external/fv3gfs-util
 -e .[examples]

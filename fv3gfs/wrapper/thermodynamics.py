@@ -2,7 +2,7 @@
 """
 from . import _wrapper
 from typing import Mapping
-from fv3gfs.util import Quantity
+from pace.util import Quantity
 
 
 def set_state_mass_conserving(
