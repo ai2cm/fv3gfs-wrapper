@@ -69,7 +69,6 @@ FROM fv3gfs-wrapper-build AS fv3gfs-wrapper
 # copy and install dependency packages
 COPY fill_templates.py /fv3gfs-wrapper/fill_templates.py
 COPY templates/ /fv3gfs-wrapper/templates/
-COPY external /fv3gfs-wrapper/external
 COPY lib/ /fv3gfs-wrapper/lib/
 
 COPY requirements_local.txt /fv3gfs-wrapper/requirements_local.txt
