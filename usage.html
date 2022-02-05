@@ -93,7 +93,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#using-mpi">Using MPI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-the-model">Running the model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#fv3gfs-util">fv3gfs-util</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pace-util">pace-util</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#restart">Restart</a></li>
 </ul>
 </li>
@@ -216,10 +216,10 @@ consistent with each other before <a class="reference internal" href="api.html#f
 </pre></div>
 </div>
 </div>
-<div class="section" id="fv3gfs-util">
-<h2>fv3gfs-util<a class="headerlink" href="#fv3gfs-util" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="pace-util">
+<h2>pace-util<a class="headerlink" href="#pace-util" title="Permalink to this headline">¶</a></h2>
 <p>Any functionality which can be used separately from the compiled Fortran model is included
-in a separate package, fv3gfs-util. We recommend reading the documentation for that package
+in a separate package, pace-util. We recommend reading the documentation for that package
 to see what tools it provides for use in your runfiles.</p>
 </div>
 <div class="section" id="restart">
@@ -240,11 +240,11 @@ names you would need to write out to disk in order to smoothly reset the model s
 <p>after calling <a class="reference internal" href="api.html#fv3gfs.wrapper.set_state" title="fv3gfs.wrapper.set_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.set_state()</span></code></a>, the model would be reset to the point
 where the checkpoint state was retrieved.</p>
 <p>The remaining step for restarting from disk is to be able to write model states to/from disk.
-For this, we have <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.write_state" title="(in fv3gfs-util v0.6.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.write_state()</span></code></a> and <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.read_state" title="(in fv3gfs-util v0.6.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.read_state()</span></code></a>. Consider a model
+For this, we have <code class="xref py py-func docutils literal notranslate"><span class="pre">pace.util.write_state()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">pace.util.read_state()</span></code>. Consider a model
 script with a general structure as follows:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
 <span class="kn">import</span> <span class="nn">fv3gfs.wrapper</span>
-<span class="kn">import</span> <span class="nn">fv3gfs.util</span>
+<span class="kn">import</span> <span class="nn">pace.util</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
 <span class="n">fv3gfs</span><span class="o">.</span><span class="n">wrapper</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
@@ -253,19 +253,19 @@ script with a general structure as follows:</p>
     <span class="sa">f</span><span class="s1">&#39;RESTART/restart.rank</span><span class="si">{</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span><span class="si">}</span><span class="s1">.nc&#39;</span>
 <span class="p">)</span>
 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">restart_filename</span><span class="p">):</span>
-    <span class="n">restart_state</span> <span class="o">=</span> <span class="n">fv3gfs</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">read_state</span><span class="p">(</span><span class="n">restart_filename</span><span class="p">)</span>
+    <span class="n">restart_state</span> <span class="o">=</span> <span class="n">pace</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">read_state</span><span class="p">(</span><span class="n">restart_filename</span><span class="p">)</span>
     <span class="n">fv3gfs</span><span class="o">.</span><span class="n">wrapper</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">restart_state</span><span class="p">)</span>
 
 <span class="c1"># ... continue to main loop and other parts of run script</span>
 
 <span class="c1"># after main loop is finished:</span>
 <span class="n">restart_state</span> <span class="o">=</span> <span class="n">fv3gfs</span><span class="o">.</span><span class="n">wrapper</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">fv3gfs</span><span class="o">.</span><span class="n">wrapper</span><span class="o">.</span><span class="n">get_restart_names</span><span class="p">())</span>
-<span class="n">fv3gfs</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">write_state</span><span class="p">(</span><span class="n">restart_state</span><span class="p">,</span> <span class="n">restart_filename</span><span class="p">)</span>
+<span class="n">pace</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">write_state</span><span class="p">(</span><span class="n">restart_state</span><span class="p">,</span> <span class="n">restart_filename</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>In this script, if a restart file exists in the RESTART directory, it will be read in and overwrite
 the model state after the Fortran initialization routines take place. Each MPI rank
-(process) reads (with <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.read_state" title="(in fv3gfs-util v0.6.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.read_state()</span></code></a>) or writes (with <a class="reference external" href="https://fv3gfs-util.readthedocs.io/en/latest/api.html#fv3gfs.util.write_state" title="(in fv3gfs-util v0.6.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.util.write_state()</span></code></a>)
+(process) reads (with <code class="xref py py-func docutils literal notranslate"><span class="pre">pace.util.read_state()</span></code>) or writes (with <code class="xref py py-func docutils literal notranslate"><span class="pre">pace.util.write_state()</span></code>)
 a netCDF file with all of its restart data. <a class="reference internal" href="api.html#fv3gfs.wrapper.get_restart_names" title="fv3gfs.wrapper.get_restart_names"><code class="xref py py-func docutils literal notranslate"><span class="pre">fv3gfs.wrapper.get_restart_names()</span></code></a> returns
 a list of all quantity names required to restart the model.</p>
 <p><code class="xref py py-func docutils literal notranslate"><span class="pre">save_intermediate_restart_if_enabled()</span></code>

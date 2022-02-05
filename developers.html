@@ -93,7 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="state.html">State</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Developers Notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#fv3gfs-util-package"><code class="docutils literal notranslate"><span class="pre">fv3gfs-util</span></code> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pace-util-package"><code class="docutils literal notranslate"><span class="pre">pace-util</span></code> Package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#templates">Templates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#properties-files">Properties Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#docker-build-system">Docker build system</a></li>
@@ -171,16 +171,16 @@
 <h1>Developers Notes<a class="headerlink" href="#developers-notes" title="Permalink to this headline">¶</a></h1>
 <p>Here are some fairly informal notes about the build system and package organization
 structure for the <code class="docutils literal notranslate"><span class="pre">fv3gfs-wrapper</span></code> wrapper.</p>
-<div class="section" id="fv3gfs-util-package">
-<h2><code class="docutils literal notranslate"><span class="pre">fv3gfs-util</span></code> Package<a class="headerlink" href="#fv3gfs-util-package" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="pace-util-package">
+<h2><code class="docutils literal notranslate"><span class="pre">pace-util</span></code> Package<a class="headerlink" href="#pace-util-package" title="Permalink to this headline">¶</a></h2>
 <p>Much of the functionality used to write run scripts in <code class="docutils literal notranslate"><span class="pre">fv3gfs-wrapper</span></code> is split out
-into a package called <code class="docutils literal notranslate"><span class="pre">fv3gfs-util</span></code>.
+into a package called <code class="docutils literal notranslate"><span class="pre">pace-util</span></code>.
 Any functionality that can be written to be independent of the wrapped Fortran model
-is put into <code class="docutils literal notranslate"><span class="pre">fv3gfs-util</span></code>. This makes it much easier to iterate on and test pure Python
+is put into <code class="docutils literal notranslate"><span class="pre">pace-util</span></code>. This makes it much easier to iterate on and test pure Python
 code for the model, as one can install the package onto the host system without needing
 to use Docker to handle Fortran dependencies. This also makes it possible for analysis
 codes to use the same routines used by the wrapped model.</p>
-<p>We recommend users and developers read the <cite>fv3gfs-util</cite> documentation as well to make
+<p>We recommend users and developers read the <cite>pace-util</cite> documentation as well to make
 full use of this package.</p>
 </div>
 <div class="section" id="templates">

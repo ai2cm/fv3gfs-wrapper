@@ -157,7 +157,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for fv3gfs.wrapper</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">fv3gfs.util</span>
+<span></span><span class="kn">import</span> <span class="nn">pace.util</span>
 <span class="kn">from</span> <span class="nn">._wrapper</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">initialize</span><span class="p">,</span>
     <span class="n">step</span><span class="p">,</span>
@@ -186,7 +186,7 @@
 
 <div class="viewcode-block" id="get_diagnostic_by_name"><a class="viewcode-back" href="../../api.html#fv3gfs.wrapper.get_diagnostic_by_name">[docs]</a><span class="k">def</span> <span class="nf">get_diagnostic_by_name</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gfs_phys&quot;</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">fv3gfs</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Quantity</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pace</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Quantity</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Get a diagnostic field as a Quantity</span>
 
 <span class="sd">    Currently, only supports diagnostics defined in the GFS_diagnostics.F90</span>

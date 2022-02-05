@@ -204,7 +204,7 @@ working properly; to date the only flag this impacted was <cite>do_adiabatic_ini
 <div class="section" id="v0-6-0-2021-01-27">
 <h2>v0.6.0 (2021-01-27)<a class="headerlink" href="#v0-6-0-2021-01-27" title="Permalink to this headline">¶</a></h2>
 <p>Breaking changes:
-- Removed many fv3util imports from fv3gfs, import those symbols from fv3gfs.util instead
+- Removed many fv3util imports from fv3gfs, import those symbols from pace.util instead
 - Removed initial cache data from fv3gfs-wrapper image</p>
 <p>Major changes:
 - Use <cite>cftime.datetime</cite> objects to represent datetimes in fv3gfs-python and fv3util instead of <cite>datetime.datetime</cite> objects.  This results in times stored in a format compatible with the fortran model, and accurate internal representation of times with the calendar specified
