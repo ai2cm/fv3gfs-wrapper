@@ -140,11 +140,21 @@ def set_state(state):
     cdef REAL_t[:, :, ::1] input_value_3d
     cdef REAL_t[:, ::1] input_value_2d
     cdef REAL_t[::1] input_value_1d
+    cdef int dt_physics
     tracer_metadata = get_tracer_metadata()
     cdef set processed_names_set = set()
     for name, quantity in state.items():
         if name == 'time':
             set_time(state[name])
+        elif name == SURFACE_PRECIPITATION_RATE:
+            get_physics_timestep_subroutine(&dt_physics)
+            quantity = quantity.transpose([pace.util.Y_DIMS, pace.util.X_DIMS])
+            total_precipitation = pace.util.Quantity(
+                quantity.view[:] * dt_physics / MM_PER_M,
+                [pace.util.Y_DIMS, pace.util.X_DIMS],
+                units='m',
+            )
+            set_2d_quantity("total_precipitation", np.ascontiguousarray(total_precipitation.view[:]))
         elif len(quantity.dims) == 3:
             quantity = quantity.transpose(
                 DIM_NAMES.get(
