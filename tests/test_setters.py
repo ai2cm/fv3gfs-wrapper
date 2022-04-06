@@ -205,7 +205,9 @@ class SetterTests(unittest.TestCase):
         total_precip_old = state["total_precipitation"]
         precip_rate_new = state["surface_precipitation_rate"]
         precip_rate_new.view[:] = 2 * precip_rate_new.view[:]
+        precip_rate_new_copy = deepcopy(precip_rate_new)
         fv3gfs.wrapper.set_state({"surface_precipitation_rate": precip_rate_new})
+        np.testing.assert_equal(precip_rate_new.view[:], precip_rate_new_copy.view[:])
         state_new = fv3gfs.wrapper.get_state(["total_precipitation"])
         total_precip_new = state_new["total_precipitation"]
         np.testing.assert_allclose(
