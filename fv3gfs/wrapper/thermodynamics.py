@@ -25,9 +25,10 @@ def set_state_mass_conserving(
     metadata = fv3gfs.get_tracer_metadata()
     water_variables = {k for k, v in metadata.items() if v["is_water"]}
     water_in_input = set(water_variables) & set(state)
+    water_not_in_input = set(water_variables) - water_in_input
 
     if pressure in state:
-        raise ValueError(f"Can't set {pressure} for mass a conserving update.")
+        raise ValueError(f"Can't set {pressure} for a mass conserving update.")
     else:
         old_state = fv3gfs.get_state([pressure, *water_variables])
         delp_old = old_state[pressure]
@@ -42,7 +43,12 @@ def set_state_mass_conserving(
         for v in water_in_input:
             total_water_new += state[v].view[:]
 
-        delp_new = delp_old.view[:] * (1 + total_water_new - total_water_old)
+        delp_new = delp_old.view[:] * (1 - total_water_old) / (1 - total_water_new)
         state[pressure] = Quantity(delp_new, units=delp_old.units, dims=delp_old.dims)
+
+        for v in water_not_in_input:
+            # conserve mass of water species not specified in input state
+            conserved_v = old_state[v].view[:] * delp_old.view[:] / delp_new
+            state[v] = Quantity(conserved_v, old_state[v].dims, old_state[v].units)
 
     fv3gfs.set_state(state)
